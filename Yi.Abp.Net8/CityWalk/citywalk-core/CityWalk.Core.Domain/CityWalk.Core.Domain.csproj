@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+	  
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.Mapster\Yi.Framework.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.SqlSugarCore.Abstractions\Yi.Framework.SqlSugarCore.Abstractions.csproj" />
+    <ProjectReference Include="..\CityWalk.Core.Domain.Shared\CityWalk.Core.Domain.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Folder Include="EventHandlers\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Managers\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+</Project>

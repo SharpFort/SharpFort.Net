@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add docs/P2_TASKS_TODO.md)",
+      "Bash(git commit -m \"$(cat <<''EOF''\ndocs: update P2_TASKS_TODO.md with completion status\n\nMark all core P2 tasks as completed:\n\n**Completed Tasks**:\n- P2.1: Deleted 4 unused Helper classes (194 lines)\n- P2.2: Enhanced EnumHelper with 4 new methods\n- P2.3: Fixed all XML documentation warnings\n- P2.4: Fixed CA2200, CS0162, CS8603, ASP0019 warnings\n- P2.5: Completed security audit (ShellHelper, RSAHelper, HtmlHelper)\n- P2.6: HttpHelper socket exhaustion review and improvements\n\n**Warning Statistics**:\n- Framework Core: 14+ → 0 warnings\n- RBAC Domain: Multiple → 0 warnings\n\nUpdate document to v2.0, add execution summary section.\n\nRemaining tasks moved to P3:\n- TreeHelper, IpHelper, AssemblyHelper analysis\n- EncryPasswordValueObject migration\n- Performance optimization\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(del \"E:\\Projects\\CityWalk-NET\\Yi\\Yi.Abp.Net8\\framework\\Yi.Framework.Core\\Helper\\ConsoleHelper.cs\")",
+      "Bash(dotnet list \"E:\\Projects\\CityWalk-NET\\Yi\\Yi.Abp.Net8\\module\\rbac\\Yi.Framework.Rbac.Domain\\Yi.Framework.Rbac.Domain.csproj\" package)",
+      "Bash(del \"E:\\Projects\\CityWalk-NET\\Yi\\Yi.Abp.Net8\\module\\rbac\\Yi.Framework.Rbac.Domain.Shared\\Enums\\DataScopeEnum.cs\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

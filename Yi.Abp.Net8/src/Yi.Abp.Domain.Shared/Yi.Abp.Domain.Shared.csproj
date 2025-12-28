@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\common.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="$(AbpVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CityWalk\citywalk-core\CityWalk.Core.Domain.Shared\CityWalk.Core.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\audit-logging\Yi.Framework.AuditLogging.Domain.Shared\Yi.Framework.AuditLogging.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\bbs\Yi.Framework.Bbs.Domain.Shared\Yi.Framework.Bbs.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\rbac\Yi.Framework.Rbac.Domain.Shared\Yi.Framework.Rbac.Domain.Shared.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="$(AbpVersion)" />
+	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Consts\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Etos\" />
+  </ItemGroup>
+
+</Project>
