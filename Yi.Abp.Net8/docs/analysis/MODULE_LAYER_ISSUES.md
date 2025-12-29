@@ -135,11 +135,11 @@ public class PasswordHash : ValueObject
 **BBS 模块示例**:
 | 当前命名 | 建议命名 |
 |---------|---------|
-| `DiscussAggregateRoot` | `Discussion` |
-| `CommentAggregateRoot` | `Comment` |
-| `ArticleAggregateRoot` | `Article` |
-| `BannerAggregateRoot` | `Banner` |
-| `PlateAggregateRoot` | `Forum` 或 `Plate` |
+| `Discuss` | `Discussion` |
+| `Comment` | `Comment` |
+| `Article` | `Article` |
+| `Banner` | `Banner` |
+| `Plate` | `Forum` 或 `Plate` |
 | `AssignmentAggregateRoot` | `Assignment` |
 
 **DDD 最佳实践**:

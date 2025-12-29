@@ -17,12 +17,12 @@ namespace Yi.Framework.Bbs.Domain.Managers
     /// </summary>
     public class ForumManager : DomainService
     {
-        public readonly ISqlSugarRepository<DiscussAggregateRoot, Guid> _discussRepository;
-        public readonly ISqlSugarRepository<PlateAggregateRoot, Guid> _plateEntityRepository;
-        public readonly ISqlSugarRepository<CommentAggregateRoot, Guid> _commentRepository;
-        public readonly ISqlSugarRepository<ArticleAggregateRoot, Guid> _articleRepository;
-        public  readonly ISqlSugarRepository<DiscussRewardAggregateRoot,Guid> _discussRewardRepository;
-        public ForumManager(ISqlSugarRepository<DiscussAggregateRoot, Guid> discussRepository, ISqlSugarRepository<PlateAggregateRoot, Guid> plateEntityRepository, ISqlSugarRepository<CommentAggregateRoot, Guid> commentRepository, ISqlSugarRepository<ArticleAggregateRoot, Guid> articleRepository, ISqlSugarRepository<DiscussRewardAggregateRoot, Guid> discussRewardRepository)
+        public readonly ISqlSugarRepository<Discuss, Guid> _discussRepository;
+        public readonly ISqlSugarRepository<Plate, Guid> _plateEntityRepository;
+        public readonly ISqlSugarRepository<Comment, Guid> _commentRepository;
+        public readonly ISqlSugarRepository<Article, Guid> _articleRepository;
+        public  readonly ISqlSugarRepository<DiscussReward,Guid> _discussRewardRepository;
+        public ForumManager(ISqlSugarRepository<Discuss, Guid> discussRepository, ISqlSugarRepository<Plate, Guid> plateEntityRepository, ISqlSugarRepository<Comment, Guid> commentRepository, ISqlSugarRepository<Article, Guid> articleRepository, ISqlSugarRepository<DiscussReward, Guid> discussRewardRepository)
         {
             _discussRepository = discussRepository;
             _plateEntityRepository = plateEntityRepository;
@@ -32,7 +32,7 @@ namespace Yi.Framework.Bbs.Domain.Managers
         }
 
         //主题是不能直接创建的，需要由领域服务统一创建
-        public async Task<DiscussAggregateRoot> CreateDiscussAsync(DiscussAggregateRoot entity,DiscussRewardAggregateRoot rewardEntity=null)
+        public async Task<Discuss> CreateDiscussAsync(Discuss entity,DiscussReward rewardEntity=null)
         {
             entity.CreationTime = DateTime.Now;
             entity.AgreeNum = 0;
@@ -47,9 +47,9 @@ namespace Yi.Framework.Bbs.Domain.Managers
             return discuss;
         }
 
-        public async Task<CommentAggregateRoot> CreateCommentAsync(Guid discussId, Guid parentId, Guid rootId, string content)
+        public async Task<Comment> CreateCommentAsync(Guid discussId, Guid parentId, Guid rootId, string content)
         {
-            var entity = new CommentAggregateRoot(discussId);
+            var entity = new Comment(discussId);
             entity.Content = content;
             entity.ParentId = parentId;
             entity.RootId = rootId;

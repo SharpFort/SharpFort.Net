@@ -5,7 +5,7 @@ namespace Yi.Framework.Bbs.Domain.Shared.Enums;
 /// <summary>
 /// 访问日志类型
 /// </summary>
-public enum AccessLogType
+public enum BbsAccessLogType
 {
     /// <summary>
     /// 未知/默认

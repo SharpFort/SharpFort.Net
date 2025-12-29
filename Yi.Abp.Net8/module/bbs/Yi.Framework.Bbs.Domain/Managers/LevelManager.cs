@@ -17,12 +17,12 @@ namespace Yi.Framework.Bbs.Domain.Managers
     {
         private ILocalEventBus _localEventBus;
         private IDistributedCache<List<LevelCacheItem>> _levelCache;
-        private IRepository<LevelAggregateRoot> _repository;
-        private ISqlSugarRepository<BbsUserExtraInfoEntity> _bbsUserRepository;
+        private IRepository<Level> _repository;
+        private ISqlSugarRepository<BbsUserExtraInfo> _bbsUserRepository;
 
         public LevelManager(ILocalEventBus localEventBus,
-            IDistributedCache<List<LevelCacheItem>> levelCache, IRepository<LevelAggregateRoot> repository,
-            ISqlSugarRepository<BbsUserExtraInfoEntity> bbsUserRepository)
+            IDistributedCache<List<LevelCacheItem>> levelCache, IRepository<Level> repository,
+            ISqlSugarRepository<BbsUserExtraInfo> bbsUserRepository)
         {
             _localEventBus = localEventBus;
             _repository = repository;

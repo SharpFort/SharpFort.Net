@@ -12,10 +12,10 @@ namespace Yi.Framework.Bbs.Domain.Entities.Integral
     /// <summary>
     /// 签到表
     /// </summary>
-    [SugarTable("SignIn")]
+    [SugarTable("bbs_signin")]
 
     [SugarIndex($"index_{nameof(CreatorId)}", nameof(CreatorId), OrderByType.Asc)]
-    public class SignInAggregateRoot : AggregateRoot<Guid>, ICreationAuditedObject
+    public class SignIn : AggregateRoot<Guid>, ICreationAuditedObject
     {
 
         [SugarColumn(IsPrimaryKey = true)]

@@ -9,7 +9,7 @@ namespace Yi.Framework.Bbs.Domain.Entities.Assignment;
 /// <summary>
 /// 任务实例表
 /// </summary>
-[SugarTable("Assignment")]
+[SugarTable("bbs_assignment")]
 public class Assignment : AggregateRoot<Guid>, IHasCreationTime, IOrderNum, IHasModificationTime
 {
     [SugarColumn(ColumnName = "Id", IsPrimaryKey = true)]

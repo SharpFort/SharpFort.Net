@@ -14,17 +14,17 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
 {
     public class SeeDiscussEventHandler : ILocalEventHandler<SeeDiscussEventArgs>, ITransientDependency
     {
-        private ISqlSugarRepository<DiscussAggregateRoot, Guid> _repository;
+        private ISqlSugarRepository<Discuss, Guid> _repository;
 
-        public SeeDiscussEventHandler(ISqlSugarRepository<DiscussAggregateRoot, Guid> repository)
+        public SeeDiscussEventHandler(ISqlSugarRepository<Discuss, Guid> repository)
         {
             _repository = repository;
         }
 
         public async Task HandleEventAsync(SeeDiscussEventArgs eventData)
         {
-            await _repository._Db.Updateable<DiscussAggregateRoot>()
-                .SetColumns(x => new DiscussAggregateRoot { SeeNum = x.SeeNum + 1 })
+            await _repository._Db.Updateable<Discuss>()
+                .SetColumns(x => new Discuss { SeeNum = x.SeeNum + 1 })
                 .Where(x => x.Id == eventData.DiscussId).ExecuteCommandAsync();
         }
     }

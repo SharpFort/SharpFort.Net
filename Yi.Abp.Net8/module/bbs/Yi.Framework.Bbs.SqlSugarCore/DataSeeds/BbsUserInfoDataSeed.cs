@@ -14,9 +14,9 @@ namespace Yi.Framework.Bbs.SqlSugarCore.DataSeeds
 {
     public class BbsUserInfoDataSeed : IDataSeedContributor, ITransientDependency
     {
-        private ISqlSugarRepository<BbsUserExtraInfoEntity> _repository;
+        private ISqlSugarRepository<BbsUserExtraInfo> _repository;
         private ISqlSugarRepository<User> _userRepository;
-        public BbsUserInfoDataSeed(ISqlSugarRepository<BbsUserExtraInfoEntity> repository, ISqlSugarRepository<User> userReponse)
+        public BbsUserInfoDataSeed(ISqlSugarRepository<BbsUserExtraInfo> repository, ISqlSugarRepository<User> userReponse)
         {
             _repository = repository;
             _userRepository = userReponse;
@@ -27,7 +27,7 @@ namespace Yi.Framework.Bbs.SqlSugarCore.DataSeeds
             if (!await _repository.IsAnyAsync(x => true))
             {
                 var userList = await _userRepository.GetListAsync(x => true);
-                var userInfoList = userList.Select(x => new BbsUserExtraInfoEntity(x.Id)).ToList();
+                var userInfoList = userList.Select(x => new BbsUserExtraInfo(x.Id)).ToList();
                 await _repository.InsertManyAsync(userInfoList);
             }
         }

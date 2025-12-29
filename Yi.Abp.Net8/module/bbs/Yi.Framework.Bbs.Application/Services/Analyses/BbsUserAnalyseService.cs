@@ -47,7 +47,7 @@
 //            {
 //                var users = await _bbsUserManager._userRepository._DbQueryable
 //                    .Where(u => u.CreationTime >= DateTime.Now.AddMonths(-3))
-//                    .LeftJoin<BbsUserExtraInfoEntity>((u, info) => u.Id == info.UserId)
+//                    .LeftJoin<BbsUserExtraInfo>((u, info) => u.Id == info.UserId)
 //                    .Select((u, info) => new BbsUserGetListOutputDto()
 //                    {
 //                        Id = u.Id,
@@ -100,7 +100,7 @@
 
 //                RefAsync<int> total = 0;
 //                var output = await _bbsUserManager._userRepository._DbQueryable
-//                    .LeftJoin<BbsUserExtraInfoEntity>((u, info) => u.Id == info.UserId)
+//                    .LeftJoin<BbsUserExtraInfo>((u, info) => u.Id == info.UserId)
 //                    .OrderByDescending((u, info) => info.Money)
 //                    .Select((u, info) =>
 //                        new MoneyTopUserDto
@@ -193,7 +193,7 @@
 
 //        //    var baseOutput = await _bbsUserManager._userRepository._DbQueryable
 //        //        .Where(u => userIds.Contains(u.Id))
-//        //        .LeftJoin<BbsUserExtraInfoEntity>((u, info) => u.Id == info.UserId)
+//        //        .LeftJoin<BbsUserExtraInfo>((u, info) => u.Id == info.UserId)
 //        //        .Select((u, info) =>
 //        //            new BaseAnalyseTopUserDto
 //        //            {
@@ -249,7 +249,7 @@
 
 //        //    var baseOutput = await _bbsUserManager._userRepository._DbQueryable
 //        //        .Where(u => userIds.Contains(u.Id))
-//        //        .LeftJoin<BbsUserExtraInfoEntity>((u, info) => u.Id == info.UserId)
+//        //        .LeftJoin<BbsUserExtraInfo>((u, info) => u.Id == info.UserId)
 //        //        .Select((u, info) =>
 //        //            new BaseAnalyseTopUserDto
 //        //            {

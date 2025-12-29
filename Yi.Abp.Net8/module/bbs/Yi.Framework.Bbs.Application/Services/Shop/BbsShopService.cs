@@ -25,12 +25,12 @@ public class BbsShopService : ApplicationService
     private readonly ISqlSugarRepository<BbsGoodsAggregateRoot> _repository;
     private readonly ISqlSugarRepository<BbsGoodsApplyAggregateRoot> _applyRepository;
     private readonly BbsShopManager _bbsShopManager;
-    private readonly ISqlSugarRepository<BbsUserExtraInfoEntity> _bbsUserRepository;
+    private readonly ISqlSugarRepository<BbsUserExtraInfo> _bbsUserRepository;
     private ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
 
     public BbsShopService(ISqlSugarRepository<BbsGoodsAggregateRoot> repository,
         ISqlSugarRepository<BbsGoodsApplyAggregateRoot> applyRepository, BbsShopManager bbsShopManager,
-        ISqlSugarRepository<BbsUserExtraInfoEntity> bbsUserRepository)
+        ISqlSugarRepository<BbsUserExtraInfo> bbsUserRepository)
     {
         _repository = repository;
         _applyRepository = applyRepository;

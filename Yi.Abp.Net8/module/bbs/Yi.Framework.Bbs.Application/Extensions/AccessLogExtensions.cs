@@ -2,11 +2,11 @@
 
 namespace Yi.Framework.Bbs.Application.Extensions;
 
-public static class AccessLogExtensions
+public static class BbsAccessLogExtensions
 {
-    public static IApplicationBuilder UseAccessLog(this IApplicationBuilder app)
+    public static IApplicationBuilder UseBbsAccessLog(this IApplicationBuilder app)
     {
-        app.UseMiddleware<AccessLogMiddleware>();
+        app.UseMiddleware<BbsAccessLogMiddleware>();
         return app;
     }
 }

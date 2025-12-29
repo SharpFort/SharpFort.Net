@@ -4,7 +4,7 @@ using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Framework.Bbs.Domain.Repositories;
 
-public interface IDiscussLableRepository: ISqlSugarRepository<DiscussLableAggregateRoot,Guid>
+public interface IDiscussLableRepository: ISqlSugarRepository<DiscussLable,Guid>
 {
     /// <summary>
     /// 获取所有分类的字典

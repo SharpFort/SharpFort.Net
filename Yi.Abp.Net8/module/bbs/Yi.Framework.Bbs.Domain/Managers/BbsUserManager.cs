@@ -16,7 +16,7 @@ namespace Yi.Framework.Bbs.Domain.Managers
         
         private readonly LevelManager _levelManager;
         public BbsUserManager(ISqlSugarRepository<User> userRepository,
-            ISqlSugarRepository<BbsUserExtraInfoEntity> bbsUserInfoRepository,
+            ISqlSugarRepository<BbsUserExtraInfo> bbsUserInfoRepository,
             LevelManager levelManager
         )
         {
@@ -59,7 +59,7 @@ namespace Yi.Framework.Bbs.Domain.Managers
         public async Task<BbsUserInfoDto?> GetBbsUserInfoAsync(Guid userId)
         {
             var userInfo = await _userRepository._DbQueryable
-                .LeftJoin<BbsUserExtraInfoEntity>((user, info) => user.Id == info.UserId)
+                .LeftJoin<BbsUserExtraInfo>((user, info) => user.Id == info.UserId)
                 .Select((user, info) => new BbsUserInfoDto
                 {
                     Id = user.Id,
@@ -83,7 +83,7 @@ namespace Yi.Framework.Bbs.Domain.Managers
         {
             var userInfos = await _userRepository._DbQueryable
                 .Where(user => userIds.Contains(user.Id))
-                .LeftJoin<BbsUserExtraInfoEntity>((user, info) => user.Id == info.UserId)
+                .LeftJoin<BbsUserExtraInfo>((user, info) => user.Id == info.UserId)
                 .Select((user, info) => new BbsUserInfoDto
                 {
                     Id = user.Id,

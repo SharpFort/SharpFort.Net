@@ -36,7 +36,7 @@ Entity<TKey>
 |---------|---------|---------|---------|------|
 | **核心业务实体** | 高业务价值、需要完整审计追踪 | `FullAuditedAggregateRoot` | 无需额外接口 | User, Role, Department |
 | **配置/元数据实体** | 需要审计但不需软删除 | `AuditedAggregateRoot` | `IOrderNum`, `IState` | Menu, Config, DictionaryType |
-| **日志/记录实体** | 仅需创建时间、不修改 | `AggregateRoot` | `ICreationAuditedObject` | LoginLog, AuditLog, AccessLog |
+| **日志/记录实体** | 仅需创建时间、不修改 | `AggregateRoot` | `ICreationAuditedObject` | LoginLog, AuditLog, BbsAccessLog |
 | **关联表实体** | 纯关系表、无业务逻辑 | `Entity` | 无 | UserRole, RoleMenu, RoleDept |
 | **临时/过程实体** | 短期存在、可物理删除 | `Entity` | 按需 | SignIn (签到), Assignment |
 
@@ -58,10 +58,10 @@ Entity<TKey>
 
 | 实体 | 当前实现 | 建议改进 |
 |------|---------|---------|
-| `DiscussAggregateRoot` | ISoftDelete, IAuditedObject | 改用 `FullAuditedAggregateRoot` |
-| `CommentAggregateRoot` | 需确认 | 改用 `FullAuditedAggregateRoot` |
-| `SignInAggregateRoot` | 需确认 | 使用 `AggregateRoot` + `ICreationAuditedObject` |
-| `AccessLogAggregateRoot` | 需确认 | 使用 `AggregateRoot` + `ICreationAuditedObject` |
+| `Discuss` | ISoftDelete, IAuditedObject | 改用 `FullAuditedAggregateRoot` |
+| `Comment` | 需确认 | 改用 `FullAuditedAggregateRoot` |
+| `SignIn` | 需确认 | 使用 `AggregateRoot` + `ICreationAuditedObject` |
+| `BbsAccessLogAggregateRoot` | 需确认 | 使用 `AggregateRoot` + `ICreationAuditedObject` |
 
 ### 1.5 改进后的代码示例
 

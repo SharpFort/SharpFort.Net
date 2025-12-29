@@ -13,25 +13,25 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
     /// <summary>
     /// 主题创建的领域事件
     /// </summary>
-    public class DiscussCreatedEventHandler : ILocalEventHandler<EntityCreatedEventData<DiscussAggregateRoot>>,
+    public class DiscussCreatedEventHandler : ILocalEventHandler<EntityCreatedEventData<Discuss>>,
         ITransientDependency
     {
-        private ISqlSugarRepository<BbsUserExtraInfoEntity> _userRepository;
+        private ISqlSugarRepository<BbsUserExtraInfo> _userRepository;
         private ILocalEventBus _localEventBus;
 
-        public DiscussCreatedEventHandler(ISqlSugarRepository<BbsUserExtraInfoEntity> userRepository,
+        public DiscussCreatedEventHandler(ISqlSugarRepository<BbsUserExtraInfo> userRepository,
             ILocalEventBus localEventBus)
         {
             _userRepository = userRepository;
             _localEventBus = localEventBus;
         }
 
-        public async Task HandleEventAsync(EntityCreatedEventData<DiscussAggregateRoot> eventData)
+        public async Task HandleEventAsync(EntityCreatedEventData<Discuss> eventData)
         {
             var disucussEntity = eventData.Entity;
 
             //给创建者发布数量+1
-            await _userRepository._Db.Updateable<BbsUserExtraInfoEntity>()
+            await _userRepository._Db.Updateable<BbsUserExtraInfo>()
                 .SetColumns(it => it.DiscussNumber == it.DiscussNumber + 1)
                 .Where(it => it.UserId == disucussEntity.CreatorId)
                 .ExecuteCommandAsync();

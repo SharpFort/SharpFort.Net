@@ -4,8 +4,8 @@ using Volo.Abp.Domain.Entities;
 
 namespace Yi.Framework.Bbs.Domain.Entities.Forum
 {
-    [SugarTable("DiscussLable")]
-    public class DiscussLableAggregateRoot : AggregateRoot<Guid>, ISoftDelete
+    [SugarTable("bbs_discussLable")]
+    public class DiscussLable : AggregateRoot<Guid>, ISoftDelete
     {
         public bool IsDeleted { get; set; }
 

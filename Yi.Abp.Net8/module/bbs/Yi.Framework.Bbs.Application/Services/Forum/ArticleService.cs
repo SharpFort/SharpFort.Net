@@ -22,12 +22,12 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// <summary>
     /// Article服务实现
     /// </summary>
-    public class ArticleService : YiCrudAppService<ArticleAggregateRoot, ArticleGetOutputDto, ArticleGetListOutputDto,
+    public class ArticleService : YiCrudAppService<Article, ArticleGetOutputDto, ArticleGetListOutputDto,
             Guid, ArticleGetListInputVo, ArticleCreateInputVo, ArticleUpdateInputVo>,
         IArticleService
     {
         public ArticleService(IArticleRepository articleRepository,
-            ISqlSugarRepository<DiscussAggregateRoot> discussRepository,
+            ISqlSugarRepository<Discuss> discussRepository,
             ForumManager forumManager) : base(articleRepository)
         {
             _articleRepository = articleRepository;
@@ -37,7 +37,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
 
         private readonly ForumManager _forumManager;
         private readonly IArticleRepository _articleRepository;
-        private readonly ISqlSugarRepository<DiscussAggregateRoot> _discussRepository;
+        private readonly ISqlSugarRepository<Discuss> _discussRepository;
 
         public override async Task<PagedResultDto<ArticleGetListOutputDto>> GetListAsync(ArticleGetListInputVo input)
         {

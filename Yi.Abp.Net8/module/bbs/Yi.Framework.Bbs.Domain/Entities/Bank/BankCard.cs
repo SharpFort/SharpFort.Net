@@ -13,7 +13,7 @@ namespace Yi.Framework.Bbs.Domain.Entities.Bank
     /// <summary>
     /// 银行卡
     /// </summary>
-    [SugarTable("BankCard")]
+    [SugarTable("bbs_bankCard")]
     public class BankCard : AggregateRoot<Guid>, IHasCreationTime
     {
         public BankCard()

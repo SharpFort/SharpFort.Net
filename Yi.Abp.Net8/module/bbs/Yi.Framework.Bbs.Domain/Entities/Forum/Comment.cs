@@ -10,19 +10,19 @@ namespace Yi.Framework.Bbs.Domain.Entities.Forum
     /// <summary>
     /// 评论表
     /// </summary>
-    [SugarTable("Comment")]
+    [SugarTable("bbs_comment")]
     [SugarIndex($"index_{nameof(DiscussId)}", nameof(DiscussId), OrderByType.Asc)]
     [SugarIndex($"index_{nameof(ParentId)}", nameof(ParentId), OrderByType.Asc)]
-    public class CommentAggregateRoot : AggregateRoot<Guid>, ISoftDelete, IAuditedObject
+    public class Comment : AggregateRoot<Guid>, ISoftDelete, IAuditedObject
     {
         /// <summary>
         /// 采用二维数组方式，不使用树形方式
         /// </summary>
-        public CommentAggregateRoot()
+        public Comment()
         {
         }
 
-        public CommentAggregateRoot(Guid discussId)
+        public Comment(Guid discussId)
         {
             DiscussId = discussId;
         }
@@ -45,7 +45,7 @@ namespace Yi.Framework.Bbs.Domain.Entities.Forum
         public Guid RootId { get; set; }
 
         [SugarColumn(IsIgnore = true)]
-        public List<CommentAggregateRoot> Children { get; set; } = new();
+        public List<Comment> Children { get; set; } = new();
 
 
         /// <summary>

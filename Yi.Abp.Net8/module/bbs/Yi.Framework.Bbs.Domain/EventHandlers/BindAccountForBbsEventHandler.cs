@@ -12,10 +12,10 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers;
 /// </summary>
 public class BindAccountForBbsEventHandler : ILocalEventHandler<BindAccountEto>, ITransientDependency
 {
-    private readonly ISqlSugarRepository<BbsUserExtraInfoEntity> _bbsUserRepository;
+    private readonly ISqlSugarRepository<BbsUserExtraInfo> _bbsUserRepository;
     private readonly ISqlSugarRepository<User> _userRepository;
 
-    public BindAccountForBbsEventHandler(ISqlSugarRepository<BbsUserExtraInfoEntity> bbsUserRepository,
+    public BindAccountForBbsEventHandler(ISqlSugarRepository<BbsUserExtraInfo> bbsUserRepository,
         ISqlSugarRepository<User> userRepository)
     {
         _bbsUserRepository = bbsUserRepository;

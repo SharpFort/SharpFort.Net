@@ -9,15 +9,15 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
 {
     public class UserCreateEventHandler : ILocalEventHandler<UserCreateEventArgs>, ITransientDependency
     {
-        private IRepository<BbsUserExtraInfoEntity> _repository;
-        public UserCreateEventHandler(IRepository<BbsUserExtraInfoEntity> repository)
+        private IRepository<BbsUserExtraInfo> _repository;
+        public UserCreateEventHandler(IRepository<BbsUserExtraInfo> repository)
         {
             _repository = repository;
         }
         public async Task HandleEventAsync(UserCreateEventArgs eventData)
         {
             //创建主表
-            var bbsUser = new BbsUserExtraInfoEntity(eventData.UserId)
+            var bbsUser = new BbsUserExtraInfo(eventData.UserId)
             {
 
             };

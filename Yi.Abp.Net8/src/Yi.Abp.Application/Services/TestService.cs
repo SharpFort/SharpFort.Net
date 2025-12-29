@@ -27,7 +27,7 @@ namespace Yi.Abp.Application.Services
         /// 属性注入
         /// 不推荐，坑太多，容易把自己玩死，简单的东西可以用一用
         /// </summary>
-        public ISqlSugarRepository<BannerAggregateRoot> sqlSugarRepository { get; set; }
+        public ISqlSugarRepository<Banner> sqlSugarRepository { get; set; }
 
         /// <summary>
         /// </summary>
@@ -83,14 +83,14 @@ namespace Yi.Abp.Application.Services
                 tasks.Add(Task.Run(async () =>
                 {
                     //以下操作是错误的，不允许在新线程中，直接操作db，所有db操作应放在工作单元内，应由工作单元统一管理-来自abp工作单元设计
-                    //await sqlSugarRepository.InsertAsync(new BannerAggregateRoot { Name = "插入2" });
+                    //await sqlSugarRepository.InsertAsync(new Banner { Name = "插入2" });
                     using (var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: true))
                     {
-                        await sqlSugarRepository.InsertAsync(new BannerAggregateRoot { Name = "插入1" });
+                        await sqlSugarRepository.InsertAsync(new Banner { Name = "插入1" });
                         await uow.CompleteAsync();
                     }
                 }));
-                await sqlSugarRepository.InsertAsync(new BannerAggregateRoot { Name = "插入3" });
+                await sqlSugarRepository.InsertAsync(new Banner { Name = "插入3" });
                 i--;
             }
 
@@ -136,7 +136,7 @@ namespace Yi.Abp.Application.Services
         public void GetMapper()
         {
             //直接无脑Adapt，无需配置
-            var entity = new BannerAggregateRoot();
+            var entity = new Banner();
             var dto = entity.Adapt<BannerGetListOutputDto>();
         }
 
@@ -218,7 +218,7 @@ namespace Yi.Abp.Application.Services
         }
 
         public ICurrentTenant CurrentTenant { get; set; }
-        public IRepository<BannerAggregateRoot> repository { get; set; }
+        public IRepository<Banner> repository { get; set; }
         /// <summary>
         /// 多租户
         /// </summary>
@@ -232,7 +232,7 @@ namespace Yi.Abp.Application.Services
                 using (CurrentTenant.Change(null,"Default"))
                 {
                     var defautTenantData2= await repository.GetListAsync();
-                    await repository.InsertAsync(new BannerAggregateRoot
+                    await repository.InsertAsync(new Banner
                     {
                         Name = "default",
                     });
@@ -242,7 +242,7 @@ namespace Yi.Abp.Application.Services
                 using (CurrentTenant.Change(null,"Mes"))
                 {
                     var otherTenantData1= await repository.GetListAsync();
-                    await repository.InsertAsync(new BannerAggregateRoot
+                    await repository.InsertAsync(new Banner
                     {
                         Name = "Mes1",
                     });
@@ -252,7 +252,7 @@ namespace Yi.Abp.Application.Services
                 using (CurrentTenant.Change(Guid.Parse("33333333-3d72-4339-9adc-845151f8ada0")))
                 {
                     var otherTenantData1= await repository.GetListAsync();
-                    await repository.InsertAsync(new BannerAggregateRoot
+                    await repository.InsertAsync(new Banner
                     {
                         Name = "Mes2",
                     });

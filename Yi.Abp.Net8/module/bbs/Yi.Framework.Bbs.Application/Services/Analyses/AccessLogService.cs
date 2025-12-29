@@ -1,7 +1,7 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
-using Yi.Framework.Bbs.Application.Contracts.Dtos.AccessLog;
+using Yi.Framework.Bbs.Application.Contracts.Dtos.BbsAccessLog;
 using Yi.Framework.Bbs.Application.Contracts.IServices;
 using Yi.Framework.Bbs.Domain.Entities;
 using Yi.Framework.Bbs.Domain.Shared.Enums;
@@ -9,11 +9,11 @@ using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Framework.Bbs.Application.Services
 {
-    public class AccessLogService : ApplicationService, IAccessLogService
+    public class BbsAccessLogService : ApplicationService, IBbsAccessLogService
     {
-        private readonly ISqlSugarRepository<AccessLogAggregateRoot> _repository;
+        private readonly ISqlSugarRepository<BbsAccessLogAggregateRoot> _repository;
 
-        public AccessLogService(ISqlSugarRepository<AccessLogAggregateRoot> repository)
+        public BbsAccessLogService(ISqlSugarRepository<BbsAccessLogAggregateRoot> repository)
         {
             _repository = repository;
         }
@@ -53,14 +53,14 @@ namespace Yi.Framework.Bbs.Application.Services
         /// <summary>
         /// 获取全部访问流量(3个月)
         /// </summary>
-        /// <param name="AccessLogType"></param>
+        /// <param name="BbsAccessLogType"></param>
         /// <returns></returns>
-        public async Task<List<AccessLogDto>> GetListAsync([FromQuery] AccessLogType accessLogType)
+        public async Task<List<BbsAccessLogDto>> GetListAsync([FromQuery] BbsAccessLogType BbsAccessLogType)
         {
-            var entities = await _repository._DbQueryable.Where(x => x.AccessLogType == accessLogType)
+            var entities = await _repository._DbQueryable.Where(x => x.BbsAccessLogType == BbsAccessLogType)
                 .Where(x => x.CreationTime >= DateTime.Now.AddMonths(-3))
                 .OrderBy(x => x.CreationTime).ToListAsync();
-            var output = entities.Adapt<List<AccessLogDto>>();
+            var output = entities.Adapt<List<BbsAccessLogDto>>();
             output?.ForEach(x => x.CreationTime = x.CreationTime.Date);
             return output;
         }
@@ -73,15 +73,15 @@ namespace Yi.Framework.Bbs.Application.Services
         public async Task AccessAsync()
         {
             //可判断http重复，防止同一ip多次访问
-            var last = await _repository._DbQueryable.Where(x=>x.AccessLogType==AccessLogType.HomeVisit).OrderByDescending(x => x.CreationTime).FirstAsync();
+            var last = await _repository._DbQueryable.Where(x=>x.BbsAccessLogType==BbsAccessLogType.HomeVisit).OrderByDescending(x => x.CreationTime).FirstAsync();
 
             if (last is null || last.CreationTime.Date != DateTime.Today)
             {
-                await _repository.InsertAsync(new AccessLogAggregateRoot(){AccessLogType=AccessLogType.HomeVisit});
+                await _repository.InsertAsync(new BbsAccessLogAggregateRoot(){BbsAccessLogType=BbsAccessLogType.HomeVisit});
             }
             else
             {
-                await _repository._Db.Updateable<AccessLogAggregateRoot>().SetColumns(it => it.Number == it.Number + 1)
+                await _repository._Db.Updateable<BbsAccessLogAggregateRoot>().SetColumns(it => it.Number == it.Number + 1)
                     .Where(it => it.Id == last.Id).ExecuteCommandAsync();
             }
         }
@@ -90,10 +90,10 @@ namespace Yi.Framework.Bbs.Application.Services
         /// 获取当前周首页点击数据
         /// </summary>
         /// <returns></returns>
-        public async Task<AccessLogDto[]> GetWeekAsync([FromQuery] AccessLogType accessLogType)
+        public async Task<BbsAccessLogDto[]> GetWeekAsync([FromQuery] BbsAccessLogType BbsAccessLogType)
         {
             var lastSeven = await _repository._DbQueryable
-                .Where(x => x.AccessLogType == accessLogType)
+                .Where(x => x.BbsAccessLogType == BbsAccessLogType)
                 .OrderByDescending(x => x.CreationTime).ToPageListAsync(1, 7);
 
             return WeekTimeHandler(lastSeven.ToArray());
@@ -104,17 +104,17 @@ namespace Yi.Framework.Bbs.Application.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private AccessLogDto[] WeekTimeHandler(AccessLogAggregateRoot[] data)
+        private BbsAccessLogDto[] WeekTimeHandler(BbsAccessLogAggregateRoot[] data)
         {
             data = data.Where(x => x.CreationTime >= GetWeekFirst()).OrderByDescending(x => x.CreationTime)
                 .DistinctBy(x => x.CreationTime.DayOfWeek).ToArray();
 
-            Dictionary<DayOfWeek, AccessLogDto> processedData = new Dictionary<DayOfWeek, AccessLogDto>();
+            Dictionary<DayOfWeek, BbsAccessLogDto> processedData = new Dictionary<DayOfWeek, BbsAccessLogDto>();
 
             // 初始化字典，将每天的数据都设为0
             foreach (DayOfWeek dayOfWeek in Enum.GetValues(typeof(DayOfWeek)))
             {
-                processedData.Add(dayOfWeek, new AccessLogDto());
+                processedData.Add(dayOfWeek, new BbsAccessLogDto());
             }
 
 
@@ -123,8 +123,8 @@ namespace Yi.Framework.Bbs.Application.Services
             {
                 DayOfWeek dayOfWeek = item.CreationTime.DayOfWeek;
                 // 如果当天有数据，则更新字典中的值为对应的Number
-                var sss = data.Adapt<AccessLogDto>();
-                processedData[dayOfWeek] = item.Adapt<AccessLogDto>();
+                var sss = data.Adapt<BbsAccessLogDto>();
+                processedData[dayOfWeek] = item.Adapt<BbsAccessLogDto>();
             }
 
             var result = processedData.Values.ToList();

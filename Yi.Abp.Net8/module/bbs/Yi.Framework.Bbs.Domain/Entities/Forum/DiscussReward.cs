@@ -5,9 +5,9 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Yi.Framework.Bbs.Domain.Entities.Forum;
 
-[SugarTable("DiscussReward")]
+[SugarTable("bbs_discussReward")]
 [SugarIndex($"index_{nameof(DiscussId)}", nameof(DiscussId), OrderByType.Asc)]
-public class DiscussRewardAggregateRoot : FullAuditedAggregateRoot<Guid>
+public class DiscussReward : FullAuditedAggregateRoot<Guid>
 {
     public Guid DiscussId { get; set; }
     

@@ -11,7 +11,7 @@ using Yi.Framework.SqlSugarCore.Repositories;
 
 namespace Yi.Framework.Bbs.SqlSugarCore.Repositories;
 
-public class DiscussLableRepository : SqlSugarRepository<DiscussLableAggregateRoot, Guid>, IDiscussLableRepository,
+public class DiscussLableRepository : SqlSugarRepository<DiscussLable, Guid>, IDiscussLableRepository,
     ITransientDependency
 {
     private readonly IDistributedCache<List<DiscussLableCacheItem>> _lableCache;

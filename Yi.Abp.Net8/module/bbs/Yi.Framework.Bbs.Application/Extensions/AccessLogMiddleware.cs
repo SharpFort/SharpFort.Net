@@ -15,17 +15,17 @@ namespace Yi.Framework.Bbs.Application.Extensions;
 /// 并发最高，采用缓存，默认10分钟才会真正操作一次数据库
 /// 需考虑一致性问题，又不能上锁影响性能
 /// </summary>
-public class AccessLogMiddleware : IMiddleware, ITransientDependency
+public class BbsAccessLogMiddleware : IMiddleware, ITransientDependency
 {
-    private static int _accessLogNumber = 0;
+    private static int _BbsAccessLogNumber = 0;
 
-    internal static void ResetAccessLogNumber()
+    internal static void ResetBbsAccessLogNumber()
     {
-        _accessLogNumber = 0;
+        _BbsAccessLogNumber = 0;
     }
-    internal static int GetAccessLogNumber()
+    internal static int GetBbsAccessLogNumber()
     {
-        return _accessLogNumber;
+        return _BbsAccessLogNumber;
     }
     
     
@@ -33,11 +33,11 @@ public class AccessLogMiddleware : IMiddleware, ITransientDependency
     {
         await next(context);
 
-        Interlocked.Increment(ref _accessLogNumber);
+        Interlocked.Increment(ref _BbsAccessLogNumber);
     }
 }
 
-public class AccessLogResetEventHandler : ILocalEventHandler<AccessLogResetArgs>,
+public class BbsAccessLogResetEventHandler : ILocalEventHandler<BbsAccessLogResetArgs>,
     ITransientDependency
 {
     /// <summary>
@@ -66,21 +66,21 @@ public class AccessLogResetEventHandler : ILocalEventHandler<AccessLogResetArgs>
     }
     
     //该事件由job定时10秒触发
-    public async Task HandleEventAsync(AccessLogResetArgs eventData)
+    public async Task HandleEventAsync(BbsAccessLogResetArgs eventData)
     {
         if (EnableRedisCache)
         {
             //分布式锁
-            if (await RedisClient.SetNxAsync("AccessLogLock",true,TimeSpan.FromSeconds(5)))
+            if (await RedisClient.SetNxAsync("BbsAccessLogLock",true,TimeSpan.FromSeconds(5)))
             {
                 //自增长数
-                var incrNumber= AccessLogMiddleware.GetAccessLogNumber();
+                var incrNumber= BbsAccessLogMiddleware.GetBbsAccessLogNumber();
                 //立即重置，开始计算，方式丢失
-                AccessLogMiddleware.ResetAccessLogNumber();
+                BbsAccessLogMiddleware.ResetBbsAccessLogNumber();
                 if (incrNumber>0)
                 {
                     await RedisClient.IncrByAsync(
-                        $"{CacheKeyPrefix}{AccessLogCacheConst.Key}:{DateTime.Now.Date:yyyyMMdd}", incrNumber);
+                        $"{CacheKeyPrefix}{BbsAccessLogCacheConst.Key}:{DateTime.Now.Date:yyyyMMdd}", incrNumber);
                 }
              
                 

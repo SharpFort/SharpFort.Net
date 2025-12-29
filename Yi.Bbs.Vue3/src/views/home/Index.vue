@@ -125,7 +125,7 @@ margin: 10px auto;">
           </el-col>
 
           <el-col :span="24">
-            <InfoCard header="访问统计" class="VisitsLineChart" text="全站历史统计" @onClickText="onClickAccessLog">
+            <InfoCard header="访问统计" class="VisitsLineChart" text="全站历史统计" @onClickText="onClickBbsAccessLog">
               <template #content>
                 <p class="switch-span" @click="onClickWeekSwitch">切换</p>
                 <VisitsLineChart :option="statisOptions" class="statisChart"/>
@@ -135,15 +135,15 @@ margin: 10px auto;">
 
           
           </el-col>
-          <el-dialog v-model="accessLogDialogVisible" title="全站历史统计" width="1200px" center>
-              <el-tabs v-model="accessLogTab">
-                <el-tab-pane label="访问统计（近3月）" name="AccessLogChart"
+          <el-dialog v-model="BbsAccessLogDialogVisible" title="全站历史统计" width="1200px" center>
+              <el-tabs v-model="BbsAccessLogTab">
+                <el-tab-pane label="访问统计（近3月）" name="BbsAccessLogChart"
                              style="display: flex;justify-content: center;">
-                  <AccessLogChart :option="accessLogOptins" style="height: 600px;width: 1200px;"/>
+                  <BbsAccessLogChart :option="BbsAccessLogOptins" style="height: 600px;width: 1200px;"/>
                 </el-tab-pane>
                 <el-tab-pane label="注册统计（近3月）" name="RegisterChart"
                              style="display: flex;justify-content: center;">
-                  <AccessLogChart :option="registerLogOptins" style="height: 600px;width: 1200px;"/>
+                  <BbsAccessLogChart :option="registerLogOptins" style="height: 600px;width: 1200px;"/>
                 </el-tab-pane>
 
               </el-tabs>
@@ -259,7 +259,7 @@ import PlateCard from "@/components/PlateCard.vue";
 import ScrollbarInfo from "@/components/ScrollbarInfo.vue";
 import BottomInfo from "@/components/BottomInfo.vue";
 import VisitsLineChart from "./components/VisitsLineChart/index.vue";
-import AccessLogChart from "./components/AccessLogChart/Index.vue"
+import BbsAccessLogChart from "./components/BbsAccessLogChart/Index.vue"
 import {access, getAccessList} from "@/apis/accessApi.js";
 import {getList} from "@/apis/plateApi.js";
 import {getList as bannerGetList} from "@/apis/bannerApi.js";
@@ -278,7 +278,7 @@ import RecommendFriend from "./components/RecommendFriend/index.vue";
 import Skeleton from "@/components/Skeleton/index.vue";
 import useSocketStore from "@/stores/socket";
 
-const accessLogDialogVisible = ref(false)
+const BbsAccessLogDialogVisible = ref(false)
 const router = useRouter();
 
 const accessAllList = ref([]);
@@ -299,7 +299,7 @@ const allDiscussList = ref([]);
 const isAllDiscussFinished = ref(false);
 const userAnalyseInfo = ref({});
 const onlineNumber = ref(0);
-const accessLogTab = ref()
+const BbsAccessLogTab = ref()
 
 const currentDiscussPageIndex = ref(1);
 const activeList = [
@@ -322,7 +322,7 @@ const activeList = [
 ];
 const isIcp = import.meta.env.VITE_APP_ICP === "true";
 
-const weekQuery = reactive({accessLogType: "Request"});
+const weekQuery = reactive({BbsAccessLogType: "Request"});
 
 const init = async () => {
 
@@ -395,7 +395,7 @@ const statisOptions = computed(() => {
   };
 });
 //历史全部访问统计
-const accessLogOptins = computed(() => {
+const BbsAccessLogOptins = computed(() => {
   return {
     xAxis: {
       data: accessAllList.value?.map((item, index) => {
@@ -454,10 +454,10 @@ watch(
     {deep: true}
 );
 watch(
-    () => accessLogTab.value,
+    () => BbsAccessLogTab.value,
     async (value) => {
       switch (value) {
-        case "AccessLogChart":
+        case "BbsAccessLogChart":
           const {data} = await getAccessList(weekQuery);
           accessAllList.value = data;
 
@@ -470,9 +470,9 @@ watch(
       }
     }
 )
-const onClickAccessLog = async () => {
-  accessLogDialogVisible.value = true;
-  accessLogTab.value = "AccessLogChart";
+const onClickBbsAccessLog = async () => {
+  BbsAccessLogDialogVisible.value = true;
+  BbsAccessLogTab.value = "BbsAccessLogChart";
 
 }
 
@@ -503,10 +503,10 @@ const loadDiscuss = async () => {
 const wechatDialogVisible = ref(false)
 //切换统计开关
 const onClickWeekSwitch = async () => {
-  if (weekQuery.accessLogType === "HomeClick") {
-    weekQuery.accessLogType = "Request";
-  } else if (weekQuery.accessLogType === "Request") {
-    weekQuery.accessLogType = "HomeClick";
+  if (weekQuery.BbsAccessLogType === "HomeClick") {
+    weekQuery.BbsAccessLogType = "Request";
+  } else if (weekQuery.BbsAccessLogType === "Request") {
+    weekQuery.BbsAccessLogType = "HomeClick";
   }
 
   const {data: weekData} = await getWeek(weekQuery);
@@ -696,7 +696,7 @@ const onClickToWeChat = () => {
     height: 300px;
   }
 
-  .accessLogChart {
+  .BbsAccessLogChart {
     width: 1100px;
     height: 500px;
   }

@@ -5,7 +5,7 @@ using Yi.Framework.Bbs.Domain.Shared.Enums;
 
 namespace Yi.Framework.Bbs.Domain.Entities
 {
-    [SugarTable("BbsNotice")]
+    [SugarTable("bbs_notice")]
     public class BbsNotice : AggregateRoot<Guid>, IHasCreationTime
     {
         public BbsNotice()

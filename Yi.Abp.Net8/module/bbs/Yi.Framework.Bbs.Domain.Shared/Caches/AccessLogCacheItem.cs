@@ -1,8 +1,8 @@
 ﻿namespace Yi.Framework.Bbs.Domain.Shared.Caches;
 
-public class AccessLogCacheItem
+public class BbsAccessLogCacheItem
 {
-    public AccessLogCacheItem(long number)
+    public BbsAccessLogCacheItem(long number)
     {
         Number = number;
     }
@@ -13,8 +13,8 @@ public class AccessLogCacheItem
     public DateTime LastInsertTime { get; set; }=DateTime.Now;
 }
 
-public class AccessLogCacheConst
+public class BbsAccessLogCacheConst
 {
 
-    public const string Key = "AccessLog";
+    public const string Key = "BbsAccessLog";
 }

@@ -2,10 +2,10 @@
     <div class="v-chart" ref="statis"></div>
   </template>
   
-  <script setup name="AccessLogChart">
+  <script setup name="BbsAccessLogChart">
   import { ref } from "vue";
   import useEcharts from "@/hooks/useEcharts";
-  import { accessLogEchartsConfig } from "../../hooks/accessLogEchartsConfig";
+  import { BbsAccessLogEchartsConfig } from "../../hooks/BbsAccessLogEchartsConfig";
   const props = defineProps({
     option: {
       type: Object,
@@ -17,7 +17,7 @@
   ]);
   
   let statis = ref(null);
-  const { resize } = useEcharts(statis, emits, props, accessLogEchartsConfig);
+  const { resize } = useEcharts(statis, emits, props, BbsAccessLogEchartsConfig);
   defineExpose({
     resize,
   });

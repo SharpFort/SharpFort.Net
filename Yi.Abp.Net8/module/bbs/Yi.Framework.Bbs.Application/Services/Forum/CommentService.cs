@@ -22,12 +22,12 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// <summary>
     /// 评论
     /// </summary>
-    public class CommentService : YiCrudAppService<CommentAggregateRoot, CommentGetOutputDto, CommentGetListOutputDto, Guid, CommentGetListInputVo, CommentCreateInputVo, CommentUpdateInputVo>,
+    public class CommentService : YiCrudAppService<Comment, CommentGetOutputDto, CommentGetListOutputDto, Guid, CommentGetListInputVo, CommentCreateInputVo, CommentUpdateInputVo>,
        ICommentService
     {
-        private readonly ISqlSugarRepository<CommentAggregateRoot, Guid> _repository;
+        private readonly ISqlSugarRepository<Comment, Guid> _repository;
         private readonly BbsUserManager _bbsUserManager;
-        public CommentService(ForumManager forumManager, ISqlSugarRepository<DiscussAggregateRoot> discussRepository, IDiscussService discussService, ISqlSugarRepository<CommentAggregateRoot, Guid> CommentRepository, BbsUserManager bbsUserManager) : base(CommentRepository)
+        public CommentService(ForumManager forumManager, ISqlSugarRepository<Discuss> discussRepository, IDiscussService discussService, ISqlSugarRepository<Comment, Guid> CommentRepository, BbsUserManager bbsUserManager) : base(CommentRepository)
         {
             _forumManager = forumManager;
             _discussRepository = discussRepository;
@@ -36,7 +36,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
             _bbsUserManager = bbsUserManager;
         }
         private ForumManager _forumManager { get; set; }
-        private ISqlSugarRepository<DiscussAggregateRoot> _discussRepository { get; set; }
+        private ISqlSugarRepository<Discuss> _discussRepository { get; set; }
 
         private IDiscussService _discussService { get; set; }
         

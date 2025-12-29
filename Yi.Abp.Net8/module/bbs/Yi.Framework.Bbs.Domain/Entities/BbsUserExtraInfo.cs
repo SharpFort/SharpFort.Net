@@ -12,13 +12,13 @@ namespace Yi.Framework.Bbs.Domain.Entities
     /// <summary>
     /// bbs用户表
     /// </summary>
-    [SugarTable("BbsUserExtraInfo")]
+    [SugarTable("bbs_user_extrainfo")]
     [SugarIndex($"index_{nameof(UserId)}", nameof(UserId), OrderByType.Asc)]
-    public class BbsUserExtraInfoEntity : Entity<Guid>
+    public class BbsUserExtraInfo : Entity<Guid>
     {
-        public BbsUserExtraInfoEntity() { }
+        public BbsUserExtraInfo() { }
 
-        public BbsUserExtraInfoEntity(Guid userId) { this.UserId = userId; }
+        public BbsUserExtraInfo(Guid userId) { this.UserId = userId; }
 
         [SugarColumn(ColumnName = "Id", IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }

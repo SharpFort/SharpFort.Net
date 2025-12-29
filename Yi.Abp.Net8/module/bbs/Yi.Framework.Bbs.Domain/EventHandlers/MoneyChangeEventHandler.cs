@@ -12,9 +12,9 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
 {
     public class MoneyChangeEventHandler : ILocalEventHandler<MoneyChangeEventArgs>, ITransientDependency
     {
-        private ISqlSugarRepository<BbsUserExtraInfoEntity> _userInfoRepository;
+        private ISqlSugarRepository<BbsUserExtraInfo> _userInfoRepository;
         private ILocalEventBus _localEventBus;
-        public MoneyChangeEventHandler(ISqlSugarRepository<BbsUserExtraInfoEntity> userInfoRepository, ILocalEventBus localEventBus)
+        public MoneyChangeEventHandler(ISqlSugarRepository<BbsUserExtraInfo> userInfoRepository, ILocalEventBus localEventBus)
         {
             _userInfoRepository = userInfoRepository;
             _localEventBus = localEventBus;
@@ -29,7 +29,7 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
                 throw new UserFriendlyException(MoneyConst.Money_Low_Zero);
             }
             //原子性sql
-            await _userInfoRepository._Db.Updateable<BbsUserExtraInfoEntity>()
+            await _userInfoRepository._Db.Updateable<BbsUserExtraInfo>()
                   .SetColumns(it => it.Money == it.Money + eventData.Number)
                   .Where(x => x.UserId == eventData.UserId).ExecuteCommandAsync();
 

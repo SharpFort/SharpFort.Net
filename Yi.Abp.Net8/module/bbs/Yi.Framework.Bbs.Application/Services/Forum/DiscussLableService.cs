@@ -13,14 +13,14 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// <summary>
     /// DiscussLable服务实现
     /// </summary>
-    public class DiscussLableService : YiCrudAppService<DiscussLableAggregateRoot, DiscussLableOutputDto,
+    public class DiscussLableService : YiCrudAppService<DiscussLable, DiscussLableOutputDto,
             DiscussLableGetListOutputDto, Guid, DiscussLableGetListInputVo, DiscussLableCreateInputVo,
             DiscussLableUpdateInputVo>,
         IDiscussLableService
     {
-        private ISqlSugarRepository<DiscussLableAggregateRoot, Guid> _repository;
+        private ISqlSugarRepository<DiscussLable, Guid> _repository;
 
-        public DiscussLableService(ISqlSugarRepository<DiscussLableAggregateRoot, Guid> repository) : base(repository)
+        public DiscussLableService(ISqlSugarRepository<DiscussLable, Guid> repository) : base(repository)
         {
             _repository = repository;
         }
@@ -28,7 +28,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
         [HttpGet("discuss-lable/all")]
         public async Task<ListResultDto<DiscussLableGetListOutputDto>> GetAllListAsync(DiscussLableGetListInputVo input)
         {
-            var order = input.Sorting ?? nameof(DiscussLableAggregateRoot.Name);
+            var order = input.Sorting ?? nameof(DiscussLable.Name);
             var output = await _repository._DbQueryable
                 .WhereIF(input.Name is not null, x => x.Name.Contains(input.Name))
                 .OrderBy(order)
@@ -41,7 +41,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
             DiscussLableGetListInputVo input)
         {
             RefAsync<int> total = 0;
-            var order = input.Sorting ?? nameof(DiscussLableAggregateRoot.Name);
+            var order = input.Sorting ?? nameof(DiscussLable.Name);
             var output = await _repository._DbQueryable
                 .WhereIF(input.Name is not null, x => x.Name.Contains(input.Name))
                 .OrderBy(order)

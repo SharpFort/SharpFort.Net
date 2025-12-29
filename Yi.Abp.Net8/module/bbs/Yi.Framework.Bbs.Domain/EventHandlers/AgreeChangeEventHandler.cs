@@ -19,11 +19,11 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
         ITransientDependency
     {
         private ISqlSugarRepository<User> _userRepository;
-        private ISqlSugarRepository<BbsUserExtraInfoEntity> _userInfoRepository;
+        private ISqlSugarRepository<BbsUserExtraInfo> _userInfoRepository;
         private ISqlSugarRepository<Agree> _agreeRepository;
         private ILocalEventBus _localEventBus;
 
-        public AgreeChangeEventHandler(ISqlSugarRepository<BbsUserExtraInfoEntity> userInfoRepository,
+        public AgreeChangeEventHandler(ISqlSugarRepository<BbsUserExtraInfo> userInfoRepository,
             ISqlSugarRepository<Agree> agreeRepository, ILocalEventBus localEventBus,
             ISqlSugarRepository<User> userRepository)
         {
@@ -40,7 +40,7 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
             //查询主题的信息
             var discussAndAgreeDto = await _agreeRepository._DbQueryable
                 .Where(agree=>agree.Id==Agree.Id)
-                .LeftJoin<DiscussAggregateRoot>((agree, discuss) => agree.DiscussId == discuss.Id)
+                .LeftJoin<Discuss>((agree, discuss) => agree.DiscussId == discuss.Id)
                 .Select((agree, discuss) =>
                     new
                     {
@@ -54,7 +54,7 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
             var agreeUser = await _userRepository.GetFirstAsync(x => x.Id == Agree.CreatorId);
 
             //给创建者点赞数量+1
-            await _userInfoRepository._Db.Updateable<BbsUserExtraInfoEntity>()
+            await _userInfoRepository._Db.Updateable<BbsUserExtraInfo>()
                 .SetColumns(it => it.AgreeNumber == it.AgreeNumber + 1)
                 .Where(it => it.UserId == discussAndAgreeDto.DiscussCreatorId)
                 .ExecuteCommandAsync();
@@ -77,11 +77,11 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
     public class AgreeDeletedEventHandler : ILocalEventHandler<EntityDeletedEventData<Agree>>,
         ITransientDependency
     {
-        private ISqlSugarRepository<BbsUserExtraInfoEntity> _userRepository;
+        private ISqlSugarRepository<BbsUserExtraInfo> _userRepository;
         private ISqlSugarRepository<Agree> _agreeRepository;
         private ILocalEventBus _localEventBus;
 
-        public AgreeDeletedEventHandler(ISqlSugarRepository<BbsUserExtraInfoEntity> userRepository,
+        public AgreeDeletedEventHandler(ISqlSugarRepository<BbsUserExtraInfo> userRepository,
             ISqlSugarRepository<Agree> agreeRepository, ILocalEventBus localEventBus)
         {
             _userRepository = userRepository;
@@ -93,11 +93,11 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
         {
             var Agree = eventData.Entity;
             var userId = await _agreeRepository._DbQueryable
-                .LeftJoin<DiscussAggregateRoot>((agree, discuss) => agree.DiscussId == discuss.Id)
+                .LeftJoin<Discuss>((agree, discuss) => agree.DiscussId == discuss.Id)
                 .Select((agree, discuss) => discuss.CreatorId).FirstAsync();
 
             //给创建者点赞数量-1
-            await _userRepository._Db.Updateable<BbsUserExtraInfoEntity>()
+            await _userRepository._Db.Updateable<BbsUserExtraInfo>()
                 .SetColumns(it => it.AgreeNumber == it.AgreeNumber - 1)
                 .Where(it => it.UserId == userId)
                 .ExecuteCommandAsync();

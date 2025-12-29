@@ -16,24 +16,24 @@ namespace Yi.Framework.Bbs.Domain.EventHandlers
     /// <summary>
     /// 评论创建的领域事件
     /// </summary>
-    public class CommentCreatedEventHandler : ILocalEventHandler<EntityCreatedEventData<CommentAggregateRoot>>,
+    public class CommentCreatedEventHandler : ILocalEventHandler<EntityCreatedEventData<Comment>>,
           ITransientDependency
     {
         private ILocalEventBus _localEventBus;
-        private ISqlSugarRepository<DiscussAggregateRoot> _discussRepository;
+        private ISqlSugarRepository<Discuss> _discussRepository;
         private ISqlSugarRepository<User> _userRepository;
-        public CommentCreatedEventHandler(ILocalEventBus localEventBus, ISqlSugarRepository<DiscussAggregateRoot> discussRepository, ISqlSugarRepository<User> userRepository)
+        public CommentCreatedEventHandler(ILocalEventBus localEventBus, ISqlSugarRepository<Discuss> discussRepository, ISqlSugarRepository<User> userRepository)
         {
             _userRepository = userRepository;
             _localEventBus = localEventBus;
             _discussRepository = discussRepository;
         }
-        public async Task HandleEventAsync(EntityCreatedEventData<CommentAggregateRoot> eventData)
+        public async Task HandleEventAsync(EntityCreatedEventData<Comment> eventData)
         {
             var commentEntity = eventData.Entity;
 
             //给创建者发布数量+1
-            await _userRepository._Db.Updateable<BbsUserExtraInfoEntity>()
+            await _userRepository._Db.Updateable<BbsUserExtraInfo>()
                                         .SetColumns(it => it.CommentNumber == it.CommentNumber + 1)
                                         .Where(it => it.UserId == commentEntity.CreatorId)
                                         .ExecuteCommandAsync();

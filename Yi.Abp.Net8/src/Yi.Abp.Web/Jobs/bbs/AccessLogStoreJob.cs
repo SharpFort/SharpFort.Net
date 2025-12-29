@@ -10,9 +10,9 @@ using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Abp.Web.Jobs.bbs;
 
-public class AccessLogStoreJob : HangfireBackgroundWorkerBase
+public class BbsAccessLogStoreJob : HangfireBackgroundWorkerBase
 {
-    private readonly ISqlSugarRepository<AccessLogAggregateRoot> _repository;
+    private readonly ISqlSugarRepository<BbsAccessLogAggregateRoot> _repository;
 
     /// <summary>
     /// 缓存前缀
@@ -39,7 +39,7 @@ public class AccessLogStoreJob : HangfireBackgroundWorkerBase
         }
     }
 
-    public AccessLogStoreJob(ISqlSugarRepository<AccessLogAggregateRoot> repository)
+    public BbsAccessLogStoreJob(ISqlSugarRepository<BbsAccessLogAggregateRoot> repository)
     {
         _repository = repository;
 
@@ -47,10 +47,10 @@ public class AccessLogStoreJob : HangfireBackgroundWorkerBase
         RecurringJobId = "访问日志写入数据库";
         //每小时执行一次
         CronExpression = "0 0 * * * ?";
-        // JobDetail = JobBuilder.Create<AccessLogStoreJob>().WithIdentity(nameof(AccessLogStoreJob))
+        // JobDetail = JobBuilder.Create<BbsAccessLogStoreJob>().WithIdentity(nameof(BbsAccessLogStoreJob))
         //     .Build();
         // //每分钟执行一次
-        // Trigger = TriggerBuilder.Create().WithIdentity(nameof(AccessLogStoreJob))
+        // Trigger = TriggerBuilder.Create().WithIdentity(nameof(BbsAccessLogStoreJob))
         //     .WithCronSchedule("0 * * * * ?")
         //     .Build();
         
@@ -64,10 +64,10 @@ public class AccessLogStoreJob : HangfireBackgroundWorkerBase
         {
             //当天的访问量
             var number =
-                await RedisClient.GetAsync<long>($"{CacheKeyPrefix}{AccessLogCacheConst.Key}:{DateTime.Now.Date:yyyyMMdd}");
+                await RedisClient.GetAsync<long>($"{CacheKeyPrefix}{BbsAccessLogCacheConst.Key}:{DateTime.Now.Date:yyyyMMdd}");
 
 
-            var entity = await _repository._DbQueryable.Where(x => x.AccessLogType == AccessLogType.ApiRequest)
+            var entity = await _repository._DbQueryable.Where(x => x.BbsAccessLogType == BbsAccessLogType.ApiRequest)
                 .Where(x => x.CreationTime.Date == DateTime.Today)
                 .FirstAsync();
 
@@ -79,11 +79,11 @@ public class AccessLogStoreJob : HangfireBackgroundWorkerBase
             }
             else
             {
-                await _repository.InsertAsync((new AccessLogAggregateRoot() { Number = number,AccessLogType = AccessLogType.ApiRequest }));
+                await _repository.InsertAsync((new BbsAccessLogAggregateRoot() { Number = number,BbsAccessLogType = BbsAccessLogType.ApiRequest }));
             }
 
             //删除前一天的缓存
-            await RedisClient.DelAsync($"{CacheKeyPrefix}{AccessLogCacheConst.Key}:{DateTime.Now.Date.AddDays(-1):yyyyMMdd}");
+            await RedisClient.DelAsync($"{CacheKeyPrefix}{BbsAccessLogCacheConst.Key}:{DateTime.Now.Date.AddDays(-1):yyyyMMdd}");
         }
     }
 }

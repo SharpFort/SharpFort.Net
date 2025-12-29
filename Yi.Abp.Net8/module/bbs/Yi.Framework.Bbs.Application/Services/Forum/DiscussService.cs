@@ -32,18 +32,18 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// <summary>
     /// Discuss应用服务实现,用于参数校验、领域服务业务组合、日志记录、事务处理、账户信息
     /// </summary>
-    public class DiscussService : YiCrudAppService<DiscussAggregateRoot, DiscussGetOutputDto, DiscussGetListOutputDto,
+    public class DiscussService : YiCrudAppService<Discuss, DiscussGetOutputDto, DiscussGetListOutputDto,
             Guid, DiscussGetListInputVo, DiscussCreateInput, DiscussUpdateInput>,
         IDiscussService
     {
-        private ISqlSugarRepository<DiscussTopEntity> _discussTopRepository;
+        private ISqlSugarRepository<DiscussTop> _discussTopRepository;
         private ISqlSugarRepository<Agree> _agreeRepository;
         private BbsUserManager _bbsUserManager;
         private IDiscussLableRepository _discussLableRepository;
 
         public DiscussService(BbsUserManager bbsUserManager, ForumManager forumManager,
-            ISqlSugarRepository<DiscussTopEntity> discussTopRepository,
-            ISqlSugarRepository<PlateAggregateRoot> plateEntityRepository, ILocalEventBus localEventBus,
+            ISqlSugarRepository<DiscussTop> discussTopRepository,
+            ISqlSugarRepository<Plate> plateEntityRepository, ILocalEventBus localEventBus,
             ISqlSugarRepository<Agree> agreeRepository, IDiscussLableRepository discussLableRepository) : base(
             forumManager._discussRepository)
         {
@@ -60,7 +60,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
         private ForumManager _forumManager { get; set; }
 
 
-        private ISqlSugarRepository<PlateAggregateRoot> _plateEntityRepository { get; set; }
+        private ISqlSugarRepository<Plate> _plateEntityRepository { get; set; }
 
         /// <summary>
         /// 单查
@@ -72,8 +72,8 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
             //查询主题发布 浏览主题 事件，浏览数+1
             var output = await _forumManager._discussRepository._DbQueryable
                 .LeftJoin<User>((discuss, user) => discuss.CreatorId == user.Id)
-                .LeftJoin<BbsUserExtraInfoEntity>((discuss, user, info) => user.Id == info.UserId)
-                .LeftJoin<PlateAggregateRoot>((discuss, user, info, plate) => plate.Id == discuss.PlateId)
+                .LeftJoin<BbsUserExtraInfo>((discuss, user, info) => user.Id == info.UserId)
+                .LeftJoin<Plate>((discuss, user, info, plate) => plate.Id == discuss.PlateId)
                 .Select((discuss, user, info, plate) => new DiscussGetOutputDto
                 {
                     Id = discuss.Id,
@@ -168,7 +168,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
                 .WhereIF(input.UserId is not null, x => x.CreatorId == input.UserId)
                 .LeftJoin<User>((discuss, user) => discuss.CreatorId == user.Id)
                 .WhereIF(input.UserName is not null, (discuss, user) => user.UserName == input.UserName!)
-                .LeftJoin<BbsUserExtraInfoEntity>((discuss, user, info) => user.Id == info.UserId)
+                .LeftJoin<BbsUserExtraInfo>((discuss, user, info) => user.Id == info.UserId)
                 .OrderByDescending(discuss => discuss.OrderNum)
                 //已提示杰哥新增表达式
                 // .OrderByIF(input.Type == DiscussSortType.New, 
@@ -238,9 +238,9 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
         public async Task<List<DiscussGetListOutputDto>> GetListTopAsync()
         {
             var output = await _discussTopRepository._DbQueryable
-                .LeftJoin<DiscussAggregateRoot>((top, discuss) => top.DiscussId == discuss.Id)
+                .LeftJoin<Discuss>((top, discuss) => top.DiscussId == discuss.Id)
                 .LeftJoin<User>((top, discuss, user) => discuss.CreatorId == user.Id)
-                .LeftJoin<BbsUserExtraInfoEntity>((top, discuss, user, info) => user.Id == info.UserId)
+                .LeftJoin<BbsUserExtraInfo>((top, discuss, user, info) => user.Id == info.UserId)
                 .OrderByDescending(top => top.OrderNum)
                 .Select((top, discuss, user, info) => new DiscussGetListOutputDto
                 {
@@ -317,7 +317,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
 
             await _bbsUserManager.VerifyUserLimitAsync(CurrentUser.GetId());
             var entity = await _forumManager.CreateDiscussAsync(await MapToEntityAsync(input),
-                input.RewardData.Adapt<DiscussRewardAggregateRoot>());
+                input.RewardData.Adapt<DiscussReward>());
             return await MapToGetOutputDtoAsync(entity);
         }
 

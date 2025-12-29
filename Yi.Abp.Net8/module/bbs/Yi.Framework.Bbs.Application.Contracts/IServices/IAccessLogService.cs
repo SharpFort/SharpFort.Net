@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Yi.Framework.Bbs.Application.Contracts.IServices
 {
-    public interface IAccessLogService
+    public interface IBbsAccessLogService
     {
     }
 }

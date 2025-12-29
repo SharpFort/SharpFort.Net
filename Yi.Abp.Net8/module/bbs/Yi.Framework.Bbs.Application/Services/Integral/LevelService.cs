@@ -22,11 +22,11 @@ namespace Yi.Framework.Bbs.Application.Services.Integral
     /// <summary>
     /// 等级服务
     /// </summary>
-    public class LevelService : YiCrudAppService<LevelAggregateRoot, LevelOutputDto, Guid, LevelGetListInputDto>, ILevelService
+    public class LevelService : YiCrudAppService<Level, LevelOutputDto, Guid, LevelGetListInputDto>, ILevelService
     {
-        private ISqlSugarRepository<LevelAggregateRoot, Guid> _repository;
+        private ISqlSugarRepository<Level, Guid> _repository;
         private LevelManager _levelManager;
-        public LevelService(ISqlSugarRepository<LevelAggregateRoot, Guid> repository, LevelManager levelManager) : base(repository)
+        public LevelService(ISqlSugarRepository<Level, Guid> repository, LevelManager levelManager) : base(repository)
         {
             _repository = repository;
             _levelManager = levelManager;

@@ -380,7 +380,7 @@ namespace Yi.Abp.Web
             app.UseYiSwagger();
 
             //流量访问统计,需redis支持，否则不生效
-            app.UseAccessLog();
+            app.UseBbsAccessLog();
 
             //请求处理
             app.UseApiInfoHandling();

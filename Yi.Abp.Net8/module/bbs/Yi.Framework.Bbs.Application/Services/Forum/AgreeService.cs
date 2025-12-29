@@ -15,7 +15,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// </summary>
     public class AgreeService : ApplicationService, IApplicationService
     {
-        public AgreeService(ISqlSugarRepository<Agree> repository, ISqlSugarRepository<DiscussAggregateRoot> discssRepository, BbsUserManager bbsUserManager)
+        public AgreeService(ISqlSugarRepository<Agree> repository, ISqlSugarRepository<Discuss> discssRepository, BbsUserManager bbsUserManager)
         {
             _repository = repository;
             _discssRepository = discssRepository;
@@ -24,7 +24,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
         private readonly BbsUserManager _bbsUserManager;
         private ISqlSugarRepository<Agree> _repository { get; set; }
 
-        private ISqlSugarRepository<DiscussAggregateRoot> _discssRepository { get; set; }
+        private ISqlSugarRepository<Discuss> _discssRepository { get; set; }
 
 
         /// <summary>

@@ -1,4 +1,4 @@
-export const accessLogEchartsConfig = {
+export const BbsAccessLogEchartsConfig = {
   tooltip: {
     trigger: 'axis'
   },

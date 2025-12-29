@@ -13,11 +13,11 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// <summary>
     /// Plate服务实现
     /// </summary>
-    public class PlateService : YiCrudAppService<PlateAggregateRoot, PlateGetOutputDto, PlateGetListOutputDto, Guid, PlateGetListInputVo, PlateCreateInputVo, PlateUpdateInputVo>,
+    public class PlateService : YiCrudAppService<Plate, PlateGetOutputDto, PlateGetListOutputDto, Guid, PlateGetListInputVo, PlateCreateInputVo, PlateUpdateInputVo>,
        IPlateService
     {
-        private ISqlSugarRepository<PlateAggregateRoot, Guid> _repository;
-        public PlateService(ISqlSugarRepository<PlateAggregateRoot, Guid> repository) : base(repository)
+        private ISqlSugarRepository<Plate, Guid> _repository;
+        public PlateService(ISqlSugarRepository<Plate, Guid> repository) : base(repository)
         {
             _repository = repository;
         }

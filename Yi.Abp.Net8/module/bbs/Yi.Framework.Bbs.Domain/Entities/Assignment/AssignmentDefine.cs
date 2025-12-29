@@ -9,7 +9,7 @@ namespace Yi.Framework.Bbs.Domain.Entities.Assignment;
 /// <summary>
 /// 任务定义表
 /// </summary>
-[SugarTable("AssignmentDefine")]
+[SugarTable("bbs_assignmentDefine")]
 
 public class AssignmentDefine: AggregateRoot<Guid>, IHasCreationTime,IOrderNum
 {

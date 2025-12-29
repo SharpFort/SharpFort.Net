@@ -6,7 +6,7 @@ using Yi.Framework.Bbs.Domain.Shared.Enums;
 
 namespace Yi.Framework.Bbs.Domain.Entities.Forum
 {
-    [SugarTable("Discuss")]
+    [SugarTable("bbs_discuss")]
     [SugarIndex($"index_{nameof(Title)}", nameof(Title), OrderByType.Asc)]
     [SugarIndex($"index_{nameof(CreationTime)}", nameof(CreationTime), OrderByType.Desc)]
     [SugarIndex($"index_{nameof(IsDeleted)}_{nameof(PlateId)}_{nameof(CreatorId)}",
@@ -14,12 +14,12 @@ namespace Yi.Framework.Bbs.Domain.Entities.Forum
         nameof(PlateId), OrderByType.Asc,
         nameof(CreatorId), OrderByType.Asc
         )]
-    public class DiscussAggregateRoot : AggregateRoot<Guid>, ISoftDelete, IAuditedObject
+    public class Discuss : AggregateRoot<Guid>, ISoftDelete, IAuditedObject
     {
-        public DiscussAggregateRoot()
+        public Discuss()
         {
         }
-        public DiscussAggregateRoot(Guid plateId)
+        public Discuss(Guid plateId)
         {
             PlateId = plateId;
         }

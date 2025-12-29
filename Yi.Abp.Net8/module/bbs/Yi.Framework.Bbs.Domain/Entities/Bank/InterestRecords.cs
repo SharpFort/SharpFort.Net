@@ -12,7 +12,7 @@ namespace Yi.Framework.Bbs.Domain.Entities.Bank
     /// <summary>
     /// 利息记录
     /// </summary>
-    [SugarTable("InterestRecords")]
+    [SugarTable("bbs_interestRecords")]
     public class InterestRecords : AggregateRoot<Guid>, IHasCreationTime
     {
         public InterestRecords()

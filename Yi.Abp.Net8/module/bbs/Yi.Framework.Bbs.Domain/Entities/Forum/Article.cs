@@ -5,11 +5,11 @@ using Volo.Abp.Domain.Entities;
 
 namespace Yi.Framework.Bbs.Domain.Entities.Forum
 {
-    [SugarTable("Article")]
+    [SugarTable("bbs_article")]
     [SugarIndex($"index_{nameof(Name)}", nameof(Name), OrderByType.Asc)]
     [SugarIndex($"index_{nameof(ParentId)}", nameof(ParentId), OrderByType.Asc)]
     [SugarIndex($"index_{nameof(DiscussId)}", nameof(DiscussId), OrderByType.Asc)]
-    public class ArticleAggregateRoot : AggregateRoot<Guid>, ISoftDelete, IAuditedObject
+    public class Article : AggregateRoot<Guid>, ISoftDelete, IAuditedObject
     {
         [SugarColumn(ColumnName = "Id", IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }
@@ -26,7 +26,7 @@ namespace Yi.Framework.Bbs.Domain.Entities.Forum
 
         [SugarColumn(IsIgnore = true)]
 
-        public List<ArticleAggregateRoot>? Children { get; set; }
+        public List<Article>? Children { get; set; }
 
 
         public DateTime CreationTime { get; set; }
@@ -50,14 +50,14 @@ namespace Yi.Framework.Bbs.Domain.Entities.Forum
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static List<ArticleAggregateRoot> Tile(this List<ArticleAggregateRoot> entities)
+        public static List<Article> Tile(this List<Article> entities)
         {
-            if (entities is null) return new List<ArticleAggregateRoot>();
-            var result = new List<ArticleAggregateRoot>();
+            if (entities is null) return new List<Article>();
+            var result = new List<Article>();
             return StartRecursion(entities, result);
         }
 
-        private static List<ArticleAggregateRoot> StartRecursion(List<ArticleAggregateRoot> entities, List<ArticleAggregateRoot> result)
+        private static List<Article> StartRecursion(List<Article> entities, List<Article> result)
         {
             foreach (var entity in entities)
             {
