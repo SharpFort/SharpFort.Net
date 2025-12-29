@@ -14,7 +14,7 @@ namespace Yi.Framework.CodeGen.Application.Contracts.Dtos.Field
         public int OrderNum { get; set; }
         public int Length { get; set; }
 
-        public FieldTypeEnum FieldType { get; set; }
+        public FieldType FieldType { get; set; }
 
         public Guid TableId { get; set; }
 

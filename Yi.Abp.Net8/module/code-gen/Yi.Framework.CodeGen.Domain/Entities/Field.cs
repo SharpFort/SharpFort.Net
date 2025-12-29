@@ -48,7 +48,7 @@ public class Field : FullAuditedEntity<Guid>
     /// 字段类型 (如 String, Int, Guid)
     /// </summary>
     [SugarColumn(ColumnName = "field_type")]
-    public FieldTypeEnum FieldType { get; set;  }
+    public FieldType FieldType { get; set;  }
 
     /// <summary>
     /// 数据长度 (如 varchar(64) 中的 64)
@@ -97,7 +97,7 @@ public class Field : FullAuditedEntity<Guid>
     /// <summary>
     /// 创建字段定义
     /// </summary>
-    public Field(Guid id, Guid tableId, string name, FieldTypeEnum fieldType) : base(id)
+    public Field(Guid id, Guid tableId, string name, FieldType fieldType) : base(id)
     {
         TableId = tableId;
         SetName(name);
@@ -117,7 +117,7 @@ public class Field : FullAuditedEntity<Guid>
     /// <summary>
     /// 更新基本信息
     /// </summary>
-    public void UpdateBasic(string name, string? description, int length, int orderNum, FieldTypeEnum type)
+    public void UpdateBasic(string name, string? description, int length, int orderNum, FieldType type)
     {
         SetName(name);
         Description = Volo.Abp.Check.Length(description, nameof(description), 512);

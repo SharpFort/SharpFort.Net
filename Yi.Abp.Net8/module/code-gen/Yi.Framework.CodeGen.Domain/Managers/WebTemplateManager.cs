@@ -82,15 +82,15 @@ namespace Yi.Framework.CodeGen.Domain.Managers
             }
 
             //判断类型
-            var enumName = typeof(FieldTypeEnum).GetFields(BindingFlags.Static | BindingFlags.Public).Where(x => x.GetCustomAttribute<DisplayAttribute>()?.Description == fieldType.Name).FirstOrDefault()?.Name;
+            var enumName = typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Where(x => x.GetCustomAttribute<DisplayAttribute>()?.Description == fieldType.Name).FirstOrDefault()?.Name;
             if (enumName is null)
             {
-                fieldEntity.FieldType = FieldTypeEnum.String;
+                fieldEntity.FieldType = FieldType.String;
                 // App.GetRequiredService<ILogger<WebTemplateManager>>().LogError($"字段类型：{propertyInfo.PropertyType.Name}，未定义");
             }
             else
             {
-                fieldEntity.FieldType = (FieldTypeEnum)Enum.Parse(typeof(FieldTypeEnum), enumName);
+                fieldEntity.FieldType = (FieldType)Enum.Parse(typeof(FieldType), enumName);
             }
 
             //判断是否可空

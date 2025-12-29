@@ -27,7 +27,7 @@ namespace Yi.Framework.CodeGen.Domain.Handlers
 
             foreach (var field in Table.Fields)
             {
-                var typeStr = typeof(FieldTypeEnum).GetFields().Where(x => x.Name == field.FieldType.ToString())?.FirstOrDefault().GetCustomAttribute<DisplayAttribute>().Name;
+                var typeStr = typeof(FieldType).GetFields().Where(x => x.Name == field.FieldType.ToString())?.FirstOrDefault().GetCustomAttribute<DisplayAttribute>().Name;
 
                 if (typeStr is null)
                 {

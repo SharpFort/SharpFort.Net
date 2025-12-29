@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Yi.Framework.CodeGen.Domain.Shared.Enums
 {
-    public enum FieldTypeEnum
+    public enum FieldType
     {
         [Display(Name = "string", Description = "String")]
         String,
