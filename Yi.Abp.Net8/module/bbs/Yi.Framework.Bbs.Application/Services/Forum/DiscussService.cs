@@ -37,14 +37,14 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
         IDiscussService
     {
         private ISqlSugarRepository<DiscussTopEntity> _discussTopRepository;
-        private ISqlSugarRepository<AgreeEntity> _agreeRepository;
+        private ISqlSugarRepository<Agree> _agreeRepository;
         private BbsUserManager _bbsUserManager;
         private IDiscussLableRepository _discussLableRepository;
 
         public DiscussService(BbsUserManager bbsUserManager, ForumManager forumManager,
             ISqlSugarRepository<DiscussTopEntity> discussTopRepository,
             ISqlSugarRepository<PlateAggregateRoot> plateEntityRepository, ILocalEventBus localEventBus,
-            ISqlSugarRepository<AgreeEntity> agreeRepository, IDiscussLableRepository discussLableRepository) : base(
+            ISqlSugarRepository<Agree> agreeRepository, IDiscussLableRepository discussLableRepository) : base(
             forumManager._discussRepository)
         {
             _forumManager = forumManager;
@@ -182,7 +182,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
                 {
                     Id = discuss.Id,
                     // 优化查询，不使用子查询
-                    // IsAgree = SqlFunc.Subqueryable<AgreeEntity>().WhereIF(CurrentUser.Id != null, x => x.CreatorId == CurrentUser.Id && x.DiscussId == discuss.Id).Any(),
+                    // IsAgree = SqlFunc.Subqueryable<Agree>().WhereIF(CurrentUser.Id != null, x => x.CreatorId == CurrentUser.Id && x.DiscussId == discuss.Id).Any(),
                     User = new BbsUserGetListOutputDto()
                     {
                         Id = user.Id,
@@ -245,7 +245,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
                 .Select((top, discuss, user, info) => new DiscussGetListOutputDto
                 {
                     Id = discuss.Id,
-                    IsAgree = SqlFunc.Subqueryable<AgreeEntity>().WhereIF(CurrentUser.Id != null,
+                    IsAgree = SqlFunc.Subqueryable<Agree>().WhereIF(CurrentUser.Id != null,
                         x => x.CreatorId == CurrentUser.Id && x.DiscussId == discuss.Id).Any(),
                     User = new BbsUserGetListOutputDto
                     {

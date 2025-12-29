@@ -11,7 +11,7 @@ using Yi.Framework.SqlSugarCore.Repositories;
 
 namespace Yi.Framework.AuditLogging.SqlSugarCore.Repositories;
 
-public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggregateRoot, Guid>, IAuditLogRepository
+public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>, IAuditLogRepository
 {
     public SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
     {
@@ -22,16 +22,16 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
     /// </summary>
     /// <param name="insertObj"></param>
     /// <returns></returns>
-    public override async Task<bool> InsertAsync(AuditLogAggregateRoot insertObj)
+    public override async Task<bool> InsertAsync(AuditLog insertObj)
     {
 
-        return await _Db.InsertNav<AuditLogAggregateRoot>(insertObj)
+        return await _Db.InsertNav<AuditLog>(insertObj)
                  .Include(z1 => z1.Actions)
                  //.Include(z1 => z1.EntityChanges).ThenInclude(z2 => z2.PropertyChanges)
                  .ExecuteCommandAsync();
     }
 
-    public virtual async Task<List<AuditLogAggregateRoot>> GetListAsync(
+    public virtual async Task<List<AuditLog>> GetListAsync(
         string sorting = null,
         int maxResultCount = 50,
         int skipCount = 0,
@@ -68,7 +68,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
         );
 
         var auditLogs = await query
-            .OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(AuditLogAggregateRoot.ExecutionTime) + " DESC") : sorting)
+            .OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(AuditLog.ExecutionTime) + " DESC") : sorting)
             .ToPageListAsync(skipCount, maxResultCount);
 
         return auditLogs;
@@ -111,7 +111,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
         return totalCount;
     }
 
-    protected virtual async Task<ISugarQueryable<AuditLogAggregateRoot>> GetListQueryAsync(
+    protected virtual async Task<ISugarQueryable<AuditLog>> GetListQueryAsync(
         DateTime? startTime = null,
         DateTime? endTime = null,
         string httpMethod = null,
@@ -161,24 +161,24 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
     }
 
 
-    public virtual async Task<EntityChangeEntity> GetEntityChange(
+    public virtual async Task<EntityChange> GetEntityChange(
         Guid entityChangeId,
         CancellationToken cancellationToken = default)
     {
-        var entityChange = await (await GetDbContextAsync()).Queryable<EntityChangeEntity>()
+        var entityChange = await (await GetDbContextAsync()).Queryable<EntityChange>()
                                 .Where(x => x.Id == entityChangeId)
                                 .OrderBy(x => x.Id)
                                 .FirstAsync();
 
         if (entityChange == null)
         {
-            throw new EntityNotFoundException(typeof(EntityChangeEntity));
+            throw new EntityNotFoundException(typeof(EntityChange));
         }
 
         return entityChange;
     }
 
-    public virtual async Task<List<EntityChangeEntity>> GetEntityChangeListAsync(
+    public virtual async Task<List<EntityChange>> GetEntityChangeListAsync(
         string sorting = null,
         int maxResultCount = 50,
         int skipCount = 0,
@@ -193,7 +193,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
     {
         var query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName, includeDetails);
 
-        return await query.OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(EntityChangeEntity.ChangeTime) + " DESC") : sorting)
+        return await query.OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(EntityChange.ChangeTime) + " DESC") : sorting)
             .ToPageListAsync(skipCount, maxResultCount);
     }
 
@@ -233,14 +233,14 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
     {
         var dbContext = await GetDbContextAsync();
 
-        var query = dbContext.Queryable<EntityChangeEntity>()
+        var query = dbContext.Queryable<EntityChange>()
                             .Where(x => x.EntityId == entityId && x.EntityTypeFullName == entityTypeFullName);
-        return await query.LeftJoin<AuditLogAggregateRoot>((x, audit) => x.AuditLogId == audit.Id)
+        return await query.LeftJoin<AuditLog>((x, audit) => x.AuditLogId == audit.Id)
              .Select((x, audit) => new EntityChangeWithUsername { EntityChange = x, UserName = audit.UserName })
                 .OrderByDescending(x => x.EntityChange.ChangeTime).ToListAsync();
     }
 
-    protected virtual async Task<ISugarQueryable<EntityChangeEntity>> GetEntityChangeListQueryAsync(
+    protected virtual async Task<ISugarQueryable<EntityChange>> GetEntityChangeListQueryAsync(
         Guid? auditLogId = null,
         DateTime? startTime = null,
         DateTime? endTime = null,
@@ -250,7 +250,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLogAggrega
         bool includeDetails = false)
     {
         return (await GetDbContextAsync())
-            .Queryable<EntityChangeEntity>()
+            .Queryable<EntityChange>()
             .WhereIF(auditLogId.HasValue, e => e.AuditLogId == auditLogId)
             .WhereIF(startTime.HasValue, e => e.ChangeTime >= startTime)
             .WhereIF(endTime.HasValue, e => e.ChangeTime <= endTime)

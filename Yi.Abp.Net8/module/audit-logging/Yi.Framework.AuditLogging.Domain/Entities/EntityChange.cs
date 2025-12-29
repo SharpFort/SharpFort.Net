@@ -11,9 +11,9 @@ namespace Yi.Framework.AuditLogging.Domain.Entities
     [SugarTable("YiEntityChange")]
     [SugarIndex($"index_{nameof(AuditLogId)}", nameof(AuditLogId), OrderByType.Asc)]
     [SugarIndex($"index_{nameof(TenantId)}_{nameof(EntityId)}", nameof(TenantId), OrderByType.Asc, nameof(EntityTypeFullName), OrderByType.Asc, nameof(EntityId), OrderByType.Asc)]
-    public class EntityChangeEntity : Entity<Guid>, IMultiTenant
+    public class EntityChange : Entity<Guid>, IMultiTenant
     {
-        public EntityChangeEntity() { }
+        public EntityChange() { }
 
         [SugarColumn(ColumnName = "Id", IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }
@@ -30,11 +30,11 @@ namespace Yi.Framework.AuditLogging.Domain.Entities
         public virtual string? EntityId { get; protected set; }
 
         public virtual string? EntityTypeFullName { get; protected set; }
-        [Navigate(NavigateType.OneToMany, nameof(EntityPropertyChangeEntity.EntityChangeId))]
-        public virtual List<EntityPropertyChangeEntity> PropertyChanges { get; protected set; }
+        [Navigate(NavigateType.OneToMany, nameof(EntityPropertyChange.EntityChangeId))]
+        public virtual List<EntityPropertyChange> PropertyChanges { get; protected set; }
 
 
-        public EntityChangeEntity(
+        public EntityChange(
        IGuidGenerator guidGenerator,
        Guid auditLogId,
        EntityChangeInfo entityChangeInfo,
@@ -51,9 +51,9 @@ namespace Yi.Framework.AuditLogging.Domain.Entities
 
             PropertyChanges = entityChangeInfo
                                   .PropertyChanges?
-                                  .Select(p => new EntityPropertyChangeEntity(guidGenerator, Id, p, tenantId))
+                                  .Select(p => new EntityPropertyChange(guidGenerator, Id, p, tenantId))
                                   .ToList()
-                              ?? new List<EntityPropertyChangeEntity>();
+                              ?? new List<EntityPropertyChange>();
 
 
         }

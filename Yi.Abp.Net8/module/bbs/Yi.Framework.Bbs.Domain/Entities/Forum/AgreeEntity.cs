@@ -4,16 +4,17 @@ using Volo.Abp.Domain.Entities;
 
 namespace Yi.Framework.Bbs.Domain.Entities.Forum
 {
-    [SugarTable("Agree")]
+    [SugarTable("bbs_agree")]
+    [SugarIndex($"index_{nameof(DiscussId)}", nameof(DiscussId), OrderByType.Agree")]
     [SugarIndex($"index_{nameof(CreatorId)}_{nameof(DiscussId)}", nameof(CreatorId), OrderByType.Asc,
         nameof(DiscussId), OrderByType.Asc)]
-    public class AgreeEntity : Entity<Guid>, ICreationAuditedObject
+    public class Agree : Entity<Guid>, ICreationAuditedObject
     {
-        public AgreeEntity()
+        public Agree()
         {
         }
 
-        public AgreeEntity(Guid discussId)
+        public Agree(Guid discussId)
         {
             DiscussId = discussId;
         }

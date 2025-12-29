@@ -17,8 +17,8 @@ namespace Yi.Framework.Bbs.Application.Services.Analyses
     public class BbsForumAnalyseService : ApplicationService, IApplicationService
     {
         private ForumManager _forumManager;
-        private ISqlSugarRepository<AgreeEntity> _agreeRepository;
-        public BbsForumAnalyseService(ForumManager forumManager, ISqlSugarRepository<AgreeEntity> agreeRepository)
+        private ISqlSugarRepository<Agree> _agreeRepository;
+        public BbsForumAnalyseService(ForumManager forumManager, ISqlSugarRepository<Agree> agreeRepository)
         {
             _forumManager = forumManager;
             _agreeRepository = agreeRepository;
@@ -40,7 +40,7 @@ namespace Yi.Framework.Bbs.Application.Services.Analyses
                            .Select((discuss, user, info) => new DiscussGetListOutputDto
                            {
                                Id = discuss.Id,
-                               // IsAgree = SqlFunc.Subqueryable<AgreeEntity>().WhereIF(CurrentUser.Id != null, x => x.CreatorId == CurrentUser.Id && x.DiscussId == discuss.Id).Any(),
+                               // IsAgree = SqlFunc.Subqueryable<Agree>().WhereIF(CurrentUser.Id != null, x => x.CreatorId == CurrentUser.Id && x.DiscussId == discuss.Id).Any(),
 
                                User = new BbsUserGetListOutputDto()
                                {

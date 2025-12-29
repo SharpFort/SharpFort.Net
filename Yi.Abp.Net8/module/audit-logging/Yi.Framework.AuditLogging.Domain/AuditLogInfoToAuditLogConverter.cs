@@ -29,7 +29,7 @@ public class AuditLogInfoToAuditLogConverter : IAuditLogInfoToAuditLogConverter,
         ExceptionHandlingOptions = exceptionHandlingOptions.Value;
     }
 
-    public virtual Task<AuditLogAggregateRoot> ConvertAsync(AuditLogInfo auditLogInfo)
+    public virtual Task<AuditLog> ConvertAsync(AuditLogInfo auditLogInfo)
     {
         var auditLogId = GuidGenerator.Create();
 
@@ -44,15 +44,15 @@ public class AuditLogInfoToAuditLogConverter : IAuditLogInfoToAuditLogConverter,
 
         var entityChanges = auditLogInfo
                                 .EntityChanges?
-                                .Select(entityChangeInfo => new EntityChangeEntity(GuidGenerator, auditLogId, entityChangeInfo, tenantId: auditLogInfo.TenantId))
+                                .Select(entityChangeInfo => new EntityChange(GuidGenerator, auditLogId, entityChangeInfo, tenantId: auditLogInfo.TenantId))
                                 .ToList()
-                            ?? new List<EntityChangeEntity>();
+                            ?? new List<EntityChange>();
 
         var actions = auditLogInfo
                           .Actions?
-                          .Select(auditLogActionInfo => new AuditLogActionEntity(GuidGenerator.Create(), auditLogId, auditLogActionInfo, tenantId: auditLogInfo.TenantId))
+                          .Select(auditLogActionInfo => new AuditLogAction(GuidGenerator.Create(), auditLogId, auditLogActionInfo, tenantId: auditLogInfo.TenantId))
                           .ToList()
-                      ?? new List<AuditLogActionEntity>();
+                      ?? new List<AuditLogAction>();
 
         var remoteServiceErrorInfos = auditLogInfo.Exceptions?.Select(exception => ExceptionToErrorInfoConverter.Convert(exception, options =>
                                           {
@@ -69,7 +69,7 @@ public class AuditLogInfoToAuditLogConverter : IAuditLogInfoToAuditLogConverter,
             .Comments?
             .JoinAsString(Environment.NewLine);
 
-        var auditLog = new AuditLogAggregateRoot(
+        var auditLog = new AuditLog(
             auditLogId,
             auditLogInfo.ApplicationName,
             auditLogInfo.TenantId,

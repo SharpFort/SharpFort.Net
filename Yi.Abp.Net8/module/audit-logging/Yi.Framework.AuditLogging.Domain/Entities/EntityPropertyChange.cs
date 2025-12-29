@@ -15,15 +15,15 @@ namespace Yi.Framework.AuditLogging.Domain.Entities
     [SugarTable("YiEntityPropertyChange")]
 
     [SugarIndex($"index_{nameof(EntityChangeId)}", nameof(EntityChangeId), OrderByType.Asc)]
-    public class EntityPropertyChangeEntity:Entity<Guid>, IMultiTenant
+    public class EntityPropertyChange:Entity<Guid>, IMultiTenant
     {
-        public EntityPropertyChangeEntity()
+        public EntityPropertyChange()
         {
 
         }
 
 
-        public EntityPropertyChangeEntity(
+        public EntityPropertyChange(
        IGuidGenerator guidGenerator,
        Guid entityChangeId,
        EntityPropertyChangeInfo entityChangeInfo,

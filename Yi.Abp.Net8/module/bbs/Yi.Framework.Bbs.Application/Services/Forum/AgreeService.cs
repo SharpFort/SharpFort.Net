@@ -15,14 +15,14 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
     /// </summary>
     public class AgreeService : ApplicationService, IApplicationService
     {
-        public AgreeService(ISqlSugarRepository<AgreeEntity> repository, ISqlSugarRepository<DiscussAggregateRoot> discssRepository, BbsUserManager bbsUserManager)
+        public AgreeService(ISqlSugarRepository<Agree> repository, ISqlSugarRepository<DiscussAggregateRoot> discssRepository, BbsUserManager bbsUserManager)
         {
             _repository = repository;
             _discssRepository = discssRepository;
             _bbsUserManager = bbsUserManager;
         }
         private readonly BbsUserManager _bbsUserManager;
-        private ISqlSugarRepository<AgreeEntity> _repository { get; set; }
+        private ISqlSugarRepository<Agree> _repository { get; set; }
 
         private ISqlSugarRepository<DiscussAggregateRoot> _discssRepository { get; set; }
 
@@ -41,7 +41,7 @@ namespace Yi.Framework.Bbs.Application.Services.Forum
             if (entity is null)
             {
                 //没点赞过，添加记录即可，,修改总点赞数量
-                await _repository.InsertAsync(new AgreeEntity(discussId));
+                await _repository.InsertAsync(new Agree(discussId));
                 var discussEntity = await _discssRepository.GetByIdAsync(discussId);
                 if (discussEntity is null)
                 {

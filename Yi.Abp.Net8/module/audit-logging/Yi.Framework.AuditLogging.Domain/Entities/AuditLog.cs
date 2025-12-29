@@ -8,17 +8,17 @@ using Yi.Framework.AuditLogging.Domain.Shared.Consts;
 namespace Yi.Framework.AuditLogging.Domain.Entities
 {
     [DisableAuditing]
-    [SugarTable("YiAuditLog")]
+    [SugarTable("Yi-AuditLog")]
     [SugarIndex($"index_{nameof(ExecutionTime)}", nameof(TenantId), OrderByType.Asc,nameof(ExecutionTime), OrderByType.Asc)]
     [SugarIndex($"index_{nameof(ExecutionTime)}_{nameof(UserId)}",nameof(TenantId), OrderByType.Asc, nameof(UserId), OrderByType.Asc, nameof(ExecutionTime), OrderByType.Asc)]
-    public class AuditLogAggregateRoot: AggregateRoot<Guid>, IMultiTenant
+    public class AuditLog: AggregateRoot<Guid>, IMultiTenant
     {
-        public AuditLogAggregateRoot()
+        public AuditLog()
         {
 
         }
 
-        public AuditLogAggregateRoot(
+        public AuditLog(
     Guid id,
     string applicationName,
     Guid? tenantId,
@@ -40,8 +40,8 @@ namespace Yi.Framework.AuditLogging.Domain.Entities
     Guid? impersonatorTenantId,
     string impersonatorTenantName,
     ExtraPropertyDictionary extraPropertyDictionary,
-    List<EntityChangeEntity> entityChanges,
-    List<AuditLogActionEntity> actions,
+    List<EntityChange> entityChanges,
+    List<AuditLogAction> actions,
     string exceptions,
     string comments)
     : base(id)
@@ -120,12 +120,12 @@ namespace Yi.Framework.AuditLogging.Domain.Entities
         public virtual Guid? TenantId { get; protected set; }
 
         //导航属性
-        [Navigate(NavigateType.OneToMany, nameof(EntityChangeEntity.AuditLogId))]
-        public virtual  List<EntityChangeEntity> EntityChanges { get; protected set; }
+        [Navigate(NavigateType.OneToMany, nameof(EntityChange.AuditLogId))]
+        public virtual  List<EntityChange> EntityChanges { get; protected set; }
 
         //导航属性
-        [Navigate(NavigateType.OneToMany, nameof(AuditLogActionEntity.AuditLogId))]
-        public  virtual List<AuditLogActionEntity> Actions { get; protected set; }
+        [Navigate(NavigateType.OneToMany, nameof(AuditLogAction.AuditLogId))]
+        public  virtual List<AuditLogAction> Actions { get; protected set; }
 
         [SugarColumn(IsIgnore = true)]
         public override ExtraPropertyDictionary ExtraProperties { get; protected set; }

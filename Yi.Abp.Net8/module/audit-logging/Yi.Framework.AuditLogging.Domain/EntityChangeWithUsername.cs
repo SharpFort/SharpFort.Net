@@ -4,7 +4,7 @@ namespace Yi.Framework.AuditLogging.Domain;
 
 public class EntityChangeWithUsername
 {
-    public EntityChangeEntity EntityChange { get; set; }
+    public EntityChange EntityChange { get; set; }
 
     public string UserName { get; set; }
 }

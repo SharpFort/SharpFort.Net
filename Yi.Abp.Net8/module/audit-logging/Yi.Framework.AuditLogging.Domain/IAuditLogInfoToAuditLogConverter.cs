@@ -6,5 +6,5 @@ namespace Yi.Framework.AuditLogging.Domain;
 
 public interface IAuditLogInfoToAuditLogConverter
 {
-    Task<AuditLogAggregateRoot> ConvertAsync(AuditLogInfo auditLogInfo);
+    Task<AuditLog> ConvertAsync(AuditLogInfo auditLogInfo);
 }
