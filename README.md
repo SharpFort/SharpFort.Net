@@ -16,6 +16,41 @@
 
 ---
 
+## 🛠️ 开发者必读：环境配置与规范
+
+为了保持代码库的整洁与可追溯性，本项目启用了严格的代码提交规范和工具。
+
+### 1. 激活 Git 提交钩子 (Husky.Net)
+项目使用 **Husky.Net** 来强制执行提交规范。在您首次拉取项目或更新依赖后，**必须**执行以下操作：
+
+```bash
+# 1. 还原 .NET 工具
+dotnet tool restore
+
+# 2. 安装并激活 Husky 钩子
+dotnet husky install
+```
+
+### 2. Git 提交规范 (Commit Convention)
+每次 `git commit` 时，提交信息必须包含以下标签之一，否则提交将被拦截：
+
+| 标签 | 说明 | 示例 |
+| :--- | :--- | :--- |
+| **feat** | 新功能 (feature) | `feat: 增加用户权限校验逻辑` |
+| **fix** | 修复 bug | `fix: 修复 Redis 缓存击穿问题` |
+| **docs** | 文档、注释变更 | `docs: 更新系统架构图` |
+| **style** | 代码格式 (不影响逻辑，如空格、缩进) | `style: 格式化 WebModule 代码` |
+| **refactor** | 代码重构 (既非新功能也非修复 bug) | `refactor: 重构文件上传服务` |
+| **perf** | 性能优化 | `perf: 优化 SQL 查询索引` |
+| **test** | 增加或修改测试用例 | `test: 完善领域层单元测试` |
+| **chore** | 构建过程或辅助工具变动 | `chore: 更新 NuGet 包引用` |
+| **revert** | 代码回退 | `revert: 回退到上一个稳定版本` |
+| **build** | 打包、发布相关变更 | `build: 发布 v1.1.0 镜像` |
+
+> **提示**：建议使用 `git commit`（不带 `-m` 参数）以触发自动模板引导，或参考 [COMMIT_CONVENTION.md](./COMMIT_CONVENTION.md) 查看详细规范。
+
+---
+
 ## ✨ 核心特性
 
 - **极致安全**: 引入 **Casbin** 强大的访问控制模型，支持 RBAC, ABAC 等多种权限控制策略。
