@@ -1,0 +1,15 @@
+{
+   "tasks": [
+      {
+         "name": "commit-msg-check",
+         "group": "commit-msg",
+         "command": "dotnet",
+         "args": [
+            "husky",
+            "exec",
+            ".husky/commit-msg.csx",
+            "${args}"
+         ]
+      }
+   ]
+}
