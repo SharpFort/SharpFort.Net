@@ -9,15 +9,15 @@ using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Framework.TenantManagement.Domain
 {
-    [SugarTable("YiTenant")]
+    [SugarTable("sys_tenant")]
     [DefaultTenantTable]
-    public class TenantAggregateRoot : FullAuditedAggregateRoot<Guid>, IHasEntityVersion
+    public class Tenant : FullAuditedAggregateRoot<Guid>, IHasEntityVersion
     {
-        public TenantAggregateRoot()
+        public Tenant()
         {
 
         }
-        protected internal TenantAggregateRoot(Guid id, [NotNull] string name)
+        protected internal Tenant(Guid id, [NotNull] string name)
     : base(id)
         {
             SetName(name);

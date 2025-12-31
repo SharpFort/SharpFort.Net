@@ -19,13 +19,13 @@ namespace Yi.Framework.TenantManagement.Application
     /// 租户管理
     /// </summary>
     public class TenantService :
-        YiCrudAppService<TenantAggregateRoot, TenantGetOutputDto, TenantGetListOutputDto, Guid, TenantGetListInput,
+        YiCrudAppService<Tenant, TenantGetOutputDto, TenantGetListOutputDto, Guid, TenantGetListInput,
             TenantCreateInput, TenantUpdateInput>, ITenantService
     {
-        private ISqlSugarRepository<TenantAggregateRoot, Guid> _repository;
+        private ISqlSugarRepository<Tenant, Guid> _repository;
         private IDataSeeder _dataSeeder;
 
-        public TenantService(ISqlSugarRepository<TenantAggregateRoot, Guid> repository, IDataSeeder dataSeeder) :
+        public TenantService(ISqlSugarRepository<Tenant, Guid> repository, IDataSeeder dataSeeder) :
             base(repository)
         {
             _repository = repository;

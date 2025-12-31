@@ -82,7 +82,7 @@ namespace Yi.Framework.TenantManagement.Domain
             {
                 using (CurrentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
                 {
-                    TenantAggregateRoot tenant = null;
+                    Tenant tenant = null;
                     using (var uow=_unitOfWorkManager.Begin(isTransactional:false))
                     {
                          tenant = await TenantRepository.FindAsync(id.Value); 
@@ -104,7 +104,7 @@ namespace Yi.Framework.TenantManagement.Domain
             throw new AbpException("Both id and name can't be invalid.");
         }
 
-        protected virtual async Task<TenantCacheItem> SetCacheAsync(string cacheKey, [CanBeNull] TenantAggregateRoot tenant)
+        protected virtual async Task<TenantCacheItem> SetCacheAsync(string cacheKey, [CanBeNull] Tenant tenant)
         {
             var tenantConfiguration = tenant != null ? MapToConfiguration(tenant) : null;
             var cacheItem = new TenantCacheItem(tenantConfiguration);
@@ -112,12 +112,12 @@ namespace Yi.Framework.TenantManagement.Domain
             return cacheItem;
         }
 
-        private TenantConfiguration MapToConfiguration(TenantAggregateRoot tenantAggregateRoot)
+        private TenantConfiguration MapToConfiguration(Tenant Tenant)
         {
             var tenantConfiguration = new TenantConfiguration();
-            tenantConfiguration.Id = tenantAggregateRoot.Id;
-            tenantConfiguration.Name = tenantAggregateRoot.Name;
-            tenantConfiguration.ConnectionStrings = MaptoString(tenantAggregateRoot.TenantConnectionString);
+            tenantConfiguration.Id = Tenant.Id;
+            tenantConfiguration.Name = Tenant.Name;
+            tenantConfiguration.ConnectionStrings = MaptoString(Tenant.TenantConnectionString);
             tenantConfiguration.IsActive = true;
             return tenantConfiguration;
         }
