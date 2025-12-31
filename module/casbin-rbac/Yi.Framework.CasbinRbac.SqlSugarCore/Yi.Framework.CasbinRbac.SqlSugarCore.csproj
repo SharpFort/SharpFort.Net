@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Casbin.NET.Adapter.SqlSugar" Version="1.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.Mapster\Yi.Framework.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.SqlSugarCore\Yi.Framework.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\Yi.Framework.CasbinRbac.Domain\Yi.Framework.CasbinRbac.Domain.csproj" />
+  </ItemGroup>
+
+
+</Project>
