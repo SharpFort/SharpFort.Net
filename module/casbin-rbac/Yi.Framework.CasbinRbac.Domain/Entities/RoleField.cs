@@ -8,7 +8,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 存储角色的字段黑名单。
 /// 逻辑：如果存在记录 (RoleId + TableName + FieldName)，则表示该角色【无权访问】该字段。
 /// </summary>
-[SugarTable("sys_role_field")]
+[SugarTable("casbin_sys_role_field")]
 public class RoleField : CreationAuditedEntity<Guid>
 {
     public RoleField() { }
@@ -37,3 +37,4 @@ public class RoleField : CreationAuditedEntity<Guid>
     [SugarColumn(Length = 64)]
     public string FieldName { get; set; }
 }
+

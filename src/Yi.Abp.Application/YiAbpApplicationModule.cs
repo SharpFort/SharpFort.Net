@@ -11,6 +11,7 @@ using Yi.Framework.SettingManagement.Application;
 //using Yi.Framework.Stock.Application;
 using Yi.Framework.TenantManagement.Application;
 using CityWalk.Core.Application;
+using Yi.Framework.CasbinRbac.Application;
 
 namespace Yi.Abp.Application
 {
@@ -19,7 +20,8 @@ namespace Yi.Abp.Application
         typeof(YiAbpDomainModule),
 
 
-        typeof(YiFrameworkRbacApplicationModule),
+        //typeof(YiFrameworkRbacApplicationModule),
+        typeof(Yi.Framework.CasbinRbac.Application.YiFrameworkCasbinRbacApplicationModule),
         typeof(YiFrameworkBbsApplicationModule),
         //typeof(YiFrameworkDigitalCollectiblesApplicationModule),
         //typeof(YiFrameworkChatHubApplicationModule),
@@ -31,7 +33,8 @@ namespace Yi.Abp.Application
         typeof(YiFrameworkCodeGenApplicationModule),
         typeof (YiFrameworkSettingManagementApplicationModule),
 
-        typeof(YiFrameworkDddApplicationModule)
+        typeof(YiFrameworkDddApplicationModule),
+        typeof(YiFrameworkCasbinRbacApplicationModule)
         
         )]
     public class YiAbpApplicationModule : AbpModule

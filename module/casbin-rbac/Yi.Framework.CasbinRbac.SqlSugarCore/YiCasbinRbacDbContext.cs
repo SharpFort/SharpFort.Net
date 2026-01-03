@@ -18,6 +18,8 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
         {
         }
 
+        public ISqlSugarClient GetSqlSugarClient() => SqlSugarClient;
+
         protected IDataFilter DataFilter => LazyServiceProvider.LazyGetRequiredService<IDataFilter>();
         protected ICurrentUser CurrentUser => LazyServiceProvider.GetRequiredService<ICurrentUser>();
 

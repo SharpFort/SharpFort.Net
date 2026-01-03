@@ -11,7 +11,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// <summary>
 /// 岗位聚合根
 /// </summary>
-[SugarTable("sys_position")]
+[SugarTable("casbin_sys_position")]
 // 岗位编码必须唯一
 [SugarIndex($"index_{nameof(PostCode)}", nameof(PostCode), OrderByType.Asc, IsUnique = true)]
 public class Position : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMultiTenant
@@ -129,3 +129,4 @@ public class Position : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMult
 
     #endregion
 }
+

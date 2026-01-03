@@ -87,7 +87,7 @@ public class Field : FullAuditedEntity<Guid>
     [SugarColumn(ColumnName = "is_public")]
     public bool IsPublic { get; set;  }
 
-    // IsDeleted, CreationTime 等由 FullAuditedEntity 自动实现
+    // IsDeleted, CreationTime 等由 FullAuditedAggregateRootEntity 自动实现
 
     /// <summary>
     /// ORM 专用

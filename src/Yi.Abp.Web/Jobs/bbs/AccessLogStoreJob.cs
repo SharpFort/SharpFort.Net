@@ -12,7 +12,7 @@ namespace Yi.Abp.Web.Jobs.bbs;
 
 public class BbsAccessLogStoreJob : HangfireBackgroundWorkerBase
 {
-    private readonly ISqlSugarRepository<BbsAccessLogAggregateRoot> _repository;
+    private readonly ISqlSugarRepository<BbsAccessLog> _repository;
 
     /// <summary>
     /// 缓存前缀
@@ -39,7 +39,7 @@ public class BbsAccessLogStoreJob : HangfireBackgroundWorkerBase
         }
     }
 
-    public BbsAccessLogStoreJob(ISqlSugarRepository<BbsAccessLogAggregateRoot> repository)
+    public BbsAccessLogStoreJob(ISqlSugarRepository<BbsAccessLog> repository)
     {
         _repository = repository;
 
@@ -79,7 +79,7 @@ public class BbsAccessLogStoreJob : HangfireBackgroundWorkerBase
             }
             else
             {
-                await _repository.InsertAsync((new BbsAccessLogAggregateRoot() { Number = number,BbsAccessLogType = BbsAccessLogType.ApiRequest }));
+                await _repository.InsertAsync((new BbsAccessLog() { Number = number,BbsAccessLogType = BbsAccessLogType.ApiRequest }));
             }
 
             //删除前一天的缓存

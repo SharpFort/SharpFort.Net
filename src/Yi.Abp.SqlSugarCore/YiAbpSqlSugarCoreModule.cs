@@ -15,13 +15,15 @@ using Yi.Framework.SqlSugarCore.Abstractions;
 //using Yi.Framework.Stock.SqlsugarCore;
 using Yi.Framework.TenantManagement.SqlSugarCore;
 using CityWalk.Core.SqlsugarCore;
+using Yi.Framework.CasbinRbac.SqlSugarCore;
 
 
 namespace Yi.Abp.SqlsugarCore
 {
     [DependsOn(
         typeof(YiAbpDomainModule),
-        typeof(YiFrameworkRbacSqlSugarCoreModule),
+        //typeof(YiFrameworkRbacSqlSugarCoreModule),
+        typeof(Yi.Framework.CasbinRbac.SqlSugarCore.YiFrameworkCasbinRbacSqlSugarCoreModule),
         //typeof(YiFrameworkDigitalCollectiblesSqlSugarCoreModule),
         typeof(YiFrameworkBbsSqlSugarCoreModule),
         typeof(YiFrameworkCodeGenSqlSugarCoreModule),
@@ -32,7 +34,8 @@ namespace Yi.Abp.SqlsugarCore
         typeof(YiFrameworkTenantManagementSqlSugarCoreModule),
         typeof(YiFrameworkMapsterModule),
         typeof(YiFrameworkSqlSugarCoreModule),
-        typeof(CityWalkCoreSqlSugarCoreModule)
+        typeof(CityWalkCoreSqlSugarCoreModule),
+        typeof(YiFrameworkCasbinRbacSqlSugarCoreModule)
     )]
     public class YiAbpSqlSugarCoreModule : AbpModule
     {

@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Data;
@@ -12,7 +12,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 字典类型聚合根
     /// (对应 sys_dictionary_type 表，管理字典的分类定义)
     /// </summary>
-    [SugarTable("sys_dictionary_type")]
+    [SugarTable("casbin_sys_dictionary_type")]
     // 核心约束：字典类型编码必须唯一，否则数据无法正确归类
     [SugarIndex($"index_{nameof(DictType)}", nameof(DictType), OrderByType.Asc, IsUnique = true)]
     public class DictionaryType : FullAuditedAggregateRoot<Guid>, IOrderNum, IState

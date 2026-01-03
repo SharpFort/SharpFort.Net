@@ -74,7 +74,7 @@ namespace Yi.Framework.SqlSugarCore
 
         private void RegisterRepositories(IServiceCollection services)
         {
-            services.TryAddTransient<ISqlSugarDbContext, SqlSugarDbContextFactory>();
+            services.TryAddScoped<ISqlSugarDbContext, SqlSugarDbContextFactory>();
             services.AddTransient(typeof(IRepository<>), typeof(SqlSugarRepository<>));
             services.AddTransient(typeof(IRepository<,>), typeof(SqlSugarRepository<,>));
             services.AddTransient(typeof(ISqlSugarRepository<>), typeof(SqlSugarRepository<>));

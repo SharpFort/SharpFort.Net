@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -7,7 +7,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 用户-岗位关联实体
 /// 用于存储用户担任的岗位信息
 /// </summary>
-[SugarTable("sys_user_position")]
+[SugarTable("casbin_sys_user_position")]
 // 核心约束：防止重复分配同一岗位，建立联合唯一索引
 [SugarIndex("index_user_position_unique", nameof(UserId),OrderByType.Asc, nameof(PostId), OrderByType.Asc, IsUnique = true)]
 public class UserPosition : CreationAuditedEntity<Guid>

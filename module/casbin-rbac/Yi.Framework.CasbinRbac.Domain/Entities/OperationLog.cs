@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -11,7 +11,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 操作日志聚合根
     /// 记录系统关键操作行为，用于审计追踪
     /// </summary>
-    [SugarTable("sys_operation_log")]
+    [SugarTable("casbin_sys_operation_log")]
     // 索引1：按时间倒序查询（日志最常用）
     [SugarIndex($"index_{nameof(CreationTime)}", nameof(CreationTime), OrderByType.Desc)]
     // 索引2：按操作人员查询
@@ -133,3 +133,4 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
         #endregion
     }
 }
+

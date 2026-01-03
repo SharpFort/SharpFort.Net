@@ -55,6 +55,7 @@ using Yi.Framework.Rbac.Domain.Shared.Options;
 using Yi.Framework.SettingManagement.Domain;
 //using Yi.Framework.Stock.Application;
 using Yi.Framework.TenantManagement.Application;
+using Yi.Framework.CasbinRbac.Application;
 
 namespace Yi.Abp.Web
 {
@@ -85,8 +86,8 @@ namespace Yi.Abp.Web
             {
                 options.ConventionalControllers.Create(typeof(YiAbpApplicationModule).Assembly,
                     options => options.RemoteServiceName = "default");
-                options.ConventionalControllers.Create(typeof(YiFrameworkRbacApplicationModule).Assembly,
-                    options => options.RemoteServiceName = "rbac");
+                //options.ConventionalControllers.Create(typeof(YiFrameworkRbacApplicationModule).Assembly,
+                //    options => options.RemoteServiceName = "rbac");
                 options.ConventionalControllers.Create(typeof(YiFrameworkBbsApplicationModule).Assembly,
                     options => options.RemoteServiceName = "bbs");
                 //options.ConventionalControllers.Create(typeof(YiFrameworkChatHubApplicationModule).Assembly,
@@ -103,6 +104,8 @@ namespace Yi.Abp.Web
                     options => options.RemoteServiceName = "setting-management");
                 options.ConventionalControllers.Create(typeof(CityWalkCoreApplicationModule).Assembly,
                     options => options.RemoteServiceName = "citywalk-core");
+                options.ConventionalControllers.Create(typeof(YiFrameworkCasbinRbacApplicationModule).Assembly,
+                    options => options.RemoteServiceName = "casbin-rbac");
 
                 //统一前缀
                 options.ConventionalControllers.ConventionalControllerSettings.ForEach(x => x.RootPath = "api/app");

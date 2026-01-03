@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,7 @@ using Yi.Framework.Core.Enums;
 
 namespace Yi.Framework.CasbinRbac.Domain.Entities
 {
-    [SugarTable("sys_file_storage")]
+    [SugarTable("casbin_sys_file_storage")]
     public class FileStorage : AggregateRoot<Guid>, IAuditedObject
     {
         public FileStorage()

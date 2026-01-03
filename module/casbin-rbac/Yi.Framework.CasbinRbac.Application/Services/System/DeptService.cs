@@ -59,6 +59,33 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
             };
         }
 
+        public override async Task<DeptGetOutputDto> CreateAsync(DeptCreateInputVo input)
+        {
+            await CheckCreateInputDtoAsync(input);
+            var entity = await MapToEntityAsync(input);
+            
+            // 处理 Ancestors
+            string ancestors = Guid.Empty.ToString();
+            Guid parentId = input.ParentId ?? Guid.Empty;
+
+            if (parentId != Guid.Empty)
+            {
+                var parent = await _repository.GetByIdAsync(parentId);
+                if (parent != null)
+                {
+                    ancestors = string.IsNullOrEmpty(parent.Ancestors) 
+                        ? parent.Id.ToString() 
+                        : $"{parent.Ancestors},{parent.Id}";
+                }
+            }
+            
+            // 使用 InitPath 设置受保护的属性
+            entity.InitPath(parentId, ancestors);
+
+            await _repository.InsertAsync(entity);
+            return await MapToGetOutputDtoAsync(entity);
+        }
+
         protected override async Task CheckCreateInputDtoAsync(DeptCreateInputVo input)
         {
             var isExist =

@@ -12,6 +12,7 @@
     <ProjectReference Include="..\..\module\tenant-management\Yi.Framework.TenantManagement.Application\Yi.Framework.TenantManagement.Application.csproj" />
     <ProjectReference Include="..\Yi.Abp.Application.Contracts\Yi.Abp.Application.Contracts.csproj" />
     <ProjectReference Include="..\Yi.Abp.Domain\Yi.Abp.Domain.csproj" />
+    <ProjectReference Include="..\..\module\casbin-rbac\Yi.Framework.CasbinRbac.Application\Yi.Framework.CasbinRbac.Application.csproj" />
   </ItemGroup>
 	
 

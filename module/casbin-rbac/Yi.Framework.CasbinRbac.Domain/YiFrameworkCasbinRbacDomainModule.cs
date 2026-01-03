@@ -41,6 +41,9 @@ namespace Yi.Framework.CasbinRbac.Domain
             //配置阿里云短信
             Configure<AliyunOptions>(configuration.GetSection(nameof(AliyunOptions)));
             
+            // 配置 Casbin 选项 (SuperAdminRoleCode, DebugMode)
+            Configure<CasbinOptions>(configuration.GetSection("Casbin"));
+            
             //分布式锁,需要redis
             if (configuration.GetSection("Redis").GetValue<bool>("IsEnabled"))
             {

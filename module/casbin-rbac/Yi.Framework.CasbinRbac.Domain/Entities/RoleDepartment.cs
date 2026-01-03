@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -8,7 +8,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 角色-部门关联实体
 /// 用于存储“自定义数据权限”的具体部门范围
 /// </summary>
-[SugarTable("sys_role_Department")] // 建议缩写表名，保持简洁
+[SugarTable("casbin_sys_role_Department")] // 建议缩写表名，保持简洁
 // 核心约束：同一个角色不能重复绑定同一个部门，设置联合唯一索引
 [SugarIndex("index_role_Department_unique", nameof(RoleId),OrderByType.Asc, nameof(DepartmentId),OrderByType.Asc, IsUnique = true)]
 public class RoleDepartment : CreationAuditedEntity<Guid>
@@ -84,3 +84,4 @@ public class RoleDepartment : CreationAuditedEntity<Guid>
 
     #endregion
 }
+

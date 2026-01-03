@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
@@ -12,7 +12,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 用于存储系统运行所需的键值对参数
     /// 配置项通常是系统关键数据，支持软删除（防止误删系统参数导致崩溃）和完整审计（追踪谁修改了关键参数，如支付开关、费率等）是非常必要的。
     /// </summary>
-    [SugarTable("sys_config")]
+    [SugarTable("casbin_sys_config")]
     // 配置键必须唯一，这是查询配置的核心依据
     [SugarIndex($"index_{nameof(ConfigKey)}", nameof(ConfigKey), OrderByType.Asc, IsUnique = true)]
     public class Config : FullAuditedAggregateRoot<Guid>, IOrderNum

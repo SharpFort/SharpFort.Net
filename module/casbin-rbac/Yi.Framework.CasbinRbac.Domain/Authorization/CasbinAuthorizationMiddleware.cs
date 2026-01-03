@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Users;
+using Yi.Framework.CasbinRbac.Domain.Shared.Options;
 
 namespace Yi.Framework.CasbinRbac.Domain.Authorization
 {
@@ -13,6 +14,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
     /// </summary>
     public class CasbinAuthorizationMiddleware : IMiddleware, ITransientDependency
     {
+        private readonly CasbinOptions _options;
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentTenant _currentTenant;
         private readonly IEnforcer _enforcer;
@@ -20,20 +22,21 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
         public CasbinAuthorizationMiddleware(
             ICurrentUser currentUser, 
             ICurrentTenant currentTenant, 
-            IEnforcer enforcer)
+            IEnforcer enforcer,
+            Microsoft.Extensions.Options.IOptions<Yi.Framework.CasbinRbac.Domain.Shared.Options.CasbinOptions> options)
         {
             _currentUser = currentUser;
             _currentTenant = currentTenant;
             _enforcer = enforcer;
+            _options = options.Value;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            // 1. 获取 Endpoint (需要 UseRouting 之后)
+            // 1. 获取 Endpoint
             var endpoint = context.GetEndpoint();
 
-            // 2. 检查 AllowAnonymous 特性
-            // 如果接口标记了 [AllowAnonymous]，则跳过 Casbin 检查
+            // 2. 检查 AllowAnonymous
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
                 await next(context);
@@ -41,20 +44,47 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
             }
 
             // 3. 构造 Casbin 请求参数
-            // Subject: 用户ID (u_GUID) 或 anonymous (未登录)
             var sub = _currentUser.IsAuthenticated ? $"u_{_currentUser.Id}" : "anonymous";
-            
-            // Domain: 租户ID (GUID) 或 default (无租户/宿主)
             var dom = _currentTenant.Id?.ToString() ?? "default";
             
-            // Object: 请求路径 (URL)
-            var obj = context.Request.Path.Value;
+            // 4. 超级管理员直通 (Bypass) - 解决跨租户管理难题
+            // 只要用户拥有指定的 SuperAdmin 角色，无需查 Casbin 规则，直接放行
+            // 注意: CurrentUser.Roles 通常包含 Role Name/Code
+            if (_currentUser.IsAuthenticated && 
+                _currentUser.Roles.Contains(_options.SuperAdminRoleCode, StringComparer.OrdinalIgnoreCase))
+            {
+                await next(context);
+                return;
+            }
             
-            // Action: 请求方法 (GET, POST...)
-            var act = context.Request.Method;
+            // Object: 优先读取 YiPermissionAttribute，降级使用 Normalized URL
+            string obj = null;
+            var permissionAttr = endpoint?.Metadata?.GetMetadata<Yi.Framework.CasbinRbac.Domain.Shared.Attributes.YiPermissionAttribute>();
+            if (permissionAttr != null)
+            {
+                obj = permissionAttr.Code;
+            }
+            else
+            {
+                var path = context.Request.Path.Value?.ToLower()?.TrimEnd('/');
+                obj = string.IsNullOrEmpty(path) ? "/" : path;
+            }
+            
+            // Action
+            var act = context.Request.Method.ToUpper();
 
-            // 4. 执行 Casbin 鉴权
-            if (await _enforcer.EnforceAsync(sub, dom, obj, act))
+            // 5. 执行 Casbin 鉴权
+            bool allowed = await _enforcer.EnforceAsync(sub, dom, obj, act);
+
+            // 6. 调试及诊断
+            if (_options.EnableDebugMode || context.Request.Headers.ContainsKey("X-Casbin-Debug"))
+            {
+                context.Response.Headers["X-Casbin-Result"] = allowed.ToString();
+                context.Response.Headers["X-Casbin-Sub"] = sub;
+                context.Response.Headers["X-Casbin-Obj"] = obj;
+            }
+
+            if (allowed)
             {
                 await next(context);
             }

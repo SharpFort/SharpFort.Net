@@ -17,7 +17,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 菜单/权限聚合根
     /// 核心系统资源，采用树形结构设计
     /// </summary>
-    [SugarTable("sys_menu")]
+    [SugarTable("casbin_sys_menu")]
     // 索引1：加速父子级递归查询
     [SugarIndex($"index_{nameof(ParentId)}", nameof(ParentId), OrderByType.Asc)]
     // 索引2：加速权限验证查询 (如: system:user:list)
@@ -364,3 +364,4 @@ public static class MenuEntityExtensions
         return rootRouters;
     }
 }
+

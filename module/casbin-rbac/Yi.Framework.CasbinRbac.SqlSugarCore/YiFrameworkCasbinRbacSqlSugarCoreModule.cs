@@ -7,6 +7,12 @@ using Volo.Abp.Modularity;
 using Yi.Framework.Mapster;
 using Yi.Framework.CasbinRbac.Domain;
 using Yi.Framework.SqlSugarCore;
+using Yi.Framework.CasbinRbac.SqlSugarCore.Adapters; // Introduce Wrapper
+using Volo.Abp;
+using Casbin.Adapter.SqlSugar.Entities;
+using Yi.Framework.SqlSugarCore.Abstractions;
+using Casbin.Persist;
+
 
 namespace Yi.Framework.CasbinRbac.SqlSugarCore
 {
@@ -20,17 +26,13 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             context.Services.AddYiDbContext<YiCasbinRbacDbContext>();
+            context.Services.AddTransient<YiCasbinRbacDbContext>();
 
-            // 注册 Casbin Adapter
-            context.Services.AddScoped<IAdapter>(sp =>
-            {
-                var dbContext = sp.GetRequiredService<YiCasbinRbacDbContext>();
-                // 确保 YiCasbinRbacDbContext 继承的 SqlSugarDbContext 暴露了 SqlSugarClient
-                return new SqlSugarAdapter(dbContext.SqlSugarClient);
-            });
+            // 1. 注册 Adapter 包装器 (它本身无状态，Scoped/Singleton 均可，但它依赖 ScopeFactory 是单例安全的)
+            context.Services.AddSingleton<IAdapter, ScopeFactoryCasbinAdapter>();
 
-            // 注册 Casbin Enforcer
-            context.Services.AddScoped<IEnforcer>(sp =>
+            // 2. 注册 Casbin Enforcer 为 Singleton (机器缓存核心)
+            context.Services.AddSingleton<IEnforcer>(sp =>
             {
                 var adapter = sp.GetRequiredService<IAdapter>();
                 var modelPath = Path.Combine(AppContext.BaseDirectory, "rbac_with_domains_model.conf");
@@ -38,16 +40,27 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                 {
                     throw new FileNotFoundException($"Casbin model file not found at: {modelPath}");
                 }
+                
+                // 使用适配器初始化
                 var enforcer = new Enforcer(modelPath, adapter);
                 
-                // 启用自动保存 (AddPolicy 时自动写入数据库)
-                enforcer.EnableAutoSave(true);
+                // 3. 关键：禁用自动保存！！！！
+                // 因为写入操作由 Repository 接管，Enforcer 只负责读
+                enforcer.EnableAutoSave(false);
                 
-                // 加载策略
+                // 4. 首次全量加载
+                // 内部会调用 adapter.LoadPolicy，我们的 adapter 会创建 Scope 读取数据库
                 enforcer.LoadPolicy();
                 
                 return enforcer;
             });
+        }
+        public override async Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
+        {
+            var db = context.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+            // 确保 CasbinRule 表存在
+            db.CodeFirst.InitTables(typeof(CasbinRule));
+            await base.OnPostApplicationInitializationAsync(context);
         }
     }
 }

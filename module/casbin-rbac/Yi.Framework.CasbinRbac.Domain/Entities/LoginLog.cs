@@ -11,7 +11,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 登录日志聚合根
     /// 记录用户登录行为，数据不可变（仅记录创建信息）
     /// </summary>
-    [SugarTable("sys_login_log")]
+    [SugarTable("casbin_sys_login_log")]
     // 索引1：按用户查询
     [SugarIndex($"index_{nameof(LoginUser)}", nameof(LoginUser), OrderByType.Asc)]
     // 索引2：按时间范围查询（日志查询最常用）
@@ -167,3 +167,4 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
 //    }
 
 //}
+

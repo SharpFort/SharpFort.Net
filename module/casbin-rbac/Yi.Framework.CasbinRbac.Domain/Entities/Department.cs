@@ -13,7 +13,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 部门聚合根
     /// 组织架构核心实体，呈树形结构
     /// </summary>
-    [SugarTable("sys_department")]
+    [SugarTable("casbin_sys_department")]
     // 部门编码全局唯一
     [SugarIndex($"index_{nameof(DeptCode)}", nameof(DeptCode), OrderByType.Asc, IsUnique = true)]
     // 父级ID索引，加速树形查找（查找子节点时非常频繁）
@@ -168,6 +168,16 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
             Ancestors = newAncestors;
         }
 
+        /// <summary>
+        /// 初始化层级路径 (用于创建时)
+        /// </summary>
+        public void InitPath(Guid parentId, string ancestors)
+        {
+            ParentId = parentId;
+            Ancestors = ancestors;
+        }
+
         #endregion
     }
 }
+

@@ -66,3 +66,79 @@
 ### 🚀 未来规划
 1.  **字段级权限**: 目前仅定义了表结构，后续需在 DTO 映射层或 JSON 序列化层实现字段过滤逻辑。
 2.  **性能调优**: 随着策略数量增长，考虑引入 Casbin 的 `Watcher` 机制实现多实例缓存同步。
+
+## 6. 字段级权限开发指南 (Field Security Guide)
+
+### 6.1 简介
+本模块实现了高性能的字段级权限控制 (Field Level Security)，使用了 **JSON 序列化拦截** 技术。
+当后端返回 DTO 给前端时，系统会自动检查当前用户的角色是否在 sys_role_field 表中有禁止访问的记录（黑名单）。如果有，该字段会在 JSON 中被彻底移除。
+
+### 6.2 使用方法 (How to Use)
+开发者只需在 Output DTO 类上添加 [SecureResource] 特性即可。
+
+**示例代码:**
+
+`csharp
+using Yi.Framework.CasbinRbac.Domain.Shared.Attributes;
+
+namespace Yi.Framework.Rbac.Application.Contracts.Dtos.User
+{
+    // 1. 标记资源名 (对应 RoleField 表中的 TableName)
+    [SecureResource("sys_user")] 
+    public class UserDto : EntityDto<Guid>
+    {
+        public string UserName { get; set; }
+
+        public string Nick { get; set; }
+
+        // 2. 如果管理员配置了 "sys_user" 表的 "Phone" 字段为禁止，
+        //    则此属性在序列化时会被忽略，前端收不到该字段。
+        public string Phone { get; set; } 
+    }
+}
+`
+
+### 6.3 注意事项
+1.  **资源名一致性**: [SecureResource("xxx")] 中的字符串必须与 SysTableConfig 和 SysRoleField 表中的 TableName 严格一致（不区分大小写）。
+2.  **性能**: 该机制经过优化（缓存了反射元数据和权限规则），性能损耗极低，可放心在大列表接口使用。
+3.  **仅限 Output**: 该机制目前仅针对 JSON **输出** (Write) 生效。输入 (Read) 暂不拦截。
+
+
+## 7. 安全增强开发指南 (Security Hardening)
+
+### 7.1 简介
+为了解决 URL 变更导致的权限失效问题，并防止大小写绕过攻击，系统引入了 **资源标识符 (Resource ID)** 和 **URL 归一化** 机制。
+
+### 7.2 资源标识符 (YiPermissionAttribute)
+强烈建议在 Controller 的 Action 上绑定固定的权限代码，而不是依赖 URL。
+
+**示例代码:**
+
+`csharp
+using Yi.Framework.CasbinRbac.Domain.Shared.Attributes;
+
+[Route("api/users")]
+public class UserController : Controller
+{
+    // 绑定固定权限码 "user:list"
+    // 即使路由改为 "api/v2/users/get-all"，原有 Casbin 策略 (obj="user:list") 依然有效！
+    [HttpGet]
+    [YiPermission("user:list")] 
+    public async Task<List<UserDto>> GetListAsync() { ... }
+}
+`
+
+### 7.3 默认 URL 策略 (Fallback)
+如果未标记 [YiPermission]，系统将降级使用 URL 进行鉴权，但会自动进行 **归一化处理**：
+*   转换为**小写** (Lowercase)
+*   **去除尾部斜杠** (Trim trailing slash)
+
+例如：请求 /API/User/List/ 会被转换为 /api/user/list 进行鉴权。请确保 Casbin 数据库中的策略也使用小写 URL。
+
+### 7.4 调试模式 (Debug Mode)
+开发人员在调试 403 问题时，可在请求头中添加 X-Casbin-Debug: true。
+响应头将包含详细的鉴权参数：
+*   X-Casbin-Result: True/False
+*   X-Casbin-Sub: u_GUID
+*   X-Casbin-Obj: user:list 或 /api/user/list
+

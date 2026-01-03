@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Server.IISIntegration;
+using Microsoft.AspNetCore.Server.IISIntegration;
 using SqlSugar;
 using Volo.Abp;
 using Volo.Abp.Auditing;
@@ -15,7 +15,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// <remarks>
     /// 注意：类名 Dictionary 与 C# 系统集合类型冲突，使用时请注意命名空间引用。
     /// </remarks>
-    [SugarTable("sys_dictionary")]
+    [SugarTable("casbin_sys_dictionary")]
     // 索引1：根据字典类型查询列表（高频操作）
     [SugarIndex($"index_{nameof(DictType)}", nameof(DictType), OrderByType.Asc)]
     // 索引2：同一字典类型下，字典值必须唯一（防止重复定义）

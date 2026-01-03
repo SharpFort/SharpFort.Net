@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 通知公告聚合根
     /// 用于管理系统通知、公告内容的发布
     /// </summary>
-    [SugarTable("sys_notice")]
+    [SugarTable("casbin_sys_notice")]
     // 索引1：查询启用状态的公告 (高频：查询首页显示的公告)
     [SugarIndex($"index_{nameof(State)}", nameof(State), OrderByType.Asc)]
     // 索引2：按类型筛选

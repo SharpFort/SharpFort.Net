@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -8,7 +8,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 用户-角色关联实体
 /// 用于存储用户拥有的角色信息
 /// </summary>
-[SugarTable("sys_user_role")]
+[SugarTable("casbin_sys_user_role")]
 // 核心约束：防止重复授权，建立联合唯一索引
 [SugarIndex("index_user_role_unique", nameof(UserId),OrderByType.Asc, nameof(RoleId), OrderByType.Asc, IsUnique = true)]
 public class UserRole : CreationAuditedEntity<Guid>

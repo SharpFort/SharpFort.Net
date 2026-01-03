@@ -5,9 +5,8 @@ using Volo.Abp.Domain.Entities;
 namespace Yi.Framework.Bbs.Domain.Entities.Forum
 {
     [SugarTable("bbs_agree")]
-    [SugarIndex($"index_{nameof(DiscussId)}", nameof(DiscussId), OrderByType.Agree")]
-    [SugarIndex($"index_{nameof(CreatorId)}_{nameof(DiscussId)}", nameof(CreatorId), OrderByType.Asc,
-        nameof(DiscussId), OrderByType.Asc)]
+    [SugarIndex($"index_{nameof(DiscussId)}", nameof(DiscussId), OrderByType.Asc)]
+    [SugarIndex($"index_{nameof(CreatorId)}_{nameof(DiscussId)}", nameof(CreatorId), OrderByType.Asc, nameof(DiscussId), OrderByType.Asc)]
     public class Agree : Entity<Guid>, ICreationAuditedObject
     {
         public Agree()

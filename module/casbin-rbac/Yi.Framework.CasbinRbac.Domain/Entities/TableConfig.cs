@@ -7,7 +7,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 表字段元数据配置
 /// 用于列出系统中所有需要进行权限控制的表和字段的中文描述，供前端配置界面选择。
 /// </summary>
-[SugarTable("sys_table_config")]
+[SugarTable("casbin_sys_table_config")]
 public class TableConfig : CreationAuditedEntity<Guid>
 {
     public TableConfig() { }
@@ -37,3 +37,4 @@ public class TableConfig : CreationAuditedEntity<Guid>
     [SugarColumn(Length = 64)]
     public string FieldRemark { get; set; }
 }
+

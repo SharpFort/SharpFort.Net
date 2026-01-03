@@ -10,6 +10,7 @@ using Yi.Framework.Bbs.Domain.Shared.Enums;
 using Yi.Framework.Bbs.Domain.Shared.Etos;
 using Yi.Framework.Rbac.Domain.Entities;
 using Yi.Framework.SqlSugarCore.Abstractions;
+using Comment = Yi.Framework.Bbs.Domain.Entities.Forum.Comment;
 
 namespace Yi.Framework.Bbs.Domain.EventHandlers
 {

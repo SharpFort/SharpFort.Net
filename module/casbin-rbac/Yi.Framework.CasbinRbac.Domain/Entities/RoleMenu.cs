@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -8,7 +8,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 角色-菜单关联实体
 /// 用于存储角色拥有的菜单/权限
 /// </summary>
-[SugarTable("sys_role_menu")]
+[SugarTable("casbin_sys_role_menu")]
 // 核心约束：防止重复授权，建立联合唯一索引
 [SugarIndex("index_role_menu_unique", nameof(RoleId), OrderByType.Asc, nameof(MenuId), OrderByType.Asc, IsUnique = true)]
 public class RoleMenu : CreationAuditedEntity<Guid>

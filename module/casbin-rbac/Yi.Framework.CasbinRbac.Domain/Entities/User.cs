@@ -5,7 +5,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 using Yi.Framework.Core.Data;
 using Yi.Framework.Core.Helper;
-using Yi.Framework.Rbac.Domain.Shared.Enums;
+using Yi.Framework.CasbinRbac.Domain.Shared.Enums;
 
 namespace Yi.Framework.CasbinRbac.Domain.Entities
 {
@@ -13,7 +13,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 用户聚合根
     /// 核心业务实体，继承 FullAuditedAggregateRoot 以支持完整的审计（创建/修改/软删除）和并发控制。
     /// </summary>
-    [SugarTable("sys_user")]
+    [SugarTable("casbin_sys_user")]
     // 用户名必须唯一，使用唯一索引
     [SugarIndex($"index_{nameof(UserName)}", nameof(UserName), OrderByType.Asc, IsUnique = true)]
     // 经常通过手机号查询，建议加索引
@@ -266,3 +266,4 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
 
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Data;
@@ -11,7 +11,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
     /// 第三方授权绑定聚合根
     /// (建议重命名为 OpenAuth 以区分权限逻辑)
     /// </summary>
-    [SugarTable("sys_open_auth")]
+    [SugarTable("casbin_sys_open_auth")]
     // 核心约束：同一个平台下的 OpenId 必须唯一，不能被多个用户绑定
     [SugarIndex($"index_unique_{nameof(AuthType)}_{nameof(OpenId)}", nameof(AuthType),OrderByType.Asc, nameof(OpenId),OrderByType.Asc, IsUnique = true)]
     // 常用查询：查询某个用户绑定了哪些平台

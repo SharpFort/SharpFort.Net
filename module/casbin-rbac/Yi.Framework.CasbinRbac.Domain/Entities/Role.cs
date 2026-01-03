@@ -4,7 +4,7 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 using Yi.Framework.Core.Data;
-using Yi.Framework.Rbac.Domain.Shared.Enums;
+using Yi.Framework.CasbinRbac.Domain.Shared.Enums;
 
 namespace Yi.Framework.CasbinRbac.Domain.Entities;
 
@@ -12,7 +12,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities;
 /// 角色聚合根
 /// 系统核心权限控制实体，使用 FullAuditedAggregateRoot 确保全生命周期可追溯
 /// </summary>
-[SugarTable("sys_role")]
+[SugarTable("casbin_sys_role")]
 // 角色编码必须唯一，防止鉴权冲突
 [SugarIndex($"index_{nameof(RoleCode)}", nameof(RoleCode), OrderByType.Asc, IsUnique = true)]
 public class Role : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMultiTenant
@@ -141,3 +141,4 @@ public class Role : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMultiTen
 
     #endregion
 }
+
