@@ -23,7 +23,5 @@ namespace Yi.Framework.CasbinRbac.Domain.Shared.Enums
         /// 女性
         /// </summary>
         Female = 2,
-      
-
     }
 }

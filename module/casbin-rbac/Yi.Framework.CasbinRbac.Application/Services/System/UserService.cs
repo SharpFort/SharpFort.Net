@@ -97,6 +97,10 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
         {
             var entitiy = await MapToEntityAsync(input);
 
+            // 处理密码加密（与 UpdateAsync 保持一致的逻辑）
+            var password = string.IsNullOrEmpty(input.Password) ? "123456" : input.Password;
+            entitiy.SetPassword(password);
+
             await _userManager.CreateAsync(entitiy);
             await _userManager.GiveUserSetRoleAsync(new List<Guid> { entitiy.Id }, input.RoleIds);
             await _userManager.GiveUserSetPostAsync(new List<Guid> { entitiy.Id }, input.PostIds);
@@ -107,7 +111,9 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
 
         protected override async Task<User> MapToEntityAsync(UserCreateInputVo createInput)
         {
+            // 使用基类的映射逻辑
             var entitiy = await base.MapToEntityAsync(createInput);
+            // 注意：此时密码是明文，会在 CreateAsync 中调用 SetPassword 加密
             return entitiy;
         }
 
