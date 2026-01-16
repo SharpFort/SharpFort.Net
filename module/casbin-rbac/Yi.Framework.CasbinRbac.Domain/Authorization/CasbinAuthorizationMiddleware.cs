@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Casbin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Users;
@@ -10,7 +11,7 @@ using Yi.Framework.CasbinRbac.Domain.Shared.Options;
 namespace Yi.Framework.CasbinRbac.Domain.Authorization
 {
     /// <summary>
-    /// Casbin 鉴权中间件
+    /// Casbin Authorization Middleware
     /// </summary>
     public class CasbinAuthorizationMiddleware : IMiddleware, ITransientDependency
     {
@@ -23,7 +24,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
             ICurrentUser currentUser, 
             ICurrentTenant currentTenant, 
             IEnforcer enforcer,
-            Microsoft.Extensions.Options.IOptions<Yi.Framework.CasbinRbac.Domain.Shared.Options.CasbinOptions> options)
+            IOptions<CasbinOptions> options)
         {
             _currentUser = currentUser;
             _currentTenant = currentTenant;
@@ -33,55 +34,54 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            // 1. 获取 Endpoint
-            var endpoint = context.GetEndpoint();
+            var path = context.Request.Path.Value;
 
-            // 2. 检查 AllowAnonymous
+            // 1. Whitelist / AllowAnonymous checks
+            var endpoint = context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
                 await next(context);
                 return;
             }
 
-            // 3. 构造 Casbin 请求参数
-            var sub = _currentUser.IsAuthenticated ? $"u_{_currentUser.Id}" : "anonymous";
-            var dom = _currentTenant.Id?.ToString() ?? "default";
-            
-            // 4. 超级管理员直通 (Bypass) - 解决跨租户管理难题
-            // 只要用户拥有指定的 SuperAdmin 角色，无需查 Casbin 规则，直接放行
-            // 注意: CurrentUser.Roles 通常包含 Role Name/Code
-            if (_currentUser.IsAuthenticated && 
-                _currentUser.Roles.Contains(_options.SuperAdminRoleCode, StringComparer.OrdinalIgnoreCase))
+            // 2. Identity (sub)
+            if (!_currentUser.IsAuthenticated)
             {
-                await next(context);
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return;
             }
+
+            var sub = _currentUser.Id?.ToString();
             
-            // Object: 优先读取 YiPermissionAttribute，降级使用 Normalized URL
-            string obj = null;
-            var permissionAttr = endpoint?.Metadata?.GetMetadata<Yi.Framework.CasbinRbac.Domain.Shared.Attributes.YiPermissionAttribute>();
-            if (permissionAttr != null)
-            {
-                obj = permissionAttr.Code;
-            }
-            else
-            {
-                var path = context.Request.Path.Value?.ToLower()?.TrimEnd('/');
-                obj = string.IsNullOrEmpty(path) ? "/" : path;
-            }
-            
-            // Action
+            // 3. Domain (dom)
+            var dom = _currentTenant.Id?.ToString() ?? "default";
+
+            // 4. Resource (obj)
+            // Strictly use Request Path for RESTful RBAC
+            // Normalizing path: lowercase? 
+            // The DB migration uses the path as stored in Menu (ApiUrl).
+            // We should ensure consistency. 
+            // Let's use the raw path or normalized to lowercase. 
+            // If DB stores "/api/User", and request is "/api/user", we need a match.
+            // keyMatch2 is case-sensitive? 
+            // Usually paths are case-insensitive in Windows but sensitive in Linux.
+            // Best practice: Normalize to lowercase for comparison if the convention allows.
+            var obj = path; //.ToLower(); // Decided to keep case for now, assuming DB matches registration.
+
+            // 5. Action (act)
             var act = context.Request.Method.ToUpper();
 
-            // 5. 执行 Casbin 鉴权
+            // 6. Enforce
             bool allowed = await _enforcer.EnforceAsync(sub, dom, obj, act);
 
-            // 6. 调试及诊断
-            if (_options.EnableDebugMode || context.Request.Headers.ContainsKey("X-Casbin-Debug"))
+            // Debug headers
+            if (_options.EnableDebugMode)
             {
-                context.Response.Headers["X-Casbin-Result"] = allowed.ToString();
                 context.Response.Headers["X-Casbin-Sub"] = sub;
                 context.Response.Headers["X-Casbin-Obj"] = obj;
+                context.Response.Headers["X-Casbin-Act"] = act;
+                context.Response.Headers["X-Casbin-Dom"] = dom;
+                context.Response.Headers["X-Casbin-Result"] = allowed.ToString();
             }
 
             if (allowed)

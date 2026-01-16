@@ -56,6 +56,7 @@ using Yi.Framework.SettingManagement.Domain;
 //using Yi.Framework.Stock.Application;
 using Yi.Framework.TenantManagement.Application;
 using Yi.Framework.CasbinRbac.Application;
+using Yi.Framework.CasbinRbac.Domain.Authorization; // Added namespace
 
 namespace Yi.Abp.Web
 {
@@ -375,6 +376,9 @@ namespace Yi.Abp.Web
 
             //鉴权
             app.UseAuthentication();
+            
+            //Casbin鉴权中间件
+            app.UseMiddleware<CasbinAuthorizationMiddleware>();
 
             //多租户
             app.UseMultiTenancy();

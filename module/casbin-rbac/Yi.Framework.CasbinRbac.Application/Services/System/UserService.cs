@@ -1,3 +1,4 @@
+using Casbin;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using TencentCloud.Tcr.V20190924.Models;
@@ -35,10 +36,10 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
         public UserService(ISqlSugarRepository<User, Guid> repository, UserManager userManager,
             IUserRepository userRepository, ICurrentUser currentUser, IDeptService deptService,
             ILocalEventBus localEventBus,
-            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache) : base(repository)
+            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache, IEnforcer enforcer) : base(repository)
             =>
-                (_userManager, _userRepository, _currentUser, _deptService, _repository, _localEventBus) =
-                (userManager, userRepository, currentUser, deptService, repository, localEventBus);
+                (_userManager, _userRepository, _currentUser, _deptService, _repository, _localEventBus, _enforcer) =
+                (userManager, userRepository, currentUser, deptService, repository, localEventBus, enforcer);
 
         private UserManager _userManager { get; set; }
         private ISqlSugarRepository<User, Guid> _repository;
@@ -48,6 +49,7 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
         private ICurrentUser _currentUser { get; set; }
 
         private ILocalEventBus _localEventBus;
+        private readonly IEnforcer _enforcer;
 
         /// <summary>
         /// 查询用户
@@ -105,8 +107,51 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
             await _userManager.GiveUserSetRoleAsync(new List<Guid> { entitiy.Id }, input.RoleIds);
             await _userManager.GiveUserSetPostAsync(new List<Guid> { entitiy.Id }, input.PostIds);
 
+            // 同步 Casbin 用户角色关系 (g)
+            // 需要获取角色编码，这里假设 RoleIds 对应角色的 Code 需要查询
+            // 或者暂时使用 RoleId 作为角色标识（推荐使用 ID 以保持一致性，但 Casbin 通常用 Code 更可读）
+            // 方案书V1.2: sub 传递 UserId, g = 用户, 角色, 域
+            
+            // 查询角色信息
+            // 考虑事务一致性，这里应该在同一个 UOW 中
+            
+            // 注意：RoleService/Manager 应该提供获取角色 Code 的方法
+            // 这里为了演示，假设 RoleIds 对应的角色列表需要被查询出来
+            // 暂时先跳过 Role Code 查询，直接用 RoleId，但最佳实践是 RoleCode
+            // 修正：Casbin g策略通常是 g, user_id, role_code, domain_id
+            
+            // Casbin 同步逻辑放入 GiveUserSetRoleAsync 或者在这里显式调用
+            // 建议：封装一个私有方法或领域服务处理 Casbin 同步
+            await SyncCasbinUserRoles(entitiy.Id, input.RoleIds);
+
             var result = await MapToGetOutputDtoAsync(entitiy);
             return result;
+        }
+
+        private async Task SyncCasbinUserRoles(Guid userId, List<Guid> roleIds)
+        {
+            if (roleIds == null || !roleIds.Any()) return;
+
+            // 1. 清理旧的用户角色关联 (如果需要全量覆盖)
+            // await _enforcer.RemoveFilteredGroupingPolicyAsync(0, userId.ToString());
+
+            // 2. 添加新的关联
+            // 需要查询 Role Code (假设 Role 表有 Code 字段)
+            // 这里为了简单，先用 RoleId.ToString()，实际项目中应查询 Role Code
+            // 但根据方案 V1.2，sub 是 UserId，g 是 (UserId, RoleId, DomainId)
+            // 所以直接用 RoleId 也是符合方案的 (Provided RoleId is consistent with policy definitions)
+            
+            // 获取当前用户的域 (假设单域，或者从 User.DepartmentId 推导，或者默认 "default")
+            // 方案 V1.2: g = _, _, _ (user, role, domain)
+            string domain = "default"; // 默认域
+
+            var policies = roleIds.Select(roleId => new [] { userId.ToString(), roleId.ToString(), domain }).ToList();
+            
+            // 必须禁用 AutoSave 并手动 Save，因为在外层事务中
+            // 已在 DI 中全局禁用 AutoSave
+            
+            await _enforcer.AddGroupingPoliciesAsync(policies);
+            await _enforcer.SavePolicyAsync(); 
         }
 
         protected override async Task<User> MapToEntityAsync(UserCreateInputVo createInput)
@@ -162,6 +207,13 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
             var res1 = await _repository.UpdateAsync(entity);
             await _userManager.GiveUserSetRoleAsync(new List<Guid> { id }, input.RoleIds);
             await _userManager.GiveUserSetPostAsync(new List<Guid> { id }, input.PostIds);
+
+            // Casbin 同步：更新用户角色
+            // 先删除旧的
+            await _enforcer.RemoveFilteredGroupingPolicyAsync(0, id.ToString());
+            // 再添加新的
+            await SyncCasbinUserRoles(id, input.RoleIds);
+
             return await MapToGetOutputDtoAsync(entity);
         }
 
@@ -213,6 +265,10 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
         [OperLog("删除用户", OperationType.Delete)]
         public override async Task DeleteAsync(Guid id)
         {
+            // Casbin 同步：删除用户关联
+            await _enforcer.RemoveFilteredGroupingPolicyAsync(0, id.ToString());
+            await _enforcer.SavePolicyAsync();
+
             await base.DeleteAsync(id);
         }
 

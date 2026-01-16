@@ -26,5 +26,15 @@ namespace Yi.Framework.CasbinRbac.Application.Contracts.Dtos.Menu
         public int OrderNum { get; set; }
         public MenuSource MenuSource { get; set; } = MenuSource.Ruoyi;
         public string? RouterName { get; set; }
+        
+        /// <summary>
+        /// API URL (用于 Casbin 鉴权，例如 /api/user)
+        /// </summary>
+        public string? ApiUrl { get; set; }
+
+        /// <summary>
+        /// API Method (用于 Casbin 鉴权，例如 GET, POST)
+        /// </summary>
+        public string? ApiMethod { get; set; }
     }
 }

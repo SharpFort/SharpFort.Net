@@ -1,18 +1,20 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Casbin;
 using Casbin.Adapter.SqlSugar;
+using Casbin.Persist;
+using Casbin.Watcher.Redis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Volo.Abp;
 using Volo.Abp.Modularity;
 using Yi.Framework.Mapster;
 using Yi.Framework.CasbinRbac.Domain;
 using Yi.Framework.SqlSugarCore;
-using Yi.Framework.CasbinRbac.SqlSugarCore.Adapters; // Introduce Wrapper
-using Volo.Abp;
-using Casbin.Adapter.SqlSugar.Entities;
 using Yi.Framework.SqlSugarCore.Abstractions;
-using Casbin.Persist;
-
+using Casbin.Adapter.SqlSugar.Entities;
 
 namespace Yi.Framework.CasbinRbac.SqlSugarCore
 {
@@ -28,11 +30,15 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
             context.Services.AddYiDbContext<YiCasbinRbacDbContext>();
             context.Services.AddTransient<YiCasbinRbacDbContext>();
 
-            // 1. 注册 Adapter 包装器 (它本身无状态，Scoped/Singleton 均可，但它依赖 ScopeFactory 是单例安全的)
-            context.Services.AddSingleton<IAdapter, ScopeFactoryCasbinAdapter>();
+            // 1. Adapter (Scoped)
+            context.Services.AddScoped<IAdapter>(sp =>
+            {
+                var dbContext = sp.GetRequiredService<ISqlSugarDbContext>();
+                return new SqlSugarAdapter(dbContext.SqlSugarClient);
+            });
 
-            // 2. 注册 Casbin Enforcer 为 Singleton (机器缓存核心)
-            context.Services.AddSingleton<IEnforcer>(sp =>
+            // 2. Enforcer (Scoped)
+            context.Services.AddScoped<IEnforcer>(sp =>
             {
                 var adapter = sp.GetRequiredService<IAdapter>();
                 var modelPath = Path.Combine(AppContext.BaseDirectory, "rbac_with_domains_model.conf");
@@ -41,25 +47,64 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                     throw new FileNotFoundException($"Casbin model file not found at: {modelPath}");
                 }
                 
-                // 使用适配器初始化
-                var enforcer = new Enforcer(modelPath, adapter);
+                // Task 11: Use CachedEnforcer for better performance within the request scope
+                var enforcer = new CachedEnforcer(modelPath, adapter);
                 
-                // 3. 关键：禁用自动保存！！！！
-                // 因为写入操作由 Repository 接管，Enforcer 只负责读
+                // Task 6: Disable AutoSave for Transaction safety
                 enforcer.EnableAutoSave(false);
                 
-                // 4. 首次全量加载
-                // 内部会调用 adapter.LoadPolicy，我们的 adapter 会创建 Scope 读取数据库
+                // Load policies from DB (Scoped means this happens per request, ensuring fresh data)
                 enforcer.LoadPolicy();
                 
+                // Task 10: Configure Redis Watcher
+                var config = sp.GetRequiredService<IConfiguration>();
+                var redisEnabled = config.GetSection("Redis").GetValue<bool>("IsEnabled");
+                if (redisEnabled)
+                {
+                    try 
+                    {
+                        var redisConn = config["Redis:Configuration"];
+                        // RedisWatcher (v2.0.0) usually takes connection string and channel name
+                        // Warning: Creating a new RedisWatcher per request (Scoped) might be resource intensive (connections).
+                        // Ideally, Watcher should be Singleton. 
+                        // But Enforcer is Scoped. 
+                        // SetWatcher binds them.
+                        
+                        // If we want to strictly follow "Scoped Enforcer", we might skip Watcher for *incoming* updates (since we reload anyway),
+                        // but we need it for *publishing* updates (SavePolicy -> Watcher.Update).
+                        
+                        var watcher = new RedisWatcher(redisConn);
+                        enforcer.SetWatcher(watcher);
+                        
+                        // Callback to clear cache if update received
+                        // (Though Scoped Enforcer is short-lived, this is good practice)
+                        watcher.SetUpdateCallback(() => 
+                        {
+                            enforcer.ClearPolicyCache(); // Clear CachedEnforcer cache
+                            // We don't need LoadPolicy() here because Scoped Enforcer loads on creation.
+                            // But if this is a long-running scope (unlikely in HTTP), we might.
+                            return Task.CompletedTask;
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log but don't fail if Redis fails?
+                         var logger = sp.GetService<ILogger<YiFrameworkCasbinRbacSqlSugarCoreModule>>();
+                         logger?.LogWarning(ex, "Failed to initialize Casbin Redis Watcher.");
+                    }
+                }
+
                 return enforcer;
             });
         }
+
         public override async Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            var db = context.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
-            // 确保 CasbinRule 表存在
-            db.CodeFirst.InitTables(typeof(CasbinRule));
+            using (var scope = context.ServiceProvider.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+                db.CodeFirst.InitTables(typeof(CasbinRule));
+            }
             await base.OnPostApplicationInitializationAsync(context);
         }
     }

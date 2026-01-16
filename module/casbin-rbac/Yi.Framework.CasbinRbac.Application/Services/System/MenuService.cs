@@ -21,6 +21,24 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
             _repository = repository;
         }
 
+        public override async Task<MenuGetOutputDto> CreateAsync(MenuCreateInputVo input)
+        {
+            // 处理 ApiMethod 转大写
+            if (!string.IsNullOrEmpty(input.ApiMethod))
+            {
+                input.ApiMethod = input.ApiMethod.ToUpper();
+            }
+            return await base.CreateAsync(input);
+        }
+
+        public override async Task<MenuGetOutputDto> UpdateAsync(Guid id, MenuUpdateInputVo input)
+        {
+            // TODO: 如果菜单的 ApiUrl/ApiMethod 变更，需要同步更新 Casbin 策略
+            // 这涉及到复杂的策略查找与替换，建议后续完善
+            // 现阶段，如果是修改，建议先手动在界面删除再添加，或开发专门的策略同步功能
+            return await base.UpdateAsync(id, input);
+        }
+
         public override async Task<PagedResultDto<MenuGetListOutputDto>> GetListAsync(MenuGetListInputVo input)
         {
             RefAsync<int> total = 0;
