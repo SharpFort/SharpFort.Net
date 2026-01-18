@@ -36,21 +36,17 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
         {
             var path = context.Request.Path.Value;
 
-            // 0. Path-based whitelist for public endpoints
-            if (!string.IsNullOrEmpty(path))
+            // 0. Check configured IgnoreUrls from appsettings.json
+            if (!string.IsNullOrEmpty(path) && _options.IgnoreUrls != null && _options.IgnoreUrls.Any())
             {
                 var pathLower = path.ToLower();
-                // Allow Swagger, Hangfire, static files, and other public paths
-                if (pathLower.StartsWith("/swagger") ||
-                    pathLower.StartsWith("/hangfire") ||
-                    pathLower.StartsWith("/api/app/wwwroot") ||
-                    pathLower.StartsWith("/_framework") ||
-                    pathLower.StartsWith("/_content") ||
-                    pathLower == "/" ||
-                    pathLower == "/favicon.ico")
+                foreach (var ignoreUrl in _options.IgnoreUrls)
                 {
-                    await next(context);
-                    return;
+                    if (pathLower.StartsWith(ignoreUrl.ToLower()))
+                    {
+                        await next(context);
+                        return;
+                    }
                 }
             }
 

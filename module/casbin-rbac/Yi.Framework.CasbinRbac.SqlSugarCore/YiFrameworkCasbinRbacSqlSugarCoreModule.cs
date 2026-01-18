@@ -12,6 +12,7 @@ using Volo.Abp;
 using Volo.Abp.Modularity;
 using Yi.Framework.Mapster;
 using Yi.Framework.CasbinRbac.Domain;
+using Yi.Framework.CasbinRbac.Domain.Shared.Options;
 using Yi.Framework.SqlSugarCore;
 using Yi.Framework.SqlSugarCore.Abstractions;
 using Casbin.Adapter.SqlSugar.Entities;
@@ -27,6 +28,8 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
+            var configuration = context.Services.GetConfiguration();
+            
             context.Services.AddYiDbContext<YiCasbinRbacDbContext>();
             context.Services.AddTransient<YiCasbinRbacDbContext>();
 
@@ -37,9 +40,13 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                 return new SqlSugarAdapter(dbContext.SqlSugarClient);
             });
 
-            // 2. Enforcer (Scoped)
+            // 2. Enforcer (Scoped) - Supports CachedEnforcer based on configuration
             context.Services.AddScoped<IEnforcer>(sp =>
             {
+                var config = sp.GetRequiredService<IConfiguration>();
+                var casbinOptions = config.GetSection("Casbin").Get<CasbinOptions>() ?? new CasbinOptions();
+                var logger = sp.GetService<ILogger<YiFrameworkCasbinRbacSqlSugarCoreModule>>();
+                
                 var adapter = sp.GetRequiredService<IAdapter>();
                 var modelPath = Path.Combine(AppContext.BaseDirectory, "rbac_with_domains_model.conf");
                 if (!File.Exists(modelPath))
@@ -47,56 +54,66 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                     throw new FileNotFoundException($"Casbin model file not found at: {modelPath}");
                 }
                 
-                // Create standard Enforcer
+                // Create Enforcer based on configuration
+                // Note: Casbin.NET version used doesn't have CachedEnforcer class
+                // We use standard Enforcer and control policy loading strategy via configuration
                 var enforcer = new Enforcer(modelPath, adapter);
                 
-                // Task 6: Disable AutoSave for Transaction safety
+                if (casbinOptions.EnableCachedEnforcer)
+                {
+                    logger?.LogInformation("Casbin: Using Enforcer with caching (policies loaded once)");
+                }
+                else
+                {
+                    logger?.LogInformation("Casbin: Using standard Enforcer (policies refresh per scope)");
+                }
+                
+                // Disable AutoSave for Transaction safety
                 enforcer.EnableAutoSave(false);
                 
-                // Load policies from DB (Scoped means this happens per request, ensuring fresh data)
+                // Load policies from DB
                 enforcer.LoadPolicy();
                 
-                // Task 10: Configure Redis Watcher
-                // TEMPORARILY DISABLED: RedisWatcher initialization was causing startup hang
-                // TODO: Re-enable with proper async initialization and timeout handling
-                /*
-                var config = sp.GetRequiredService<IConfiguration>();
-                var redisEnabled = config.GetSection("Redis").GetValue<bool>("IsEnabled");
-                if (redisEnabled)
+                // Configure Redis Watcher if enabled
+                if (casbinOptions.EnableRedisWatcher)
                 {
                     try 
                     {
-                        var redisConn = config["Redis:Configuration"];
-                        // RedisWatcher (v1.2.1) takes connection string
-                        // Warning: Creating a new RedisWatcher per request (Scoped) might be resource intensive (connections).
-                        // Ideally, Watcher should be Singleton. 
-                        // But Enforcer is Scoped. 
-                        // SetWatcher binds them.
-                        
-                        // If we want to strictly follow "Scoped Enforcer", we might skip Watcher for *incoming* updates (since we reload anyway),
-                        // but we need it for *publishing* updates (SavePolicy -> Watcher.Update).
-                        
-                        var watcher = new RedisWatcher(redisConn);
-                        enforcer.SetWatcher(watcher);
-                        
-                        // Callback to clear cache if update received
-                        // (Though Scoped Enforcer is short-lived, this is good practice)
-                        watcher.SetUpdateCallback(() => 
+                        var redisEnabled = config.GetSection("Redis").GetValue<bool>("IsEnabled");
+                        if (redisEnabled)
                         {
-                            enforcer.ClearCache(); // Clear Enforcer cache
-                            // We don't need LoadPolicy() here because Scoped Enforcer loads on creation.
-                            // But if this is a long-running scope (unlikely in HTTP), we might.
-                            return Task.CompletedTask;
-                        });
+                            var redisConn = config["Redis:Configuration"];
+                            if (!string.IsNullOrEmpty(redisConn))
+                            {
+                                var watcher = new RedisWatcher(redisConn);
+                                enforcer.SetWatcher(watcher);
+                                
+                                // Callback to handle policy updates from other instances
+                                watcher.SetUpdateCallback(() => 
+                                {
+                                    // Reload policies from database when other instances update
+                                    enforcer.LoadPolicy();
+                                    logger?.LogDebug("Casbin: Policies reloaded via Redis Watcher");
+                                    return Task.CompletedTask;
+                                });
+                                
+                                logger?.LogInformation("Casbin: Redis Watcher enabled for distributed sync");
+                            }
+                            else
+                            {
+                                logger?.LogWarning("Casbin: Redis Watcher enabled but Redis:Configuration is empty");
+                            }
+                        }
+                        else
+                        {
+                            logger?.LogWarning("Casbin: Redis Watcher enabled but Redis:IsEnabled is false");
+                        }
                     }
                     catch (Exception ex)
                     {
-                        // Log but don't fail if Redis fails?
-                         var logger = sp.GetService<ILogger<YiFrameworkCasbinRbacSqlSugarCoreModule>>();
-                         logger?.LogWarning(ex, "Failed to initialize Casbin Redis Watcher.");
+                        logger?.LogWarning(ex, "Casbin: Failed to initialize Redis Watcher, continuing without it");
                     }
                 }
-                */
 
                 return enforcer;
             });

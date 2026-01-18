@@ -10,6 +10,11 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Yi.Framework.Rbac.Domain.Authorization
 {
+    /// <summary>
+    /// 旧版权限全局过滤器 - 已废弃
+    /// 系统已切换到 Casbin 中间件进行权限控制
+    /// </summary>
+    [Obsolete("此过滤器已废弃，系统已切换到 Casbin 中间件进行权限控制。", false)]
     internal class PermissionGlobalAttribute : ActionFilterAttribute, ITransientDependency
     {
         private readonly IPermissionHandler _permissionHandler;
