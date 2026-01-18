@@ -49,7 +49,7 @@ using Yi.Framework.CodeGen.Application;
 using Yi.Framework.Core.Json;
 //using Yi.Framework.DigitalCollectibles.Application;
 using Yi.Framework.Rbac.Application;
-using Yi.Framework.Rbac.Domain.Authorization;
+// using Yi.Framework.Rbac.Domain.Authorization; // Removed: Conflicts with CasbinRbac
 using Yi.Framework.Rbac.Domain.Shared.Consts;
 using Yi.Framework.Rbac.Domain.Shared.Options;
 using Yi.Framework.SettingManagement.Domain;

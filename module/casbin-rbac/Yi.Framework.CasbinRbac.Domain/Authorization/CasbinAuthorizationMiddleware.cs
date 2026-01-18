@@ -36,6 +36,24 @@ namespace Yi.Framework.CasbinRbac.Domain.Authorization
         {
             var path = context.Request.Path.Value;
 
+            // 0. Path-based whitelist for public endpoints
+            if (!string.IsNullOrEmpty(path))
+            {
+                var pathLower = path.ToLower();
+                // Allow Swagger, Hangfire, static files, and other public paths
+                if (pathLower.StartsWith("/swagger") ||
+                    pathLower.StartsWith("/hangfire") ||
+                    pathLower.StartsWith("/api/app/wwwroot") ||
+                    pathLower.StartsWith("/_framework") ||
+                    pathLower.StartsWith("/_content") ||
+                    pathLower == "/" ||
+                    pathLower == "/favicon.ico")
+                {
+                    await next(context);
+                    return;
+                }
+            }
+
             // 1. Whitelist / AllowAnonymous checks
             var endpoint = context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)

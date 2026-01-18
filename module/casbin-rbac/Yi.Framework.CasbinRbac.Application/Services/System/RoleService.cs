@@ -146,65 +146,27 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
             if (menuIds == null || !menuIds.Any()) return;
 
             // 获取菜单对应的接口信息
-            // 仅处理 API 类型的菜单或带有 API 路径的菜单
-            var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id) && !string.IsNullOrEmpty(m.Permission));
+            // 仅处理带有 API 路径的菜单
+            var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id) && !string.IsNullOrEmpty(m.ApiUrl));
             
             // 方案 V1.2: p = sub, dom, obj, act
             // sub = roleId.ToString()
             // dom = "default" (或从 input 传入，如果支持多域)
-            // obj = menu.Permission (需确保是 RESTful 路径，如 /api/user/:id，或者这里存储的是 path)
-            // act = menu.Method (GET, POST 等)
-            
-            // 假设 Menu 表有 Permission (作为 API Path) 和 Method 字段
-            // 如果没有，需要扩展 Menu 实体或从其他地方获取
-            // 现有代码 Menu 实体未详查，假设需要适配
-            
-            // 暂时逻辑：只处理 MenuType.Button 或 Api 类型的，且 Permission 字段存的是 API Path
-            // 如果 Permission 存的是 "user:list"，则无法直接转为 Casbin 路径，需额外映射
-            // 任务清单 5: "apiPath 使用 RESTful 风格"
-            
-            // 修正：Menu 实体通常存的是权限标识，需要关联 API 资源
-            // 如果没有单独的 API 资源表，则需在 Menu 中增加 ApiPath 和 Method 字段
-            // 或者暂时假设 Permission 字段就是 ApiPath (需确认 Menu 实体结构)
-            
-            // 查阅 Menu 实体：module/casbin-rbac/Yi.Framework.CasbinRbac.Domain/Entities/Menu.cs
-            // 发现有 Permission 字段，但可能是 "system:user:list"
-            // 需要确认是否有 Url 字段或类似字段作为 API Path
-            
-            // 如果 Menu 没有 Path/Method，无法直接同步。
-            // 假设 Menu 表暂未改造，需后续在“接口扫描”任务中完善
-            // 这里先写个 TODO 或尝试使用 Url 字段（如果是菜单的话）
-            
-            // 暂时使用 Url 字段作为 Path (如果是 API 类型的菜单)
-            // 假设 Method 默认为 ALL 或需新增字段
+            // obj = menu.ApiUrl (RESTful API 路径，如 /api/user/:id)
+            // act = menu.ApiMethod (GET, POST 等)
             
             var policies = new List<string[]>();
             string domain = "default";
 
             foreach (var menu in menus)
             {
-                // 仅当菜单是 API 类型或包含有效 URL 时
-                // 现阶段假设 Url 存的是 API 路径
-                if (!string.IsNullOrEmpty(menu.Url))
+                // 仅当菜单包含有效的 API URL 时
+                if (!string.IsNullOrEmpty(menu.ApiUrl))
                 {
-                    // 默认 GET，或者需要扩展 Menu 实体支持 Method
-                    // 任务清单 7 提到移除 [Permission]，说明要靠 Path 鉴权
-                    // 建议：Menu 表增加 Method 字段，或 Url 包含 Method (e.g., "GET:/api/users")
+                    string path = menu.ApiUrl;
+                    // 使用 Menu 实体的 ApiMethod 字段，如果为空则默认为 GET
+                    string method = !string.IsNullOrEmpty(menu.ApiMethod) ? menu.ApiMethod.ToUpper() : "GET";
                     
-                    string path = menu.Url;
-                    string method = "GET"; // 默认，待完善
-                    
-                    // 简单解析：如果 Url 格式为 "POST:/api/user"
-                    if (path.Contains(":"))
-                    {
-                        var parts = path.Split(':');
-                        if (parts.Length > 1 && new[]{"GET","POST","PUT","DELETE"}.Contains(parts[0].ToUpper()))
-                        {
-                            method = parts[0].ToUpper();
-                            path = path.Substring(method.Length + 1);
-                        }
-                    }
-
                     policies.Add(new[] { roleId.ToString(), domain, path, method });
                 }
             }

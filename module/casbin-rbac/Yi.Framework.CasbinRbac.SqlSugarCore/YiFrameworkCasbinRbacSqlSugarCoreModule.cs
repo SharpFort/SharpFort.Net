@@ -47,8 +47,8 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                     throw new FileNotFoundException($"Casbin model file not found at: {modelPath}");
                 }
                 
-                // Task 11: Use CachedEnforcer for better performance within the request scope
-                var enforcer = new CachedEnforcer(modelPath, adapter);
+                // Create standard Enforcer
+                var enforcer = new Enforcer(modelPath, adapter);
                 
                 // Task 6: Disable AutoSave for Transaction safety
                 enforcer.EnableAutoSave(false);
@@ -57,6 +57,9 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                 enforcer.LoadPolicy();
                 
                 // Task 10: Configure Redis Watcher
+                // TEMPORARILY DISABLED: RedisWatcher initialization was causing startup hang
+                // TODO: Re-enable with proper async initialization and timeout handling
+                /*
                 var config = sp.GetRequiredService<IConfiguration>();
                 var redisEnabled = config.GetSection("Redis").GetValue<bool>("IsEnabled");
                 if (redisEnabled)
@@ -64,7 +67,7 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                     try 
                     {
                         var redisConn = config["Redis:Configuration"];
-                        // RedisWatcher (v2.0.0) usually takes connection string and channel name
+                        // RedisWatcher (v1.2.1) takes connection string
                         // Warning: Creating a new RedisWatcher per request (Scoped) might be resource intensive (connections).
                         // Ideally, Watcher should be Singleton. 
                         // But Enforcer is Scoped. 
@@ -80,7 +83,7 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                         // (Though Scoped Enforcer is short-lived, this is good practice)
                         watcher.SetUpdateCallback(() => 
                         {
-                            enforcer.ClearPolicyCache(); // Clear CachedEnforcer cache
+                            enforcer.ClearCache(); // Clear Enforcer cache
                             // We don't need LoadPolicy() here because Scoped Enforcer loads on creation.
                             // But if this is a long-running scope (unlikely in HTTP), we might.
                             return Task.CompletedTask;
@@ -93,6 +96,7 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
                          logger?.LogWarning(ex, "Failed to initialize Casbin Redis Watcher.");
                     }
                 }
+                */
 
                 return enforcer;
             });
