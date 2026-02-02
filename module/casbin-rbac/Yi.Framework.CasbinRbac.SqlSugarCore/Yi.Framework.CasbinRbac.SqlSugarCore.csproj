@@ -2,7 +2,7 @@
 	<Import Project="..\..\..\common.props" />
 
   <ItemGroup>
-    <PackageReference Include="Casbin.NET.Adapter.SqlSugar" Version="1.0.0" />
+    <PackageReference Include="Casbin.NET.Adapter.SqlSugar" Version="1.0.3" />
     <PackageReference Include="Casbin.Watcher.Redis" Version="1.2.1" />
     <PackageReference Include="SqlSugarCore" Version="$(SqlSugarVersion)" />
   </ItemGroup>

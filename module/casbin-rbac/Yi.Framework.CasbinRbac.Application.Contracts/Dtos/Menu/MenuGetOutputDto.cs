@@ -25,6 +25,9 @@ namespace Yi.Framework.CasbinRbac.Application.Contracts.Dtos.Menu
         public int OrderNum { get; set; }
 
         public string? RouterName { get; set; }
+        public string? ApiUrl { get; set; }
+        public string? ApiMethod { get; set; }
+
 
         //public List<MenuEntity>? Children { get; set; }
     }

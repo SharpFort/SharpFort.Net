@@ -73,6 +73,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Managers
                 throw new UserFriendlyException(UserConst.State_Is_State);
             }
 
+            // 临时注释，允许无角色/无权限用户登录
             if (userInfo.RoleCodes.Count == 0)
             {
                 throw new UserFriendlyException(UserConst.No_Role);

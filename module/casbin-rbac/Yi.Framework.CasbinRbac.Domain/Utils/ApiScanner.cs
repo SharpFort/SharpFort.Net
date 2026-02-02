@@ -69,10 +69,12 @@ namespace Yi.Framework.CasbinRbac.Domain.Utils
                             Domain.Shared.Enums.MenuType.Button, // Type
                             Guid.Empty, // Parent (Root or specific category)
                             $"{controller.Name}:{method.Name}", // PermissionCode
-                            null, null, 999
+                            null, // MenuIcon
+                            null, // Component
+                            fullPath, // ApiUrl
+                            httpMethod, // ApiMethod
+                            999 // OrderNum
                         );
-                        menu.ApiUrl = fullPath;
-                        menu.ApiMethod = httpMethod;
                         menu.IsShow = false; // API 资源不显示在菜单栏
 
                         newMenus.Add(menu);

@@ -5,7 +5,7 @@ namespace Yi.Framework.CasbinRbac.Application.Contracts.Dtos.Menu
     /// <summary>
     /// Menu输入创建对象
     /// </summary>
-    public class MenuCreateInputVo
+    public class MenuCreateInputVo 
     {
         public Guid? Id { get; set; }
         public DateTime CreationTime { get; set; } = DateTime.Now;

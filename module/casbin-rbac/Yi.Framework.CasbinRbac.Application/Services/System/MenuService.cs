@@ -23,6 +23,9 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
 
         public override async Task<MenuGetOutputDto> CreateAsync(MenuCreateInputVo input)
         {
+            // 防止前端传入重复ID导致唯一约束报错
+            input.Id = Guid.NewGuid();
+
             // 处理 ApiMethod 转大写
             if (!string.IsNullOrEmpty(input.ApiMethod))
             {

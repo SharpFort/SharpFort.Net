@@ -2,7 +2,7 @@ using Yi.Framework.CasbinRbac.Domain.Shared.Enums;
 
 namespace Yi.Framework.CasbinRbac.Application.Contracts.Dtos.Menu
 {
-    public class MenuUpdateInputVo
+    public class MenuUpdateInputVo 
     {
         public Guid Id { get; set; }
         public Guid? CreatorId { get; set; }
@@ -21,5 +21,7 @@ namespace Yi.Framework.CasbinRbac.Application.Contracts.Dtos.Menu
         public string? Query { get; set; }
         public int OrderNum { get; set; }
         public string? RouterName { get; set; }
+        public string? ApiUrl { get; set; }
+        public string? ApiMethod { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace Yi.Framework.CasbinRbac.Domain.Shared.Consts
         public const string Phone_Repeat = "手机号已重复";
 
         //子租户管理员
-        public const string Admin = "cc";
+        public const string Admin = "admin";
         public const string AdminRolesCode = "admin";
         public const string AdminPermissionCode = "*:*:*";
 

@@ -121,12 +121,69 @@ namespace Yi.Framework.CasbinRbac.SqlSugarCore
 
         public override async Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
         {
+            //========================================================================
+            //【方案一】原始代码 - 使用 CreateScope（会导致 SQLite 死锁）
+            //========================================================================
             using (var scope = context.ServiceProvider.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
                 db.CodeFirst.InitTables(typeof(CasbinRule));
             }
-            await base.OnPostApplicationInitializationAsync(context);
+            
+            // ========================================================================
+            // 【方案二】使用 CopyNew（仍然导致 SQLite 死锁）
+            // ========================================================================
+            // var db = context.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+            // db.CopyNew().CodeFirst.InitTables(typeof(CasbinRule));
+            
+            // ========================================================================
+            // 【方案三】使用原生 ADO.NET 创建表（推荐，仅针对 SQLite）
+            // ========================================================================
+            // 问题：SqlSugar 的 CodeFirst.InitTables() 无论使用何种方式都会争抢 SQLite 文件锁
+            // 解决：使用原生 ADO.NET 直接执行 CREATE TABLE IF NOT EXISTS
+            // 注意：其他数据库（PostgreSQL、SQL Server、MySQL）可直接使用方案二
+            
+            // var config = context.ServiceProvider.GetRequiredService<IConfiguration>();
+            // var dbConnOptions = config.GetSection("DbConnOptions").Get<DbConnOptions>();
+            
+            // if (dbConnOptions?.DbType == SqlSugar.DbType.Sqlite)
+            // {
+            //     // SQLite 使用原生 ADO.NET
+            //     await CreateCasbinRuleTableWithAdoNet(dbConnOptions.Url);
+            // }
+            // else
+            // {
+            //     // 其他数据库使用 SqlSugar CodeFirst
+            //     var db = context.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+            //     db.CodeFirst.InitTables(typeof(CasbinRule));
+            // }
+            
+            // await base.OnPostApplicationInitializationAsync(context);
         }
+        
+        // /// <summary>
+        // /// 使用原生 ADO.NET 创建 CasbinRule 表（专门针对 SQLite 避免锁冲突）
+        // /// </summary>
+        // private async Task CreateCasbinRuleTableWithAdoNet(string connectionString)
+        // {
+        //     const string createTableSql = @"
+        //         CREATE TABLE IF NOT EXISTS casbin_rule (
+        //             id INTEGER PRIMARY KEY AUTOINCREMENT,
+        //             ptype TEXT,
+        //             v0 TEXT,
+        //             v1 TEXT,
+        //             v2 TEXT,
+        //             v3 TEXT,
+        //             v4 TEXT,
+        //             v5 TEXT
+        //         );";
+            
+        //     using var connection = new Microsoft.Data.Sqlite.SqliteConnection(connectionString);
+        //     await connection.OpenAsync();
+            
+        //     using var command = connection.CreateCommand();
+        //     command.CommandText = createTableSql;
+        //     await command.ExecuteNonQueryAsync();
+        // }
     }
 }

@@ -43,6 +43,8 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
             string? permissionCode = null,
             string? menuIcon = null,
             string? component= null,
+            string? apiUrl = null,
+            string? apiMethod = null,
             int orderNum = 0)
             : base(id)
         {
@@ -54,6 +56,8 @@ namespace Yi.Framework.CasbinRbac.Domain.Entities
             ParentId = parentId;
             PermissionCode = permissionCode;
             Component = component;
+            ApiUrl = apiUrl;
+            ApiMethod = apiMethod;
             MenuIcon = menuIcon;
             OrderNum = orderNum;
 

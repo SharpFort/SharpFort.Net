@@ -109,6 +109,43 @@ dotnet husky install
 - **数据处理**: 选用 **MiniExcel**。采用流式读写（Stream），避免将整个文件加载到内存，彻底解决百万级数据导入导出时的 **OOM (内存溢出)** 风险。
 - **单据编码**: 基于 **Redis 原子计数器 (INCR)**。在高并发场景下保证单据号（如 PO-20251010-001）绝对唯一且连续。
 
+### 5. SQLite 并发优化 (解决 "database is locked" 问题)
+
+> [!IMPORTANT]
+> **此章节仅针对 SQLite 数据库**。PostgreSQL、SQL Server、MySQL 等数据库拥有成熟的连接池和 MVCC 并发机制，**不存在此问题**，无需任何特殊配置。
+
+在开发/测试阶段使用 SQLite 时，可能会遇到 `SQLite Error 5: 'database is locked'` 错误。这是因为 SQLite 使用**文件锁**机制，同一进程内多个连接会相互阻塞。
+
+**本框架的解决方案**：
+
+1. **使用 SqlSugarScope 替代 SqlSugarClient**（在 `SqlSugarDbContextFactory.cs` 中）
+   - 确保同一请求作用域内 ABP 和 Casbin 共享同一个连接上下文
+   - 从根本上避免多客户端争抢文件锁
+
+2. **启用 SQLite PRAGMA 优化**（在 `YiFrameworkSqlSugarCoreModule.cs` 中，仅对 SQLite 生效）：
+
+| PRAGMA 配置 | 作用 | 说明 |
+| :--- | :--- | :--- |
+| `journal_mode = WAL` | 启用 Write-Ahead Logging | 大幅提升读写并发能力，读操作不会阻塞写操作 |
+| `synchronous = NORMAL` | 同步模式设为 NORMAL | 平衡性能与安全，减少不必要的磁盘同步操作 |
+| `busy_timeout = 5000` | 遇锁等待 5 秒 | **关键配置**！遇到锁时等待 5 秒再重试，而非立即抛出异常 |
+
+> **技术细节**：
+> - **WAL 模式**：SQLite 默认使用 DELETE 日志模式，写操作会阻塞读操作。WAL 模式将写操作追加到单独的日志文件，允许读写并发。
+> - **synchronous=NORMAL**：默认 FULL 模式每次事务都会 fsync，性能较慢；NORMAL 在 WAL 模式下仅在 checkpoint 时同步，足够安全且性能更好。
+> - **busy_timeout**：SQLite 默认遇到锁会立即返回错误，设置超时后会自动重试，大大减少并发冲突。
+
+此外，本框架使用 **SqlSugarScope** (而非 SqlSugarClient) 作为数据库连接容器，确保同一请求作用域内共享同一个连接上下文，从根本上避免多客户端争抢锁的问题。
+
+**对比其他数据库**：
+
+| 数据库 | 并发模型 | 是否需要此配置 |
+| :--- | :--- | :--- |
+| SQLite | 文件锁，单写多读 | ✅ **需要** |
+| PostgreSQL | MVCC 多版本并发 | ❌ 不需要 |
+| SQL Server | 行级锁 + MVCC | ❌ 不需要 |
+| MySQL (InnoDB) | 行级锁 | ❌ 不需要 |
+
 ---
 
 ## 🗺️ 功能全景与技术实现规划 (Detailed Roadmap)

@@ -111,7 +111,7 @@ namespace Yi.Framework.Rbac.Domain.Entities
         /// <summary>
         /// 性别
         /// </summary>
-        [SugarColumn(IsNullable = true,ColumnDataType = "string")]
+        [SugarColumn(IsNullable = true)]
         public Gender Gender { get; protected set; }
 
         /// <summary>
