@@ -89,8 +89,8 @@ namespace Yi.Abp.Web
                     options => options.RemoteServiceName = "default");
                 //options.ConventionalControllers.Create(typeof(YiFrameworkRbacApplicationModule).Assembly,
                 //    options => options.RemoteServiceName = "rbac");
-                options.ConventionalControllers.Create(typeof(YiFrameworkBbsApplicationModule).Assembly,
-                    options => options.RemoteServiceName = "bbs");
+                //options.ConventionalControllers.Create(typeof(YiFrameworkBbsApplicationModule).Assembly,
+                //    options => options.RemoteServiceName = "bbs");
                 //options.ConventionalControllers.Create(typeof(YiFrameworkChatHubApplicationModule).Assembly,
                 //    options => options.RemoteServiceName = "chat-hub");
                 options.ConventionalControllers.Create(typeof(YiFrameworkTenantManagementApplicationModule).Assembly,
@@ -103,8 +103,8 @@ namespace Yi.Abp.Web
                 //    options => options.RemoteServiceName = "ai-stock");
                 options.ConventionalControllers.Create(typeof(YiFrameworkSettingManagementDomainModule).Assembly,
                     options => options.RemoteServiceName = "setting-management");
-                options.ConventionalControllers.Create(typeof(CityWalkCoreApplicationModule).Assembly,
-                    options => options.RemoteServiceName = "citywalk-core");
+                //options.ConventionalControllers.Create(typeof(CityWalkCoreApplicationModule).Assembly,
+                //    options => options.RemoteServiceName = "citywalk-core");
                 options.ConventionalControllers.Create(typeof(YiFrameworkCasbinRbacApplicationModule).Assembly,
                     options => options.RemoteServiceName = "casbin-rbac");
 
