@@ -11,6 +11,8 @@
     <ProjectReference Include="..\..\module\tenant-management\Yi.Framework.TenantManagement.SqlSugarCore\Yi.Framework.TenantManagement.SqlSugarCore.csproj" />
     <ProjectReference Include="..\Yi.Abp.Domain\Yi.Abp.Domain.csproj" />
     <ProjectReference Include="..\..\module\casbin-rbac\Yi.Framework.CasbinRbac.SqlSugarCore\Yi.Framework.CasbinRbac.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\file-management\Yi.Framework.FileManagement.SqlSugarCore\Yi.Framework.FileManagement.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\FluidSequence\FluidSequence.SqlSugarCore\FluidSequence.SqlSugarCore.csproj" />
   </ItemGroup>
 
 

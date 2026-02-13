@@ -7,6 +7,7 @@ using Yi.Framework.Rbac.Application;
 using Yi.Framework.SettingManagement.Application;
 using Yi.Framework.TenantManagement.Application;
 using Yi.Framework.CasbinRbac.Application;
+using Yi.Framework.FileManagement.Application;
 
 namespace Yi.Abp.Application
 {
@@ -18,7 +19,8 @@ namespace Yi.Abp.Application
         typeof(YiFrameworkCodeGenApplicationModule),
         typeof (YiFrameworkSettingManagementApplicationModule),
         typeof(YiFrameworkDddApplicationModule),
-        typeof(YiFrameworkCasbinRbacApplicationModule)
+        typeof(YiFrameworkCasbinRbacApplicationModule),
+        typeof(YiFrameworkFileManagementApplicationModule)
         )]
     public class YiAbpApplicationModule : AbpModule
     {

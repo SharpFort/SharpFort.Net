@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.Ddd.Application\Yi.Framework.Ddd.Application.csproj" />
+    <ProjectReference Include="..\FluidSequence.Application.Contracts\FluidSequence.Application.Contracts.csproj" />
+    <ProjectReference Include="..\FluidSequence.Domain\FluidSequence.Domain.csproj" />
+  </ItemGroup>
+
+
+</Project>

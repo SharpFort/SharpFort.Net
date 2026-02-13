@@ -48,6 +48,8 @@ using Yi.Framework.SettingManagement.Domain;
 using Yi.Framework.TenantManagement.Application;
 using Yi.Framework.CasbinRbac.Application;
 using Yi.Framework.CasbinRbac.Domain.Authorization; // Added namespace
+using Yi.Framework.FileManagement.Application;
+using FluidSequence.Application;
 
 namespace Yi.Abp.Web
 {
@@ -88,6 +90,10 @@ namespace Yi.Abp.Web
                     options => options.RemoteServiceName = "setting-management");
                 options.ConventionalControllers.Create(typeof(YiFrameworkCasbinRbacApplicationModule).Assembly,
                     options => options.RemoteServiceName = "casbin-rbac");
+                options.ConventionalControllers.Create(typeof(YiFrameworkFileManagementApplicationModule).Assembly,
+                    options => options.RemoteServiceName = "file-management");
+                options.ConventionalControllers.Create(typeof(FluidSequenceApplicationModule).Assembly,
+                    options => options.RemoteServiceName = "fluid-sequence");
 
                 //统一前缀
                 options.ConventionalControllers.ConventionalControllerSettings.ForEach(x => x.RootPath = "api/app");

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.Ddd.Application\Yi.Framework.Ddd.Application.csproj" />
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.SqlSugarCore.Abstractions\Yi.Framework.SqlSugarCore.Abstractions.csproj" />
+    <ProjectReference Include="..\Yi.Framework.FileManagement.Application.Contracts\Yi.Framework.FileManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Yi.Framework.FileManagement.Domain\Yi.Framework.FileManagement.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

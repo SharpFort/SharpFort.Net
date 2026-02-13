@@ -38,7 +38,7 @@ namespace Yi.Framework.Rbac.Test.System
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "RegisterTest", Password = "123456", Phone = 15945645645 });
             var user = await _userRepository._DbQueryable.Where(user => user.UserName == "RegisterTest").FirstAsync();
             user.ShouldNotBeNull();
-            user.JudgePassword("123456").ShouldBeTrue();
+            user.VerifyPassword("123456").ShouldBeTrue();
         }
 
         /// <summary>

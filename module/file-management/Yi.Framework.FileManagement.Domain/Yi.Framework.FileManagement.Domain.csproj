@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+	  <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="$(AbpVersion)" />
+	  <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.Mapster\Yi.Framework.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\framework\Yi.Framework.SqlSugarCore.Abstractions\Yi.Framework.SqlSugarCore.Abstractions.csproj" />
+    <ProjectReference Include="..\Yi.Framework.FileManagement.Domain.Shared\Yi.Framework.FileManagement.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

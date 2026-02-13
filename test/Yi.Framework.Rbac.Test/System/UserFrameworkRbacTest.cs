@@ -60,7 +60,7 @@ namespace Yi.Framework.Rbac.Test.System
             user.ShouldNotBeNull();
             user.Nick.ShouldBe("nickTest2");
             user.Gender.ShouldBe(Gender.Female);
-            user.JudgePassword("123456888abc");
+            user.VerifyPassword("123456888abc").ShouldBeTrue();
         }
 
 

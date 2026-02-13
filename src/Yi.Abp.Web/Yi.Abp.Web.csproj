@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\framework\Yi.Framework.BackgroundWorkers.Hangfire\Yi.Framework.BackgroundWorkers.Hangfire.csproj" />
     <ProjectReference Include="..\Yi.Abp.Application\Yi.Abp.Application.csproj" />
     <ProjectReference Include="..\Yi.Abp.SqlSugarCore\Yi.Abp.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\FluidSequence\FluidSequence.Application\FluidSequence.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
