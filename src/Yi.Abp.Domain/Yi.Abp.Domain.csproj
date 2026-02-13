@@ -7,11 +7,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CityWalk\citywalk-core\CityWalk.Core.Domain\CityWalk.Core.Domain.csproj" />
     <ProjectReference Include="..\..\framework\Yi.Framework.Mapster\Yi.Framework.Mapster.csproj" />
     <ProjectReference Include="..\..\framework\Yi.Framework.SqlSugarCore.Abstractions\Yi.Framework.SqlSugarCore.Abstractions.csproj" />
     <ProjectReference Include="..\..\module\audit-logging\Yi.Framework.AuditLogging.Domain\Yi.Framework.AuditLogging.Domain.csproj" />
-    <ProjectReference Include="..\..\module\bbs\Yi.Framework.Bbs.Domain\Yi.Framework.Bbs.Domain.csproj" />
     <ProjectReference Include="..\..\module\casbin-rbac\Yi.Framework.CasbinRbac.Domain\Yi.Framework.CasbinRbac.Domain.csproj" />
     <ProjectReference Include="..\..\module\rbac\Yi.Framework.Rbac.Domain\Yi.Framework.Rbac.Domain.csproj" />
     <ProjectReference Include="..\..\module\setting-management\Yi.Framework.SettingManagement.Domain\Yi.Framework.SettingManagement.Domain.csproj" />

@@ -9,8 +9,6 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Settings;
 using Volo.Abp.Uow;
-using Yi.Framework.Bbs.Application.Contracts.Dtos.Banner;
-using Yi.Framework.Bbs.Domain.Entities.Forum;
 using Yi.Framework.Rbac.Domain.Authorization;
 using Yi.Framework.Rbac.Domain.Extensions;
 using Yi.Framework.SettingManagement.Domain;
@@ -23,11 +21,11 @@ namespace Yi.Abp.Application.Services
     /// </summary>
     public class TestService : ApplicationService
     {
-        /// <summary>
-        /// 属性注入
-        /// 不推荐，坑太多，容易把自己玩死，简单的东西可以用一用
-        /// </summary>
-        public ISqlSugarRepository<Banner> sqlSugarRepository { get; set; }
+        ///// <summary>
+        ///// 属性注入
+        ///// 不推荐，坑太多，容易把自己玩死，简单的东西可以用一用
+        ///// </summary>
+        //public ISqlSugarRepository<Banner> sqlSugarRepository { get; set; } //TODO: BBS模块已移除
 
         /// <summary>
         /// </summary>
@@ -53,49 +51,32 @@ namespace Yi.Abp.Application.Services
             throw new Exception("系统异常");
         }
 
-        /// <summary>
-        /// SqlSugar
-        /// </summary>
-        /// <returns></returns>
-        public async Task<object> GetSqlSugarDbAsync()
-        {
-            //用户体验优先，可直接使用Db操作，依赖抽象
-            return await sqlSugarRepository._DbQueryable.ToListAsync();
-        }
 
-        /// <summary>
-        /// 工作单元
-        /// </summary>
-        /// <returns></returns>
-        public async Task GetUowAsync()
-        {
-            //魔改
-            // 用户体验优先，万金油模式，支持高并发。支持单、多线程并发安全，支持多线程工作单元，支持。。。
-            // 不支持多线程无工作单元，应由工作单元统一管理（来自abp工作单元设计）
-            // 请注意，如果requiresNew: true只有在没有工作单元内使用，嵌套子工作单元，默认值false即可
-            // 自动在各个情况处理db客户端最优解之一
-            int i = 3;
-            List<Task> tasks = new List<Task>();
-            await sqlSugarRepository.GetListAsync();
-            await sqlSugarRepository.GetListAsync();
-            while (i > 0)
-            {
-                tasks.Add(Task.Run(async () =>
-                {
-                    //以下操作是错误的，不允许在新线程中，直接操作db，所有db操作应放在工作单元内，应由工作单元统一管理-来自abp工作单元设计
-                    //await sqlSugarRepository.InsertAsync(new Banner { Name = "插入2" });
-                    using (var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: true))
-                    {
-                        await sqlSugarRepository.InsertAsync(new Banner { Name = "插入1" });
-                        await uow.CompleteAsync();
-                    }
-                }));
-                await sqlSugarRepository.InsertAsync(new Banner { Name = "插入3" });
-                i--;
-            }
-
-            await Task.WhenAll(tasks);
-        }
+        ///// <summary>
+        ///// 工作单元
+        ///// </summary>
+        ///// <returns></returns>
+        //public async Task GetUowAsync()
+        //{
+        //    int i = 3;
+        //    List<Task> tasks = new List<Task>();
+        //    await sqlSugarRepository.GetListAsync();
+        //    await sqlSugarRepository.GetListAsync();
+        //    while (i > 0)
+        //    {
+        //        tasks.Add(Task.Run(async () =>
+        //        {
+        //            using (var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: true))
+        //            {
+        //                await sqlSugarRepository.InsertAsync(new Banner { Name = "插入1" });
+        //                await uow.CompleteAsync();
+        //            }
+        //        }));
+        //        await sqlSugarRepository.InsertAsync(new Banner { Name = "插入3" });
+        //        i--;
+        //    }
+        //    await Task.WhenAll(tasks);
+        //}
 
         /// <summary>
         /// 当前用户
@@ -130,15 +111,6 @@ namespace Yi.Abp.Application.Services
             //这里会数据权限过滤
         }
 
-        /// <summary>
-        /// 对象映射
-        /// </summary>
-        public void GetMapper()
-        {
-            //直接无脑Adapt，无需配置
-            var entity = new Banner();
-            var dto = entity.Adapt<BannerGetListOutputDto>();
-        }
 
         private static int RequestNumber { get; set; } = 0;
 
@@ -218,51 +190,6 @@ namespace Yi.Abp.Application.Services
         }
 
         public ICurrentTenant CurrentTenant { get; set; }
-        public IRepository<Banner> repository { get; set; }
-        /// <summary>
-        /// 多租户
-        /// </summary>
-        /// <returns></returns>
-        public async Task<string>  GetMultiTenantAsync()
-        {
-            using (var uow=UnitOfWorkManager.Begin())
-            {
-                //此处会实例化一个db,连接默认库
-                var defautTenantData1= await repository.GetListAsync();
-                using (CurrentTenant.Change(null,"Default"))
-                {
-                    var defautTenantData2= await repository.GetListAsync();
-                    await repository.InsertAsync(new Banner
-                    {
-                        Name = "default",
-                    });
-                    var defautTenantData3= await repository.GetListAsync(x=>x.Name=="default");
-                }
-                //此处会实例化一个新的db连接MES
-                using (CurrentTenant.Change(null,"Mes"))
-                {
-                    var otherTenantData1= await repository.GetListAsync();
-                    await repository.InsertAsync(new Banner
-                    {
-                        Name = "Mes1",
-                    });
-                    var otherTenantData2= await repository.GetListAsync(x=>x.Name=="Mes1");
-                }
-                //此处会复用Mesdb，不会实例化新的db
-                using (CurrentTenant.Change(Guid.Parse("33333333-3d72-4339-9adc-845151f8ada0")))
-                {
-                    var otherTenantData1= await repository.GetListAsync();
-                    await repository.InsertAsync(new Banner
-                    {
-                        Name = "Mes2",
-                    });
-                    var otherTenantData2= await repository.GetListAsync(x=>x.Name=="Mes2");
-                }
-                //此处会将多库进行一起提交，前面的操作有报错，全部回滚
-                await uow.CompleteAsync();
-                return "根据租户切换不同的数据库，并管理db实例连接，涉及多库事务统一到最后提交";
-            }
-         
-        }
+       
     }
 }

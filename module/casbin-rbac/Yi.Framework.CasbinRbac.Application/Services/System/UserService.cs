@@ -7,8 +7,6 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Users;
-using Yi.Framework.Bbs.Domain.Shared.Enums;
-using Yi.Framework.Bbs.Domain.Shared.Etos;
 using Yi.Framework.Ddd.Application;
 using Yi.Framework.CasbinRbac.Application.Contracts.Dtos.User;
 using Yi.Framework.CasbinRbac.Application.Contracts.IServices;
@@ -230,13 +228,6 @@ namespace Yi.Framework.CasbinRbac.Application.Services.System
 
             await _repository.UpdateAsync(entity);
             var dto = await MapToGetOutputDtoAsync(entity);
-            //发布更新昵称任务事件
-            if (input.Nick != entity.Icon)
-            {
-                await this.LocalEventBus.PublishAsync(
-                    new AssignmentEventArgs(AssignmentRequirements.UpdateNick, _currentUser.GetId(), input.Nick),
-                    false);
-            }
 
             return dto;
         }

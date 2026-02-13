@@ -17,8 +17,6 @@ using Volo.Abp.EventBus.Local;
 using Volo.Abp.Guids;
 using Volo.Abp.Uow;
 using Volo.Abp.Users;
-using Yi.Framework.Bbs.Domain.Shared.Enums;
-using Yi.Framework.Bbs.Domain.Shared.Etos;
 using Yi.Framework.CasbinRbac.Application.Contracts.Dtos.Account;
 using Yi.Framework.CasbinRbac.Application.Contracts.IServices;
 using Yi.Framework.CasbinRbac.Domain.Entities;
@@ -531,9 +529,9 @@ namespace Yi.Framework.CasbinRbac.Application.Services
             entity.Icon = input.Icon;
             await _userRepository.UpdateAsync(entity);
 
-            //发布更新头像任务事件
-            await this.LocalEventBus.PublishAsync(
-                new AssignmentEventArgs(AssignmentRequirements.UpdateIcon, userId), false);
+            //TODO: BBS模块已移除，任务事件发布已禁用
+            //await this.LocalEventBus.PublishAsync(
+            //    new AssignmentEventArgs(AssignmentRequirements.UpdateIcon, userId), false);
             return true;
         }
     }

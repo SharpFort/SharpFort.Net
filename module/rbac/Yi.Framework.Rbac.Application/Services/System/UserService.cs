@@ -6,8 +6,6 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Users;
-using Yi.Framework.Bbs.Domain.Shared.Enums;
-using Yi.Framework.Bbs.Domain.Shared.Etos;
 using Yi.Framework.Ddd.Application;
 using Yi.Framework.Rbac.Application.Contracts.Dtos.User;
 using Yi.Framework.Rbac.Application.Contracts.IServices;
@@ -191,13 +189,13 @@ namespace Yi.Framework.Rbac.Application.Services.System
 
             await _repository.UpdateAsync(entity);
             var dto = await MapToGetOutputDtoAsync(entity);
-            //发布更新昵称任务事件
-            if (input.Nick != entity.Icon)
-            {
-                await this.LocalEventBus.PublishAsync(
-                    new AssignmentEventArgs(AssignmentRequirements.UpdateNick, _currentUser.GetId(), input.Nick),
-                    false);
-            }
+            //TODO: BBS模块已移除，任务事件发布已禁用
+            //if (input.Nick != entity.Icon)
+            //{
+            //    await this.LocalEventBus.PublishAsync(
+            //        new AssignmentEventArgs(AssignmentRequirements.UpdateNick, _currentUser.GetId(), input.Nick),
+            //        false);
+            //}
 
             return dto;
         }

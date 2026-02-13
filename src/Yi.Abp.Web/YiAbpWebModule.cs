@@ -1,5 +1,3 @@
-using CityWalk.Core.Application;
-using CityWalk.Core.Application.Contracts;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Hangfire.Redis.StackExchange;
@@ -42,18 +40,11 @@ using Yi.Framework.AspNetCore.Authentication.OAuth.QQ;
 using Yi.Framework.AspNetCore.Microsoft.AspNetCore.Builder;
 using Yi.Framework.AspNetCore.Microsoft.Extensions.DependencyInjection;
 using Yi.Framework.BackgroundWorkers.Hangfire;
-using Yi.Framework.Bbs.Application;
-using Yi.Framework.Bbs.Application.Extensions;
-//using Yi.Framework.ChatHub.Application;
 using Yi.Framework.CodeGen.Application;
 using Yi.Framework.Core.Json;
-//using Yi.Framework.DigitalCollectibles.Application;
-using Yi.Framework.Rbac.Application;
-// using Yi.Framework.Rbac.Domain.Authorization; // Removed: Conflicts with CasbinRbac
 using Yi.Framework.Rbac.Domain.Shared.Consts;
 using Yi.Framework.Rbac.Domain.Shared.Options;
 using Yi.Framework.SettingManagement.Domain;
-//using Yi.Framework.Stock.Application;
 using Yi.Framework.TenantManagement.Application;
 using Yi.Framework.CasbinRbac.Application;
 using Yi.Framework.CasbinRbac.Domain.Authorization; // Added namespace
@@ -89,22 +80,12 @@ namespace Yi.Abp.Web
                     options => options.RemoteServiceName = "default");
                 //options.ConventionalControllers.Create(typeof(YiFrameworkRbacApplicationModule).Assembly,
                 //    options => options.RemoteServiceName = "rbac");
-                //options.ConventionalControllers.Create(typeof(YiFrameworkBbsApplicationModule).Assembly,
-                //    options => options.RemoteServiceName = "bbs");
-                //options.ConventionalControllers.Create(typeof(YiFrameworkChatHubApplicationModule).Assembly,
-                //    options => options.RemoteServiceName = "chat-hub");
                 options.ConventionalControllers.Create(typeof(YiFrameworkTenantManagementApplicationModule).Assembly,
                     options => options.RemoteServiceName = "tenant-management");
                 options.ConventionalControllers.Create(typeof(YiFrameworkCodeGenApplicationModule).Assembly,
                     options => options.RemoteServiceName = "code-gen");
-                //options.ConventionalControllers.Create(typeof(YiFrameworkDigitalCollectiblesApplicationModule).Assembly,
-                //    options => options.RemoteServiceName = "digital-collectibles");
-                //options.ConventionalControllers.Create(typeof(YiFrameworkStockApplicationModule).Assembly,
-                //    options => options.RemoteServiceName = "ai-stock");
                 options.ConventionalControllers.Create(typeof(YiFrameworkSettingManagementDomainModule).Assembly,
                     options => options.RemoteServiceName = "setting-management");
-                //options.ConventionalControllers.Create(typeof(CityWalkCoreApplicationModule).Assembly,
-                //    options => options.RemoteServiceName = "citywalk-core");
                 options.ConventionalControllers.Create(typeof(YiFrameworkCasbinRbacApplicationModule).Assembly,
                     options => options.RemoteServiceName = "casbin-rbac");
 
@@ -387,7 +368,7 @@ namespace Yi.Abp.Web
             app.UseYiSwagger();
 
             //流量访问统计,需redis支持，否则不生效
-            app.UseBbsAccessLog();
+            //app.UseBbsAccessLog(); //TODO: BBS模块已移除
 
             //请求处理
             app.UseApiInfoHandling();

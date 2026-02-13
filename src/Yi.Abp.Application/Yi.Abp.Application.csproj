@@ -3,9 +3,7 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\CityWalk\citywalk-core\CityWalk.Core.Application\CityWalk.Core.Application.csproj" />
     <ProjectReference Include="..\..\framework\Yi.Framework.Ddd.Application\Yi.Framework.Ddd.Application.csproj" />
-    <ProjectReference Include="..\..\module\bbs\Yi.Framework.Bbs.Application\Yi.Framework.Bbs.Application.csproj" />
     <ProjectReference Include="..\..\module\code-gen\Yi.Framework.CodeGen.Application\Yi.Framework.CodeGen.Application.csproj" />
     <ProjectReference Include="..\..\module\rbac\Yi.Framework.Rbac.Application\Yi.Framework.Rbac.Application.csproj" />
     <ProjectReference Include="..\..\module\setting-management\Yi.Framework.SettingManagement.Application\Yi.Framework.SettingManagement.Application.csproj" />
