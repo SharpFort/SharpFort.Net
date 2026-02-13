@@ -56,7 +56,7 @@ namespace Yi.Framework.FileManagement.Application.Services
         /// 下载文件
         /// </summary>
         [AllowAnonymous]
-        public async Task<IActionResult> DownloadAsync(Guid id)
+        public async Task<IActionResult> DownloadAsync(Guid id, bool isThumbnail = false)
         {
             var file = await _repository.GetAsync(x => x.Id == id);
             if (file == null)
@@ -64,7 +64,7 @@ namespace Yi.Framework.FileManagement.Application.Services
                 throw new UserFriendlyException("文件不存在");
             }
 
-            var stream = await _fileManager.GetFileStreamAsync(file);
+            var stream = await _fileManager.GetFileStreamAsync(file, isThumbnail);
             if (stream == null)
             {
                 throw new UserFriendlyException("文件内容不存在");

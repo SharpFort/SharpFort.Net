@@ -107,11 +107,22 @@ namespace Yi.Framework.FileManagement.Domain.Managers
         /// <summary>
         /// 获取文件流
         /// </summary>
-        public async Task<Stream?> GetFileStreamAsync(FileDescriptor file)
+        public async Task<Stream?> GetFileStreamAsync(FileDescriptor file, bool isThumbnail = false)
         {
             var providerConfig = await GetProviderConfigAsync(file.ProviderName);
             var blobProvider = GetBlobProvider(file.ProviderName);
             var containerName = GetContainerName(file);
+
+            // 如果是获取缩略图
+            if (isThumbnail)
+            {
+                // 只有图片才有缩略图
+                if (file.FileType != FileType.Image)
+                {
+                    return null;
+                }
+                containerName = FileManagementConsts.ThumbnailDirectory;
+            }
 
             return await blobProvider.GetAsync(containerName, file.BlobName, providerConfig);
         }

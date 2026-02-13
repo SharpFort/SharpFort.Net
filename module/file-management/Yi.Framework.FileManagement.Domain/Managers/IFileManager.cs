@@ -21,7 +21,7 @@ namespace Yi.Framework.FileManagement.Domain.Managers
         /// <summary>
         /// 获取文件流
         /// </summary>
-        Task<Stream?> GetFileStreamAsync(FileDescriptor file);
+        Task<Stream?> GetFileStreamAsync(FileDescriptor file, bool isThumbnail = false);
 
         /// <summary>
         /// 删除文件 (从存储和数据库)

@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\framework\Yi.Framework.Ddd.Application\Yi.Framework.Ddd.Application.csproj" />
     <ProjectReference Include="..\Yi.Framework.CasbinRbac.Application.Contracts\Yi.Framework.CasbinRbac.Application.Contracts.csproj" />
     <ProjectReference Include="..\Yi.Framework.CasbinRbac.Domain\Yi.Framework.CasbinRbac.Domain.csproj" />
+    <ProjectReference Include="..\..\file-management\Yi.Framework.FileManagement.Application.Contracts\Yi.Framework.FileManagement.Application.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -19,7 +19,7 @@ namespace Yi.Framework.FileManagement.Application.Contracts.IServices
         /// <summary>
         /// 下载文件
         /// </summary>
-        Task<IActionResult> DownloadAsync(Guid id);
+        Task<IActionResult> DownloadAsync(Guid id, bool isThumbnail = false);
 
         /// <summary>
         /// 获取文件信息
