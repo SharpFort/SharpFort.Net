@@ -62,7 +62,7 @@ public class OpenApiService : ApplicationService
     {
         //前面都是校验，后面才是真正的调用
         var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext), input.Model);
+        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
         var userId = tokenValidation.UserId;
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
@@ -100,7 +100,7 @@ public class OpenApiService : ApplicationService
     {
         var httpContext = this._httpContextAccessor.HttpContext;
         Intercept(httpContext);
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext), input.Model);
+        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
         var userId = tokenValidation.UserId;
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
@@ -118,7 +118,7 @@ public class OpenApiService : ApplicationService
     {
         var httpContext = this._httpContextAccessor.HttpContext;
         Intercept(httpContext);
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext), input.Model);
+        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
         var userId = tokenValidation.UserId;
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
@@ -163,7 +163,7 @@ public class OpenApiService : ApplicationService
     {
         //前面都是校验，后面才是真正的调用
         var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext), input.Model);
+        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
         var userId = tokenValidation.UserId;
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
@@ -203,7 +203,7 @@ public class OpenApiService : ApplicationService
     {
         //前面都是校验，后面才是真正的调用
         var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext), input.Model);
+        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
         var userId = tokenValidation.UserId;
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
@@ -247,7 +247,7 @@ public class OpenApiService : ApplicationService
     {
         //前面都是校验，后面才是真正的调用
         var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext), modelId);
+        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
         var userId = tokenValidation.UserId;
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);

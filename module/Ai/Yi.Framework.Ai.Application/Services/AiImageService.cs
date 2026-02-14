@@ -29,7 +29,6 @@ public class AiImageService : ApplicationService
     private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageTaskRepository;
     private readonly IBackgroundJobManager _backgroundJobManager;
     private readonly AiBlacklistManager _aiBlacklistManager;
-    // private readonly PremiumPackageManager _premiumPackageManager; // TODO: Restore when available
     private readonly ModelManager _modelManager;
     private readonly IGuidGenerator _guidGenerator;
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -40,7 +39,6 @@ public class AiImageService : ApplicationService
         ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageTaskRepository,
         IBackgroundJobManager backgroundJobManager,
         AiBlacklistManager aiBlacklistManager,
-        // PremiumPackageManager premiumPackageManager,
         ModelManager modelManager,
         IGuidGenerator guidGenerator,
         IWebHostEnvironment webHostEnvironment, TokenManager tokenManager,
@@ -49,7 +47,6 @@ public class AiImageService : ApplicationService
         _imageTaskRepository = imageTaskRepository;
         _backgroundJobManager = backgroundJobManager;
         _aiBlacklistManager = aiBlacklistManager;
-        // _premiumPackageManager = premiumPackageManager;
         _modelManager = modelManager;
         _guidGenerator = guidGenerator;
         _webHostEnvironment = webHostEnvironment;
@@ -74,26 +71,11 @@ public class AiImageService : ApplicationService
         //校验token
         if (input.TokenId is not null)
         {
-            await _tokenManager.ValidateTokenAsync(input.TokenId, input.ModelId);
+         var tokenValidation = await _tokenManager.ValidateTokenAsync(input.TokenId);
         }
 
 
-        // VIP校验
-        // if (!CurrentUser.IsAiVip()) // TODO: User extension
-        // {
-        //     throw new UserFriendlyException("图片生成功能需要VIP用户才能使用，请购买VIP后重新登录重试");
-        // }
 
-        // 尊享包校验 - 使用ModelManager统一判断
-        var isPremium = await _modelManager.IsPremiumModelAsync(input.ModelId);
-        if (isPremium)
-        {
-            // var availableTokens = await _premiumPackageManager.GetAvailableTokensAsync(userId);
-            // if (availableTokens <= 0)
-            // {
-            //     throw new UserFriendlyException("尊享token包用量不足，请先购买尊享token包");
-            // }
-        }
 
         // 创建任务实体
         var task = new ImageStoreTaskAggregateRoot
@@ -379,7 +361,6 @@ public class AiImageService : ApplicationService
                 ModelName = x.Name,
                 ModelDescribe = x.Description,
                 Remark = x.Description,
-                IsPremiumPackage = x.IsPremium
             }).ToListAsync();
         return output;
     }

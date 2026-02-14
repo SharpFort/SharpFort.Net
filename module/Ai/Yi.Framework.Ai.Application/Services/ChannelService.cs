@@ -131,8 +131,8 @@ public class ChannelService : ApplicationService, IChannelService
             .Where(x => !x.IsDeleted)
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x =>
                 x.Name.Contains(input.SearchKey) || x.ModelId.Contains(input.SearchKey))
-            .WhereIF(input.AiAppId.HasValue, x => x.AiProviderId == input.AiAppId.Value)
-            .WhereIF(input.IsPremiumOnly == true, x => x.IsPremium);
+            .WhereIF(input.AiAppId.HasValue, x => x.AiProviderId == input.AiAppId.Value);
+
 
         var entities = await query
             .OrderBy(x => x.OrderNum)
@@ -183,7 +183,6 @@ public class ChannelService : ApplicationService, IChannelService
             MultiplierShow = input.MultiplierShow,
             ProviderName = input.ProviderName,
             IconUrl = input.IconUrl,
-            IsPremium = input.IsPremium,
             IsEnabled = input.IsEnabled,
             IsDeleted = false
         };
@@ -225,9 +224,7 @@ public class ChannelService : ApplicationService, IChannelService
         entity.MultiplierShow = input.MultiplierShow;
         entity.ProviderName = input.ProviderName;
         entity.IconUrl = input.IconUrl;
-        entity.IsPremium = input.IsPremium;
         entity.IsEnabled = input.IsEnabled;
-
         await _modelRepository.UpdateAsync(entity);
         return entity.Adapt<AiModelDto>();
     }

@@ -59,9 +59,9 @@ public class TokenManager : DomainService
     /// 验证Token并返回用户Id和TokenId
     /// </summary>
     /// <param name="tokenOrId">Token密钥或者TokenId</param>
-    /// <param name="modelId">模型Id（用于判断是否是尊享模型需要检查额度）</param>
+    /// <param name="tokenOrId">Token密钥或者TokenId</param>
     /// <returns>Token验证结果</returns>
-    public async Task<TokenValidationResult> ValidateTokenAsync(object tokenOrId, string? modelId = null)
+    public async Task<TokenValidationResult> ValidateTokenAsync(object tokenOrId)
     {
         
         if (tokenOrId is null)
@@ -105,23 +105,7 @@ public class TokenManager : DomainService
             throw new UserFriendlyException("当前Token已过期，请更新过期时间或创建新的Token", "403");
         }
 
-        // 如果是尊享模型且Token设置了额度限制，检查是否超限
-        if (!string.IsNullOrEmpty(modelId) && entity.PremiumQuotaLimit.HasValue)
-        {
-            var isPremium = await _aiModelRepository._DbQueryable
-                .Where(x => x.ModelId == modelId)
-                .Select(x => x.IsPremium)
-                .FirstAsync();
 
-            if (isPremium)
-            {
-                var usedQuota = await GetTokenPremiumUsedQuotaAsync(entity.UserId, entity.Id);
-                if (usedQuota >= entity.PremiumQuotaLimit.Value)
-                {
-                    throw new UserFriendlyException($"当前Token的尊享包额度已用完（已使用：{usedQuota}，限制：{entity.PremiumQuotaLimit.Value}），请调整额度限制或使用其他Token", "403");
-                }
-            }
-        }
 
         return new TokenValidationResult
         {
@@ -133,23 +117,7 @@ public class TokenManager : DomainService
         };
     }
 
-    /// <summary>
-    /// 获取Token的尊享包已使用额度
-    /// </summary>
-    private async Task<long> GetTokenPremiumUsedQuotaAsync(Guid userId, Guid tokenId)
-    {
-        // 先获取所有尊享模型的ModelId列表
-        var premiumModelIds = await _aiModelRepository._DbQueryable
-            .Where(x => x.IsPremium)
-            .Select(x => x.ModelId)
-            .ToListAsync();
 
-        var usedQuota = await _usageStatisticsRepository._DbQueryable
-            .Where(x => x.UserId == userId && x.TokenId == tokenId && premiumModelIds.Contains(x.ModelId))
-            .SumAsync(x => x.TotalTokenCount);
-
-        return usedQuota;
-    }
 
     /// <summary>
     /// 获取用户的Token（兼容旧接口，返回第一个可用的Token）

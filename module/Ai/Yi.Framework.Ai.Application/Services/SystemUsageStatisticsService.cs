@@ -31,14 +31,7 @@ public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStat
         _modelRepository = modelRepository;
     }
 
-    /// <summary>
-    /// 获取利润统计数据 (已移除)
-    /// </summary>
-    [HttpPost("system-statistics/profit")]
-    public Task<ProfitStatisticsOutput> GetProfitStatisticsAsync(ProfitStatisticsInput input)
-    {
-        throw new UserFriendlyException("该功能已移除");
-    }
+
 
     /// <summary>
     /// 获取指定日期各模型Token统计
@@ -49,12 +42,11 @@ public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStat
         var day = input.Date.Date;
         var nextDay = day.AddDays(1);
 
-        // 1. 获取所有尊享模型(包含被禁用的),按ModelId去重
-        var premiumModels = await _modelRepository._DbQueryable
-            .Where(x => x.IsPremium)
+        // 1. 获取所有模型,按ModelId去重
+        var models = await _modelRepository._DbQueryable
             .ToListAsync();
 
-        if (premiumModels.Count == 0)
+        if (models.Count == 0)
         {
             return new TokenStatisticsOutput
             {
@@ -64,7 +56,7 @@ public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStat
         }
 
         // 按ModelId去重,保留第一个模型的名称
-        var distinctModels = premiumModels
+        var distinctModels = models
             .GroupBy(x => x.ModelId)
             .Select(g => g.First())
             .ToList();

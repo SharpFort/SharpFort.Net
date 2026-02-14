@@ -78,11 +78,6 @@ public class AiModelDto
     public string? IconUrl { get; set; }
 
     /// <summary>
-    /// 是否为尊享模型
-    /// </summary>
-    public bool IsPremium { get; set; }
-
-    /// <summary>
     /// 是否启用
     /// </summary>
     public bool IsEnabled { get; set; }

@@ -43,7 +43,6 @@ public class AiGateWayManager : DomainService
     private readonly AiMessageManager _aiMessageManager;
     private readonly UsageStatisticsManager _usageStatisticsManager;
     private readonly ISpecialCompatible _specialCompatible;
-    // private PremiumPackageManager? _premiumPackageManager;
     private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageStoreTaskRepository;
 
     public AiGateWayManager(ISqlSugarRepository<AiProvider> aiAppRepository, ILogger<AiGateWayManager> logger,
@@ -62,8 +61,7 @@ public class AiGateWayManager : DomainService
         _imageStoreTaskRepository = imageStoreTaskRepository;
     }
 
-    // private PremiumPackageManager PremiumPackageManager =>
-    //    _premiumPackageManager ??= LazyServiceProvider.LazyGetRequiredService<PremiumPackageManager>();
+
 
     /// <summary>
     /// 获取模型
@@ -91,9 +89,6 @@ public class AiGateWayManager : DomainService
                     ModelName = model.Name,
                     Description = model.Description,
                     AppExtraUrl = app.ExtraUrl,
-                    ModelExtraInfo = model.ExtraInfo,
-                    Multiplier = model.Multiplier,
-                    IsPremium = model.IsPremium,
                     ModelType = model.ModelType
                 })
             .FirstAsync();
@@ -160,16 +155,7 @@ public class AiGateWayManager : DomainService
 
             await _usageStatisticsManager.SetUsageAsync(userId.Value, sourceModelId, data.Usage, tokenId);
 
-            /*
-            if (modelDescribe.IsPremium)
-            {
-                var totalTokens = data.Usage?.TotalTokens ?? 0;
-                if (totalTokens > 0)
-                {
-                    await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-                }
-            }
-            */
+
         }
 
         await response.WriteAsJsonAsync(data, cancellationToken);
@@ -314,20 +300,7 @@ public class AiGateWayManager : DomainService
 
         await _usageStatisticsManager.SetUsageAsync(userId, sourceModelId, tokenUsage, tokenId);
 
-        // 扣减尊享token包用量
-        if (userId is not null)
-        {
-            /*
-            if (modelDescribe.IsPremium)
-            {
-                var totalTokens = tokenUsage.TotalTokens ?? 0;
-                if (totalTokens > 0)
-                {
-                    await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-                }
-            }
-            */
-        }
+
     }
 
 
@@ -382,17 +355,7 @@ public class AiGateWayManager : DomainService
 
             await _usageStatisticsManager.SetUsageAsync(userId, model, response.Usage, tokenId);
 
-            /*
-            // 直接扣减尊享token包用量
-            if (userId is not null)
-            {
-                var totalTokens = response.Usage.TotalTokens ?? 0;
-                if (totalTokens > 0)
-                {
-                    await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-                }
-            }
-            */
+
         }
         catch (Exception e)
         {
@@ -576,14 +539,7 @@ public class AiGateWayManager : DomainService
 
             await _usageStatisticsManager.SetUsageAsync(userId.Value, sourceModelId, tokenUsage, tokenId);
 
-            /*
-            // 直接扣减尊享token包用量
-            var totalTokens = tokenUsage.TotalTokens ?? 0;
-            if (totalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-            */
+
         }
 
         await response.WriteAsJsonAsync(data, cancellationToken);
@@ -700,17 +656,7 @@ public class AiGateWayManager : DomainService
 
         await _usageStatisticsManager.SetUsageAsync(userId, sourceModelId, tokenUsage, tokenId);
 
-        /*
-        // 直接扣减尊享token包用量
-        if (userId.HasValue && tokenUsage is not null)
-        {
-            var totalTokens = tokenUsage.TotalTokens ?? 0;
-            if (tokenUsage.TotalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-        }
-        */
+
     }
 
 
@@ -771,14 +717,7 @@ public class AiGateWayManager : DomainService
 
             await _usageStatisticsManager.SetUsageAsync(userId.Value, sourceModelId, tokenUsage, tokenId);
 
-            /*
-            // 直接扣减尊享token包用量
-            var totalTokens = tokenUsage.TotalTokens ?? 0;
-            if (totalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-            */
+
         }
 
         await response.WriteAsJsonAsync(data, cancellationToken);
@@ -868,17 +807,7 @@ public class AiGateWayManager : DomainService
 
         await _usageStatisticsManager.SetUsageAsync(userId, sourceModelId, tokenUsage, tokenId);
 
-        /*
-        // 直接扣减尊享token包用量
-        if (userId.HasValue && tokenUsage is not null)
-        {
-            var totalTokens = tokenUsage.TotalTokens ?? 0;
-            if (tokenUsage.TotalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-        }
-        */
+      
     }
 
 
@@ -942,15 +871,6 @@ public class AiGateWayManager : DomainService
                 }, tokenId);
 
             await _usageStatisticsManager.SetUsageAsync(userId.Value, modelId, tokenUsage, tokenId);
-
-            /*
-            // 直接扣减尊享token包用量
-            var totalTokens = tokenUsage.TotalTokens ?? 0;
-            if (totalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-            */
         }
 
         await response.WriteAsJsonAsync(data, cancellationToken);
@@ -1041,18 +961,6 @@ public class AiGateWayManager : DomainService
             }, tokenId);
 
         await _usageStatisticsManager.SetUsageAsync(userId, modelId, tokenUsage, tokenId);
-
-        /*
-        // 直接扣减尊享token包用量
-        if (userId.HasValue && tokenUsage is not null)
-        {
-            var totalTokens = tokenUsage.TotalTokens ?? 0;
-            if (tokenUsage.TotalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-        }
-        */
     }
 
     private const string ImageStoreHost = "https://ccnetcore.com/prod-api";
@@ -1125,15 +1033,6 @@ public class AiGateWayManager : DomainService
             }, tokenId);
 
         await _usageStatisticsManager.SetUsageAsync(userId, modelId, tokenUsage, tokenId);
-
-        /*
-        // 直接扣减尊享token包用量
-        var totalTokens = tokenUsage.TotalTokens ?? 0;
-        if (totalTokens > 0)
-        {
-            await PremiumPackageManager.TryConsumeTokensAsync(userId, totalTokens);
-        }
-        */
 
         //设置存储base64和url
         imageStoreTask.SetSuccess($"{ImageStoreHost}{storeUrl}");
@@ -1256,17 +1155,6 @@ public class AiGateWayManager : DomainService
         
         await _usageStatisticsManager.SetUsageAsync(userId, sourceModelId, processResult?.TokenUsage, tokenId);
 
-        /*
-        // 扣减尊享token包用量
-        if (userId.HasValue && processResult?.TokenUsage is not null && modelDescribe.IsPremium)
-        {
-            var totalTokens = processResult?.TokenUsage.TotalTokens ?? 0;
-            if (totalTokens > 0)
-            {
-                await PremiumPackageManager.TryConsumeTokensAsync(userId.Value, totalTokens);
-            }
-        }
-        */
     }
 
     #region 统一流式处理 - 各API类型的具体实现

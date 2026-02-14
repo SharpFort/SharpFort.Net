@@ -19,8 +19,5 @@ public class TokenCreateInput
     /// </summary>
     public DateTime? ExpireTime { get; set; }
 
-    /// <summary>
-    /// 尊享包额度限制（空为不限制）
-    /// </summary>
-    public long? PremiumQuotaLimit { get; set; }
+
 }

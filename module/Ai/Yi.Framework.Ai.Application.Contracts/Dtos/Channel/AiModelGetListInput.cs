@@ -17,8 +17,4 @@ public class AiModelGetListInput : PagedAllResultRequestDto
     /// </summary>
     public Guid? AiAppId { get; set; }
 
-    /// <summary>
-    /// 是否只显示尊享模型
-    /// </summary>
-    public bool? IsPremiumOnly { get; set; }
 }

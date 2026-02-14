@@ -94,7 +94,7 @@ public class AiModelService : ApplicationService, IAiModelService
             MultiplierShow = input.MultiplierShow,
             ProviderName = input.ProviderName,
             IconUrl = input.IconUrl,
-            IsPremium = input.IsPremium, 
+ 
             IsEnabled = input.IsEnabled,
             IsDeleted = false
         };
@@ -141,7 +141,7 @@ public class AiModelService : ApplicationService, IAiModelService
         entity.MultiplierShow = input.MultiplierShow;
         entity.ProviderName = input.ProviderName;
         entity.IconUrl = input.IconUrl;
-        entity.IsPremium = input.IsPremium;
+
         entity.IsEnabled = input.IsEnabled;
 
         await _modelRepository.UpdateAsync(entity);

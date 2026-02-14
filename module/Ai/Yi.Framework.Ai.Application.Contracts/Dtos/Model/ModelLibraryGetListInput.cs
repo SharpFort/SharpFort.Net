@@ -27,9 +27,4 @@ public class ModelLibraryGetListInput : PagedAllResultRequestDto
     /// API类型筛选
     /// </summary>
     public List<ModelApiTypeEnum>? ModelApiTypes { get; set; }
-
-    /// <summary>
-    /// 是否只显示尊享模型
-    /// </summary>
-    public bool? IsPremiumOnly { get; set; }
 }

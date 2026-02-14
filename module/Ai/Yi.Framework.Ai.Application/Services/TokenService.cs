@@ -53,32 +53,17 @@ public class TokenService : ApplicationService
             return new PagedResultDto<TokenGetListOutputDto>();
         }
 
-        // 通过ModelManager获取尊享包模型ID列表
-        var premiumModelIds = await _modelManager.GetPremiumModelIdsAsync();
 
-        // 批量查询所有Token的尊享包已使用额度
-        var tokenIds = tokens.Select(t => t.Id).ToList();
-        var usageStats = await _usageStatisticsRepository._DbQueryable
-            .Where(x => x.UserId == userId && tokenIds.Contains(x.TokenId) && premiumModelIds.Contains(x.ModelId))
-            .GroupBy(x => x.TokenId)
-            .Select(g => new
-            {
-                TokenId = g.TokenId,
-                UsedQuota = SqlFunc.AggregateSum(g.TotalTokenCount)
-            })
-            .ToListAsync();
 
         var result = tokens.Select(t =>
         {
-            var usedQuota = usageStats.FirstOrDefault(u => u.TokenId == t.Id)?.UsedQuota ?? 0;
+
             return new TokenGetListOutputDto
             {
                 Id = t.Id,
                 Name = t.Name,
                 ApiKey = t.TokenKey,
                 ExpireTime = t.ExpireTime,
-                PremiumQuotaLimit = t.PremiumQuotaLimit,
-                PremiumUsedQuota = usedQuota,
                 IsDisabled = t.IsDisabled,
                 IsEnableLog = t.IsEnableLog,
                 CreationTime = t.CreationTime
@@ -125,11 +110,7 @@ public class TokenService : ApplicationService
     {
         var userId = CurrentUser.GetId();
 
-        // 检查用户是否为VIP
-        // if (!CurrentUser.IsAiVip()) // User extension needed
-        // {
-        //     throw new UserFriendlyException("充值成为Vip，畅享第三方token服务");
-        // }
+
 
         // 检查名称是否重复
         var exists = await _tokenRepository._DbQueryable
@@ -141,8 +122,7 @@ public class TokenService : ApplicationService
 
         var token = new Token(userId, input.Name)
         {
-            ExpireTime = input.ExpireTime,
-            PremiumQuotaLimit = input.PremiumQuotaLimit
+            ExpireTime = input.ExpireTime
         };
 
         await _tokenRepository.InsertAsync(token);
@@ -153,8 +133,6 @@ public class TokenService : ApplicationService
             Name = token.Name,
             ApiKey = token.TokenKey,
             ExpireTime = token.ExpireTime,
-            PremiumQuotaLimit = token.PremiumQuotaLimit,
-            PremiumUsedQuota = 0,
             IsDisabled = token.IsDisabled,
             IsEnableLog = token.IsEnableLog,
             CreationTime = token.CreationTime
@@ -187,7 +165,6 @@ public class TokenService : ApplicationService
 
         token.Name = input.Name;
         token.ExpireTime = input.ExpireTime;
-        token.PremiumQuotaLimit = input.PremiumQuotaLimit;
 
         await _tokenRepository.UpdateAsync(token);
     }

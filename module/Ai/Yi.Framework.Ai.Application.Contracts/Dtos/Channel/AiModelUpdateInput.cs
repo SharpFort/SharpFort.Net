@@ -95,10 +95,6 @@ public class AiModelUpdateInput
     [StringLength(500, ErrorMessage = "模型图标URL不能超过500个字符")]
     public string? IconUrl { get; set; }
 
-    /// <summary>
-    /// 是否为尊享模型
-    /// </summary>
-    public bool IsPremium { get; set; }
 
     /// <summary>
     /// 是否启用

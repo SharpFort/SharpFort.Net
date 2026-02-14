@@ -64,10 +64,7 @@ public class AiModelDescribe
     /// </summary>
     public decimal Multiplier { get; set; }
     
-    /// <summary>
-    /// 是否为尊享模型
-    /// </summary>
-    public bool IsPremium { get; set; }
+
     
     /// <summary>
     /// 模型类型(聊天/图片等)

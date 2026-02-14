@@ -41,7 +41,7 @@ public class ChatManager : DomainService
     public ChatManager(ILoggerFactory loggerFactory,
         ISqlSugarRepository<ChatMessage> messageRepository,
         ISqlSugarRepository<AgentStore> agentStoreRepository, AiMessageManager aiMessageManager,
-        UsageStatisticsManager usageStatisticsManager, // PremiumPackageManager premiumPackageManager,
+        UsageStatisticsManager usageStatisticsManager,
         AiGateWayManager aiGateWayManager, ISqlSugarRepository<AiModel, Guid> aiModelRepository,
         IUnitOfWorkManager unitOfWorkManager)
     {
@@ -217,23 +217,7 @@ public class ChatManager : DomainService
                             //创建用量统计，用于统计分析
                             await _usageStatisticsManager.SetUsageAsync(userId, modelId, usage, tokenId);
 
-                            //扣减尊享token包用量
-                            var isPremium = await _aiModelRepository._DbQueryable
-                                .Where(x => x.ModelId == modelId)
-                                .Select(x => x.IsPremium)
-                                .FirstAsync();
 
-                                    // 暂不处理尊享包扣减
-                                    /*
-                                    if (isPremium)
-                                    {
-                                        var totalTokens = usage?.TotalTokens ?? 0;
-                                        if (totalTokens > 0)
-                                        {
-                                            await _premiumPackageManager.TryConsumeTokensAsync(userId, totalTokens);
-                                        }
-                                    }
-                                    */
 
                             await uow.CompleteAsync();
 

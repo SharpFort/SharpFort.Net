@@ -29,10 +29,7 @@ public class ModelGetListOutput
     /// </summary>
     public string? Remark { get; set; }
 
-    /// <summary>
-    /// 是否为尊享包
-    /// </summary>
-    public bool IsPremiumPackage { get; set; }
+
 
     /// <summary>
     /// 是否免费模型

@@ -90,8 +90,5 @@ public class AiModel : Entity<Guid>, IOrderNum, ISoftDelete
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 
-    /// <summary>
-    /// 是否为尊享模型
-    /// </summary>
-    public bool IsPremium { get; set; } = false;
+
 }

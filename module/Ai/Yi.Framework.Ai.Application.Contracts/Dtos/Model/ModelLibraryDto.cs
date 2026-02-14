@@ -53,11 +53,6 @@ public class ModelLibraryDto
     /// 模型图标URL
     /// </summary>
     public string? IconUrl { get; set; }
-
-    /// <summary>
-    /// 是否为尊享模型（PremiumChat类型）
-    /// </summary>
-    public bool IsPremium { get; set; }
     
     /// <summary>
     /// 排序

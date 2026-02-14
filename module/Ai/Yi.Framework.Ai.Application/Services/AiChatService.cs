@@ -29,7 +29,6 @@ public class AiChatService : ApplicationService, IAiChatService
     private readonly ILogger<AiChatService> _logger;
     private readonly AiGateWayManager _aiGateWayManager;
     private readonly ModelManager _modelManager;
-    // private readonly PremiumPackageManager _premiumPackageManager; // Omitted for now
     private readonly ChatManager _chatManager;
     private readonly TokenManager _tokenManager;
     private readonly IAccountService _accountService;
@@ -42,7 +41,6 @@ public class AiChatService : ApplicationService, IAiChatService
         ILogger<AiChatService> logger,
         AiGateWayManager aiGateWayManager,
         ModelManager modelManager,
-        // PremiumPackageManager premiumPackageManager,
         ChatManager chatManager, TokenManager tokenManager, IAccountService accountService,
         ISqlSugarRepository<AgentStore> agentStoreRepository,
         ISqlSugarRepository<AiModel> aiModelRepository)
@@ -52,7 +50,6 @@ public class AiChatService : ApplicationService, IAiChatService
         _logger = logger;
         _aiGateWayManager = aiGateWayManager;
         _modelManager = modelManager;
-        // _premiumPackageManager = premiumPackageManager;
         _chatManager = chatManager;
         _tokenManager = tokenManager;
         _accountService = accountService;
@@ -78,7 +75,6 @@ public class AiChatService : ApplicationService, IAiChatService
         {
             if (x.ModelId == FreeModelId)
             {
-                // x.IsPremium = false; // logic from original
                 // x.IsFree = true; // DTO doesn't have IsFree?
             }
         });
@@ -107,18 +103,8 @@ public class AiChatService : ApplicationService, IAiChatService
             if (CurrentUser.IsAuthenticated)
             {
                 await _aiBlacklistManager.VerifiyAiBlacklist(CurrentUser.GetId());
-                // VIP Check logic - simplified or via IAccountService
-                // var userInfo = await _accountService.GetAsync();
-                // if (!userInfo.RoleCodes.Contains("vip")) ...
-            }
-            else
-            {
-                 // Allow anonymous for now or throw? Original threw exception.
-                 // throw new UserFriendlyException("未登录用户，只能使用未加速的DeepSeek-R1，请登录后重试");
             }
         }
-
-        // 尊享包校验逻辑 (Omitted)
 
         // 调用统一流式处理
         await _aiGateWayManager.UnifiedStreamForStatisticsAsync(
