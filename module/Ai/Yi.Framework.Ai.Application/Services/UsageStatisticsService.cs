@@ -31,13 +31,11 @@ public class UsageStatisticsService : ApplicationService, IUsageStatisticsServic
     public UsageStatisticsService(
         ISqlSugarRepository<ChatMessage> messageRepository,
         ISqlSugarRepository<AiUsage> usageStatisticsRepository,
-        // ISqlSugarRepository<PremiumPackageAggregateRoot> premiumPackageRepository,
         ISqlSugarRepository<Token> tokenRepository,
         ModelManager modelManager)
     {
         _messageRepository = messageRepository;
         _usageStatisticsRepository = usageStatisticsRepository;
-        // _premiumPackageRepository = premiumPackageRepository;
         _tokenRepository = tokenRepository;
         _modelManager = modelManager;
     }
@@ -123,127 +121,7 @@ public class UsageStatisticsService : ApplicationService, IUsageStatisticsServic
         return result;
     }
 
-    /// <summary>
-    /// 获取当前用户尊享服务Token用量统计
-    /// </summary>
-    /// <returns>尊享服务Token用量统计</returns>
-    public async Task<PremiumTokenUsageDto> GetPremiumTokenUsageAsync()
-    {
-        // Placeholder implementation until PremiumPackageManager is restored
-        return new PremiumTokenUsageDto();
-        
-        /*
-        var userId = CurrentUser.GetId();
 
-        // 获取尊享包Token信息
-        var premiumPackages = await _premiumPackageRepository._DbQueryable
-            .Where(x => x.UserId == userId && x.IsActive)
-            .ToListAsync();
-
-        var result = new PremiumTokenUsageDto();
-
-        if (premiumPackages.Any())
-        {
-            // 过滤掉已过期、禁用的包，不过滤用量负数的包
-            var validPackages = premiumPackages
-                .Where(p => p.IsAvailable(false))
-                .ToList();
-
-            result.PremiumTotalTokens = validPackages.Sum(x => x.TotalTokens);
-            result.PremiumUsedTokens = validPackages.Sum(x => x.UsedTokens);
-            result.PremiumRemainingTokens = validPackages.Sum(x => x.RemainingTokens);
-        }
-
-        return result;
-        */
-    }
-
-    /// <summary>
-    ///  获取当前用户尊享服务token用量统计列表
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("usage-statistics/premium-token-usage/list")]
-    public async Task<PagedResultDto<PremiumTokenUsageGetListOutput>> GetPremiumTokenUsageListAsync(
-        PremiumTokenUsageGetListInput input)
-    {
-         // Placeholder implementation until PremiumPackageManager is restored
-        return new PagedResultDto<PremiumTokenUsageGetListOutput>();
-        
-        /*
-        var userId = CurrentUser.GetId();
-        RefAsync<int> total = 0;
-        // 获取尊享包Token信息
-        var entities = await _premiumPackageRepository._DbQueryable
-            .Where(x => x.UserId == userId)
-            .WhereIF(input.IsFree == false, x => x.PurchaseAmount > 0)
-            .WhereIF(input.IsFree == true, x => x.PurchaseAmount == 0)
-            .WhereIF(input.StartTime is not null && input.EndTime is not null,
-                x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
-            .OrderByDescending(x => x.CreationTime)
-            .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
-        return new PagedResultDto<PremiumTokenUsageGetListOutput>(total,
-            entities.Adapt<List<PremiumTokenUsageGetListOutput>>());
-        */
-    }
-
-    /// <summary>
-    /// 获取当前用户尊享包不同Token用量占比（饼图）
-    /// </summary>
-    /// <returns>各Token的尊享模型用量及占比</returns>
-    [HttpGet("usage-statistics/premium-token-usage/by-token")]
-    public async Task<List<TokenPremiumUsageDto>> GetPremiumTokenUsageByTokenAsync()
-    {
-        // Placeholder implementation until PremiumPackageManager is restored
-        return new List<TokenPremiumUsageDto>();
-
-        /*
-        var userId = CurrentUser.GetId();
-
-        // 通过ModelManager获取所有尊享模型的ModelId列表
-        var premiumModelIds = await _modelManager.GetPremiumModelIdsAsync();
-
-        // 从UsageStatistics表获取尊享模型的token消耗统计（按TokenId聚合）
-        var tokenUsages = await _usageStatisticsRepository._DbQueryable
-            .Where(x => x.UserId == userId && premiumModelIds.Contains(x.ModelId))
-            .GroupBy(x => x.TokenId)
-            .Select(x => new
-            {
-                TokenId = x.TokenId,
-                TotalTokenCount = SqlFunc.AggregateSum(x.TotalTokenCount)
-            })
-            .ToListAsync();
-
-        if (!tokenUsages.Any())
-        {
-            return new List<TokenPremiumUsageDto>();
-        }
-
-        // 获取用户的所有Token信息用于名称映射
-        var tokenIds = tokenUsages.Select(x => x.TokenId).ToList();
-        var tokens = await _tokenRepository._DbQueryable
-            .Where(x => x.UserId == userId && tokenIds.Contains(x.Id))
-            .Select(x => new { x.Id, x.Name })
-            .ToListAsync();
-
-        var tokenNameDict = tokens.ToDictionary(x => x.Id, x => x.Name);
-
-        // 计算总token数
-        var totalTokens = tokenUsages.Sum(x => x.TotalTokenCount);
-
-        // 计算各Token占比
-        var result = tokenUsages.Select(x => new TokenPremiumUsageDto
-        {
-            TokenId = x.TokenId,
-            TokenName = x.TokenId == Guid.Empty
-                ? "默认"
-                : (tokenNameDict.TryGetValue(x.TokenId, out var name) ? name : "其他"),
-            Tokens = x.TotalTokenCount,
-            Percentage = totalTokens > 0 ? Math.Round((decimal)x.TotalTokenCount / totalTokens * 100, 2) : 0
-        }).OrderByDescending(x => x.Tokens).ToList();
-
-        return result;
-        */
-    }
 
     /// <summary>
     /// 获取当前用户近24小时每小时Token消耗统计（柱状图）

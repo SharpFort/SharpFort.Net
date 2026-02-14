@@ -20,12 +20,6 @@ public interface IUsageStatisticsService
     Task<List<ModelTokenUsageDto>> GetModelTokenUsageAsync(UsageStatisticsGetInput input);
 
     /// <summary>
-    /// 获取当前用户尊享服务Token用量统计
-    /// </summary>
-    /// <returns>尊享服务Token用量统计</returns>
-    Task<PremiumTokenUsageDto> GetPremiumTokenUsageAsync();
-
-    /// <summary>
     /// 获取当前用户近24小时每小时Token消耗统计（柱状图）
     /// </summary>
     /// <returns>每小时Token使用量列表，包含各模型堆叠数据</returns>

@@ -29,7 +29,6 @@ public class OpenApiService : ApplicationService
     private readonly AiGateWayManager _aiGateWayManager;
     private readonly ModelManager _modelManager;
     private readonly AiBlacklistManager _aiBlacklistManager;
-    private readonly IUserService _userService;
     // private readonly PremiumPackageManager _premiumPackageManager;
     private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageStoreRepository;
     private readonly ISqlSugarRepository<AiModel> _aiModelRepository;
@@ -37,7 +36,7 @@ public class OpenApiService : ApplicationService
     public OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<OpenApiService> logger,
         TokenManager tokenManager, AiGateWayManager aiGateWayManager,
         ModelManager modelManager, AiBlacklistManager aiBlacklistManager,
-        IUserService userService, /* PremiumPackageManager premiumPackageManager, */ ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageStoreRepository, ISqlSugarRepository<AiModel> aiModelRepository,
+         /* PremiumPackageManager premiumPackageManager, */ ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageStoreRepository, ISqlSugarRepository<AiModel> aiModelRepository,
         IServiceScopeFactory serviceScopeFactory)
     {
         _httpContextAccessor = httpContextAccessor;
@@ -46,7 +45,6 @@ public class OpenApiService : ApplicationService
         _aiGateWayManager = aiGateWayManager;
         _modelManager = modelManager;
         _aiBlacklistManager = aiBlacklistManager;
-        _userService = userService;
         // _premiumPackageManager = premiumPackageManager;
         _imageStoreRepository = imageStoreRepository;
         _aiModelRepository = aiModelRepository;
@@ -69,20 +67,7 @@ public class OpenApiService : ApplicationService
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
-        //如果是尊享包服务，需要校验是是否尊享包足够
-        var isPremium = await _modelManager.IsPremiumModelAsync(input.Model);
 
-        /*
-        if (isPremium)
-        {
-            // 检查尊享token包用量
-            var availableTokens = await _premiumPackageManager.GetAvailableTokensAsync(userId);
-            if (availableTokens <= 0)
-            {
-                throw new UserFriendlyException("尊享token包用量不足，请先购买尊享token包");
-            }
-        }
-        */
 
         //ai网关代理httpcontext
         if (input.Stream == true)
@@ -168,7 +153,7 @@ public class OpenApiService : ApplicationService
 
 
     /// <summary>
-    /// Anthropic对话（尊享服务专用）
+    /// Anthropic对话
     /// </summary>
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
@@ -183,27 +168,7 @@ public class OpenApiService : ApplicationService
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
-        // 验证用户是否为VIP
-        var userInfo = await _userService.GetAsync(userId);
-        if (userInfo == null)
-        {
-            throw new UserFriendlyException("用户信息不存在");
-        }
 
-        // 检查是否为VIP（使用RoleCodes判断）
-        if ((userInfo.Roles == null || !userInfo.Roles.Any(r => r.RoleCode == AiHubConst.VipRole)) && userInfo.UserName != "cc")
-        {
-            throw new UserFriendlyException("该接口为尊享服务专用，需要VIP权限才能使用");
-        }
-
-        // 检查尊享token包用量
-        /*
-        var availableTokens = await _premiumPackageManager.GetAvailableTokensAsync(userId);
-        if (availableTokens <= 0)
-        {
-            throw new UserFriendlyException("尊享token包用量不足，请先购买尊享token包");
-        }
-        */
 
         //ai网关代理httpcontext
         if (input.Stream)
@@ -229,7 +194,7 @@ public class OpenApiService : ApplicationService
 
 
     /// <summary>
-    /// 响应-Openai新规范 (尊享服务专用)
+    /// 响应-Openai新规范
     /// </summary>
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
@@ -243,27 +208,7 @@ public class OpenApiService : ApplicationService
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
-        // 验证用户是否为VIP
-        var userInfo = await _userService.GetAsync(userId);
-        if (userInfo == null)
-        {
-            throw new UserFriendlyException("用户信息不存在");
-        }
 
-        // 检查是否为VIP（使用RoleCodes判断）
-        if ((userInfo.Roles == null || !userInfo.Roles.Any(r => r.RoleCode == AiHubConst.VipRole)) && userInfo.UserName != "cc")
-        {
-            throw new UserFriendlyException("该接口为尊享服务专用，需要VIP权限才能使用");
-        }
-
-        // 检查尊享token包用量
-        /*
-        var availableTokens = await _premiumPackageManager.GetAvailableTokensAsync(userId);
-        if (availableTokens <= 0)
-        {
-            throw new UserFriendlyException("尊享token包用量不足，请先购买尊享token包");
-        }
-        */
 
         //ai网关代理httpcontext
         if (input.Stream == true)
@@ -289,7 +234,7 @@ public class OpenApiService : ApplicationService
 
 
     /// <summary>
-    /// 生成-Gemini (尊享服务专用)
+    /// 生成-Gemini
     /// </summary>
     /// <param name="input"></param>
     /// <param name="modelId"></param>
@@ -307,27 +252,7 @@ public class OpenApiService : ApplicationService
         var tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
-        // 验证用户是否为VIP
-        var userInfo = await _userService.GetAsync(userId);
-        if (userInfo == null)
-        {
-            throw new UserFriendlyException("用户信息不存在");
-        }
 
-        // 检查是否为VIP（使用RoleCodes判断）
-        if ((userInfo.Roles == null || !userInfo.Roles.Any(r => r.RoleCode == AiHubConst.VipRole)) && userInfo.UserName != "cc")
-        {
-            throw new UserFriendlyException("该接口为尊享服务专用，需要VIP权限才能使用");
-        }
-
-        // 检查尊享token包用量
-        /*
-        var availableTokens = await _premiumPackageManager.GetAvailableTokensAsync(userId);
-        if (availableTokens <= 0)
-        {
-            throw new UserFriendlyException("尊享token包用量不足，请先购买尊享token包");
-        }
-        */
 
 
         //ai网关代理httpcontext
