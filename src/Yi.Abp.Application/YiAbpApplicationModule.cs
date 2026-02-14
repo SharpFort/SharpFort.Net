@@ -8,6 +8,8 @@ using Yi.Framework.SettingManagement.Application;
 using Yi.Framework.TenantManagement.Application;
 using Yi.Framework.CasbinRbac.Application;
 using Yi.Framework.FileManagement.Application;
+using Yi.Framework.Ai.Application;
+using FluidSequence.Application;
 
 namespace Yi.Abp.Application
 {
@@ -20,7 +22,9 @@ namespace Yi.Abp.Application
         typeof (YiFrameworkSettingManagementApplicationModule),
         typeof(YiFrameworkDddApplicationModule),
         typeof(YiFrameworkCasbinRbacApplicationModule),
-        typeof(YiFrameworkFileManagementApplicationModule)
+        typeof(YiFrameworkFileManagementApplicationModule),
+        typeof(YiFrameworkAiApplicationModule),
+        typeof(FluidSequenceApplicationModule)
         )]
     public class YiAbpApplicationModule : AbpModule
     {

@@ -7,6 +7,7 @@ using Yi.Framework.Rbac.Application.Contracts;
 using Yi.Framework.TenantManagement.Application.Contracts;
 //using CityWalk.Core.Application.Contracts;
 using Yi.Framework.CasbinRbac.Application.Contracts;
+using Yi.Framework.Ai.Application.Contracts;
 
 namespace Yi.Abp.Application.Contracts
 {
@@ -21,7 +22,8 @@ namespace Yi.Abp.Application.Contracts
         typeof(YiFrameworkTenantManagementApplicationContractsModule),
         typeof(YiFrameworkDddApplicationContractsModule),
         //typeof(CityWalkCoreApplicationContractsModule),
-        typeof(YiFrameworkCasbinRbacApplicationContractsModule)
+        typeof(YiFrameworkCasbinRbacApplicationContractsModule),
+        typeof(YiFrameworkAiApplicationContractsModule)
         )]
     public class YiAbpApplicationContractsModule:AbpModule
     {

@@ -15,6 +15,9 @@ x86/
 .idea/
 *.sln.iml
 
+## 移除文件夹
+module/ai-hub
+
 ## [日志与临时文件]
 **/[Ll]ogs/
 *.log

@@ -12,7 +12,9 @@
     <ProjectReference Include="..\Yi.Abp.Domain\Yi.Abp.Domain.csproj" />
     <ProjectReference Include="..\..\module\casbin-rbac\Yi.Framework.CasbinRbac.SqlSugarCore\Yi.Framework.CasbinRbac.SqlSugarCore.csproj" />
     <ProjectReference Include="..\..\module\file-management\Yi.Framework.FileManagement.SqlSugarCore\Yi.Framework.FileManagement.SqlSugarCore.csproj" />
-    <ProjectReference Include="..\..\module\FluidSequence\FluidSequence.SqlSugarCore\FluidSequence.SqlSugarCore.csproj" />
+
+    <ProjectReference Include="..\..\module\fluid-sequence\FluidSequence.SqlSugarCore\FluidSequence.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\Ai\Yi.Framework.Ai.SqlSugarCore\Yi.Framework.Ai.SqlSugarCore.csproj" />
   </ItemGroup>
 
 

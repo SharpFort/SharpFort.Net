@@ -6,6 +6,7 @@ using Yi.Framework.AuditLogging.Domain.Shared;
 using Yi.Framework.Rbac.Domain.Shared;
 //using CityWalk.Core.Domain.Shared;
 using Yi.Framework.CasbinRbac.Domain.Shared;
+using Yi.Framework.Ai.Domain.Shared;
 
 namespace Yi.Abp.Domain.Shared
 {
@@ -18,7 +19,8 @@ namespace Yi.Abp.Domain.Shared
         typeof(AbpSettingManagementDomainSharedModule),
         typeof(AbpDddDomainSharedModule),
         //typeof(CityWalkCoreDomainSharedModule),
-        typeof(YiFrameworkCasbinRbacDomainSharedModule)
+        typeof(YiFrameworkCasbinRbacDomainSharedModule),
+        typeof(YiFrameworkAiDomainSharedModule)
         )]
     public class YiAbpDomainSharedModule : AbpModule
     {

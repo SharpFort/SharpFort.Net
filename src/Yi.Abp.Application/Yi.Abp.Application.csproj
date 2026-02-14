@@ -12,7 +12,9 @@
     <ProjectReference Include="..\Yi.Abp.Domain\Yi.Abp.Domain.csproj" />
     <ProjectReference Include="..\..\module\casbin-rbac\Yi.Framework.CasbinRbac.Application\Yi.Framework.CasbinRbac.Application.csproj" />
     <ProjectReference Include="..\..\module\file-management\Yi.Framework.FileManagement.Application\Yi.Framework.FileManagement.Application.csproj" />
-    <ProjectReference Include="..\..\module\FluidSequence\FluidSequence.Application\FluidSequence.Application.csproj" />
+
+    <ProjectReference Include="..\..\module\fluid-sequence\FluidSequence.Application\FluidSequence.Application.csproj" />
+    <ProjectReference Include="..\..\module\Ai\Yi.Framework.Ai.Application\Yi.Framework.Ai.Application.csproj" />
   </ItemGroup>
 	
 

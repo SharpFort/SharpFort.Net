@@ -1,0 +1,81 @@
+using System.Text.Json.Serialization;
+
+namespace Yi.Framework.Ai.Domain.Shared.Dtos.OpenAi;
+
+/// <summary>
+/// 对话补全服务返回结果
+/// </summary>
+public record ThorChatCompletionsResponse
+{
+    /// <summary>
+    /// 对话补全的唯一标识符。<br/>
+    /// 聊天完成的唯一标识符。如果是流式对话，每个区块都具有相同的 ID。
+    /// </summary>
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
+
+    /// <summary>
+    /// 用于对话补全的模型。
+    /// </summary>
+    [JsonPropertyName("model")]
+    public string? Model { get; set; }
+
+    /// <summary>
+    /// 对象类型<br/>
+    /// 非流式对话补全始终为 chat.completion<br/>
+    /// 流式对话补全始终为 chat.completion.chunk<br/>
+    /// </summary>
+    [JsonPropertyName("object")]
+    public string? ObjectTypeName { get; set; }
+
+    /// <summary>
+    /// 对话补全选项列表。如果 n 大于 1，则可以是多个。
+    /// </summary>
+    [JsonPropertyName("choices")]
+    public List<ThorChatChoiceResponse>? Choices { get; set; }
+
+    /// <summary>
+    /// 完成请求的使用情况统计信息。
+    /// 仅在您 stream_options: {"include_usage": true} 设置请求时才会显示。
+    /// 如果存在，则它包含一个 null 值，但最后一个块除外，该块包含整个请求的令牌使用情况统计信息。
+    /// </summary>
+    [JsonPropertyName("usage")]
+    public ThorUsageResponse? Usage { get; set; }
+
+    /// <summary>
+    /// 创建对话补全时的 Unix 时间戳（以秒为单位）。
+    /// </summary>
+    [JsonPropertyName("created")]
+    public int Created { get; set; }
+
+    /// <summary>
+    /// 此指纹表示模型运行时使用的后端配置。
+    /// 可以与 seed 请求参数结合使用，以了解何时进行了可能影响确定性的后端更改。
+    /// </summary>
+    [JsonPropertyName("system_fingerprint")]
+    public string SystemFingerPrint { get; set; }
+
+    /// <summary>
+    /// 错误信息
+    /// </summary>
+    [JsonPropertyName("error")]
+    public ThorError? Error { get; set; }
+
+    public void SupplementalMultiplier(decimal multiplier)
+    {
+        if (this.Usage is not null)
+        {
+            this.Usage.InputTokens =
+                (int)Math.Round((this.Usage.InputTokens ?? 0) * multiplier);
+            this.Usage.OutputTokens =
+                (int)Math.Round((this.Usage.OutputTokens ?? 0) * multiplier);
+            this.Usage.CompletionTokens =
+                (int)Math.Round((this.Usage.CompletionTokens ?? 0) * multiplier);
+            this.Usage.PromptTokens =
+                (int)Math.Round((this.Usage.PromptTokens ?? 0) * multiplier);
+
+            this.Usage.TotalTokens =
+                (int)Math.Round((this.Usage.TotalTokens ?? 0) * multiplier);
+        }
+    }
+}

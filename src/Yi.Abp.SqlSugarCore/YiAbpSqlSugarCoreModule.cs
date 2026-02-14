@@ -12,6 +12,8 @@ using Yi.Framework.SqlSugarCore.Abstractions;
 using Yi.Framework.TenantManagement.SqlSugarCore;
 using Yi.Framework.CasbinRbac.SqlSugarCore;
 using Yi.Framework.FileManagement.SqlSugarCore;
+using Yi.Framework.Ai.SqlSugarCore;
+using FluidSequence.SqlSugarCore;
 
 
 namespace Yi.Abp.SqlsugarCore
@@ -25,7 +27,9 @@ namespace Yi.Abp.SqlsugarCore
         typeof(YiFrameworkMapsterModule),
         typeof(YiFrameworkSqlSugarCoreModule),
         typeof(YiFrameworkCasbinRbacSqlSugarCoreModule),
-        typeof(YiFrameworkFileManagementSqlSugarCoreModule)
+        typeof(YiFrameworkFileManagementSqlSugarCoreModule),
+        typeof(YiFrameworkAiSqlSugarCoreModule),
+        typeof(FluidSequenceSqlSugarCoreModule)
     )]
     public class YiAbpSqlSugarCoreModule : AbpModule
     {

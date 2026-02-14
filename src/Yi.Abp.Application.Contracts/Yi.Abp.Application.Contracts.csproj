@@ -7,6 +7,7 @@
     <ProjectReference Include="..\..\module\rbac\Yi.Framework.Rbac.Application.Contracts\Yi.Framework.Rbac.Application.Contracts.csproj" />
     <ProjectReference Include="..\..\module\tenant-management\Yi.Framework.TenantManagement.Application.Contracts\Yi.Framework.TenantManagement.Application.Contracts.csproj" />
     <ProjectReference Include="..\Yi.Abp.Domain.Shared\Yi.Abp.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\Ai\Yi.Framework.Ai.Application.Contracts\Yi.Framework.Ai.Application.Contracts.csproj" />
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(AbpVersion)" />

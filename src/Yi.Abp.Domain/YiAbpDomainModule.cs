@@ -11,6 +11,7 @@ using Yi.Framework.SettingManagement.Domain;
 using Yi.Framework.TenantManagement.Domain;
 //using CityWalk.Core.Domain;
 using Yi.Framework.CasbinRbac.Domain;
+using Yi.Framework.Ai.Domain;
 
 namespace Yi.Abp.Domain
 {
@@ -28,7 +29,8 @@ namespace Yi.Abp.Domain
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule),
         //typeof(CityWalkCoreDomainModule),
-        typeof(YiFrameworkCasbinRbacDomainModule)
+        typeof(YiFrameworkCasbinRbacDomainModule),
+        typeof(YiFrameworkAiDomainModule)
         )]
     public class YiAbpDomainModule : AbpModule
     {

@@ -51,6 +51,8 @@ using Yi.Framework.CasbinRbac.Domain.Authorization; // Added namespace
 using Yi.Framework.FileManagement.Application;
 using FluidSequence.Application;
 
+using Yi.Framework.Ai.Application;
+
 namespace Yi.Abp.Web
 {
     [DependsOn(
@@ -58,15 +60,15 @@ namespace Yi.Abp.Web
         typeof(YiAbpApplicationModule),
         typeof(AbpAspNetCoreMultiTenancyModule),
         typeof(AbpAspNetCoreMvcModule),
-
         typeof(AbpSwashbuckleModule),
         typeof(AbpAspNetCoreSerilogModule),
         typeof(AbpAuditingModule),
         typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
         typeof(YiFrameworkAspNetCoreModule),
         typeof(YiFrameworkAspNetCoreAuthenticationOAuthModule),
-        
         typeof(YiFrameworkBackgroundWorkersHangfireModule),
+        typeof(YiFrameworkAiApplicationModule),
+        typeof(FluidSequenceApplicationModule),
         typeof(AbpAutofacModule)
     )]
     public class YiAbpWebModule : AbpModule
@@ -94,6 +96,8 @@ namespace Yi.Abp.Web
                     options => options.RemoteServiceName = "file-management");
                 options.ConventionalControllers.Create(typeof(FluidSequenceApplicationModule).Assembly,
                     options => options.RemoteServiceName = "fluid-sequence");
+                options.ConventionalControllers.Create(typeof(YiFrameworkAiApplicationModule).Assembly,
+                    options => options.RemoteServiceName = "ai");
 
                 //统一前缀
                 options.ConventionalControllers.ConventionalControllerSettings.ForEach(x => x.RootPath = "api/app");

@@ -1,0 +1,31 @@
+using Volo.Abp.Application.Dtos;
+using Yi.Framework.Ai.Domain.Shared.Enums;
+using Yi.Framework.Ddd.Application.Contracts;
+
+namespace Yi.Framework.Ai.Application.Contracts.Dtos.Chat;
+
+/// <summary>
+/// 图片任务分页查询输入
+/// </summary>
+public class ImagePlazaPageInput: PagedAllResultRequestDto
+{
+    /// <summary>
+    /// 分类
+    /// </summary>
+    public string? Categories { get; set; }
+    
+    /// <summary>
+    /// 提示词
+    /// </summary>
+    public string? Prompt { get; set; }
+    
+    /// <summary>
+    /// 任务状态筛选（可选）
+    /// </summary>
+    public TaskStatusEnum? TaskStatus { get; set; }
+    
+    /// <summary>
+    /// 用户名
+    /// </summary>
+    public string? UserName{ get; set; }
+}
