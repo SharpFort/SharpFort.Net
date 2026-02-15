@@ -17,16 +17,13 @@ namespace Yi.Framework.Ai.Application.Services;
 [Authorize(Roles = "admin")]
 public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStatisticsService
 {
-    private readonly ISqlSugarRepository<AiRecharge> _rechargeRepository;
     private readonly ISqlSugarRepository<ChatMessage> _messageRepository;
     private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository;
 
     public SystemUsageStatisticsService(
-        ISqlSugarRepository<AiRecharge> rechargeRepository,
         ISqlSugarRepository<ChatMessage> messageRepository,
         ISqlSugarRepository<AiModel, Guid> modelRepository)
     {
-        _rechargeRepository = rechargeRepository;
         _messageRepository = messageRepository;
         _modelRepository = modelRepository;
     }
