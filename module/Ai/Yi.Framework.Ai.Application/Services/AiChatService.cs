@@ -15,7 +15,7 @@ using Yi.Framework.Ai.Domain.Entities;
 using Yi.Framework.Ai.Domain.Managers;
 using Yi.Framework.Ai.Domain.Shared.Enums;
 using Yi.Framework.SqlSugarCore.Abstractions;
-using Yi.Framework.Rbac.Application.Contracts.IServices;
+using Yi.Framework.CasbinRbac.Application.Contracts.IServices;
 
 namespace Yi.Framework.Ai.Application.Services;
 

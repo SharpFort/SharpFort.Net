@@ -6,8 +6,8 @@ using System.Globalization;
 using System.Text;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Users;
-using Yi.Framework.Rbac.Application.Contracts.IServices;
-using Yi.Framework.Rbac.Domain.Shared.Dtos;
+using Yi.Framework.CasbinRbac.Application.Contracts.IServices;
+using Yi.Framework.CasbinRbac.Domain.Shared.Dtos;
 using Yi.Framework.Ai.Domain.Entities;
 using Yi.Framework.SqlSugarCore.Abstractions;
 

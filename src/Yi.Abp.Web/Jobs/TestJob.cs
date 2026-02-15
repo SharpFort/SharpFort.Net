@@ -1,6 +1,6 @@
 ﻿using Hangfire;
 using Volo.Abp.BackgroundWorkers.Hangfire;
-using Yi.Framework.Rbac.Domain.Entities;
+
 using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Abp.Web.Jobs
@@ -10,10 +10,8 @@ namespace Yi.Abp.Web.Jobs
     /// </summary>
     public class TestJob : HangfireBackgroundWorkerBase
     {
-        private ISqlSugarRepository<User> _repository;
-        public TestJob(ISqlSugarRepository<User> repository)
+        public TestJob()
         {
-            _repository = repository;
             RecurringJobId = "测试";
             //每天一次
             CronExpression = Cron.Daily();

@@ -4,7 +4,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\framework\Yi.Framework.Ddd.Application.Contracts\Yi.Framework.Ddd.Application.Contracts.csproj" />
     <ProjectReference Include="..\Yi.Framework.Ai.Domain.Shared\Yi.Framework.Ai.Domain.Shared.csproj" />
-    <ProjectReference Include="..\..\Rbac\Yi.Framework.Rbac.Domain.Shared\Yi.Framework.Rbac.Domain.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(AbpVersion)" />

@@ -6,7 +6,6 @@
     <ProjectReference Include="..\..\framework\Yi.Framework.SqlSugarCore\Yi.Framework.SqlSugarCore.csproj" />
     <ProjectReference Include="..\..\module\audit-logging\Yi.Framework.AuditLogging.SqlSugarCore\Yi.Framework.AuditLogging.SqlSugarCore.csproj" />
     <ProjectReference Include="..\..\module\code-gen\Yi.Framework.CodeGen.SqlSugarCore\Yi.Framework.CodeGen.SqlSugarCore.csproj" />
-    <ProjectReference Include="..\..\module\rbac\Yi.Framework.Rbac.SqlSugarCore\Yi.Framework.Rbac.SqlSugarCore.csproj" />
     <ProjectReference Include="..\..\module\setting-management\Yi.Framework.SettingManagement.SqlSugarCore\Yi.Framework.SettingManagement.SqlSugarCore.csproj" />
     <ProjectReference Include="..\..\module\tenant-management\Yi.Framework.TenantManagement.SqlSugarCore\Yi.Framework.TenantManagement.SqlSugarCore.csproj" />
     <ProjectReference Include="..\Yi.Abp.Domain\Yi.Abp.Domain.csproj" />

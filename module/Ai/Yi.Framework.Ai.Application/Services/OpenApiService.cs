@@ -16,7 +16,7 @@ using Yi.Framework.Ai.Domain.Shared.Dtos.OpenAi.Embeddings;
 using Yi.Framework.Ai.Domain.Shared.Dtos.OpenAi.Images;
 using Yi.Framework.Ai.Domain.Shared.Dtos.OpenAi.Responses;
 using Yi.Framework.Ai.Domain.Shared.Enums;
-using Yi.Framework.Rbac.Application.Contracts.IServices;
+using Yi.Framework.CasbinRbac.Application.Contracts.IServices;
 using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Framework.Ai.Application.Services;

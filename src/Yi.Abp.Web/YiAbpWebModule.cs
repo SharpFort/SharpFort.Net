@@ -42,8 +42,8 @@ using Yi.Framework.AspNetCore.Microsoft.Extensions.DependencyInjection;
 using Yi.Framework.BackgroundWorkers.Hangfire;
 using Yi.Framework.CodeGen.Application;
 using Yi.Framework.Core.Json;
-using Yi.Framework.Rbac.Domain.Shared.Consts;
-using Yi.Framework.Rbac.Domain.Shared.Options;
+using Yi.Framework.CasbinRbac.Domain.Shared.Consts;
+using Yi.Framework.CasbinRbac.Domain.Shared.Options;
 using Yi.Framework.SettingManagement.Domain;
 using Yi.Framework.TenantManagement.Application;
 using Yi.Framework.CasbinRbac.Application;
@@ -82,8 +82,6 @@ namespace Yi.Abp.Web
             {
                 options.ConventionalControllers.Create(typeof(YiAbpApplicationModule).Assembly,
                     options => options.RemoteServiceName = "default");
-                //options.ConventionalControllers.Create(typeof(YiFrameworkRbacApplicationModule).Assembly,
-                //    options => options.RemoteServiceName = "rbac");
                 options.ConventionalControllers.Create(typeof(YiFrameworkTenantManagementApplicationModule).Assembly,
                     options => options.RemoteServiceName = "tenant-management");
                 options.ConventionalControllers.Create(typeof(YiFrameworkCodeGenApplicationModule).Assembly,

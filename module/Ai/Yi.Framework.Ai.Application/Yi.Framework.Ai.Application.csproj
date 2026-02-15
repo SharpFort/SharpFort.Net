@@ -6,8 +6,8 @@
     <ProjectReference Include="..\..\..\framework\Yi.Framework.Ddd.Application\Yi.Framework.Ddd.Application.csproj" />
     <ProjectReference Include="..\Yi.Framework.Ai.Application.Contracts\Yi.Framework.Ai.Application.Contracts.csproj" />
     <ProjectReference Include="..\Yi.Framework.Ai.Domain\Yi.Framework.Ai.Domain.csproj" />
-    <ProjectReference Include="..\..\Rbac\Yi.Framework.Rbac.Application.Contracts\Yi.Framework.Rbac.Application.Contracts.csproj" />
     <PackageReference Include="Volo.Abp.BackgroundJobs" Version="$(AbpVersion)" />
+    <ProjectReference Include="..\..\casbin-rbac\Yi.Framework.CasbinRbac.Application.Contracts\Yi.Framework.CasbinRbac.Application.Contracts.csproj" />
   </ItemGroup>
 
 

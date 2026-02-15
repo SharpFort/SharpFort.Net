@@ -1,6 +1,6 @@
 ﻿using Volo.Abp.Uow;
 using Xunit;
-using Yi.Framework.Rbac.Domain.Entities;
+using Yi.Framework.CasbinRbac.Domain.Entities;
 using Yi.Framework.SqlSugarCore.Abstractions;
 
 namespace Yi.Abp.Test.example

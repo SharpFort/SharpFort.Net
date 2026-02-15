@@ -9,8 +9,8 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Settings;
 using Volo.Abp.Uow;
-using Yi.Framework.Rbac.Domain.Authorization;
-using Yi.Framework.Rbac.Domain.Extensions;
+using Yi.Framework.CasbinRbac.Domain.Authorization;
+using Yi.Framework.CasbinRbac.Domain.Extensions;
 using Yi.Framework.SettingManagement.Domain;
 using Yi.Framework.SqlSugarCore.Abstractions;
 

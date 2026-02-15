@@ -5,7 +5,7 @@ using Yi.Abp.SqlSugarCore;
 using Yi.Framework.AuditLogging.SqlSugarCore;
 using Yi.Framework.CodeGen.SqlSugarCore;
 using Yi.Framework.Mapster;
-using Yi.Framework.Rbac.SqlSugarCore;
+
 using Yi.Framework.SettingManagement.SqlSugarCore;
 using Yi.Framework.SqlSugarCore;
 using Yi.Framework.SqlSugarCore.Abstractions;

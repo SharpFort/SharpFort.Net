@@ -8,7 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\module\audit-logging\Yi.Framework.AuditLogging.Domain.Shared\Yi.Framework.AuditLogging.Domain.Shared.csproj" />
     <ProjectReference Include="..\..\module\casbin-rbac\Yi.Framework.CasbinRbac.Domain.Shared\Yi.Framework.CasbinRbac.Domain.Shared.csproj" />
-    <ProjectReference Include="..\..\module\rbac\Yi.Framework.Rbac.Domain.Shared\Yi.Framework.Rbac.Domain.Shared.csproj" />
     <ProjectReference Include="..\..\module\Ai\Yi.Framework.Ai.Domain.Shared\Yi.Framework.Ai.Domain.Shared.csproj" />
   </ItemGroup>
 
