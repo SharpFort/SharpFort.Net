@@ -16,7 +16,7 @@ This document summarizes the fixes applied to the `FluidSequence` module to reso
 - **Fix**: 
   - Updated inheritance to `SqlSugarRepository<SysSequenceRule, long>`.
   - Injected `ISugarDbContextProvider<ISqlSugarDbContext>`.
-  - Added `using Yi.Framework.SqlSugarCore.Abstractions;` and `using Yi.Framework.SqlSugarCore.Repositories;`.
+  - Added `using SharpFort.SqlSugarCore.Abstractions;` and `using SharpFort.SqlSugarCore.Repositories;`.
 
 ### 3. DbContext Configuration (FluidSequenceDbContext.cs)
 - **Problem**: `SqlSugarDbContext` is non-generic, but `FluidSequenceDbContext` was inheriting as generic.
@@ -25,19 +25,19 @@ This document summarizes the fixes applied to the `FluidSequence` module to reso
   - Exposed `SqlSugarClient` property via `new` keyword.
 
 ### 4. Application Service (SequenceRuleAppService.cs)
-- **Problem**: `YiCrudAppService` overrides masked `_DbQueryable`, preventing access to SqlSugar-specific query capabilities for filtering.
+- **Problem**: `SfCrudAppService` overrides masked `_DbQueryable`, preventing access to SqlSugar-specific query capabilities for filtering.
 - **Fix**: 
   - Injected and stored `ISequenceRuleRepository` privately.
   - Overrode `GetListAsync` to use `_repository._DbQueryable` for filtering by `RuleName` and `RuleCode`.
 
 ### 5. Test Project Fixes
-- **Problem**: `JudgePassword` method was missing in `User` entity (commented out), causing build failures in `Yi.Framework.Rbac.Test`.
+- **Problem**: `JudgePassword` method was missing in `User` entity (commented out), causing build failures in `SharpFort.Rbac.Test`.
 - **Fix**: Replaced `JudgePassword` with `VerifyPassword` in `AccountFrameworkRbacTest.cs` and `UserFrameworkRbacTest.cs`.
-- **Problem**: Missing `appsettings.Development.json` in `Yi.Abp.Test`.
+- **Problem**: Missing `appsettings.Development.json` in `SharpFort.Test`.
 - **Fix**: Created the file by copying `appsettings.json`.
 
 ## Verification
-- **Build**: Run `dotnet build Yi.Abp.sln`.
+- **Build**: Run `dotnet build SharpFort.sln`.
   - **Result**: Build succeeded with 0 errors.
 
 ## Next Steps

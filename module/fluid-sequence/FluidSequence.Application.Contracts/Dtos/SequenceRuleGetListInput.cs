@@ -1,4 +1,4 @@
-using Yi.Framework.Ddd.Application.Contracts;
+using SharpFort.Ddd.Application.Contracts;
 
 namespace FluidSequence.Application.Contracts.Dtos
 {

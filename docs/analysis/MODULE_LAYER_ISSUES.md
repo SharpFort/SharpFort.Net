@@ -1,7 +1,7 @@
 # SharpFort 模块层问题分析报告
 
 > 分析日期: 2025-11-16
-> 分析范围: `Yi.Abp.Net8/module/` 目录下的 6 个业务模块
+> 分析范围: `SharpFort.Net8/module/` 目录下的 6 个业务模块
 
 ---
 
@@ -22,7 +22,7 @@
 
 ### 2.1 密码加密方案不安全
 
-**位置**: `module/rbac/Yi.Framework.Rbac.Domain/Entities/UserAggregateRoot.cs`
+**位置**: `module/rbac/SharpFort.Rbac.Domain/Entities/UserAggregateRoot.cs`
 
 **当前实现** (第 179-193 行):
 ```csharp
@@ -78,7 +78,7 @@ public bool JudgePassword(string password)
 
 ### 2.2 值对象设计问题
 
-**位置**: `module/rbac/Yi.Framework.Rbac.Domain/Entities/ValueObjects/EncryPasswordValueObject.cs`
+**位置**: `module/rbac/SharpFort.Rbac.Domain/Entities/ValueObjects/EncryPasswordValueObject.cs`
 
 **当前实现**:
 ```csharp
@@ -196,7 +196,7 @@ public enum BankCardStateEnum { ... }         // 应为 BankCardState
 
 ### 3.3 审计接口使用不完整
 
-**位置**: `module/rbac/Yi.Framework.Rbac.Domain/Entities/UserAggregateRoot.cs:16`
+**位置**: `module/rbac/SharpFort.Rbac.Domain/Entities/UserAggregateRoot.cs:16`
 
 **当前实现**:
 ```csharp
@@ -314,8 +314,8 @@ public bool ValidatePassword(string password)
 ### 5.1 重复的通知枚举
 
 **发现**:
-- `module/rbac/Yi.Framework.Rbac.Domain.Shared/Enums/NoticeTypeEnum.cs`
-- `module/bbs/Yi.Framework.Bbs.Domain.Shared/Enums/NoticeTypeEnum.cs`
+- `module/rbac/SharpFort.Rbac.Domain.Shared/Enums/NoticeTypeEnum.cs`
+- `module/bbs/SharpFort.Bbs.Domain.Shared/Enums/NoticeTypeEnum.cs`
 
 **问题**: 相同名称的枚举在不同模块中重复定义
 

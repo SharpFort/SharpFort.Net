@@ -12,11 +12,11 @@ The `FileManagement` module provides a unified interface for file storage operat
 
 ### 1. Dependency Injection
 
-In your application module, add a dependency on `YiFrameworkFileManagementApplicationContractsModule`:
+In your application module, add a dependency on `SharpFortFileManagementApplicationContractsModule`:
 
 ```csharp
 [DependsOn(
-    typeof(Yi.Framework.FileManagement.Application.Contracts.YiFrameworkFileManagementApplicationContractsModule)
+    typeof(SharpFort.FileManagement.Application.Contracts.SharpFortFileManagementApplicationContractsModule)
 )]
 public class YourModule : AbpModule
 {
@@ -28,7 +28,7 @@ public class YourModule : AbpModule
 Inject `IFileDescriptorService` to manage files:
 
 ```csharp
-using Yi.Framework.FileManagement.Application.Contracts.IServices;
+using SharpFort.FileManagement.Application.Contracts.IServices;
 
 public class YourService : ApplicationService
 {

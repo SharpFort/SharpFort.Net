@@ -27,19 +27,19 @@
 ### 已删除文件
 
 ```
-framework/Yi.Framework.Core/Helper/IpHelper.cs        (56 行)
-framework/Yi.Framework.Core/Helper/AssemblyHelper.cs  (94 行)
-framework/Yi.Framework.Core/Helper/ConsoleHelper.cs   (54 行)
-framework/Yi.Framework.Core/Helper/DateHelper.cs      (58 行)
-framework/Yi.Framework.Core/Helper/DistinctHelper.cs  (42 行)
-framework/Yi.Framework.Core/Helper/UnicodeHelper.cs   (47 行)
-framework/Yi.Framework.Core/Helper/MimeHelper.cs      (260 行)
+framework/SharpFort.Core/Helper/IpHelper.cs        (56 行)
+framework/SharpFort.Core/Helper/AssemblyHelper.cs  (94 行)
+framework/SharpFort.Core/Helper/ConsoleHelper.cs   (54 行)
+framework/SharpFort.Core/Helper/DateHelper.cs      (58 行)
+framework/SharpFort.Core/Helper/DistinctHelper.cs  (42 行)
+framework/SharpFort.Core/Helper/UnicodeHelper.cs   (47 行)
+framework/SharpFort.Core/Helper/MimeHelper.cs      (260 行)
 ```
 
 ### 重构详情
 
 **FileAggregateRoot.cs** 变更:
-- 移除 `using Yi.Framework.Core.Helper`
+- 移除 `using SharpFort.Core.Helper`
 - 新增 `using Microsoft.AspNetCore.StaticFiles`
 - `GetFileType()`: 使用 switch 表达式判断扩展名
 - `GetMimeMapping()`: 使用 `FileExtensionContentTypeProvider`
@@ -70,13 +70,13 @@ framework/Yi.Framework.Core/Helper/MimeHelper.cs      (260 行)
 
 ### 2.1 TreeHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/TreeHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/TreeHelper.cs`
 **代码行数**: 68 行
 **引用次数**: 2
 
 **使用位置**:
-- `module/rbac/Yi.Framework.Rbac.Domain.Shared/Dtos/Vue3RouterDto.cs:6` - 实现 ITreeModel
-- `module/rbac/Yi.Framework.Rbac.Domain/Entities/MenuAggregateRoot.cs:232` - 调用 SetTree()
+- `module/rbac/SharpFort.Rbac.Domain.Shared/Dtos/Vue3RouterDto.cs:6` - 实现 ITreeModel
+- `module/rbac/SharpFort.Rbac.Domain/Entities/MenuAggregateRoot.cs:232` - 调用 SetTree()
 
 **功能分析**:
 ```csharp
@@ -119,7 +119,7 @@ public static List<T> ToTree<T>(this IEnumerable<T> items,
 
 ### 2.2 IpHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/IpHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/IpHelper.cs`
 **代码行数**: 56 行
 **引用次数**: 0
 
@@ -151,7 +151,7 @@ var ipv4 = addresses.FirstOrDefault(a =>
 
 ### 2.3 AssemblyHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/AssemblyHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/AssemblyHelper.cs`
 **代码行数**: 94 行
 **引用次数**: 0
 
@@ -184,7 +184,7 @@ List<Type> GetClassByInterfaces(string assemblyFile, Type type)
 
 ### 2.4 ConsoleHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/ConsoleHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/ConsoleHelper.cs`
 **代码行数**: 54 行
 **引用次数**: 0
 
@@ -219,7 +219,7 @@ _logger.LogInformation("Info message");
 
 ### 2.5 DateHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/DateHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/DateHelper.cs`
 **代码行数**: 58 行
 **引用次数**: 0
 
@@ -258,7 +258,7 @@ var unix = dt.ToTimestamp();     // DateTime 转时间戳
 
 ### 2.6 DistinctHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/DistinctHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/DistinctHelper.cs`
 **代码行数**: 42 行
 **引用次数**: 0
 
@@ -291,13 +291,13 @@ var result = list.DistinctBy(x => x.Name);
 
 ### 2.7 MimeHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/MimeHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/MimeHelper.cs`
 **代码行数**: 260 行
 **引用次数**: 2
 
 **使用位置**:
-- `module/rbac/Yi.Framework.Rbac.Domain/Entities/FileAggregateRoot.cs:59` - GetFileType()
-- `module/rbac/Yi.Framework.Rbac.Domain/Entities/FileAggregateRoot.cs:68` - GetMimeMapping()
+- `module/rbac/SharpFort.Rbac.Domain/Entities/FileAggregateRoot.cs:59` - GetFileType()
+- `module/rbac/SharpFort.Rbac.Domain/Entities/FileAggregateRoot.cs:68` - GetMimeMapping()
 
 **功能分析**:
 ```csharp
@@ -359,7 +359,7 @@ public string GetContentType()
 
 ### 2.8 UnicodeHelper.cs
 
-**文件**: `framework/Yi.Framework.Core/Helper/UnicodeHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/UnicodeHelper.cs`
 **代码行数**: 47 行
 **引用次数**: 0
 
@@ -440,12 +440,12 @@ public static List<T> ToTree<T, TKey>(
 
 ```bash
 # 待删除文件（0 引用）
-framework/Yi.Framework.Core/Helper/IpHelper.cs
-framework/Yi.Framework.Core/Helper/AssemblyHelper.cs
-framework/Yi.Framework.Core/Helper/ConsoleHelper.cs
-framework/Yi.Framework.Core/Helper/DateHelper.cs
-framework/Yi.Framework.Core/Helper/DistinctHelper.cs
-framework/Yi.Framework.Core/Helper/UnicodeHelper.cs
+framework/SharpFort.Core/Helper/IpHelper.cs
+framework/SharpFort.Core/Helper/AssemblyHelper.cs
+framework/SharpFort.Core/Helper/ConsoleHelper.cs
+framework/SharpFort.Core/Helper/DateHelper.cs
+framework/SharpFort.Core/Helper/DistinctHelper.cs
+framework/SharpFort.Core/Helper/UnicodeHelper.cs
 ```
 
 **预期效果**: 删除 ~351 行代码

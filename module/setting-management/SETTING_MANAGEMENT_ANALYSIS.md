@@ -2,7 +2,7 @@
 
 ## 1. 模块概述
 
-`setting-management` 模块是 `Yi.Framework` 中用于管理和存取应用配置的核心模块。它基于 ABP Framework 的设置管理系统进行了扩展和实现，提供了多层级、可插拔的配置值解析机制。
+`setting-management` 模块是 `SharpFort` 中用于管理和存取应用配置的核心模块。它基于 ABP Framework 的设置管理系统进行了扩展和实现，提供了多层级、可插拔的配置值解析机制。
 
 该模块允许开发者定义各种设置（Settings），并根据不同的**提供者（Provider）**（如：全局默认值、配置文件、数据库、当前租户、当前用户等）按优先级获取配置值。
 
@@ -84,13 +84,13 @@
     *   `Volo.Abp.Settings`: ABP 框架的设置定义基础库。
     *   `Volo.Abp.Caching`: 用于缓存支持。
     *   `Volo.Abp.Users` / `Volo.Abp.MultiTenancy`: 用于获取当前用户和租户信息。
-    *   `Yi.Framework.SqlSugarCore`: 用于数据库持久化。
+    *   `SharpFort.SqlSugarCore`: 用于数据库持久化。
 
 *   **被依赖项:**
     *   几乎所有的业务模块都可能依赖它来获取系统配置。例如：
         *   `module/bbs`: 可能用于获取论坛的开关、积分规则等配置。
         *   `module/rbac`: 可能用于获取密码策略、登录限制等配置。
-        *   `Yi.Abp.Web`: 用于获取系统的全局显示配置（如站点名称）。
+        *   `SharpFort.Web`: 用于获取系统的全局显示配置（如站点名称）。
 
 ## 5. 如何使用
 
@@ -190,7 +190,7 @@ public async Task UpdateConfigAsync()
 *   **单体部署 (Monolithic):** 如果所有模块都在一个 Web 宿主下运行，通常只需要**一个** `appsettings.json`。所有的配置项都可以在这个文件中按层级（如 `Settings:MyModule:MyConfig`）组织。
 *   **微服务部署 (Microservices):** 每个微服务应该有自己独立的 `appsettings.json`，仅包含该服务所需的配置。
 
-在 `Yi.Framework` 这种模块化架构中，通常是在**Web 宿主层 (src/Yi.Abp.Web)** 维护一个统一的 `appsettings.json`。各个模块定义的配置可以通过 `Settings:` 节点在其中进行覆盖。
+在 `SharpFort` 这种模块化架构中，通常是在**Web 宿主层 (src/SharpFort.Web)** 维护一个统一的 `appsettings.json`。各个模块定义的配置可以通过 `Settings:` 节点在其中进行覆盖。
 
 ### 6.3 可以完全依赖 `gen_setting` 表，只保留最基础的 `appsettings.json` 吗？
 
@@ -212,6 +212,6 @@ public async Task UpdateConfigAsync()
 
 ## 7. 总结
 
-`module/setting-management` 模块通过实现 ABP 的 Setting 系统，为 Yi 框架提供了一个强大且灵活的配置管理基础设施。
+`module/setting-management` 模块通过实现 ABP 的 Setting 系统，为 Sf 框架提供了一个强大且灵活的配置管理基础设施。
 它解决了**“配置不仅是静态文件，更是动态数据”**的问题，允许系统在运行时动态调整行为，并支持不同维度的配置隔离（租户隔离、用户个性化）。
 通过结合 SqlSugar 和 Redis 缓存，它在保证灵活性的同时，也兼顾了性能。

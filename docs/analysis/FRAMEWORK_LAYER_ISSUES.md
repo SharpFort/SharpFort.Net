@@ -1,7 +1,7 @@
 # SharpFort 框架层问题分析报告
 
 > 分析日期: 2025-11-16
-> 分析范围: `Yi.Abp.Net8/framework/` 目录下的 11 个项目
+> 分析范围: `SharpFort.Net8/framework/` 目录下的 11 个项目
 
 ---
 
@@ -10,23 +10,23 @@
 ### 框架层项目清单
 | 项目名称 | 主要功能 | 问题等级 |
 |---------|---------|---------|
-| Yi.Framework.Core | 核心工具类 | **严重** |
-| Yi.Framework.SqlSugarCore | SqlSugar ORM 集成 | 中等 |
-| Yi.Framework.SqlSugarCore.Abstractions | ORM 抽象层 | 轻微 |
-| Yi.Framework.AspNetCore | ASP.NET Core 集成 | 中等 |
-| Yi.Framework.Ddd.Application | DDD 应用层基类 | 轻微 |
-| Yi.Framework.Ddd.Application.Contracts | DDD 契约层 | 轻微 |
-| Yi.Framework.Mapster | 对象映射 | 轻微 |
-| Yi.Framework.Caching.FreeRedis | Redis 缓存 | 轻微 |
-| Yi.Framework.BackgroundWorkers.Hangfire | 后台任务 | 轻微 |
-| Yi.Framework.AspNetCore.Authentication.OAuth | OAuth 认证 | 待评估 |
-| Yi.Framework.WeChat.MiniProgram | 微信小程序 | 待评估 |
+| SharpFort.Core | 核心工具类 | **严重** |
+| SharpFort.SqlSugarCore | SqlSugar ORM 集成 | 中等 |
+| SharpFort.SqlSugarCore.Abstractions | ORM 抽象层 | 轻微 |
+| SharpFort.AspNetCore | ASP.NET Core 集成 | 中等 |
+| SharpFort.Ddd.Application | DDD 应用层基类 | 轻微 |
+| SharpFort.Ddd.Application.Contracts | DDD 契约层 | 轻微 |
+| SharpFort.Mapster | 对象映射 | 轻微 |
+| SharpFort.Caching.FreeRedis | Redis 缓存 | 轻微 |
+| SharpFort.BackgroundWorkers.Hangfire | 后台任务 | 轻微 |
+| SharpFort.AspNetCore.Authentication.OAuth | OAuth 认证 | 待评估 |
+| SharpFort.WeChat.MiniProgram | 微信小程序 | 待评估 |
 
 ---
 
 ## 二、严重问题 (Critical Issues)
 
-### 2.1 Yi.Framework.Core/Helper - 自定义工具类问题
+### 2.1 SharpFort.Core/Helper - 自定义工具类问题
 
 #### 问题概述
 共发现 **27 个自定义 Helper 类**，存在以下问题：

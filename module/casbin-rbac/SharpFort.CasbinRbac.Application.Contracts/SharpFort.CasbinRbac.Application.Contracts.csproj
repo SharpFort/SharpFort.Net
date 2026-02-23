@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.Ddd.Application.Contracts\SharpFort.Ddd.Application.Contracts.csproj" />
+    <ProjectReference Include="..\SharpFort.CasbinRbac.Domain.Shared\SharpFort.CasbinRbac.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

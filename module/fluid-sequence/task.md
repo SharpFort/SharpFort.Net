@@ -1,15 +1,15 @@
-# Fluid Sequence Module (Yi.Framework.FluidSequence)
+# Fluid Sequence Module (SharpFort.FluidSequence)
 
 ## Phase 1: Planning & Setup
 - [x] Create module via `yi-abp new FluidSequence` CLI tool (or manual structure creation)
 - [x] **Organization**: Flatten directory structure (move `module/FluidSequence/FluidSequence` up)
-- [x] Add all 5 projects to `Yi.Abp.sln`
+- [x] Add all 5 projects to `SharpFort.sln`
   - `FluidSequence.Domain.Shared`
   - `FluidSequence.Domain`
   - `FluidSequence.Application.Contracts`
   - `FluidSequence.Application`
   - `FluidSequence.SqlSugarCore`
-- [x] **Config**: Configure `FluidSequenceDbContext` (avoid naming conflict with `YiDbContext`)
+- [x] **Config**: Configure `FluidSequenceDbContext` (avoid naming conflict with `SfDbContext`)
 - [x] **Dependency Injection**: Add module dependencies (Application, SqlSugarCore)
 
 ## Phase 2: Domain.Shared Layer
@@ -46,7 +46,7 @@
 
 ## Phase 5: Application Layer (Business Logic)
 - [x] **Service Implementation**: `SequenceRuleAppService`
-  - [x] CRUD via `YiCrudAppService<SysSequenceRule, SequenceRuleDto, ...>`
+  - [x] CRUD via `SfCrudAppService<SysSequenceRule, SequenceRuleDto, ...>`
   - [x] `TestGenerateAsync` (Preview API)
   - [x] `GetPlaceholdersAsync` (Metadata API)
   - [x] `[Authorize]` attributes for permission control

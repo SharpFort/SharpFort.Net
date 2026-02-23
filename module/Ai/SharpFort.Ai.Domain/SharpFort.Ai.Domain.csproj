@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+    <PackageReference Include="AlipayEasySDK" Version="2.1.3" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.2.0-beta.4" />
+    <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0-preview.251219.1" />
+    <PackageReference Include="ModelContextProtocol.Core" Version="0.5.0-preview.1" />
+    <PackageReference Include="Volo.Abp.DistributedLocking" Version="$(AbpVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.Mapster\SharpFort.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\framework\SharpFort.SqlSugarCore.Abstractions\SharpFort.SqlSugarCore.Abstractions.csproj" />
+    <ProjectReference Include="..\SharpFort.Ai.Domain.Shared\SharpFort.Ai.Domain.Shared.csproj" />
+    <ProjectReference Include="..\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Folder Include="EventHandlers\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Managers\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+</Project>

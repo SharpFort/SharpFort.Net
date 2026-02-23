@@ -19,10 +19,10 @@ feat(TreeExtensions): Add node callback and custom comparer support for ToTree m
 
 ### 2.1 当前使用场景
 
-在 Yi.Framework 项目中，我们有一个 `TreeHelper` 类，它提供了一个独特的功能：
+在 SharpFort 项目中，我们有一个 `TreeHelper` 类，它提供了一个独特的功能：
 
 ```csharp
-// 当前 Yi.Framework.TreeHelper 的使用
+// 当前 SharpFort.TreeHelper 的使用
 var routers = TreeHelper.SetTree(menuList, item =>
 {
     // 在构建树时对每个节点执行额外操作

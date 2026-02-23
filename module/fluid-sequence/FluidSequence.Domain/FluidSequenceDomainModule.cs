@@ -1,14 +1,14 @@
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
 using FluidSequence.Domain.Shared;
-using Yi.Framework.Mapster;
+using SharpFort.Mapster;
 
 namespace FluidSequence.Domain
 {
     [DependsOn(
         typeof(FluidSequenceDomainSharedModule),
 
-        typeof(YiFrameworkMapsterModule),
+        typeof(SharpFortMapsterModule),
         typeof(AbpDddDomainModule),
         typeof(AbpCachingModule)
     )]

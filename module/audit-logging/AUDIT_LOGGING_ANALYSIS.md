@@ -2,10 +2,10 @@
 
 ## 1. 现状分析
 
-基于对 `module/audit-logging` 模块及项目启动文件 (`src/Yi.Abp.Web/Program.cs`) 的代码分析，以下是关于当前日志系统的详细现状：
+基于对 `module/audit-logging` 模块及项目启动文件 (`src/SharpFort.Web/Program.cs`) 的代码分析，以下是关于当前日志系统的详细现状：
 
 ### 1.1 使用的日志库
-*   **应用层日志 (Application Logging):** 项目使用了 **Serilog** 作为主要的日志记录库。在 `src/Yi.Abp.Web/Program.cs` 中进行了配置，支持控制台输出和文件滚动存储（`logs/all/` 和 `logs/error/`）。
+*   **应用层日志 (Application Logging):** 项目使用了 **Serilog** 作为主要的日志记录库。在 `src/SharpFort.Web/Program.cs` 中进行了配置，支持控制台输出和文件滚动存储（`logs/all/` 和 `logs/error/`）。
 *   **审计日志 (Audit Logging):** 审计日志模块依赖于 **ABP Framework** 的审计系统 (`Volo.Abp.Auditing`)。虽然它使用了 `Microsoft.Extensions.Logging` (ILogger) 来记录调试信息，但其核心职责是实现 `IAuditingStore` 接口，将审计数据持久化。
 
 ### 1.2 日志收集手段
@@ -19,10 +19,10 @@
 *   **存储介质:** 关系型数据库 (RDBMS)。
 *   **ORM 框架:** **SqlSugar** (`SqlSugarRepository`).
 *   **表结构:**
-    *   `Yi-AuditLog`: 存储请求维度的核心信息。
-    *   `YiAuditLogAction`: 存储具体的服务方法调用。
-    *   `YiEntityChange`: 存储实体级别的变更记录。
-    *   `YiEntityPropertyChange`: 存储字段级别的变更详情。
+    *   `Sf-AuditLog`: 存储请求维度的核心信息。
+    *   `SfAuditLogAction`: 存储具体的服务方法调用。
+    *   `SfEntityChange`: 存储实体级别的变更记录。
+    *   `SfEntityPropertyChange`: 存储字段级别的变更详情。
 *   **数据流向:** `AuditLogInfo` (ABP 对象) -> `AuditingStore` (实现类) -> `AuditLogInfoToAuditLogConverter` (转换器) -> `SqlSugarCoreAuditLogRepository` -> 数据库。
 
 ### 1.4 日志完整性
@@ -99,11 +99,11 @@
 
 | 日志类型 | 状态 | 实现方式 / 详情 |
 | :--- | :--- | :--- |
-| **访问日志** (Access Log) | ✅ 已实现 | **实现 1 (详细):** `Yi-AuditLog` 表记录了 ClientIpAddress, BrowserInfo, Url, ExecutionTime。<br>**实现 2 (计数):** BBS模块有独立的 `BbsAccessLogMiddleware` 做高并发访问计数。 |
-| **操作日志** (Operation Log) | ✅ 已实现 | `YiAuditLogAction` 表记录了用户调用的 ServiceName, MethodName 以及具体参数 (`Parameters`)。 |
-| **异常日志** (Exception Log) | ✅ 已实现 | **实现 1 (业务关联):** `Yi-AuditLog` 表中的 `Exceptions` 字段记录请求时的异常。<br>**实现 2 (系统级):** `logs/error/` 文件记录了由 Serilog 捕获的系统崩溃或未处理异常。 |
-| **差异日志** (Difference Log) | ✅ 已实现 | `YiEntityChange` 和 `YiEntityPropertyChange` 表记录了实体变更前后的值 (`OriginalValue` vs `NewValue`)。 |
-| **请求日志** (Request Log) | ✅ 已实现 | 包含在 `Yi-AuditLog` 中，记录了 HTTP Method, HttpStatusCode, ExecutionDuration (耗时)。 |
+| **访问日志** (Access Log) | ✅ 已实现 | **实现 1 (详细):** `Sf-AuditLog` 表记录了 ClientIpAddress, BrowserInfo, Url, ExecutionTime。<br>**实现 2 (计数):** BBS模块有独立的 `BbsAccessLogMiddleware` 做高并发访问计数。 |
+| **操作日志** (Operation Log) | ✅ 已实现 | `SfAuditLogAction` 表记录了用户调用的 ServiceName, MethodName 以及具体参数 (`Parameters`)。 |
+| **异常日志** (Exception Log) | ✅ 已实现 | **实现 1 (业务关联):** `Sf-AuditLog` 表中的 `Exceptions` 字段记录请求时的异常。<br>**实现 2 (系统级):** `logs/error/` 文件记录了由 Serilog 捕获的系统崩溃或未处理异常。 |
+| **差异日志** (Difference Log) | ✅ 已实现 | `SfEntityChange` 和 `SfEntityPropertyChange` 表记录了实体变更前后的值 (`OriginalValue` vs `NewValue`)。 |
+| **请求日志** (Request Log) | ✅ 已实现 | 包含在 `Sf-AuditLog` 中，记录了 HTTP Method, HttpStatusCode, ExecutionDuration (耗时)。 |
 | **消息日志** (Message Log) | ⚠️ **待完善** | **现状:** 代码中引入了 `Volo.Abp.EventBus`，但目前的审计模块主要针对 **HTTP请求** 和 **应用服务调用**。对于异步消息（EventBus）或 SignalR 消息的发送/消费记录，并没有看到专门的持久化存储或审计拦截。 |
 
 #### **待开发/需补充的功能：**
@@ -117,7 +117,7 @@
 
 您提供的 JSON 配置非常详细且专业（类似 Furion 或其他成熟框架的配置风格）。**完全可以借鉴，且建议引入**，但需要对现有代码进行改造。
 
-#### **当前痛点 (src/Yi.Abp.Web/Program.cs):**
+#### **当前痛点 (src/SharpFort.Web/Program.cs):**
 目前 Serilog 的配置是**硬编码**在 C# 代码中的：
 ```csharp
 // Program.cs

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+	  
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.Mapster\SharpFort.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\framework\SharpFort.SqlSugarCore.Abstractions\SharpFort.SqlSugarCore.Abstractions.csproj" />
+    <ProjectReference Include="..\FluidSequence.Domain.Shared\SharpFort.FluidSequence.Domain.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Folder Include="EventHandlers\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Managers\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+</Project>

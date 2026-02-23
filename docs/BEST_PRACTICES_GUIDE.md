@@ -2,7 +2,7 @@
 
 > 版本: 1.0
 > 创建日期: 2025-11-16
-> 适用于: SharpFort (原 YiFramework) 项目开发
+> 适用于: SharpFort (原 SharpFort) 项目开发
 
 ---
 

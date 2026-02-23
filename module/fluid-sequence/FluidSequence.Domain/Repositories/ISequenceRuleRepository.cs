@@ -1,5 +1,5 @@
 using FluidSequence.Domain.Entities;
-using Yi.Framework.SqlSugarCore.Abstractions;
+using SharpFort.SqlSugarCore.Abstractions;
 
 namespace FluidSequence.Domain.Repositories
 {

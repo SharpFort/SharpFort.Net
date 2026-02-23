@@ -2,7 +2,7 @@
 
 ## 1. 模块概述
 
-`code-gen` 模块是 `Yi.Abp` 框架中的一个自定义代码生成模块。经过分析，该模块**没有引用第三方的代码生成库（如 T4, CodeSmith 等）**，而是完全**自己实现了一套基于字符串替换的轻量级代码生成引擎**。
+`code-gen` 模块是 `SharpFort` 框架中的一个自定义代码生成模块。经过分析，该模块**没有引用第三方的代码生成库（如 T4, CodeSmith 等）**，而是完全**自己实现了一套基于字符串替换的轻量级代码生成引擎**。
 
 它利用 Entity Framework (实际上是 SqlSugar) 映射的元数据和反射机制，将数据库表结构或代码中的实体定义转换为其他形式的代码（如前端代码、CRUD后端代码等）。
 
@@ -63,7 +63,7 @@
 
 ### 4.1 添加新的模板占位符
 
-1.  **创建 Handler:** 在 `Yi.Framework.CodeGen.Domain/Handlers` 目录下创建一个新的类，继承 `TemplateHandlerBase` 并实现 `ITemplateHandler` 接口。
+1.  **创建 Handler:** 在 `SharpFort.CodeGen.Domain/Handlers` 目录下创建一个新的类，继承 `TemplateHandlerBase` 并实现 `ITemplateHandler` 接口。
 2.  **实现逻辑:** 在 `Invoker` 方法中实现你的替换逻辑。例如，如果你想支持 `@Author` 占位符：
     ```csharp
     public class AuthorTemplateHandler : TemplateHandlerBase, ITemplateHandler
@@ -72,7 +72,7 @@
         {
             var output = new HandledTemplate();
             // 假设可以从某个配置或上下文中获取作者名
-            var author = "YiFramework"; 
+            var author = "SharpFort"; 
             output.TemplateStr = str.Replace("@Author", author);
             output.BuildPath = path; 
             return output;
@@ -91,7 +91,7 @@
 
 直接在数据库的 `gen_template` 表中插入新的记录即可。
 *   **Name:** 模板名称。
-*   **BuildPath:** 目标文件路径，支持 `@model`/`@Model` 占位符，例如 `src/Yi.Abp.Application/Services/@ModelService.cs`。
+*   **BuildPath:** 目标文件路径，支持 `@model`/`@Model` 占位符，例如 `src/SharpFort.Application/Services/@ModelService.cs`。
 *   **Content:** 模板内容，支持 `@field`, `@model`, `@Model` 等所有 Handler 支持的占位符。
 
 ## 5. 如何使用
@@ -118,4 +118,4 @@
 
 ## 6. 总结
 
-Yi.Framework 的 `code-gen` 模块是一个**轻量级、自研的、易于扩展**的代码生成器。它不依赖复杂的第三方模板引擎，而是通过简单的字符串替换策略，结合领域驱动设计 (DDD) 的思想（将模板和表结构作为聚合根管理），实现了灵活的代码生成工作流。适合用于快速搭建项目基础结构和减少重复性编码工作。
+SharpFort 的 `code-gen` 模块是一个**轻量级、自研的、易于扩展**的代码生成器。它不依赖复杂的第三方模板引擎，而是通过简单的字符串替换策略，结合领域驱动设计 (DDD) 的思想（将模板和表结构作为聚合根管理），实现了灵活的代码生成工作流。适合用于快速搭建项目基础结构和减少重复性编码工作。

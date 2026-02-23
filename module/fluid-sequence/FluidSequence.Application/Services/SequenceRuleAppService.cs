@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Application.Dtos;
 using SqlSugar;
-using Yi.Framework.Ddd.Application;
+using SharpFort.Ddd.Application;
 using FluidSequence.Application.Contracts.Dtos;
 using FluidSequence.Application.Contracts.IServices;
 using FluidSequence.Domain.Entities;
@@ -15,7 +15,7 @@ using FluidSequence.Domain.Repositories;
 namespace FluidSequence.Application.Services
 {
     [Authorize]
-    public class SequenceRuleAppService : YiCrudAppService< 
+    public class SequenceRuleAppService : SfCrudAppService< 
         SysSequenceRule, 
         SequenceRuleDto, 
         long, 

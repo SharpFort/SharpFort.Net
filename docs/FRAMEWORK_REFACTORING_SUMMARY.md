@@ -27,7 +27,7 @@
 
 **执行操作**:
 ```bash
-dotnet add framework/Yi.Framework.Core/Yi.Framework.Core.csproj package BCrypt.Net-Next --version 4.0.3
+dotnet add framework/SharpFort.Core/SharpFort.Core.csproj package BCrypt.Net-Next --version 4.0.3
 ```
 
 **验证**:
@@ -46,7 +46,7 @@ dotnet add framework/Yi.Framework.Core/Yi.Framework.Core.csproj package BCrypt.N
 
 **执行操作**:
 ```bash
-mv framework/Yi.Framework.Core/Helper/MD5Hepler.cs framework/Yi.Framework.Core/Helper/MD5Helper.cs
+mv framework/SharpFort.Core/Helper/MD5Hepler.cs framework/SharpFort.Core/Helper/MD5Helper.cs
 ```
 
 **影响范围**: 仅文件名，类名本身已正确
@@ -95,7 +95,7 @@ bRet = SHA512.HashData(bAll);
 
 **执行操作**:
 ```bash
-dotnet add framework/Yi.Framework.Core/Yi.Framework.Core.csproj package Masuit.Tools.Core --version 2025.5.2
+dotnet add framework/SharpFort.Core/SharpFort.Core.csproj package Masuit.Tools.Core --version 2025.5.2
 ```
 
 **包依赖冲突解决**:
@@ -129,7 +129,7 @@ dotnet add framework/Yi.Framework.Core/Yi.Framework.Core.csproj package Masuit.T
 
 **替换方案**:
 
-**位置1**: `module/rbac/Yi.Framework.Rbac.Domain/Operlog/OperLogGlobalAttribute.cs`
+**位置1**: `module/rbac/SharpFort.Rbac.Domain/Operlog/OperLogGlobalAttribute.cs`
 ```csharp
 // 修改前
 logEntity.RequestResult = JsonHelper.ObjToStr(result3.Value);
@@ -138,13 +138,13 @@ logEntity.RequestResult = JsonHelper.ObjToStr(result3.Value);
 logEntity.RequestResult = JsonConvert.SerializeObject(result3.Value);
 ```
 
-**位置2**: `module/audit-logging/Yi.Framework.AuditLogging.Domain/AuditingStore.cs`
+**位置2**: `module/audit-logging/SharpFort.AuditLogging.Domain/AuditingStore.cs`
 ```csharp
 // 修改前
-Logger.LogDebug("Yi-请求追踪:" + JsonHelper.ObjToStr(auditInfo, "yyyy-MM-dd HH:mm:ss"));
+Logger.LogDebug("Sf-请求追踪:" + JsonHelper.ObjToStr(auditInfo, "yyyy-MM-dd HH:mm:ss"));
 
 // 修改后
-Logger.LogDebug("Yi-请求追踪:" + JsonConvert.SerializeObject(auditInfo, new JsonSerializerSettings
+Logger.LogDebug("Sf-请求追踪:" + JsonConvert.SerializeObject(auditInfo, new JsonSerializerSettings
 {
     DateFormatString = "yyyy-MM-dd HH:mm:ss"
 }));
@@ -209,19 +209,19 @@ Logger.LogDebug("Yi-请求追踪:" + JsonConvert.SerializeObject(auditInfo, new 
 
 ### 4.1 框架层编译
 ```bash
-cd framework/Yi.Framework.Core && dotnet build
+cd framework/SharpFort.Core && dotnet build
 ```
 **结果**: ✅ **0 个错误，14 个警告**（仅XML注释格式问题）
 
 ### 4.2 RBAC 模块编译
 ```bash
-cd module/rbac/Yi.Framework.Rbac.Domain && dotnet build
+cd module/rbac/SharpFort.Rbac.Domain && dotnet build
 ```
 **结果**: ✅ 成功编译
 
 ### 4.3 审计日志模块编译
 ```bash
-cd module/audit-logging/Yi.Framework.AuditLogging.Domain && dotnet build
+cd module/audit-logging/SharpFort.AuditLogging.Domain && dotnet build
 ```
 **结果**: ✅ 成功编译
 
@@ -408,7 +408,7 @@ public class User : FullAuditedAggregateRoot<Guid>
 
 ### 关键任务：密码加密方案替换
 
-**位置**: `module/rbac/Yi.Framework.Rbac.Domain/Entities/UserAggregateRoot.cs`
+**位置**: `module/rbac/SharpFort.Rbac.Domain/Entities/UserAggregateRoot.cs`
 
 **当前实现** (不安全 ❌):
 ```csharp
@@ -466,9 +466,9 @@ public bool VerifyPassword(string password)
 
 ### 10.1 Git 提交建议
 ```bash
-git add framework/Yi.Framework.Core/
-git add module/rbac/Yi.Framework.Rbac.Domain/
-git add module/audit-logging/Yi.Framework.AuditLogging.Domain/
+git add framework/SharpFort.Core/
+git add module/rbac/SharpFort.Rbac.Domain/
+git add module/audit-logging/SharpFort.AuditLogging.Domain/
 git commit -m "refactor(framework): complete P0-P1 priority tasks
 
 - Security: Add BCrypt.Net-Next package for password hashing

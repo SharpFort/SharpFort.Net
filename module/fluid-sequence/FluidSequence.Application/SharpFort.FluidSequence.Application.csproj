@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.Ddd.Application\SharpFort.Ddd.Application.csproj" />
+    <ProjectReference Include="..\FluidSequence.Application.Contracts\SharpFort.FluidSequence.Application.Contracts.csproj" />
+    <ProjectReference Include="..\FluidSequence.Domain\SharpFort.FluidSequence.Domain.csproj" />
+  </ItemGroup>
+
+
+</Project>

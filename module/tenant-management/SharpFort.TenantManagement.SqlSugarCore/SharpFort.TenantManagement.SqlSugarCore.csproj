@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.SqlSugarCore\SharpFort.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\SharpFort.TenantManagement.Domain\SharpFort.TenantManagement.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

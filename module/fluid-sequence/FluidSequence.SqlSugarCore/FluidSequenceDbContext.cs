@@ -1,8 +1,8 @@
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using SqlSugar;
-using Yi.Framework.SqlSugarCore;
-using Yi.Framework.SqlSugarCore.Abstractions;
+using SharpFort.SqlSugarCore;
+using SharpFort.SqlSugarCore.Abstractions;
 using FluidSequence.Domain.Shared.Consts;
 using FluidSequence.Domain.Entities;
 

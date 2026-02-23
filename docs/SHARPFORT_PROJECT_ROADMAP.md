@@ -11,7 +11,7 @@
 
 ### 1.1 项目现状
 
-**SharpFort** 源自 **YiFramework** —— 一个基于 .NET 8、ABP Framework v8.3 和 SqlSugar ORM 的 DDD 开源后端框架。原项目已停止维护，现由新维护者接手并计划长期发展。
+**SharpFort** 源自 **SharpFort** —— 一个基于 .NET 8、ABP Framework v8.3 和 SqlSugar ORM 的 DDD 开源后端框架。原项目已停止维护，现由新维护者接手并计划长期发展。
 
 **技术栈**:
 - .NET 8
@@ -65,7 +65,7 @@
 - **依赖精简**: 用 Masuit.Tools 替代自定义 Helper
 
 ### 2.3 品牌重塑
-- **新身份**: YiFramework → SharpFort
+- **新身份**: SharpFort → SharpFort
 - **专业形象**: 规范的文档、清晰的架构
 - **社区认可**: 通过贡献和分享建立声誉
 
@@ -83,12 +83,12 @@
 **操作步骤**:
 1. 添加 NuGet 包：
    ```bash
-   dotnet add module/rbac/Yi.Framework.Rbac.Domain/Yi.Framework.Rbac.Domain.csproj package BCrypt.Net-Next
+   dotnet add module/rbac/SharpFort.Rbac.Domain/SharpFort.Rbac.Domain.csproj package BCrypt.Net-Next
    ```
 
 2. 创建新的密码服务：
    ```csharp
-   // module/rbac/Yi.Framework.Rbac.Domain/Services/PasswordHasher.cs
+   // module/rbac/SharpFort.Rbac.Domain/Services/PasswordHasher.cs
    public class PasswordHasher : IPasswordHasher
    {
        private const int WorkFactor = 12;
@@ -129,7 +129,7 @@
 
 **任务**: 移除 `#pragma warning disable` 并使用现代 API
 
-**文件**: `framework/Yi.Framework.Core/Helper/MD5Hepler.cs`
+**文件**: `framework/SharpFort.Core/Helper/MD5Hepler.cs`
 
 **修复**:
 ```csharp
@@ -276,7 +276,7 @@ public class User : FullAuditedAggregateRoot<Guid>
 #### 3.1 引入 Masuit.Tools
 
 ```bash
-dotnet add framework/Yi.Framework.Core/Yi.Framework.Core.csproj package Masuit.Tools.Core
+dotnet add framework/SharpFort.Core/SharpFort.Core.csproj package Masuit.Tools.Core
 ```
 
 #### 3.2 替换策略
@@ -357,7 +357,7 @@ var guid = Guid.NewGuid().ToString("N");
 
 ```csharp
 // 创建别名
-namespace Yi.Framework.Core
+namespace SharpFort.Core
 {
     [Obsolete("Use SharpFort.Core instead", false)]
     public static class LegacyNamespace { }

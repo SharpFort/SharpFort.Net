@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\common.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="$(AbpVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\module\audit-logging\SharpFort.AuditLogging.Domain.Shared\SharpFort.AuditLogging.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\casbin-rbac\SharpFort.CasbinRbac.Domain.Shared\SharpFort.CasbinRbac.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\Ai\SharpFort.Ai.Domain.Shared\SharpFort.Ai.Domain.Shared.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="$(AbpVersion)" />
+	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Consts\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Etos\" />
+  </ItemGroup>
+
+</Project>

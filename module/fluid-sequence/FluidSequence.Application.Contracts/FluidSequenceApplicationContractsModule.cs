@@ -1,6 +1,6 @@
 using Volo.Abp.SettingManagement;
 using FluidSequence.Domain.Shared;
-using Yi.Framework.Ddd.Application.Contracts;
+using SharpFort.Ddd.Application.Contracts;
 
 namespace FluidSequence.Application.Contracts
 {
@@ -9,7 +9,7 @@ namespace FluidSequence.Application.Contracts
 
         typeof(AbpSettingManagementApplicationContractsModule),
 
-        typeof(YiFrameworkDddApplicationContractsModule))]
+        typeof(SharpFortDddApplicationContractsModule))]
     public class FluidSequenceApplicationContractsModule:AbpModule
     {
 

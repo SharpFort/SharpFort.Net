@@ -1,9 +1,9 @@
 using System;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.DependencyInjection;
-using Yi.Framework.SqlSugarCore;
-using Yi.Framework.SqlSugarCore.Abstractions;
-using Yi.Framework.SqlSugarCore.Repositories;
+using SharpFort.SqlSugarCore;
+using SharpFort.SqlSugarCore.Abstractions;
+using SharpFort.SqlSugarCore.Repositories;
 using FluidSequence.Domain.Entities;
 using FluidSequence.Domain.Repositories;
 

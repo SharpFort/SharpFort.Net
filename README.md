@@ -122,7 +122,7 @@ dotnet husky install
    - 确保同一请求作用域内 ABP 和 Casbin 共享同一个连接上下文
    - 从根本上避免多客户端争抢文件锁
 
-2. **启用 SQLite PRAGMA 优化**（在 `YiFrameworkSqlSugarCoreModule.cs` 中，仅对 SQLite 生效）：
+2. **启用 SQLite PRAGMA 优化**（在 `SharpFortSqlSugarCoreModule.cs` 中，仅对 SQLite 生效）：
 
 | PRAGMA 配置 | 作用 | 说明 |
 | :--- | :--- | :--- |

@@ -1,14 +1,14 @@
 using FluidSequence.Application.Contracts;
 using FluidSequence.Domain;
-using Yi.Framework.Ddd.Application;
+using SharpFort.Ddd.Application;
 
-namespace FluidSequence.Application
+namespace SharpFort.FluidSequence.Application
 {
     [DependsOn(
         typeof(FluidSequenceApplicationContractsModule),
         typeof(FluidSequenceDomainModule),
         
-        typeof(YiFrameworkDddApplicationModule)
+        typeof(SharpFortDddApplicationModule)
 
     )]
     public class FluidSequenceApplicationModule : AbpModule

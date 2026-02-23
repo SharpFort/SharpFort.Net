@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\SharpFort.Mapster\SharpFort.Mapster.csproj" />
+    <ProjectReference Include="..\..\framework\SharpFort.SqlSugarCore\SharpFort.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\audit-logging\SharpFort.AuditLogging.SqlSugarCore\SharpFort.AuditLogging.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\code-gen\SharpFort.CodeGen.SqlSugarCore\SharpFort.CodeGen.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\setting-management\SharpFort.SettingManagement.SqlSugarCore\SharpFort.SettingManagement.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\tenant-management\SharpFort.TenantManagement.SqlSugarCore\SharpFort.TenantManagement.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\Sf.Abp.Domain\Sf.Abp.Domain.csproj" />
+    <ProjectReference Include="..\..\module\casbin-rbac\SharpFort.CasbinRbac.SqlSugarCore\SharpFort.CasbinRbac.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\file-management\SharpFort.FileManagement.SqlSugarCore\SharpFort.FileManagement.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\fluid-sequence\FluidSequence.SqlSugarCore\SharpFort.FluidSequence.SqlSugarCore.csproj" />
+    <ProjectReference Include="..\..\module\Ai\SharpFort.Ai.SqlSugarCore\SharpFort.Ai.SqlSugarCore.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="DataSeeds\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+</Project>

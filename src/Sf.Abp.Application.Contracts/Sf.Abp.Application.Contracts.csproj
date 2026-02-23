@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\framework\SharpFort.Ddd.Application.Contracts\SharpFort.Ddd.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\module\casbin-rbac\SharpFort.CasbinRbac.Application.Contracts\SharpFort.CasbinRbac.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\module\tenant-management\SharpFort.TenantManagement.Application.Contracts\SharpFort.TenantManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Sf.Abp.Domain.Shared\Sf.Abp.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj" />
+  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="$(AbpVersion)" />
+	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dtos\" />
+    <Folder Include="IServices\" />
+  </ItemGroup>
+
+</Project>

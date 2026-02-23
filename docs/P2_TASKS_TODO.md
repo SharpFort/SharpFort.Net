@@ -71,7 +71,7 @@
 - `TryParseEnumString<TEnum>()` - 安全解析枚举
 - `GetDescription<TEnum>()` - 获取 Description 特性
 
-详见：`framework/Yi.Framework.Core/Helper/EnumHelper.cs`
+详见：`framework/SharpFort.Core/Helper/EnumHelper.cs`
 
 ---
 
@@ -98,13 +98,13 @@
 
 ### 4.1 CA2200 警告修复 ✅
 
-**文件**: `framework/Yi.Framework.Core/Helper/ReflexHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/ReflexHelper.cs`
 
 **解决方案**: 移除无意义的 try-catch 块（仅重新抛出异常）
 
 ### 4.2 ASP0019 警告修复 ✅
 
-**文件**: `framework/Yi.Framework.Core/Extensions/HttpContextExtensions.cs`
+**文件**: `framework/SharpFort.Core/Extensions/HttpContextExtensions.cs`
 
 **解决方案**: 使用索引器赋值替代 `Headers.Add()`
 
@@ -158,7 +158,7 @@ context.Response.Headers[key] = value; // ✅ 使用索引器
 
 ### 5.2 种子数据更新
 
-**文件**: `module/rbac/Yi.Framework.Rbac.SqlSugarCore/DataSeeds/UserDataSeed.cs`
+**文件**: `module/rbac/SharpFort.Rbac.SqlSugarCore/DataSeeds/UserDataSeed.cs`
 
 **当前问题**:
 - 仍使用 `new EncryPasswordValueObject("123456")` 模式
@@ -180,7 +180,7 @@ user.SetPassword("123456");
 
 ### 5.3 应用层密码设置优化
 
-**文件**: `module/rbac/Yi.Framework.Rbac.Application/Services/System/UserService.cs`
+**文件**: `module/rbac/SharpFort.Rbac.Application/Services/System/UserService.cs`
 
 **位置**:
 - 第 95 行: `output.EncryPassword = new Domain.Entities.ValueObjects.EncryPasswordValueObject(createInput.Password);`
@@ -204,7 +204,7 @@ entity.SetPassword(input.Password);
 
 ### 6.1 ShellHelper 命令注入审查 ✅
 
-**文件**: `framework/Yi.Framework.Core/Helper/ShellHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/ShellHelper.cs`
 
 **审查结果**:
 - [x] 已添加命令注入风险文档
@@ -214,7 +214,7 @@ entity.SetPassword(input.Password);
 
 ### 6.2 RSAHelper 加密强度审查 ✅
 
-**文件**: `framework/Yi.Framework.Core/Helper/RSAHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/RSAHelper.cs`
 
 **审查结果**:
 - [x] 已文档化已知安全问题（PKCS1 填充、SHA1 签名）
@@ -224,7 +224,7 @@ entity.SetPassword(input.Password);
 
 ### 6.3 HtmlHelper XSS 防护审查 ✅
 
-**文件**: `framework/Yi.Framework.Core/Helper/HtmlHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/HtmlHelper.cs`
 
 **审查结果**:
 - [x] 已明确正确用途（提取纯文本，非 XSS 防护）
@@ -253,7 +253,7 @@ entity.SetPassword(input.Password);
 
 ### 7.2 HttpHelper 套接字耗尽风险 ✅
 
-**文件**: `framework/Yi.Framework.Core/Helper/HttpHelper.cs`
+**文件**: `framework/SharpFort.Core/Helper/HttpHelper.cs`
 
 **审查结果**:
 - [x] 确认使用静态 HttpClient 实例（正确做法）

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.Mapster\SharpFort.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\framework\SharpFort.SqlSugarCore\SharpFort.SqlSugarCore.csproj" />
+
+    <ProjectReference Include="..\SharpFort.Ai.Domain\SharpFort.Ai.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataSeeds\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+</Project>

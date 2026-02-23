@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\common.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\SharpFort.Ddd.Application\SharpFort.Ddd.Application.csproj" />
+    <ProjectReference Include="..\..\..\framework\SharpFort.SqlSugarCore.Abstractions\SharpFort.SqlSugarCore.Abstractions.csproj" />
+    <ProjectReference Include="..\SharpFort.FileManagement.Application.Contracts\SharpFort.FileManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\SharpFort.FileManagement.Domain\SharpFort.FileManagement.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

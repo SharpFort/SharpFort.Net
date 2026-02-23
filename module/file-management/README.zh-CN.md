@@ -12,11 +12,11 @@
 
 ### 1. 依赖注入
 
-在你的应用模块中，添加对 `YiFrameworkFileManagementApplicationContractsModule` 的依赖：
+在你的应用模块中，添加对 `SharpFortFileManagementApplicationContractsModule` 的依赖：
 
 ```csharp
 [DependsOn(
-    typeof(Yi.Framework.FileManagement.Application.Contracts.YiFrameworkFileManagementApplicationContractsModule)
+    typeof(SharpFort.FileManagement.Application.Contracts.SharpFortFileManagementApplicationContractsModule)
 )]
 public class YourModule : AbpModule
 {
@@ -28,7 +28,7 @@ public class YourModule : AbpModule
 注入 `IFileDescriptorService` 来管理文件：
 
 ```csharp
-using Yi.Framework.FileManagement.Application.Contracts.IServices;
+using SharpFort.FileManagement.Application.Contracts.IServices;
 
 public class YourService : ApplicationService
 {
