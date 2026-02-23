@@ -29,7 +29,6 @@ namespace Yi.Framework.CasbinRbac.Domain.Shared.Model
         public DateTime LoginTime { get; set; }
         public string? Ipaddr { get; set; }
         public string? LoginLocation { get; set; }
-
         public string? Os { get; set; }
         public string? Browser { get; set; }
 

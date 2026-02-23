@@ -375,9 +375,6 @@ namespace Yi.Abp.Web
             //swagger
             app.UseYiSwagger();
 
-            //流量访问统计,需redis支持，否则不生效
-            //app.UseBbsAccessLog(); //TODO: BBS模块已移除
-
             //请求处理
             app.UseApiInfoHandling();
 

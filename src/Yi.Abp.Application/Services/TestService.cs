@@ -21,12 +21,6 @@ namespace Yi.Abp.Application.Services
     /// </summary>
     public class TestService : ApplicationService
     {
-        ///// <summary>
-        ///// 属性注入
-        ///// 不推荐，坑太多，容易把自己玩死，简单的东西可以用一用
-        ///// </summary>
-        //public ISqlSugarRepository<Banner> sqlSugarRepository { get; set; } //TODO: BBS模块已移除
-
         /// <summary>
         /// </summary>
         /// <param name="name"></param>
