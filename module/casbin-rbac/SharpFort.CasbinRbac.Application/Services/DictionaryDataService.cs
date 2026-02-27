@@ -14,11 +14,11 @@ namespace SharpFort.CasbinRbac.Application.Services
     /// <summary>
     /// Dictionary服务实现
     /// </summary>
-    public class DictionaryService : SfCrudAppService<Dictionary, DictionaryGetOutputDto, DictionaryGetListOutputDto, Guid, DictionaryGetListInputVo, DictionaryCreateInputVo, DictionaryUpdateInputVo>,
-       IDictionaryService
+    public class DictionaryDataService : SfCrudAppService<Dictionary, DictionaryGetOutputDto, DictionaryGetListOutputDto, Guid, DictionaryGetListInputVo, DictionaryCreateInputVo, DictionaryUpdateInputVo>,
+       IDictionaryDataService
     {
         private ISqlSugarRepository<Dictionary, Guid> _repository;
-        public DictionaryService(ISqlSugarRepository<Dictionary, Guid> repository) : base(repository)
+        public DictionaryDataService(ISqlSugarRepository<Dictionary, Guid> repository) : base(repository)
         {
             _repository= repository;
         }
@@ -49,7 +49,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// </summary>
         /// <param name="dicType"></param>
         /// <returns></returns>
-        [Route("dictionary/dic-type/{dicType}")]
+        [Route("type/{dicType}")]
         public async Task<List<DictionaryGetListOutputDto>> GetDicType([FromRoute] string dicType)
         {
             var entities = await _repository.GetListAsync(u => u.DictType == dicType && u.State == true);
