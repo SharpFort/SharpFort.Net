@@ -50,7 +50,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         private readonly IEnforcer _enforcer;
 
         /// <summary>
-        /// 查询用户
+        /// 批量查询用户
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>

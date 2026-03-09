@@ -83,6 +83,23 @@ namespace SharpFort.Ddd.Application
         {
         }
 
+        // /// <summary>
+        // /// 获取单个实体详情
+        // /// </summary>
+        // /// <param name="id">实体主键ID</param>
+        // /// <returns>实体详细DTO</returns>
+        // public override async Task<TGetOutputDto> GetAsync(TKey id)
+        // {
+        //     // 检查查询权限
+        //     await CheckGetPolicyAsync();
+
+        //     // 获取并验证实体
+        //     var entity = await GetEntityByIdAsync(id);
+
+        //     // 映射并返回实体DTO
+        //     return await MapToGetOutputDtoAsync(entity);
+        // }
+
         /// <summary>
         /// 更新实体
         /// </summary>
