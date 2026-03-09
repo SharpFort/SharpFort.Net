@@ -130,26 +130,21 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             if (roleIds == null || !roleIds.Any()) return;
 
-            // 1. 清理旧的用户角色关联 (如果需要全量覆盖)
-            // await _enforcer.RemoveFilteredGroupingPolicyAsync(0, userId.ToString());
-
-            // 2. 添加新的关联
-            // 需要查询 Role Code (假设 Role 表有 Code 字段)
-            // 这里为了简单，先用 RoleId.ToString()，实际项目中应查询 Role Code
-            // 但根据方案 V1.2，sub 是 UserId，g 是 (UserId, RoleId, DomainId)
-            // 所以直接用 RoleId 也是符合方案的 (Provided RoleId is consistent with policy definitions)
-            
             // 获取当前用户的域 (假设单域，或者从 User.DepartmentId 推导，或者默认 "default")
             // 方案 V1.2: g = _, _, _ (user, role, domain)
             string domain = "default"; // 默认域
 
-            var policies = roleIds.Select(roleId => new [] { userId.ToString(), roleId.ToString(), domain }).ToList();
-            
+            // 查询实际的 RoleCode
+            var roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
+            var roleCodes = roles.Select(r => r.RoleCode).ToList();
+
+            var policies = roleCodes.Select(roleCode => new [] { userId.ToString(), roleCode, domain }).ToList();
+
             // 必须禁用 AutoSave 并手动 Save，因为在外层事务中
             // 已在 DI 中全局禁用 AutoSave
-            
+
             await _enforcer.AddGroupingPoliciesAsync(policies);
-            await _enforcer.SavePolicyAsync(); 
+            await _enforcer.SavePolicyAsync();
         }
 
         protected override async Task<User> MapToEntityAsync(UserCreateInputVo createInput)

@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Casbin;
 using Casbin.Adapter.SqlSugar.Entities;
@@ -16,7 +15,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 {
     /// <summary>
     /// Casbin Data Migration Service
-    /// Uses COMPLETELY DECOUPLED read/write phases to avoid SQLite lock conflicts
+    /// Migrates role, menu, and user-role data to Casbin policy table
     /// </summary>
     public class CasbinSeedService : DomainService
     {
@@ -36,16 +35,17 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         /// <summary>
         /// Perform Full Migration with COMPLETELY DECOUPLED phases
-        /// Phase 1: Read all data with dedicated connection, then DISPOSE immediately
+        /// Phase 1: Read all data with dedicated connection
         /// Phase 2: Build rules in memory (no DB access)
         /// Phase 3: Write with NEW dedicated connection
+        /// Phase 4: Reload enforcer
         /// </summary>
         [Volo.Abp.Uow.UnitOfWork(IsDisabled = true)]
         public async Task MigrateAllAsync()
         {
             var totalSw = Stopwatch.StartNew();
             _logger.LogInformation("========== CASBIN MIGRATION START ==========");
-            
+
             var connectionString = _roleRepo._Db.CurrentConnectionConfig.ConnectionString;
             var dbType = _roleRepo._Db.CurrentConnectionConfig.DbType;
             string domain = "default";
@@ -53,11 +53,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // ========== PHASE 1: READ DATA ==========
             _logger.LogInformation("[PHASE 1] Starting READ phase...");
             var phaseSw = Stopwatch.StartNew();
-            
-            List<Role> roles;
-            List<Menu> menus;
-            List<RoleMenu> roleMenus;
-            List<UserRole> userRoles;
+
+            // Use anonymous types to avoid protected setter issues
+            List<(Guid Id, string RoleCode, string RoleName, bool State)> roleData;
+            List<(Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State)> menuData;
+            List<(Guid RoleId, Guid MenuId)> roleMenuData;
+            List<(Guid UserId, Guid RoleId)> userRoleData;
 
             // Create dedicated READ client
             using (var readClient = new SqlSugarClient(new ConnectionConfig
@@ -68,131 +69,310 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 InitKeyType = InitKeyType.Attribute
             }))
             {
-                // NOTE: No PRAGMA commands in READ phase
-                // PRAGMA journal_mode=WAL requires exclusive lock, causing blocking
-                // NOTE: Use IgnoreColumns to skip ABP's ExtraProperties/ConcurrencyStamp (not in SQLite table)
                 var stepSw = Stopwatch.StartNew();
                 _logger.LogInformation("[READ] Reading Role table...");
-                roles = await readClient.Queryable<Role>()
-                    .IgnoreColumns("ExtraProperties", "ConcurrencyStamp")
-                    .ToListAsync();
-                _logger.LogInformation($"[READ] Role: {roles.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+
+                // Use raw SQL to avoid entity mapping issues with TenantId field
+                // We only need: id, role_code, role_name, state (no tenant_id needed)
+                var roleQuery = @"
+                    SELECT id, role_code, role_name, state
+                    FROM casbin_sys_role
+                    WHERE is_deleted = false";
+
+                var roleRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleQuery);
+                roleData = roleRows.Select(r => (
+                    Id: (Guid)r.id,
+                    RoleCode: (string)r.role_code,
+                    RoleName: (string)r.role_name,
+                    State: (bool)r.state
+                )).ToList();
+
+                _logger.LogInformation($"[READ] Role: {roleData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
 
                 stepSw.Restart();
                 _logger.LogInformation("[READ] Reading Menu table...");
-                menus = await readClient.Queryable<Menu>()
-                    .IgnoreColumns("ExtraProperties", "ConcurrencyStamp")
-                    .ToListAsync();
-                _logger.LogInformation($"[READ] Menu: {menus.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+
+                // Use raw SQL for Menu table
+                var menuQuery = @"
+                    SELECT id, menu_name, api_url, api_method, state
+                    FROM casbin_sys_menu
+                    WHERE is_deleted = false";
+
+                var menuRows = await readClient.Ado.SqlQueryAsync<dynamic>(menuQuery);
+                menuData = menuRows.Select(m => (
+                    Id: (Guid)m.id,
+                    MenuName: (string)m.menu_name,
+                    ApiUrl: m.api_url != null ? (string)m.api_url : "",
+                    ApiMethod: m.api_method != null ? (string)m.api_method : "",
+                    State: (bool)m.state
+                )).ToList();
+
+                _logger.LogInformation($"[READ] Menu: {menuData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
 
                 stepSw.Restart();
                 _logger.LogInformation("[READ] Reading RoleMenu table...");
-                roleMenus = await readClient.Queryable<RoleMenu>().ToListAsync();
-                _logger.LogInformation($"[READ] RoleMenu: {roleMenus.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+
+                // Use raw SQL for RoleMenu table
+                var roleMenuQuery = @"
+                    SELECT role_id, menu_id
+                    FROM casbin_sys_role_menu";
+
+                var roleMenuRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleMenuQuery);
+                roleMenuData = roleMenuRows.Select(rm => (
+                    RoleId: (Guid)rm.role_id,
+                    MenuId: (Guid)rm.menu_id
+                )).ToList();
+
+                _logger.LogInformation($"[READ] RoleMenu: {roleMenuData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
 
                 stepSw.Restart();
                 _logger.LogInformation("[READ] Reading UserRole table...");
-                userRoles = await readClient.Queryable<UserRole>().ToListAsync();
-                _logger.LogInformation($"[READ] UserRole: {userRoles.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+
+                // Use raw SQL for UserRole table
+                var userRoleQuery = @"
+                    SELECT user_id, role_id
+                    FROM casbin_sys_user_role";
+
+                var userRoleRows = await readClient.Ado.SqlQueryAsync<dynamic>(userRoleQuery);
+                userRoleData = userRoleRows.Select(ur => (
+                    UserId: (Guid)ur.user_id,
+                    RoleId: (Guid)ur.role_id
+                )).ToList();
+
+                _logger.LogInformation($"[READ] UserRole: {userRoleData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
             }
             // *** READ CLIENT IS NOW DISPOSED ***
             _logger.LogInformation($"[PHASE 1] READ phase COMPLETE. Connection CLOSED. Total: {phaseSw.ElapsedMilliseconds}ms");
-            
-            // Small delay to ensure SQLite releases file lock
+
+            // Small delay to ensure connection is fully released
             await Task.Delay(100);
 
             // ========== PHASE 2: BUILD RULES IN MEMORY ==========
             _logger.LogInformation("[PHASE 2] Starting PROCESSING phase (in-memory)...");
             phaseSw.Restart();
 
-            var roleDic = new Dictionary<Guid, Role>();
-            foreach (var r in roles) roleDic[r.Id] = r;
+            // Build dictionaries for fast lookup
+            var roleDic = new Dictionary<Guid, (string RoleCode, string RoleName)>();
+            foreach (var r in roleData)
+            {
+                if (!string.IsNullOrEmpty(r.RoleCode))
+                {
+                    roleDic[r.Id] = (r.RoleCode, r.RoleName);
+                }
+                else
+                {
+                    _logger.LogWarning($"[PROCESS] Skipping role {r.Id} - RoleCode is empty");
+                }
+            }
+            _logger.LogInformation($"[PROCESS] Loaded {roleDic.Count} valid roles");
 
-            var menuDic = new Dictionary<Guid, Menu>();
-            foreach (var m in menus) menuDic[m.Id] = m;
+            var menuDic = new Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)>();
+            int menuWithApiCount = 0;
+            foreach (var m in menuData)
+            {
+                menuDic[m.Id] = (m.MenuName, m.ApiUrl, m.ApiMethod);
+                if (!string.IsNullOrEmpty(m.ApiUrl))
+                {
+                    menuWithApiCount++;
+                }
+            }
+            _logger.LogInformation($"[PROCESS] Loaded {menuDic.Count} menus, {menuWithApiCount} with API URLs");
 
             var rulesToInsert = new List<CasbinRule>();
 
             // Build p rules (role-permission)
-            foreach (var rm in roleMenus)
+            _logger.LogInformation("[PROCESS] Building p-rules (role-permission)...");
+            int skippedMenus = 0;
+            int skippedRoles = 0;
+
+            foreach (var rm in roleMenuData)
             {
-                if (!roleDic.TryGetValue(rm.RoleId, out var role)) continue;
-                if (!menuDic.TryGetValue(rm.MenuId, out var menu)) continue;
-                if (string.IsNullOrEmpty(menu.ApiUrl)) continue;
+                if (!roleDic.TryGetValue(rm.RoleId, out var role))
+                {
+                    skippedRoles++;
+                    continue;
+                }
+
+                if (!menuDic.TryGetValue(rm.MenuId, out var menu))
+                {
+                    skippedMenus++;
+                    continue;
+                }
+
+                // Only create rules for menus with API URLs
+                if (string.IsNullOrEmpty(menu.ApiUrl))
+                {
+                    continue;
+                }
 
                 var method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper();
 
                 rulesToInsert.Add(new CasbinRule
                 {
                     PType = "p",
-                    V0 = role.Id.ToString(), // Use roleId for consistency with RoleService
+                    V0 = role.RoleCode, // Use RoleCode for better readability
                     V1 = domain,
                     V2 = menu.ApiUrl,
                     V3 = method
                 });
             }
+
             int pRuleCount = rulesToInsert.Count;
             _logger.LogInformation($"[PROCESS] Built {pRuleCount} p-rules (role-permission)");
+            if (skippedRoles > 0) _logger.LogWarning($"[PROCESS] Skipped {skippedRoles} role-menu relations (role not found)");
+            if (skippedMenus > 0) _logger.LogWarning($"[PROCESS] Skipped {skippedMenus} role-menu relations (menu not found)");
 
             // Build g rules (user-role)
-            foreach (var ur in userRoles)
+            _logger.LogInformation("[PROCESS] Building g-rules (user-role)...");
+            int skippedUserRoles = 0;
+
+            foreach (var ur in userRoleData)
             {
-                if (!roleDic.TryGetValue(ur.RoleId, out var role)) continue;
+                if (!roleDic.TryGetValue(ur.RoleId, out var role))
+                {
+                    skippedUserRoles++;
+                    continue;
+                }
 
                 rulesToInsert.Add(new CasbinRule
                 {
                     PType = "g",
-                    V0 = ur.UserId.ToString(), // Use userId directly
-                    V1 = ur.RoleId.ToString(), // Use roleId for consistency
+                    V0 = ur.UserId.ToString(), // Use userId directly (no prefix)
+                    V1 = role.RoleCode, // Use RoleCode for consistency
                     V2 = domain
                 });
             }
+
             int gRuleCount = rulesToInsert.Count - pRuleCount;
             _logger.LogInformation($"[PROCESS] Built {gRuleCount} g-rules (user-role)");
+            if (skippedUserRoles > 0) _logger.LogWarning($"[PROCESS] Skipped {skippedUserRoles} user-role relations (role not found)");
+
             _logger.LogInformation($"[PHASE 2] PROCESSING phase COMPLETE. Total rules: {rulesToInsert.Count}, {phaseSw.ElapsedMilliseconds}ms");
 
-            // ========== PHASE 3: GENERATE SQL FILE ==========
-            // SQLite's file-level lock prevents writing while Enforcer's adapter holds a connection
-            // Solution: Generate SQL file for manual execution when app is stopped
-            _logger.LogInformation("[PHASE 3] Generating SQL file (bypassing SQLite lock)...");
+            // Log sample data for verification
+            _logger.LogInformation("[PHASE 2] Sample p-rules:");
+            foreach (var rule in rulesToInsert.Where(r => r.PType == "p").Take(5))
+            {
+                _logger.LogInformation($"  p, {rule.V0}, {rule.V1}, {rule.V2}, {rule.V3}");
+            }
+
+            _logger.LogInformation("[PHASE 2] Sample g-rules:");
+            foreach (var rule in rulesToInsert.Where(r => r.PType == "g").Take(5))
+            {
+                _logger.LogInformation($"  g, {rule.V0}, {rule.V1}, {rule.V2}");
+            }
+
+            // ========== PHASE 3: WRITE TO DATABASE ==========
+            _logger.LogInformation("[PHASE 3] Starting WRITE phase...");
             phaseSw.Restart();
 
-            var sqlFilePath = Path.Combine(AppContext.BaseDirectory, $"casbin_migration_{DateTime.Now:yyyyMMdd_HHmmss}.sql");
-            var sb = new StringBuilder();
-            
-            sb.AppendLine("-- Casbin Migration SQL");
-            sb.AppendLine($"-- Generated at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine($"-- Total rules: {rulesToInsert.Count}");
-            sb.AppendLine();
-            sb.AppendLine("-- Step 1: Clear old data");
-            sb.AppendLine("DELETE FROM casbin_rule;");
-            sb.AppendLine();
-            sb.AppendLine("-- Step 2: Insert new rules");
-            
-            foreach (var rule in rulesToInsert)
+            if (rulesToInsert.Count == 0)
             {
-                var v0 = rule.V0?.Replace("'", "''") ?? "";
-                var v1 = rule.V1?.Replace("'", "''") ?? "";
-                var v2 = rule.V2?.Replace("'", "''") ?? "";
-                var v3 = rule.V3?.Replace("'", "''") ?? "";
-                var v4 = rule.V4?.Replace("'", "''") ?? "";
-                var v5 = rule.V5?.Replace("'", "''") ?? "";
-                
-                sb.AppendLine($"INSERT INTO casbin_rule (PType, V0, V1, V2, V3, V4, V5) VALUES ('{rule.PType}', '{v0}', '{v1}', '{v2}', '{v3}', '{v4}', '{v5}');");
+                _logger.LogWarning("[PHASE 3] No rules to insert! Check your role-menu and user-role configurations.");
+                _logger.LogInformation($"========== CASBIN MIGRATION COMPLETED (NO DATA). Total time: {totalSw.ElapsedMilliseconds}ms ==========");
+                return;
             }
-            
-            await File.WriteAllTextAsync(sqlFilePath, sb.ToString());
-            _logger.LogInformation($"[PHASE 3] SQL file generated: {sqlFilePath}");
-            _logger.LogInformation($"[PHASE 3] COMPLETE. {rulesToInsert.Count} INSERT statements, {phaseSw.ElapsedMilliseconds}ms");
 
-            // ========== PHASE 4: SKIP ENFORCER RELOAD ==========
-            _logger.LogWarning("[PHASE 4] SKIPPED - SQL file needs manual execution");
-            _logger.LogWarning($"[ACTION REQUIRED] 1. Stop the application");
-            _logger.LogWarning($"[ACTION REQUIRED] 2. Execute SQL file: {sqlFilePath}");
-            _logger.LogWarning($"[ACTION REQUIRED] 3. Restart the application");
+            // Create dedicated WRITE client
+            using (var writeClient = new SqlSugarClient(new ConnectionConfig
+            {
+                ConnectionString = connectionString,
+                DbType = dbType,
+                IsAutoCloseConnection = true,
+                InitKeyType = InitKeyType.Attribute,
+                ConfigureExternalServices = new ConfigureExternalServices
+                {
+                    EntityService = (property, column) =>
+                    {
+                        // Force convert PascalCase to snake_case for PostgreSQL
+                        // This is critical for casbin_rule table (PType -> p_type, etc.)
+                        column.DbColumnName = ToSnakeCase(property.Name);
+                    }
+                }
+            }))
+            {
+                try
+                {
+                    // Clear old data
+                    _logger.LogInformation("[WRITE] Clearing old casbin_rule data...");
+                    var deletedCount = await writeClient.Deleteable<CasbinRule>().ExecuteCommandAsync();
+                    _logger.LogInformation($"[WRITE] Deleted {deletedCount} old rules.");
+
+                    // Insert new rules in batches
+                    _logger.LogInformation($"[WRITE] Inserting {rulesToInsert.Count} new rules...");
+                    var batchSize = 500;
+                    int totalInserted = 0;
+
+                    for (int i = 0; i < rulesToInsert.Count; i += batchSize)
+                    {
+                        var batch = rulesToInsert.Skip(i).Take(batchSize).ToList();
+                        var insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
+                        totalInserted += insertedCount;
+                        _logger.LogInformation($"[WRITE] Batch {i / batchSize + 1}: inserted {insertedCount} rules (total: {totalInserted}/{rulesToInsert.Count})");
+                    }
+
+                    _logger.LogInformation($"[WRITE] All {totalInserted} rules inserted successfully.");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "[WRITE] Failed to write casbin_rule data");
+                    throw;
+                }
+            }
+            // *** WRITE CLIENT IS NOW DISPOSED ***
+            _logger.LogInformation($"[PHASE 3] WRITE phase COMPLETE. {rulesToInsert.Count} rules inserted, {phaseSw.ElapsedMilliseconds}ms");
+
+            // ========== PHASE 4: RELOAD ENFORCER ==========
+            _logger.LogInformation("[PHASE 4] Reloading Casbin Enforcer...");
+            phaseSw.Restart();
+
+            try
+            {
+                await _enforcer.LoadPolicyAsync();
+                _logger.LogInformation($"[PHASE 4] Enforcer reloaded successfully. {phaseSw.ElapsedMilliseconds}ms");
+
+                // Verify loaded policies (use synchronous methods)
+                var loadedPolicies = _enforcer.GetPolicy().ToList();
+                var loadedGroupings = _enforcer.GetGroupingPolicy().ToList();
+                _logger.LogInformation($"[PHASE 4] Verification: {loadedPolicies.Count} policies, {loadedGroupings.Count} groupings loaded");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[PHASE 4] Failed to reload Casbin Enforcer");
+                throw;
+            }
 
             totalSw.Stop();
-            _logger.LogInformation($"========== CASBIN MIGRATION SQL GENERATED. Total time: {totalSw.ElapsedMilliseconds}ms ==========");
+            _logger.LogInformation($"========== CASBIN MIGRATION COMPLETED SUCCESSFULLY. Total time: {totalSw.ElapsedMilliseconds}ms ==========");
+        }
+
+        /// <summary>
+        /// Convert PascalCase to snake_case
+        /// Example: TenantId -> tenant_id, RoleCode -> role_code
+        /// </summary>
+        private static string ToSnakeCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            var result = new System.Text.StringBuilder();
+            result.Append(char.ToLowerInvariant(input[0]));
+
+            for (int i = 1; i < input.Length; i++)
+            {
+                char c = input[i];
+                if (char.IsUpper(c))
+                {
+                    result.Append('_');
+                    result.Append(char.ToLowerInvariant(c));
+                }
+                else
+                {
+                    result.Append(c);
+                }
+            }
+
+            return result.ToString();
         }
     }
 }

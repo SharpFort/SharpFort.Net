@@ -120,21 +120,10 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { id }, input.MenuIds);
 
             // Casbin 同步：更新角色权限
-            // 先删除旧策略
-            // 注意：RoleCode 可能会变，需要删除旧 RoleCode 的策略，但 Enforcer 通常按字符串删
-            // 如果 RoleCode 变了，需要先用旧的删，这里假设 Id 关联或已经拿到旧实体
-            // 简单起见，使用 Update 后的 RoleCode 重新构建
-            
-            // 重要：如果 RoleCode 允许修改，需要清理旧 RoleCode 的策略
-            // 这里我们使用 sub = RoleId.ToString() 或者 RoleCode (方案中提到 sub 是 UserId, g 映射到 RoleCode/RoleId)
-            // 方案 V1.2: p = sub, dom, obj, act. 这里的 sub 是角色标识
-            // 如果 sub 用 RoleId，则不受 RoleCode 修改影响
-            // 如果 sub 用 RoleCode，则需要删旧加新
-            
-            // 我们在 UserService 中 g 使用了 roleId.ToString()，所以这里也应该用 roleId.ToString() 作为 p 的 sub
-            // p, roleId, domain, path, method
-            
-            await _enforcer.RemoveFilteredPolicyAsync(0, id.ToString());
+            // 使用 RoleCode 作为策略标识，如果 RoleCode 变更，需要删除旧的策略
+            // 这里我们使用更新后的 RoleCode，如果允许修改 RoleCode，需要额外处理
+
+            await _enforcer.RemoveFilteredPolicyAsync(0, entity.RoleCode);
             await SyncCasbinRolePermissions(id, input.MenuIds, entity.RoleCode);
 
             var dto = await MapToGetOutputDtoAsync(entity);
@@ -148,13 +137,13 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 获取菜单对应的接口信息
             // 仅处理带有 API 路径的菜单
             var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id) && !string.IsNullOrEmpty(m.ApiUrl));
-            
+
             // 方案 V1.2: p = sub, dom, obj, act
-            // sub = roleId.ToString()
+            // sub = roleCode (使用 RoleCode 而不是 RoleId，更具可读性)
             // dom = "default" (或从 input 传入，如果支持多域)
             // obj = menu.ApiUrl (RESTful API 路径，如 /api/user/:id)
             // act = menu.ApiMethod (GET, POST 等)
-            
+
             var policies = new List<string[]>();
             string domain = "default";
 
@@ -166,8 +155,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                     string path = menu.ApiUrl;
                     // 使用 Menu 实体的 ApiMethod 字段，如果为空则默认为 GET
                     string method = !string.IsNullOrEmpty(menu.ApiMethod) ? menu.ApiMethod.ToUpper() : "GET";
-                    
-                    policies.Add(new[] { roleId.ToString(), domain, path, method });
+
+                    policies.Add(new[] { roleCode, domain, path, method });
                 }
             }
 
@@ -268,7 +257,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             // Casbin 同步：添加用户角色关联 (g)
             string domain = "default";
-            var policies = input.UserIds.Select(userId => new[] { userId.ToString(), input.RoleId.ToString(), domain }).ToList();
+
+            // 查询 RoleCode
+            var role = await _repository.GetByIdAsync(input.RoleId);
+            var roleCode = role?.RoleCode ?? throw new UserFriendlyException("角色不存在");
+
+            var policies = input.UserIds.Select(userId => new[] { userId.ToString(), roleCode, domain }).ToList();
             await _enforcer.AddGroupingPoliciesAsync(policies);
             await _enforcer.SavePolicyAsync();
         }
@@ -287,7 +281,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             
             // Casbin 同步：移除用户角色关联
             string domain = "default";
-            var policies = input.UserIds.Select(userId => new[] { userId.ToString(), input.RoleId.ToString(), domain }).ToList();
+
+            // 查询 RoleCode
+            var role = await _repository.GetByIdAsync(input.RoleId);
+            var roleCode = role?.RoleCode ?? throw new UserFriendlyException("角色不存在");
+
+            var policies = input.UserIds.Select(userId => new[] { userId.ToString(), roleCode, domain }).ToList();
             await _enforcer.RemoveGroupingPoliciesAsync(policies);
             await _enforcer.SavePolicyAsync();
         }
