@@ -1,6 +1,7 @@
 using Casbin;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Uow;
+using Volo.Abp.MultiTenancy;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
 using Casbin.Adapter.SqlSugar.Entities;
@@ -14,44 +15,54 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly IEnforcer _enforcer;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
         private readonly ISqlSugarRepository<Role> _roleRepository;
+        private readonly ICurrentTenant _currentTenant;
 
         public CasbinPolicyManager(
-            IEnforcer enforcer, 
+            IEnforcer enforcer,
             IUnitOfWorkManager unitOfWorkManager,
-            ISqlSugarRepository<Role> roleRepository)
+            ISqlSugarRepository<Role> roleRepository,
+            ICurrentTenant currentTenant)
         {
             _enforcer = enforcer;
             _unitOfWorkManager = unitOfWorkManager;
             _roleRepository = roleRepository;
+            _currentTenant = currentTenant;
         }
 
         #region Helper Methods
 
-        private string GetUserSubject(Guid userId) => $"u_{userId}";
+        private string GetUserSubject(Guid userId) => userId.ToString();
         private string GetRoleSubject(string roleCode) => roleCode;
-        private string GetTenantDomain(Guid? tenantId) => tenantId?.ToString() ?? "default";
+        private string GetTenantDomain(Guid? tenantId)
+        {
+            var finalTenantId = tenantId ?? _currentTenant.Id;
+            return finalTenantId?.ToString() ?? "default";
+        }
 
         #endregion
 
         /// <summary>
         /// 内存同步核心方法
         /// 仅在事务成功提交后触发全量重载 (保证最终一致性)
+        /// 使用工作单元Items字典实现防抖，确保一个事务内只注册一次回调
         /// </summary>
         private void TriggerMemorySync()
         {
-            // 如果存在当前工作单元，则注册回调
-            if (_unitOfWorkManager.Current != null)
+            var uow = _unitOfWorkManager.Current;
+            if (uow != null)
             {
-                _unitOfWorkManager.Current.OnCompleted(async () =>
+                const string syncKey = "CasbinMemorySyncTriggered";
+                if (!uow.Items.ContainsKey(syncKey))
                 {
-                    // 事务已提交，DB 中是最新的，此时加载最安全
-                    // 注意：LoadPolicyAsync 内部有锁，高并发下可能会有锁竞争，但在管理端操作频率下可接受
-                    await _enforcer.LoadPolicyAsync();
-                });
+                    uow.Items[syncKey] = true;
+                    uow.OnCompleted(async () =>
+                    {
+                        await _enforcer.LoadPolicyAsync();
+                    });
+                }
             }
             else
             {
-                // 如果没有事务（罕见），则立即加载
                 _enforcer.LoadPolicy();
             }
         }
@@ -223,6 +234,41 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 3. 触发同步
             TriggerMemorySync();
         }
+
+        public async Task CleanRolePoliciesAsync(Role role)
+        {
+            var roleSub = GetRoleSubject(role.RoleCode);
+            var domain = GetTenantDomain(role.TenantId);
+
+            // 1. 持久化
+            // 清理该角色的 p 规则 (权限) 和 g 规则 (作为角色与用户的绑定)
+            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain) || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain)).ExecuteCommandAsync();
+
+            // 2. 内存更新
+            // 移除该角色下所有的 p 规则
+            await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
+            // 移除所有带有该角色的 g 规则 (用户绑定)
+            // _enforcer.RemoveGroupingPolicyAsync is singular, we need to remove by filter
+            await _enforcer.RemoveFilteredGroupingPolicyAsync(1, roleSub, domain);
+
+            // 3. 触发同步
+            TriggerMemorySync();
+        }
+
+        public async Task CleanRolePoliciesByRoleCodeAsync(string roleCode, Guid? tenantId)
+        {
+            var roleSub = GetRoleSubject(roleCode);
+            var domain = GetTenantDomain(tenantId);
+
+            // 1. 持久化
+            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain) || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain)).ExecuteCommandAsync();
+
+            // 2. 内存更新
+            await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
+            await _enforcer.RemoveFilteredGroupingPolicyAsync(1, roleSub, domain);
+
+            // 3. 触发同步
+            TriggerMemorySync();
+        }
     }
 }
-

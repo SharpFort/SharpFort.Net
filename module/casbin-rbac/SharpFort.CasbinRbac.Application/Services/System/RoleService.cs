@@ -27,15 +27,19 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     {
         private readonly IEnforcer _enforcer;
         private readonly ISqlSugarRepository<Menu, Guid> _menuRepository;
+        private readonly ICasbinPolicyManager _casbinPolicyManager;
+        private readonly ISqlSugarRepository<User, Guid> _userRepository;
 
         public RoleService(RoleManager roleManager, ISqlSugarRepository<RoleDepartment> roleDeptRepository,
             ISqlSugarRepository<UserRole> userRoleRepository,
             ISqlSugarRepository<Role, Guid> repository,
             IEnforcer enforcer,
-            ISqlSugarRepository<Menu, Guid> menuRepository) : base(repository)
+            ISqlSugarRepository<Menu, Guid> menuRepository,
+            ICasbinPolicyManager casbinPolicyManager,
+            ISqlSugarRepository<User, Guid> userRepository) : base(repository)
         {
-            (_roleManager, _roleDeptRepository, _userRoleRepository, _repository, _enforcer, _menuRepository) =
-                (roleManager, roleDeptRepository, userRoleRepository, repository, enforcer, menuRepository);
+            (_roleManager, _roleDeptRepository, _userRoleRepository, _repository, _enforcer, _menuRepository, _casbinPolicyManager, _userRepository) =
+                (roleManager, roleDeptRepository, userRoleRepository, repository, enforcer, menuRepository, casbinPolicyManager, userRepository);
         }
 
         private ISqlSugarRepository<Role, Guid> _repository;
@@ -90,8 +94,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var entity = await MapToEntityAsync(input);
             await _repository.InsertAsync(entity);
 
-            // Casbin 同步
-            await SyncCasbinRolePermissions(entity.Id, input.MenuIds, entity.RoleCode);
+            // /* 原代码注释保留 */
+            // // Casbin 同步
+            // await SyncCasbinRolePermissions(entity.Id, input.MenuIds, entity.RoleCode);
+
+            // 修复之后使用 RoleManager 进行统一授权和Casbin分配
+            await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { entity.Id }, input.MenuIds ?? new List<Guid>());
 
             var outputDto = await MapToGetOutputDtoAsync(entity);
 
@@ -114,17 +122,27 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 throw new UserFriendlyException(RoleConst.Exist);
             }
 
+            var oldRoleCode = entity.RoleCode;
+
+            // Map 之后 entity.RoleCode 会更新为新值
             await MapToEntityAsync(input, entity);
+
+            if (oldRoleCode != entity.RoleCode)
+            {
+                await _casbinPolicyManager.CleanRolePoliciesByRoleCodeAsync(oldRoleCode, entity.TenantId);
+            }
+
             await _repository.UpdateAsync(entity);
 
             await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { id }, input.MenuIds);
 
-            // Casbin 同步：更新角色权限
-            // 使用 RoleCode 作为策略标识，如果 RoleCode 变更，需要删除旧的策略
-            // 这里我们使用更新后的 RoleCode，如果允许修改 RoleCode，需要额外处理
-
-            await _enforcer.RemoveFilteredPolicyAsync(0, entity.RoleCode);
-            await SyncCasbinRolePermissions(id, input.MenuIds, entity.RoleCode);
+            // /* 原代码注释保留 */
+            // // Casbin 同步：更新角色权限
+            // // 使用 RoleCode 作为策略标识，如果 RoleCode 变更，需要删除旧的策略
+            // // 这里我们使用更新后的 RoleCode，如果允许修改 RoleCode，需要额外处理
+            //
+            // await _enforcer.RemoveFilteredPolicyAsync(0, entity.RoleCode);
+            // await SyncCasbinRolePermissions(id, input.MenuIds, entity.RoleCode);
 
             var dto = await MapToGetOutputDtoAsync(entity);
             return dto;
@@ -132,39 +150,40 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         private async Task SyncCasbinRolePermissions(Guid roleId, List<Guid> menuIds, string roleCode)
         {
-            if (menuIds == null || !menuIds.Any()) return;
-
-            // 获取菜单对应的接口信息
-            // 仅处理带有 API 路径的菜单
-            var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id) && !string.IsNullOrEmpty(m.ApiUrl));
-
-            // 方案 V1.2: p = sub, dom, obj, act
-            // sub = roleCode (使用 RoleCode 而不是 RoleId，更具可读性)
-            // dom = "default" (或从 input 传入，如果支持多域)
-            // obj = menu.ApiUrl (RESTful API 路径，如 /api/user/:id)
-            // act = menu.ApiMethod (GET, POST 等)
-
-            var policies = new List<string[]>();
-            string domain = "default";
-
-            foreach (var menu in menus)
-            {
-                // 仅当菜单包含有效的 API URL 时
-                if (!string.IsNullOrEmpty(menu.ApiUrl))
-                {
-                    string path = menu.ApiUrl;
-                    // 使用 Menu 实体的 ApiMethod 字段，如果为空则默认为 GET
-                    string method = !string.IsNullOrEmpty(menu.ApiMethod) ? menu.ApiMethod.ToUpper() : "GET";
-
-                    policies.Add(new[] { roleCode, domain, path, method });
-                }
-            }
-
-            if (policies.Any())
-            {
-                await _enforcer.AddPoliciesAsync(policies);
-                await _enforcer.SavePolicyAsync();
-            }
+            // /* 原代码注释保留，该方法已经废弃，统一使用 CasbinPolicyManager 处理 */
+            // if (menuIds == null || !menuIds.Any()) return;
+            // 
+            // // 获取菜单对应的接口信息
+            // // 仅处理带有 API 路径的菜单
+            // var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id) && !string.IsNullOrEmpty(m.ApiUrl));
+            // 
+            // // 方案 V1.2: p = sub, dom, obj, act
+            // // sub = roleCode (使用 RoleCode 而不是 RoleId，更具可读性)
+            // // dom = "default" (或从 input 传入，如果支持多域)
+            // // obj = menu.ApiUrl (RESTful API 路径，如 /api/user/:id)
+            // // act = menu.ApiMethod (GET, POST 等)
+            // 
+            // var policies = new List<string[]>();
+            // string domain = "default";
+            // 
+            // foreach (var menu in menus)
+            // {
+            //     // 仅当菜单包含有效的 API URL 时
+            //     if (!string.IsNullOrEmpty(menu.ApiUrl))
+            //     {
+            //         string path = menu.ApiUrl;
+            //         // 使用 Menu 实体的 ApiMethod 字段，如果为空则默认为 GET
+            //         string method = !string.IsNullOrEmpty(menu.ApiMethod) ? menu.ApiMethod.ToUpper() : "GET";
+            // 
+            //         policies.Add(new[] { roleCode, domain, path, method });
+            //     }
+            // }
+            // 
+            // if (policies.Any())
+            // {
+            //     await _enforcer.AddPoliciesAsync(policies);
+            //     await _enforcer.SavePolicyAsync();
+            // }
         }
 
 
@@ -255,16 +274,26 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .ToList();
             await _userRoleRepository.InsertRangeAsync(userRoleEntities);
 
-            // Casbin 同步：添加用户角色关联 (g)
-            string domain = "default";
-
-            // 查询 RoleCode
+            // Casbin 同步：添加用户角色关联 (g) (使用 CasbinPolicyManager 双写同步机制)
             var role = await _repository.GetByIdAsync(input.RoleId);
-            var roleCode = role?.RoleCode ?? throw new UserFriendlyException("角色不存在");
+            if (role == null) throw new UserFriendlyException("角色不存在");
+            
+            var users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
+            foreach (var user in users)
+            {
+                await _casbinPolicyManager.AddRoleForUserAsync(user, role);
+            }
 
-            var policies = input.UserIds.Select(userId => new[] { userId.ToString(), roleCode, domain }).ToList();
-            await _enforcer.AddGroupingPoliciesAsync(policies);
-            await _enforcer.SavePolicyAsync();
+            // /* 原代码注释保留 */
+            // string domain = "default";
+            // 
+            // // 查询 RoleCode
+            // var role = await _repository.GetByIdAsync(input.RoleId);
+            // var roleCode = role?.RoleCode ?? throw new UserFriendlyException("角色不存在");
+            // 
+            // var policies = input.UserIds.Select(userId => new[] { userId.ToString(), roleCode, domain }).ToList();
+            // await _enforcer.AddGroupingPoliciesAsync(policies);
+            // await _enforcer.SavePolicyAsync();
         }
 
 
@@ -279,16 +308,39 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .Where(x => input.UserIds.Contains(x.UserId))
                 .ExecuteCommandAsync();
             
-            // Casbin 同步：移除用户角色关联
-            string domain = "default";
-
-            // 查询 RoleCode
+            // Casbin 同步：移除用户角色关联 (使用 CasbinPolicyManager 双写同步机制)
             var role = await _repository.GetByIdAsync(input.RoleId);
-            var roleCode = role?.RoleCode ?? throw new UserFriendlyException("角色不存在");
+            if (role == null) throw new UserFriendlyException("角色不存在");
 
-            var policies = input.UserIds.Select(userId => new[] { userId.ToString(), roleCode, domain }).ToList();
-            await _enforcer.RemoveGroupingPoliciesAsync(policies);
-            await _enforcer.SavePolicyAsync();
+            var users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
+            foreach (var user in users)
+            {
+                await _casbinPolicyManager.RemoveRoleForUserAsync(user, role);
+            }
+
+            // /* 原代码注释保留 */
+            // string domain = "default";
+            // 
+            // // 查询 RoleCode
+            // var role = await _repository.GetByIdAsync(input.RoleId);
+            // var roleCode = role?.RoleCode ?? throw new UserFriendlyException("角色不存在");
+            // 
+            // var policies = input.UserIds.Select(userId => new[] { userId.ToString(), roleCode, domain }).ToList();
+            // await _enforcer.RemoveGroupingPoliciesAsync(policies);
+            // await _enforcer.SavePolicyAsync();
+        }
+
+        public override async Task DeleteAsync(IEnumerable<Guid> ids)
+        {
+            var roles = await _repository.GetListAsync(x => ids.Contains(x.Id));
+
+            await base.DeleteAsync(ids);
+
+            // 物理删除角色后，清理与该角色绑定的所有 Casbin p规则与g规则
+            foreach (var role in roles)
+            {
+                await _casbinPolicyManager.CleanRolePoliciesAsync(role);
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.SqlSugarCore.Abstractions;
 
@@ -16,9 +17,20 @@ namespace SharpFort.CasbinRbac.Application.Services.System
        IMenuService
     {
         private readonly ISqlSugarRepository<Menu, Guid> _repository;
-        public MenuService(ISqlSugarRepository<Menu, Guid> repository) : base(repository)
+        private readonly ISqlSugarRepository<RoleMenu> _roleMenuRepository;
+        private readonly ICasbinPolicyManager _casbinPolicyManager;
+        private readonly ISqlSugarRepository<Role, Guid> _roleRepository;
+
+        public MenuService(
+            ISqlSugarRepository<Menu, Guid> repository,
+            ISqlSugarRepository<RoleMenu> roleMenuRepository,
+            ICasbinPolicyManager casbinPolicyManager,
+            ISqlSugarRepository<Role, Guid> roleRepository) : base(repository)
         {
             _repository = repository;
+            _roleMenuRepository = roleMenuRepository;
+            _casbinPolicyManager = casbinPolicyManager;
+            _roleRepository = roleRepository;
         }
 
         /// <summary>
@@ -31,6 +43,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             // 防止前端传入重复ID导致唯一约束报错
             input.Id = Guid.NewGuid();
+
+            // 最小权限原则：如果提供了ApiUrl但没有ApiMethod，默认为GET
+            if (!string.IsNullOrWhiteSpace(input.ApiUrl) && string.IsNullOrWhiteSpace(input.ApiMethod))
+            {
+                input.ApiMethod = "GET";
+            }
 
             // 处理 ApiMethod 转大写
             if (!string.IsNullOrEmpty(input.ApiMethod))
@@ -49,10 +67,41 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         public override async Task<MenuGetOutputDto> UpdateAsync(Guid id, MenuUpdateInputVo input)
         {
-            // TODO: 如果菜单的 ApiUrl/ApiMethod 变更，需要同步更新 Casbin 策略
-            // 这涉及到复杂的策略查找与替换，建议后续完善
-            // 现阶段，如果是修改，建议先手动在界面删除再添加，或开发专门的策略同步功能
-            return await base.UpdateAsync(id, input);
+            // 最小权限原则：如果提供了ApiUrl但没有ApiMethod，默认为GET
+            if (!string.IsNullOrWhiteSpace(input.ApiUrl) && string.IsNullOrWhiteSpace(input.ApiMethod))
+            {
+                input.ApiMethod = "GET";
+            }
+
+            // 获取旧菜单数据
+            var oldMenu = await _repository.GetByIdAsync(id);
+            bool isApiChanged = oldMenu != null &&
+                (oldMenu.ApiUrl != input.ApiUrl || (oldMenu.ApiMethod?.ToUpper() ?? "") != (input.ApiMethod?.ToUpper() ?? ""));
+
+            // /* 原代码注释保留 */
+            // // TODO: 如果菜单的 ApiUrl/ApiMethod 变更，需要同步更新 Casbin 策略
+            // // 这涉及到复杂的策略查找与替换，建议后续完善
+            // // 现阶段，如果是修改，建议先手动在界面删除再添加，或开发专门的策略同步功能
+            
+            var result = await base.UpdateAsync(id, input);
+
+            // 如果 API 路由发生了变化，找到所有拥有此菜单的角色，并刷新其 Casbin 权限
+            if (isApiChanged)
+            {
+                var roleIds = await _roleMenuRepository._DbQueryable.Where(x => x.MenuId == id).Select(x => x.RoleId).ToListAsync();
+                if (roleIds.Any())
+                {
+                    var roles = await _roleRepository.GetListAsync(x => roleIds.Contains(x.Id));
+                    foreach (var role in roles)
+                    {
+                        var menuIds = await _roleMenuRepository._DbQueryable.Where(x => x.RoleId == role.Id).Select(x => x.MenuId).ToListAsync();
+                        var menus = await _repository.GetListAsync(x => menuIds.Contains(x.Id));
+                        await _casbinPolicyManager.SetRolePermissionsAsync(role, menus);
+                    }
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -98,9 +147,30 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// 批量删除菜单
         /// </summary>
         /// <param name="ids">菜单ID集合</param>
-        public override Task DeleteAsync(IEnumerable<Guid> ids)
+        public override async Task DeleteAsync(IEnumerable<Guid> ids)
         {
-            return base.DeleteAsync(ids);
+            // 在物理删除之前，找出这些被删除菜单影响到的角色
+            var affectedRoleIds = await _roleMenuRepository._DbQueryable
+                .Where(x => ids.Contains(x.MenuId))
+                .Select(x => x.RoleId)
+                .Distinct()
+                .ToListAsync();
+
+            // 原始代码: await base.DeleteAsync(ids);
+            await base.DeleteAsync(ids);
+
+            // 物理删除后，刷新受影响角色的 Casbin 权限
+            if (affectedRoleIds.Any())
+            {
+                var roles = await _roleRepository.GetListAsync(x => affectedRoleIds.Contains(x.Id));
+                foreach (var role in roles)
+                {
+                    // 获取删除剩余的有效菜单
+                    var menuIds = await _roleMenuRepository._DbQueryable.Where(x => x.RoleId == role.Id).Select(x => x.MenuId).ToListAsync();
+                    var menus = await _repository.GetListAsync(x => menuIds.Contains(x.Id));
+                    await _casbinPolicyManager.SetRolePermissionsAsync(role, menus);
+                }
+            }
         }
 
         /// <summary>

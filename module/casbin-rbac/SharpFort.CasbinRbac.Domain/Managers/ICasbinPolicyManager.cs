@@ -31,5 +31,17 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// 初始化/重置超级管理员权限 (通配符 *)
         /// </summary>
         Task InitAdminPermissionAsync(Role adminRole);
+
+        /// <summary>
+        /// 清理角色所有的策略 (p policy 和 g policy)
+        /// 用于删除角色时
+        /// </summary>
+        Task CleanRolePoliciesAsync(Role role);
+
+        /// <summary>
+        /// 根据角色编码清理所有策略 (p policy 和 g policy)
+        /// 用于角色编码变更时清理旧编码的策略
+        /// </summary>
+        Task CleanRolePoliciesByRoleCodeAsync(string roleCode, Guid? tenantId);
     }
 }
