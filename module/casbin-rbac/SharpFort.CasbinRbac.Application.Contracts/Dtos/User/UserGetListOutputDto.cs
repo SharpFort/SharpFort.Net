@@ -1,5 +1,7 @@
 using Volo.Abp.Application.Dtos;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.Role;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.Post;
 
 namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.User
 {
@@ -20,10 +22,9 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.User
         public Guid? DepartmentId { get; set; }
         public DateTime CreationTime { get; set; } = DateTime.Now;
         public Guid? CreatorId { get; set; }
-
         public bool State { get; set; }
-
-
         public string DeptName { get; set; }
+        public List<RoleGetListOutputDto>? Roles { get; set; }
+        public List<PostGetListOutputDto>? Posts { get; set; }
     }
 }

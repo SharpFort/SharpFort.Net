@@ -6,4 +6,8 @@
     <ProjectReference Include="..\SharpFort.CasbinRbac.Domain.Shared\SharpFort.CasbinRbac.Domain.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MiniExcel" Version="1.31.3" />
+  </ItemGroup>
+
 </Project>

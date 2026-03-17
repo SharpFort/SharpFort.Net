@@ -1,8 +1,9 @@
-﻿namespace SharpFort.CasbinRbac.Domain.Shared.Dtos;
+namespace SharpFort.CasbinRbac.Domain.Shared.Dtos;
 
 public class Vue3PureRouterDto
 {
     public Guid Id { get; set; }
+    public int OrderNum { get; set; }
     public Guid ParentId { get; set; }
     public string Path { get; set; }
     public string Name { get; set; }

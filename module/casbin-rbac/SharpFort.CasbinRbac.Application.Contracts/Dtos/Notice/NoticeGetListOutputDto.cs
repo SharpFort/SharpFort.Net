@@ -6,7 +6,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Notice
     public class NoticeGetListOutputDto : EntityDto<Guid>
     {
         public string Title { get; set; }
-        public NoticeType Type { get; set; }
+        public NoticeType NoticeType { get; set; }
         public string Content { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime CreationTime { get; set; }

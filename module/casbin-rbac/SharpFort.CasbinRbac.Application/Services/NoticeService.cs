@@ -34,11 +34,30 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable.WhereIF(input.NoticeType is not null, x => x.Type == input.NoticeType)
+            var entities = await _repository._DbQueryable.WhereIF(input.NoticeType is not null, x => x.NoticeType == input.NoticeType)
                           .WhereIF(!string.IsNullOrEmpty(input.Title), x => x.Title!.Contains(input.Title!))
+                          .WhereIF(!string.IsNullOrEmpty(input.Content), x => x.Content!.Contains(input.Content!))
+                          .WhereIF(input.State is not null, x => x.State == input.State)
                           .WhereIF(input.StartTime is not null && input.EndTime is not null, x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
                           .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             return new PagedResultDto<NoticeGetListOutputDto>(total, await MapToGetListOutputDtosAsync(entities));
+        }
+
+        /// <summary>
+        /// 获取通知动态下拉框列表
+        /// </summary>
+        /// <param name="keywords">查询关键字</param>
+        /// <returns>通知下拉框数据列表</returns>
+        public override async Task<PagedResultDto<NoticeGetListOutputDto>> GetSelectDataListAsync(string? keywords = null)
+        {
+            var entities = await _repository._DbQueryable
+                          .WhereIF(!string.IsNullOrEmpty(keywords), x => x.Title!.Contains(keywords!) || x.Content!.Contains(keywords!))
+                          .ToListAsync();
+
+            var totalCount = entities.Count;
+            var dtos = await MapToGetListOutputDtosAsync(entities);
+
+            return new PagedResultDto<NoticeGetListOutputDto>(totalCount, dtos);
         }
 
         /// <summary>
@@ -49,7 +68,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task SendOnlineAsync([FromRoute] Guid id)
         {
             var entity = await _repository._DbQueryable.FirstAsync(x => x.Id == id);
-            await _hubContext.Clients.All.SendAsync("ReceiveNotice", entity.Type.ToString(), entity.Title, entity.Content);
+            await _hubContext.Clients.All.SendAsync("ReceiveNotice", entity.NoticeType.ToString(), entity.Title, entity.Content);
         }
         /// <summary>
         /// 发送离线消息

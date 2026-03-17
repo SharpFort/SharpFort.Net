@@ -7,7 +7,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
     {
         public UserDto User { get; set; } = new();
         public HashSet<RoleDto> Roles { get; set; } = new();
-        public HashSet<MenuDto> Menus { get; set; } = new();
+        public List<MenuDto> Menus { get; set; } = new();
 
         public HashSet<string> RoleCodes { get; set; } = new();
         public HashSet<string> PermissionCodes { get; set; } = new();

@@ -35,11 +35,11 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// </summary>
         /// <param name="id">主键</param>
         /// <param name="title">标题</param>
-        /// <param name="type">类型</param>
+        /// <param name="noticeType">类型</param>
         /// <param name="content">内容(富文本)</param>
         /// <param name="orderNum">排序</param>
         /// <param name="state">状态(默认发布或草稿)</param>
-        public Notice(Guid id, string title, NoticeType type, string content, int orderNum = 0, bool state = true)
+        public Notice(Guid id, string title, NoticeType noticeType, string content, int orderNum = 0, bool state = true)
             : base(id)
         {
             Volo.Abp.Check.NotNullOrWhiteSpace(title, nameof(title));
@@ -47,7 +47,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             Volo.Abp.Check.NotNullOrWhiteSpace(content, nameof(content));
 
             Title = title;
-            Type = type;
+            NoticeType = noticeType;
             Content = content;
             OrderNum = orderNum;
             State = state;
@@ -72,7 +72,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <summary>
         /// 公告类型
         /// </summary>
-        public NoticeType Type { get; protected set; }
+        public NoticeType NoticeType { get; protected set; }
 
         /// <summary>
         /// 公告内容
@@ -100,13 +100,13 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <summary>
         /// 更新公告内容
         /// </summary>
-        public void Update(string title, NoticeType type, string content, int orderNum, bool state)
+        public void Update(string title, NoticeType noticeType, string content, int orderNum, bool state)
         {
             Volo.Abp.Check.NotNullOrWhiteSpace(title, nameof(title));
             Volo.Abp.Check.NotNullOrWhiteSpace(content, nameof(content));
 
             Title = title;
-            Type = type;
+            NoticeType = noticeType;
             Content = content;
             OrderNum = orderNum;
             State = state;

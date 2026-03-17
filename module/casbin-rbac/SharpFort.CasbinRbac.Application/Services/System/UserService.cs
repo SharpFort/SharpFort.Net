@@ -1,5 +1,7 @@
 using Casbin;
 using Microsoft.AspNetCore.Mvc;
+using MiniExcelLibs;
+using System.IO;
 using SqlSugar;
 using TencentCloud.Tcr.V20190924.Models;
 using Volo.Abp;
@@ -9,6 +11,8 @@ using Volo.Abp.EventBus.Local;
 using Volo.Abp.Users;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.User;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.Role;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.Post;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
@@ -80,6 +84,26 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .OrderByDescending(user => user.CreationTime)
                 .Select((user, dept) => new UserGetListOutputDto(), true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
+
+            var userIds = outPut.Select(x => x.Id).ToList();
+            if (userIds.Any())
+            {
+                var usersWithRelations = await _repository._DbQueryable
+                    .Includes(u => u.Roles)
+                    .Includes(u => u.Posts)
+                    .Where(u => userIds.Contains(u.Id))
+                    .ToListAsync();
+
+                foreach (var dto in outPut)
+                {
+                    var userEntity = usersWithRelations.FirstOrDefault(u => u.Id == dto.Id);
+                    if (userEntity != null)
+                    {
+                        dto.Roles = ObjectMapper.Map<List<Role>, List<RoleGetListOutputDto>>(userEntity.Roles);
+                        dto.Posts = ObjectMapper.Map<List<Position>, List<PostGetListOutputDto>>(userEntity.Posts);
+                    }
+                }
+            }
 
             var result = new PagedResultDto<UserGetListOutputDto>();
             result.Items = outPut;
@@ -258,9 +282,53 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await base.DeleteAsync(id);
         }
 
-        public override Task<IActionResult> GetExportExcelAsync(UserGetListInputVo input)
+        /// <summary>
+        /// 导出 Excel（优化版本：解决冗余列和集合序列化问题）
+        /// </summary>
+        public override async Task<IActionResult> GetExportExcelAsync(UserGetListInputVo input)
         {
-            return base.GetExportExcelAsync(input);
+            // 1. 获取包含关联关系的数据（复用已有的分页查询逻辑，但获取全部数据）
+            input.SkipCount = 0;
+            input.MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount;
+            var listResult = await GetListAsync(input);
+
+            // 2. 将数据映射为专用的导出 DTO，处理“性别”、“角色”、“岗位”等字段的展示格式
+            var exportData = listResult.Items.Select(x => new UserExportOutputDto
+            {
+                UserName = x.UserName,
+                Name = x.Name,
+                Nick = x.Nick,
+                Gender = x.Gender switch
+                {
+                    Gender.Male => "男",
+                    Gender.Female => "女",
+                    _ => "未知"
+                },
+                DeptName = x.DeptName,
+                // 关键点：将 List 集合扁平化为逗号分隔的字符串
+                RoleNames = x.Roles != null ? string.Join(", ", x.Roles.Select(r => r.RoleName)) : "",
+                PostNames = x.Posts != null ? string.Join(", ", x.Posts.Select(p => p.PostName)) : "",
+                Phone = x.Phone,
+                Email = x.Email,
+                State = x.State ? "启用" : "禁用",
+                Remark = x.Remark,
+                CreationTime = x.CreationTime
+            }).ToList();
+
+            // 3. 生成 Excel 文件
+            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "temp");
+            if (!Directory.Exists(tempPath))
+            {
+                Directory.CreateDirectory(tempPath);
+            }
+
+            var fileName = $"User_{DateTime.Now:yyyyMMddHHmmss}_{Guid.NewGuid()}.xlsx";
+            var filePath = Path.Combine(tempPath, fileName);
+
+            // MiniExcel 会根据 UserExportOutputDto 上的特性自动处理表头和格式
+            await MiniExcel.SaveAsAsync(filePath, exportData);
+
+            return new PhysicalFileResult(filePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
         public override Task PostImportExcelAsync(List<UserCreateInputVo> input)

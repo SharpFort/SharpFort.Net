@@ -116,7 +116,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName.Contains(input.MenuName!))
                         .WhereIF(input.State is not null, x => x.State == input.State)
                         .Where(x=>x.MenuSource==input.MenuSource)
-                        .OrderByDescending(x => x.OrderNum)
+                        .OrderBy(x => x.OrderNum)
+                        .OrderBy(x => x.CreationTime)
                         .ToListAsync();
             return new PagedResultDto<MenuGetListOutputDto>(total, await MapToGetListOutputDtosAsync(entities));
         }

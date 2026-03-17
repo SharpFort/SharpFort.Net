@@ -10,5 +10,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Notice
     {
         public string? Title { get; set; }
         public NoticeType? NoticeType { get; set; }
+        public string? Content { get; set; }
+        public bool? State { get; set; }
     }
 }

@@ -311,7 +311,7 @@ public static class MenuEntityExtensions
             routers.Add(r);
         }
 
-        return TreeHelper.SetTree(routers);
+        return MenuTreeHelper.SetTree(routers);
     }
 
 
@@ -339,8 +339,8 @@ public static class MenuEntityExtensions
                     Auths = new List<string>() { m.PermissionCode },
                     Icon = m.MenuIcon,
                     Title = m.MenuName,
-
                 },
+                OrderNum = m.OrderNum,
                 Children = null,
                 Id = m.Id,
                 ParentId = m.ParentId
@@ -365,6 +365,6 @@ public static class MenuEntityExtensions
             }
         }
 
-        return rootRouters;
+        return rootRouters.OrderBy(x => x.OrderNum).ThenBy(x => x.Id).ToList();
     }
 }
