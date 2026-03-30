@@ -20,7 +20,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
     // 索引1：查询启用状态的公告 (高频：查询首页显示的公告)
     [SugarIndex($"index_{nameof(State)}", nameof(State), OrderByType.Asc)]
     // 索引2：按类型筛选
-    [SugarIndex($"index_{nameof(Type)}", nameof(Type), OrderByType.Asc)]
+    [SugarIndex($"index_{nameof(NoticeType)}", nameof(NoticeType), OrderByType.Asc)]
     public class Notice : FullAuditedAggregateRoot<Guid>, IOrderNum, IState
     {
         #region 构造函数

@@ -98,7 +98,7 @@ namespace FluidSequence.Domain.Entities
         /// 备注
         /// </summary>
         [SugarColumn(Length = 200, IsNullable = true)]
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 扩展属性 (JSON格式)
