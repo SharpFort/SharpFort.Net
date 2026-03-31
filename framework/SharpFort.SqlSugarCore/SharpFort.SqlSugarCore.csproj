@@ -3,8 +3,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="MySqlBackup.NET.MySqlConnector" Version="2.3.8" />
-    <PackageReference Include="SqlSugarCore" Version="$(SqlSugarVersion)" />
+    <PackageReference Include="MySqlBackup.NET.MySqlConnector" Version="2.7.0" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.4.214" />
 
   </ItemGroup>
 

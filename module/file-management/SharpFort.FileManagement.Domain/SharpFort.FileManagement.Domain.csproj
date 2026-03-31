@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\..\..\common.props" />
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
-	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
-	  <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="$(AbpVersion)" />
-	  <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.0" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.2.0" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="10.2.0" />
+	  <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="10.2.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.9" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,16 +3,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Volo.Abp;
-using SharpFort.Rbac.Domain.Repositories;
-using SharpFort.Rbac.SqlSugarCore.Repositories;
+using SharpFort.CasbinRbac.Domain.Repositories;
+using SharpFort.CasbinRbac.SqlSugarCore.Repositories;
 
 namespace SharpFort.Rbac.Test
 {
-    public class SharpFortRbacTestBase : AbpTestBaseWithServiceProvider
+    public class SharpFortCasbinRbacTestBase : AbpTestBaseWithServiceProvider
     {
         public ILogger Logger { get; private set; }
         protected IServiceScope TestServiceScope { get; }
-        public SharpFortRbacTestBase()
+        public SharpFortCasbinRbacTestBase()
         {
             //在启动之前，清除sqlite全库，由于非常危险，建议使用sqlite
             //Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();

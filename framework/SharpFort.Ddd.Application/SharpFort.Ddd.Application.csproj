@@ -2,8 +2,8 @@
 	<Import Project="..\..\common.props" />
 
 	<ItemGroup>
-		<PackageReference Include="MiniExcel" Version="1.31.3" />
-		<PackageReference Include="Volo.Abp.Ddd.Application" Version="$(AbpVersion)" />
+		<PackageReference Include="MiniExcel" Version="1.43.0" />
+		<PackageReference Include="Volo.Abp.Ddd.Application" Version="10.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>

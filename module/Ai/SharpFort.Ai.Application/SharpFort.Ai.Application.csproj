@@ -6,7 +6,7 @@
     <ProjectReference Include="..\..\..\framework\SharpFort.Ddd.Application\SharpFort.Ddd.Application.csproj" />
     <ProjectReference Include="..\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj" />
     <ProjectReference Include="..\SharpFort.Ai.Domain\SharpFort.Ai.Domain.csproj" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs" Version="10.2.0" />
     <ProjectReference Include="..\..\casbin-rbac\SharpFort.CasbinRbac.Application.Contracts\SharpFort.CasbinRbac.Application.Contracts.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="10.2.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\..\common.props" />
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
-	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="10.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SharpFort.Tool.Domain.Shared\SharpFort.Tool.Domain.Shared.csproj" />

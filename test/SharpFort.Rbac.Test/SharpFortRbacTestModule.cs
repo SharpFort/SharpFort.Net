@@ -2,18 +2,18 @@
 using Volo.Abp.Auditing;
 using Volo.Abp.Autofac;
 using Volo.Abp.BackgroundWorkers;
-using SharpFort.Rbac.Application;
-using SharpFort.Rbac.Domain.Entities;
-using SharpFort.Rbac.Domain.Managers;
-using SharpFort.Rbac.Domain.Shared.Consts;
-using SharpFort.Rbac.SqlSugarCore;
+using SharpFort.CasbinRbac.Application;
+using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Managers;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.SqlSugarCore;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Rbac.Test
 {
     [DependsOn(
-        typeof(SharpFortRbacApplicationModule),
-        typeof(SharpFortRbacSqlSugarCoreModule),
+        typeof(SharpFortCasbinRbacApplicationModule),
+        typeof(SharpFortCasbinRbacSqlSugarCoreModule),
 
         typeof(AbpAutofacModule)
         )]

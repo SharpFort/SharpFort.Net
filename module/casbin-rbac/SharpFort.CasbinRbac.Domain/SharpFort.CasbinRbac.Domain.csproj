@@ -4,29 +4,29 @@
 
   <ItemGroup>
 
-    <PackageReference Include="AlibabaCloud.SDK.Dysmsapi20170525" Version="2.0.24" />
+    <PackageReference Include="AlibabaCloud.SDK.Dysmsapi20170525" Version="4.3.0" />
 
     <PackageReference Include="IPTools.China" Version="1.6.0" />
 
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.3.9" />
 
-    <PackageReference Include="TencentCloudSDK" Version="3.0.966" />
+    <PackageReference Include="TencentCloudSDK" Version="3.0.1397" />
 
     <PackageReference Include="UAParser" Version="3.1.47" />
 
-    <PackageReference Include="Volo.Abp.AspNetCore.SignalR" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.AspNetCore.SignalR" Version="10.2.0" />
 
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
-	  <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
-    <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.2.0" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="10.2.0" />
+    <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="10.2.0" />
     <PackageReference Include="Casbin.NET.Adapter.SqlSugar" Version="1.0.3" />
     <PackageReference Include="Casbin.NET.Watcher.Redis" Version="2.0.0" />
 	  
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DistributedLock.Redis" Version="1.0.3" />
-    <PackageReference Include="Volo.Abp.DistributedLocking" Version="$(AbpVersion)" />
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="DistributedLock.Redis" Version="1.1.1" />
+    <PackageReference Include="Volo.Abp.DistributedLocking" Version="10.2.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\framework\SharpFort.Caching.FreeRedis\SharpFort.Caching.FreeRedis.csproj" />

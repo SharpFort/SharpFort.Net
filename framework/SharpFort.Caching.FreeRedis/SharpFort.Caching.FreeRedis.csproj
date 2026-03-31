@@ -2,15 +2,15 @@
 	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FreeRedis" Version="1.2.14" />
-    <PackageReference Include="FreeRedis.DistributedCache" Version="1.2.5" />
-    <PackageReference Include="Volo.Abp.Caching" Version="$(AbpVersion)" />
+    <PackageReference Include="FreeRedis" Version="1.5.5" />
+    <PackageReference Include="FreeRedis.DistributedCache" Version="1.5.2" />
+    <PackageReference Include="Volo.Abp.Caching" Version="10.2.0" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 	<Import Project="..\..\common.props" />
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="10.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -12,7 +12,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="$(AbpVersion)" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="10.2.0" />
 	</ItemGroup>
   <ItemGroup>
     <Folder Include="Consts\" />

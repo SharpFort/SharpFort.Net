@@ -5,9 +5,9 @@
   <ItemGroup>
 <!--    <PackageReference Include="SqlSugarCoreNoDrive" Version="$(SqlSugarVersion)" />-->
     
-    <PackageReference Include="SqlSugarCore" Version="$(SqlSugarVersion)" />
+    <PackageReference Include="SqlSugarCore" Version="5.1.4.214" />
     
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="$(AbpVersion)" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.2.0" />
   </ItemGroup>
 
   <ItemGroup>

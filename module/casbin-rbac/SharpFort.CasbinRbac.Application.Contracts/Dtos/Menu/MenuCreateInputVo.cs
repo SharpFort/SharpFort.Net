@@ -8,6 +8,10 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu
     public class MenuCreateInputVo 
     {
         public Guid? Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date and time when the object was created.
+        /// </summary>
         public DateTime CreationTime { get; set; } = DateTime.Now;
         public Guid? CreatorId { get; set; }
         public bool State { get; set; }
