@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -32,6 +32,16 @@ namespace SharpFort.SqlSugarCore.Repositories
         /// 是否启用变更追踪
         /// </summary>
         public bool? IsChangeTrackingEnabled => false;
+
+        /// <summary>
+        /// 实体名称
+        /// </summary>
+        public string EntityName { get; set; } = typeof(TEntity).Name;
+
+        /// <summary>
+        /// 提供程序名称
+        /// </summary>
+        public string ProviderName => "SqlSugar";
 
         public SqlSugarRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider)
         {

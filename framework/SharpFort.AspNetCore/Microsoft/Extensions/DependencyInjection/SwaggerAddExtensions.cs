@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Xml.Linq;
@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
+using System.Text.Json.Nodes; // 处理 Enum 必须用到
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Conventions;
@@ -135,18 +136,9 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
                 Scheme = "bearer"
             });
 
-            var scheme = new OpenApiSecurityScheme
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                Reference = new OpenApiReference 
-                { 
-                    Type = ReferenceType.SecurityScheme, 
-                    Id = "JwtBearer" 
-                }
-            };
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                [scheme] = Array.Empty<string>()
+                [new OpenApiSecuritySchemeReference("JwtBearer", document)] = new List<string>()
             });
         }
 
@@ -170,13 +162,15 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="schema">OpenAPI架构</param>
         /// <param name="context">架构过滤器上下文</param>
-        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+        public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
             if (!context.Type.IsEnum) return;
 
-            schema.Enum.Clear();
-            schema.Type = "string";
-            schema.Format = null;
+            if (schema is not OpenApiSchema openApiSchema) return;
+
+            openApiSchema.Enum.Clear();
+            openApiSchema.Type = JsonSchemaType.String;
+            openApiSchema.Format = null;
 
             var enumDescriptions = new StringBuilder();
             foreach (var enumName in Enum.GetNames(context.Type))
@@ -185,11 +179,11 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
                 var description = GetEnumDescription(enumValue);
                 var enumIntValue = Convert.ToInt64(enumValue);
 
-                schema.Enum.Add(new OpenApiString(enumName));
+                openApiSchema.Enum.Add(JsonValue.Create(enumName));
                 enumDescriptions.AppendLine(
                     $"【枚举：{enumName}{(description is null ? string.Empty : $"({description})")}={enumIntValue}】");
             }
-            schema.Description = enumDescriptions.ToString();
+            openApiSchema.Description = enumDescriptions.ToString();
         }
 
         /// <summary>
@@ -218,7 +212,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// </summary>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            operation.Parameters ??= new List<OpenApiParameter>();
+            operation.Parameters ??= new List<IOpenApiParameter>();
             
             operation.Parameters.Add(new OpenApiParameter
             {

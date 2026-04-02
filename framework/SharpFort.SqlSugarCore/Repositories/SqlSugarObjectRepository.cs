@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -31,6 +31,16 @@ namespace SharpFort.SqlSugarCore.Repositories
         public IAsyncQueryableExecuter AsyncExecuter => throw new NotImplementedException();
 
         public bool? IsChangeTrackingEnabled => throw new NotImplementedException();
+
+        /// <summary>
+        /// 实体名称
+        /// </summary>
+        public string EntityName { get; set; } = typeof(TEntity).Name;
+
+        /// <summary>
+        /// 提供程序名称
+        /// </summary>
+        public string ProviderName => "SqlSugar";
 
         public Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, bool autoSave = false, CancellationToken cancellationToken = default)
         {

@@ -2,7 +2,7 @@
 	<Import Project="usings.props" />
 	<Import Project="version.props" />
 	<PropertyGroup>
-		<TargetFramework>net10.0.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Authors>SharpFort Team</Authors>
