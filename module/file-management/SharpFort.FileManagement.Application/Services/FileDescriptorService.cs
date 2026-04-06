@@ -37,15 +37,42 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         [AllowAnonymous]
         public async Task<List<FileDescriptorGetOutputDto>> UploadAsync(
-            [FromForm] IFormFileCollection files,
+            [FromForm] IFormFileCollection? files = null,
             [FromQuery] Guid? directoryId = null)
         {
-            var entities = await _fileManager.CreateAsync(files, directoryId);
+            // 通过 HttpContext 直接穿透获取所有的文件，避免因为前端组件上传变量名为 "file" 而非 "files" 导致的绑定失败
+            var httpContextAccessor = LazyServiceProvider.LazyGetRequiredService<IHttpContextAccessor>();
+            var formFiles = httpContextAccessor.HttpContext?.Request?.Form?.Files;
+            IEnumerable<IFormFile> finalFiles = formFiles != null && formFiles.Any() ? formFiles : (files ?? new FormFileCollection());
+
+            if (!finalFiles.Any())
+            {
+                throw new UserFriendlyException("未接收到任何文件数据，请检查上传参数设置！");
+            }
+
+            // 兼容前端直接将 Id 拼接在路径末尾的 REST 风格 (例如 /upload/3fa85f64...)，防止 [FromQuery] 无法绑定
+            if (directoryId == null || directoryId == Guid.Empty)
+            {
+                var pathSegments = httpContextAccessor.HttpContext?.Request.Path.Value?.TrimEnd('/').Split('/');
+                if (pathSegments != null && pathSegments.Length > 0 && Guid.TryParse(pathSegments.Last(), out Guid parsedGuid))
+                {
+                    directoryId = parsedGuid;
+                }
+            }
+
+            // 如果此时为 Guid.Empty，说明前端意图为上传到根目录，在数据库层面归一化为 null
+            if (directoryId == Guid.Empty)
+            {
+                directoryId = null;
+            }
+
+            var entities = await _fileManager.CreateAsync(finalFiles, directoryId);
 
             // 保存每个文件到 Blob 存储
-            for (int i = 0; i < files.Count; i++)
+            var finalFilesList = finalFiles.ToList();
+            for (int i = 0; i < finalFilesList.Count; i++)
             {
-                using var stream = files[i].OpenReadStream();
+                using var stream = finalFilesList[i].OpenReadStream();
                 await _fileManager.SaveFileAsync(entities[i], stream);
             }
 
@@ -167,6 +194,61 @@ namespace SharpFort.FileManagement.Application.Services
 
             file.Rename(newName);
             await _repository.UpdateAsync(file);
+        }
+
+        /// <summary>
+        /// 校验文件哈希（判断是否可以秒传）
+        /// </summary>
+        public async Task<FileVerifyResultDto> VerifyHashAsync(VerifyHashInput input)
+        {
+            var existingFile = await _repository._DbQueryable
+                .Where(x => x.Hash == input.Hash)
+                .OrderByDescending(x => x.CreationTime)
+                .FirstAsync();
+
+            if (existingFile != null)
+            {
+                return new FileVerifyResultDto
+                {
+                    CanQuickUpload = true,
+                    FileId = existingFile.Id,
+                    Url = existingFile.Url
+                };
+            }
+
+            return new FileVerifyResultDto { CanQuickUpload = false };
+        }
+
+        /// <summary>
+        /// 文件秒传
+        /// </summary>
+        [Volo.Abp.Uow.UnitOfWork]
+        public async Task<FileDescriptorGetOutputDto> QuickUploadAsync(QuickUploadInput input)
+        {
+            var existingFile = await _repository._DbQueryable
+                .Where(x => x.Hash == input.Hash)
+                .OrderByDescending(x => x.CreationTime)
+                .FirstAsync();
+
+            if (existingFile == null) 
+            {
+                throw new UserFriendlyException("文件不存在，无法秒传");
+            }
+
+            // 创建新记录，指向现有物理文件
+            var newFile = FileDescriptor.CreateForQuickUpload(
+                GuidGenerator.Create(), 
+                existingFile,
+                input.FileName,
+                input.DirectoryId,
+                CurrentTenant.Id
+            );
+
+            await _repository.InsertAsync(newFile);
+            
+            var dto = newFile.Adapt<FileDescriptorGetOutputDto>();
+            dto.SizeInfo = newFile.GetSizeInfo();
+            return dto;
         }
     }
 }

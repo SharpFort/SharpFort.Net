@@ -7,7 +7,7 @@ namespace FluidSequence.Application.Contracts.IServices
 {
     public interface ISequenceRuleAppService : ICrudAppService< 
         SequenceRuleDto, 
-        long, 
+        Guid, 
         SequenceRuleGetListInput, 
         CreateSequenceRuleInput, 
         UpdateSequenceRuleInput>

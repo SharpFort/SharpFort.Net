@@ -12,13 +12,13 @@ namespace FluidSequence.Domain.Entities
     /// </summary>
     [SugarTable("sys_sequence_rule", "流水号规则配置")]
     [SugarIndex("index_rule_code", nameof(RuleCode), OrderByType.Asc, true)]
-    public class SysSequenceRule : FullAuditedAggregateRoot<long>
+    public class SysSequenceRule : FullAuditedAggregateRoot<Guid>
     {
         public SysSequenceRule()
         {
         }
 
-        public SysSequenceRule(long id) : base(id)
+        public SysSequenceRule(Guid id) : base(id)
         {
         }
 
@@ -44,7 +44,7 @@ namespace FluidSequence.Domain.Entities
         /// 当前计数值 (核心状态，持久化存储)
         /// </summary>
         [SugarColumn(ColumnDescription = "当前值", IsNullable = false)]
-        public long CurrentValue { get; set; }
+        public int CurrentValue { get; set; }
 
         /// <summary>
         /// 步长 (默认为 1)
@@ -62,13 +62,13 @@ namespace FluidSequence.Domain.Entities
         /// 最小值 (重置后的起始值)
         /// </summary>
         [SugarColumn(ColumnDescription = "最小值", DefaultValue = "1")]
-        public long MinValue { get; set; } = 1;
+        public int MinValue { get; set; } = 1;
 
         /// <summary>
         /// 最大值 (防止溢出)
         /// </summary>
         [SugarColumn(ColumnDescription = "最大值", DefaultValue = "999999999")]
-        public long MaxValue { get; set; } = 999999999;
+        public int MaxValue { get; set; } = 999999999;
 
         /// <summary>
         /// 重置规则 (0:不重置, 1:按日, 2:按月, 3:按年...)
@@ -85,6 +85,10 @@ namespace FluidSequence.Domain.Entities
         /// <summary>
         /// 乐观锁版本号 (并发控制核心)
         /// </summary>
+        /// <remarks>
+        /// Version 必须为整型。SqlSugar 的乐观锁校验（IsEnableUpdateVersionValidation）
+        /// 会自动将其 +1，Guid 无法执行该运算，故保留 long 类型。
+        /// </remarks>
         [SugarColumn(IsEnableUpdateVersionValidation = true, ColumnDescription = "版本号")]
         public long Version { get; set; }
 
@@ -177,6 +181,16 @@ namespace FluidSequence.Domain.Entities
             {
                 throw new OverflowException($"Sequence {RuleCode} exceeded MaxValue {MaxValue}");
             }
+        }
+
+        /// <summary>
+        /// Hi-Lo 缓冲模式专用：直接将外部计算好的序列号注入 CurrentValue，
+        /// 使 ParseTemplate 中的 {SEQ} 占位符能渲染正确的值。
+        /// 此方法不触发 NextValue 递增逻辑，不写数据库，仅修改内存状态。
+        /// </summary>
+        public void SetCurrentValue(int value)
+        {
+            CurrentValue = value;
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Volo.Abp;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Guids;
@@ -44,7 +45,7 @@ namespace SharpFort.FileManagement.Domain.Managers
         {
             if (!files.Any())
             {
-                throw new ArgumentException("文件上传为空！");
+                throw new UserFriendlyException("文件上传为空！");
             }
 
             // 获取默认存储提供者

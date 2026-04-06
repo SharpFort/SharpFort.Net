@@ -20,19 +20,21 @@ namespace FluidSequence.Application.Contracts.Dtos
 
         public int Step { get; set; } = 1;
         public int SeqLength { get; set; } = 6;
-        public long MinValue { get; set; } = 1;
-        public long MaxValue { get; set; } = 999999999;
+        public int MinValue { get; set; } = 1;
+        public int MaxValue { get; set; } = 999999999;
         public SequenceResetType ResetType { get; set; } = SequenceResetType.None;
         /// <summary>
-        /// 备注（选填）
+        /// 备注（可选）
         /// </summary>
         public string? Remark { get; set; }
 
         /// <summary>
-        /// 扩展配置属性（选填，JSON 键值对）
-        /// 用于存储规则的可选配置，例如：
-        ///   { "EnableBuffer": true, "BufferCount": 100 }  → 开启 Hi-Lo 预取
-        ///   { "FiscalYearStartMonth": 4 }               → 财年起始月
+        /// 扩展配置（可选 JSON 键值对）
+        /// 支持以下运行时配置键：
+        ///   - EnableBuffer (bool)  : 是否启用 Hi-Lo 预取缓冲，默认 false
+        ///   - BufferCount (int)    : 单次预取号段大小，默认 50
+        ///   - FiscalYearStartMonth (int) : 财年起始月份，配合 {FY} 占位符使用，默认 1
+        /// 示例: { "EnableBuffer": true, "BufferCount": 100 }
         /// </summary>
         public Dictionary<string, object>? ExtensionProps { get; set; }
     }

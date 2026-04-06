@@ -15,7 +15,16 @@ namespace SharpFort.FileManagement.Domain.Entities
     [SugarTable(FileManagementConsts.DbTablePrefix + "file_descriptor")]
     [SugarIndex($"index_DirectoryId", nameof(DirectoryId), OrderByType.Asc)]
     [SugarIndex($"index_Hash", nameof(Hash), OrderByType.Asc)]
+    // 1. 存储提供者索引：便于按存储渠道（Local/OSS）进行管理维护
     [SugarIndex($"index_ProviderName", nameof(ProviderName), OrderByType.Asc)]
+    // 2. 复合唯一索引：实现“同一租户、同一文件夹下，未删除的文件不允许重名”
+    // 这里的 true 表示 Unique 约束
+    [SugarIndex($"index_Unique_FileName", 
+        nameof(TenantId), OrderByType.Asc, 
+        nameof(DirectoryId), OrderByType.Asc, 
+        // nameof(Name), OrderByType.Asc, 
+        nameof(IsDeleted), OrderByType.Asc, 
+        true)]
     public class FileDescriptor : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
         #region 构造函数
@@ -265,6 +274,35 @@ namespace SharpFort.FileManagement.Domain.Entities
                 return contentType;
             }
             return "application/octet-stream";
+        }
+
+        /// <summary>
+        /// 静态工厂方法：用于秒传创建新记录
+        /// </summary>
+        public static FileDescriptor CreateForQuickUpload(
+            Guid id, 
+            FileDescriptor existingFile, 
+            string name, 
+            Guid? directoryId, 
+            Guid? tenantId)
+        {
+            return new FileDescriptor
+            {
+                Id = id,
+                TenantId = tenantId,
+                DirectoryId = directoryId,
+                Name = name, 
+                // 以下全部复用 existingFile 的物理信息
+                BlobName = existingFile.BlobName, 
+                MimeType = existingFile.MimeType,
+                Size = existingFile.Size,
+                Hash = existingFile.Hash,
+                FileType = existingFile.FileType,
+                ProviderName = existingFile.ProviderName,
+                Url = existingFile.Url,
+                ThumbnailUrl = existingFile.ThumbnailUrl,
+                IsPublic = existingFile.IsPublic
+            };
         }
 
         #endregion

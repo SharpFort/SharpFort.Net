@@ -37,7 +37,7 @@ namespace SharpFort.FileManagement.Application.Services
         public async Task<DirectoryDescriptorGetOutputDto> CreateAsync(DirectoryDescriptorCreateInput input)
         {
             // 检查同级目录下是否重名
-            var exists = await _repository.AnyAsync(x =>
+            var exists = await _repository.IsAnyAsync(x =>
                 x.ParentId == input.ParentId && x.Name == input.Name);
             if (exists)
             {
@@ -80,7 +80,7 @@ namespace SharpFort.FileManagement.Application.Services
             }
 
             // 检查同级目录下是否重名
-            var exists = await _repository.AnyAsync(x =>
+            var exists = await _repository.IsAnyAsync(x =>
                 x.ParentId == entity.ParentId && x.Name == input.Name && x.Id != id);
             if (exists)
             {
@@ -105,14 +105,14 @@ namespace SharpFort.FileManagement.Application.Services
             }
 
             // 检查是否有子目录
-            var hasChildren = await _repository.AnyAsync(x => x.ParentId == id);
+            var hasChildren = await _repository.IsAnyAsync(x => x.ParentId == id);
             if (hasChildren)
             {
                 throw new UserFriendlyException("目录下存在子目录，请先删除子目录");
             }
 
             // 检查是否有文件
-            var hasFiles = await _fileRepository.AnyAsync(x => x.DirectoryId == id);
+            var hasFiles = await _fileRepository.IsAnyAsync(x => x.DirectoryId == id);
             if (hasFiles)
             {
                 throw new UserFriendlyException("目录下存在文件，请先删除文件");

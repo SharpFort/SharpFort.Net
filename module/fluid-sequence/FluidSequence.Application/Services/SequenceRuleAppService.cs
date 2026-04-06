@@ -18,7 +18,7 @@ namespace FluidSequence.Application.Services
     public class SequenceRuleAppService : SfCrudAppService< 
         SysSequenceRule, 
         SequenceRuleDto, 
-        long, 
+        Guid, 
         SequenceRuleGetListInput, 
         CreateSequenceRuleInput, 
         UpdateSequenceRuleInput>,

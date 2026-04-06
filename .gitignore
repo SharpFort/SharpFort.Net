@@ -17,6 +17,8 @@ x86/
 
 ## 移除文件夹
 module/ai-hub
+src/Sf.Abp.Web/wwwroot
+
 
 ## 移除文件
 
