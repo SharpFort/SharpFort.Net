@@ -14,7 +14,7 @@ namespace SharpFort.Ai.Application.Services;
 /// <summary>
 /// 系统使用量统计服务实现
 /// </summary>
-[Authorize(Roles = "admin")]
+[Authorize]
 public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStatisticsService
 {
     private readonly ISqlSugarRepository<ChatMessage> _messageRepository;

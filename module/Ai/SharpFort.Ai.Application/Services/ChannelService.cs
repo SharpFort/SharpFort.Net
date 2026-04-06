@@ -14,7 +14,7 @@ namespace SharpFort.Ai.Application.Services;
 /// <summary>
 /// 渠道商管理服务实现
 /// </summary>
-[Authorize(Roles = "admin")]
+[Authorize]
 public class ChannelService : ApplicationService, IChannelService
 {
     private readonly ISqlSugarRepository<AiProvider, Guid> _appRepository;

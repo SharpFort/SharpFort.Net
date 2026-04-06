@@ -15,7 +15,7 @@ namespace SharpFort.Ai.Application.Services;
 /// <summary>
 /// AI供应商管理服务
 /// </summary>
-[Authorize(Roles = "admin")]
+[Authorize]
 public class AiProviderService : ApplicationService, IAiProviderService
 {
     private readonly ISqlSugarRepository<AiProvider, Guid> _providerRepository;
