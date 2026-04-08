@@ -34,7 +34,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 任务状态
     /// </summary>
-    public TaskStatus TaskStatus { get; set; } = TaskStatus.Processing;
+    public TaskStatusEnum TaskStatus { get; set; } = TaskStatusEnum.Processing;
 
     /// <summary>
     /// 用户id
@@ -84,7 +84,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <param name="storeUrl"></param>
     public void SetSuccess(string storeUrl)
     {
-        TaskStatus = TaskStatus.Success;
+        TaskStatus = TaskStatusEnum.Success;
         StoreUrl = storeUrl;
     }
 

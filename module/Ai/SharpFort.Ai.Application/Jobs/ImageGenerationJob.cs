@@ -94,7 +94,7 @@ public class ImageGenerationJob : AsyncBackgroundJob<ImageGenerationJobArgs>, IT
             var error = $"图片任务失败，TaskId: {args.TaskId}，错误信息: {ex.Message}，错误堆栈：{ex.StackTrace}";
             _logger.LogError(ex, error);
 
-            task.TaskStatus = TaskStatus.Fail;
+            task.TaskStatus = TaskStatusEnum.Fail;
             task.ErrorInfo = error;
 
             await _imageStoreTaskRepository.UpdateAsync(task);

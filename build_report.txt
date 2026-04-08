@@ -1,0 +1,74 @@
+  姝ｅ湪纭畾瑕佽繕鍘熺殑椤圭洰鈥?
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Web\SharpFort.Tool.Web.csproj]
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj]
+E:\Projects\SharpFort.Net\test\Sf.Abp.Test\Sf.Abp.Test.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?[E:\Projects\SharpFort.Net\Sf.Abp.sln]
+E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?[E:\Projects\SharpFort.Net\Sf.Abp.sln]
+  鎵€鏈夐」鐩潎鏄渶鏂扮殑锛屾棤娉曡繕鍘熴€?
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj]
+E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?
+  SharpFort.AuditLogging.Domain.Shared -> E:\Projects\SharpFort.Net\module\audit-logging\SharpFort.AuditLogging.Domain.Shared\bin\Debug\net10.0.0\SharpFort.AuditLogging.Domain.Shared.dll
+  SharpFort.CodeGen.Domain.Shared -> E:\Projects\SharpFort.Net\module\code-gen\SharpFort.CodeGen.Domain.Shared\bin\Debug\net10.0.0\SharpFort.CodeGen.Domain.Shared.dll
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Web\SharpFort.Tool.Web.csproj]
+  SharpFort.Core -> E:\Projects\SharpFort.Net\framework\SharpFort.Core\bin\Debug\net10.0\SharpFort.Core.dll
+E:\Projects\SharpFort.Net\test\Sf.Abp.Test\Sf.Abp.Test.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?
+  SharpFort.Caching.FreeRedis -> E:\Projects\SharpFort.Net\framework\SharpFort.Caching.FreeRedis\bin\Debug\net10.0.0\SharpFort.Caching.FreeRedis.dll
+  SharpFort.BackgroundWorkers.Hangfire -> E:\Projects\SharpFort.Net\framework\SharpFort.BackgroundWorkers.Hangfire\bin\Debug\net10.0.0\SharpFort.BackgroundWorkers.Hangfire.dll
+C:\Program Files\dotnet\sdk\10.0.201\Microsoft.Common.CurrentVersion.targets(2151,5): error MSB4006: 娑夊強鐩爣鈥淩esolveProjectReferences鈥濈殑鐩爣渚濊禆椤瑰叧绯诲浘涓瓨鍦ㄥ惊鐜緷璧栭」銆?[E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj]
+  SharpFort.FileManagement.Domain.Shared -> E:\Projects\SharpFort.Net\module\file-management\SharpFort.FileManagement.Domain.Shared\bin\Debug\net10.0\SharpFort.FileManagement.Domain.Shared.dll
+  SharpFort.Ai.Domain.Shared -> E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Domain.Shared\bin\Debug\net10.0\SharpFort.Ai.Domain.Shared.dll
+  SharpFort.FluidSequence.Domain.Shared -> E:\Projects\SharpFort.Net\module\fluid-sequence\FluidSequence.Domain.Shared\bin\Debug\net10.0\SharpFort.FluidSequence.Domain.Shared.dll
+  SharpFort.Ddd.Application.Contracts -> E:\Projects\SharpFort.Net\framework\SharpFort.Ddd.Application.Contracts\bin\Debug\net10.0\SharpFort.Ddd.Application.Contracts.dll
+  SharpFort.Mapster -> E:\Projects\SharpFort.Net\framework\SharpFort.Mapster\bin\Debug\net10.0\SharpFort.Mapster.dll
+  SharpFort.AspNetCore -> E:\Projects\SharpFort.Net\framework\SharpFort.AspNetCore\bin\Debug\net10.0\SharpFort.AspNetCore.dll
+  SharpFort.SqlSugarCore.Abstractions -> E:\Projects\SharpFort.Net\framework\SharpFort.SqlSugarCore.Abstractions\bin\Debug\net10.0\SharpFort.SqlSugarCore.Abstractions.dll
+  SharpFort.WeChat.MiniProgram -> E:\Projects\SharpFort.Net\framework\SharpFort.WeChat.MiniProgram\bin\Debug\net10.0\SharpFort.WeChat.MiniProgram.dll
+E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\Dtos\Chat\ImagePlazaPageInput.cs(25,12): error CS0104: 鈥淭askStatus鈥濇槸鈥淪harpFort.Ai.Domain.Shared.Enums.TaskStatus鈥濆拰鈥淪ystem.Threading.Tasks.TaskStatus鈥濅箣闂寸殑涓嶆槑纭殑寮曠敤 [E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj]
+E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\Dtos\Chat\ImageMyTaskPageInput.cs(20,12): error CS0104: 鈥淭askStatus鈥濇槸鈥淪harpFort.Ai.Domain.Shared.Enums.TaskStatus鈥濆拰鈥淪ystem.Threading.Tasks.TaskStatus鈥濅箣闂寸殑涓嶆槑纭殑寮曠敤 [E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj]
+E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\Dtos\Chat\ImageTaskOutput.cs(33,12): error CS0104: 鈥淭askStatus鈥濇槸鈥淪harpFort.Ai.Domain.Shared.Enums.TaskStatus鈥濆拰鈥淪ystem.Threading.Tasks.TaskStatus鈥濅箣闂寸殑涓嶆槑纭殑寮曠敤 [E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj]
+  SharpFort.Tool.Domain.Shared -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Domain.Shared\bin\Debug\net10.0.0\SharpFort.Tool.Domain.Shared.dll
+  SharpFort.FileManagement.Application.Contracts -> E:\Projects\SharpFort.Net\module\file-management\SharpFort.FileManagement.Application.Contracts\bin\Debug\net10.0\SharpFort.FileManagement.Application.Contracts.dll
+  SharpFort.Ddd.Application -> E:\Projects\SharpFort.Net\framework\SharpFort.Ddd.Application\bin\Debug\net10.0\SharpFort.Ddd.Application.dll
+  SharpFort.CodeGen.Application.Contracts -> E:\Projects\SharpFort.Net\module\code-gen\SharpFort.CodeGen.Application.Contracts\bin\Debug\net10.0.0\SharpFort.CodeGen.Application.Contracts.dll
+  SharpFort.Tool.Domain -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Domain\bin\Debug\net10.0.0\SharpFort.Tool.Domain.dll
+  SharpFort.Tool.Application.Contracts -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Application.Contracts\bin\Debug\net10.0.0\SharpFort.Tool.Application.Contracts.dll
+  SharpFort.CodeGen.Domain -> E:\Projects\SharpFort.Net\module\code-gen\SharpFort.CodeGen.Domain\bin\Debug\net10.0.0\SharpFort.CodeGen.Domain.dll
+  SharpFort.AspNetCore.Authentication.OAuth -> E:\Projects\SharpFort.Net\framework\SharpFort.AspNetCore.Authentication.OAuth\bin\Debug\net10.0.0\SharpFort.AspNetCore.Authentication.OAuth.dll
+  SharpFort.CasbinRbac.Domain.Shared -> E:\Projects\SharpFort.Net\module\casbin-rbac\SharpFort.CasbinRbac.Domain.Shared\bin\Debug\net10.0\SharpFort.CasbinRbac.Domain.Shared.dll
+  SharpFort.TenantManagement.Application.Contracts -> E:\Projects\SharpFort.Net\module\tenant-management\SharpFort.TenantManagement.Application.Contracts\bin\Debug\net10.0.0\SharpFort.TenantManagement.Application.Contracts.dll
+  SharpFort.FileManagement.Domain -> E:\Projects\SharpFort.Net\module\file-management\SharpFort.FileManagement.Domain\bin\Debug\net10.0\SharpFort.FileManagement.Domain.dll
+  SharpFort.CasbinRbac.Application.Contracts -> E:\Projects\SharpFort.Net\module\casbin-rbac\SharpFort.CasbinRbac.Application.Contracts\bin\Debug\net10.0\SharpFort.CasbinRbac.Application.Contracts.dll
+  SharpFort.SettingManagement.Domain -> E:\Projects\SharpFort.Net\module\setting-management\SharpFort.SettingManagement.Domain\bin\Debug\net10.0.0\SharpFort.SettingManagement.Domain.dll
+  SharpFort.TenantManagement.Domain -> E:\Projects\SharpFort.Net\module\tenant-management\SharpFort.TenantManagement.Domain\bin\Debug\net10.0.0\SharpFort.TenantManagement.Domain.dll
+  SharpFort.Tool.HttpApi.Client -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool.HttpApi.Client\bin\Debug\net10.0.0\SharpFort.Tool.HttpApi.Client.dll
+  SharpFort.CasbinRbac.Domain -> E:\Projects\SharpFort.Net\module\casbin-rbac\SharpFort.CasbinRbac.Domain\bin\Debug\net10.0\SharpFort.CasbinRbac.Domain.dll
+  SharpFort.Tool -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool\bin\Debug\net10.0.0\SharpFort.Tool.dll
+  Sf.Abp.Domain.Shared -> E:\Projects\SharpFort.Net\src\Sf.Abp.Domain.Shared\bin\Debug\net10.0\Sf.Abp.Domain.Shared.dll
+  SharpFort.SettingManagement.Application -> E:\Projects\SharpFort.Net\module\setting-management\SharpFort.SettingManagement.Application\bin\Debug\net10.0.0\SharpFort.SettingManagement.Application.dll
+  SharpFort.Tool.Application -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Application\bin\Debug\net10.0.0\SharpFort.Tool.Application.dll
+  SharpFort.CodeGen.Application -> E:\Projects\SharpFort.Net\module\code-gen\SharpFort.CodeGen.Application\bin\Debug\net10.0.0\SharpFort.CodeGen.Application.dll
+  SharpFort.FluidSequence.Domain -> E:\Projects\SharpFort.Net\module\fluid-sequence\FluidSequence.Domain\bin\Debug\net10.0\SharpFort.FluidSequence.Domain.dll
+  SharpFort.FileManagement.Application -> E:\Projects\SharpFort.Net\module\file-management\SharpFort.FileManagement.Application\bin\Debug\net10.0\SharpFort.FileManagement.Application.dll
+  SharpFort.TenantManagement.Application -> E:\Projects\SharpFort.Net\module\tenant-management\SharpFort.TenantManagement.Application\bin\Debug\net10.0.0\SharpFort.TenantManagement.Application.dll
+  SharpFort.FluidSequence.Application.Contracts -> E:\Projects\SharpFort.Net\module\fluid-sequence\FluidSequence.Application.Contracts\bin\Debug\net10.0\SharpFort.FluidSequence.Application.Contracts.dll
+  SharpFort.CasbinRbac.Application -> E:\Projects\SharpFort.Net\module\casbin-rbac\SharpFort.CasbinRbac.Application\bin\Debug\net10.0\SharpFort.CasbinRbac.Application.dll
+  SharpFort.Tool.Web -> E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Web\bin\Debug\net10.0.0\SharpFort.Tool.Web.dll
+  SharpFort.FluidSequence.Application -> E:\Projects\SharpFort.Net\module\fluid-sequence\FluidSequence.Application\bin\Debug\net10.0\SharpFort.FluidSequence.Application.dll
+
+鐢熸垚澶辫触銆?
+
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Web\SharpFort.Tool.Web.csproj]
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj]
+E:\Projects\SharpFort.Net\test\Sf.Abp.Test\Sf.Abp.Test.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?[E:\Projects\SharpFort.Net\Sf.Abp.sln]
+E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?[E:\Projects\SharpFort.Net\Sf.Abp.sln]
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj]
+E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?
+C:\Program Files\dotnet\sdk\10.0.201\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.FrameworkReferenceResolution.targets(94,5): warning NETSDK1086: 椤圭洰涓寘鍚簡鈥淢icrosoft.AspNetCore.App鈥濈殑 FrameworkReference銆傚畠鐢?.NET SDK 闅愬紡寮曠敤锛屼笖閫氬父鎯呭喌涓嬫棤闇€浠庨」鐩腑瀵瑰叾杩涜寮曠敤銆傛湁鍏宠缁嗕俊鎭紝璇峰弬闃?https://aka.ms/sdkimplicitrefs [E:\Projects\SharpFort.Net\tool\SharpFort.Tool.Web\SharpFort.Tool.Web.csproj]
+E:\Projects\SharpFort.Net\test\Sf.Abp.Test\Sf.Abp.Test.csproj : warning NU1608: 妫€娴嬪埌鐨勫寘鐗堟湰鍦ㄤ緷璧栭」绾︽潫涔嬪: Hangfire.NetCore 1.8.21 闇€瑕?Hangfire.Core (= 1.8.21)锛屼絾鐗堟湰 Hangfire.Core 1.8.23 宸茶В鍐炽€?
+C:\Program Files\dotnet\sdk\10.0.201\Microsoft.Common.CurrentVersion.targets(2151,5): error MSB4006: 娑夊強鐩爣鈥淩esolveProjectReferences鈥濈殑鐩爣渚濊禆椤瑰叧绯诲浘涓瓨鍦ㄥ惊鐜緷璧栭」銆?[E:\Projects\SharpFort.Net\src\Sf.Abp.Web\Sf.Abp.Web.csproj]
+E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\Dtos\Chat\ImagePlazaPageInput.cs(25,12): error CS0104: 鈥淭askStatus鈥濇槸鈥淪harpFort.Ai.Domain.Shared.Enums.TaskStatus鈥濆拰鈥淪ystem.Threading.Tasks.TaskStatus鈥濅箣闂寸殑涓嶆槑纭殑寮曠敤 [E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj]
+E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\Dtos\Chat\ImageMyTaskPageInput.cs(20,12): error CS0104: 鈥淭askStatus鈥濇槸鈥淪harpFort.Ai.Domain.Shared.Enums.TaskStatus鈥濆拰鈥淪ystem.Threading.Tasks.TaskStatus鈥濅箣闂寸殑涓嶆槑纭殑寮曠敤 [E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj]
+E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\Dtos\Chat\ImageTaskOutput.cs(33,12): error CS0104: 鈥淭askStatus鈥濇槸鈥淪harpFort.Ai.Domain.Shared.Enums.TaskStatus鈥濆拰鈥淪ystem.Threading.Tasks.TaskStatus鈥濅箣闂寸殑涓嶆槑纭殑寮曠敤 [E:\Projects\SharpFort.Net\module\Ai\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj]
+    8 涓鍛?
+    4 涓敊璇?
+
+宸茬敤鏃堕棿 00:00:20.66

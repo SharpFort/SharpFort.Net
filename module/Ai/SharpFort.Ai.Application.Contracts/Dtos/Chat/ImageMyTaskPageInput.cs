@@ -17,7 +17,7 @@ public class ImageMyTaskPageInput: PagedAllResultRequestDto
     /// <summary>
     /// 任务状态筛选（可选）
     /// </summary>
-    public TaskStatus? TaskStatus { get; set; }
+    public TaskStatusEnum? TaskStatusEnum { get; set; }
     
     /// <summary>
     /// 发布状态

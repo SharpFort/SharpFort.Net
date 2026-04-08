@@ -3,7 +3,7 @@ namespace SharpFort.Ai.Domain.Shared.Enums;
 /// <summary>
 /// 任务状态枚举
 /// </summary>
-public enum TaskStatus
+public enum TaskStatusEnum
 {
     /// <summary>
     /// 处理中

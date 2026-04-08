@@ -30,7 +30,7 @@ public class ImageTaskOutput
     /// <summary>
     /// 任务状态
     /// </summary>
-    public TaskStatus TaskStatus { get; set; }
+    public TaskStatusEnum TaskStatusEnum { get; set; }
 
     /// <summary>
     /// 发布状态

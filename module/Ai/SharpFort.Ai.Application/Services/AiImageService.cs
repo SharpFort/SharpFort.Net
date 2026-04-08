@@ -20,6 +20,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
+
 /// <summary>
 /// AI图片生成服务
 /// </summary>
@@ -71,11 +72,11 @@ public class AiImageService : ApplicationService
         //校验token
         if (input.TokenId is not null)
         {
-         var tokenValidation = await _tokenManager.ValidateTokenAsync(input.TokenId);
+            await _tokenManager.ValidateTokenAsync(input.TokenId);
         }
 
 
-
+        
 
         // 创建任务实体
         var task = new ImageStoreTaskAggregateRoot
@@ -83,7 +84,7 @@ public class AiImageService : ApplicationService
             Prompt = input.Prompt,
             ReferenceImagesPrefixBase64 = input.ReferenceImagesPrefixBase64 ?? new List<string>(),
             ReferenceImagesUrl = new List<string>(),
-            TaskStatus = TaskStatus.Processing,
+            TaskStatus = TaskStatusEnum.Processing,
             UserId = userId,
             UserName = CurrentUser.UserName,
             TokenId = input.TokenId,
@@ -124,7 +125,7 @@ public class AiImageService : ApplicationService
             // ReferenceImagesUrl = task.ReferenceImagesUrl,
             // StoreBase64 = task.StoreBase64,
             StoreUrl = task.StoreUrl,
-            TaskStatus = task.TaskStatus,
+            TaskStatusEnum = task.TaskStatus,
             PublishStatus = task.PublishStatus,
             Categories = task.Categories,
             CreationTime = task.CreationTime,
@@ -226,7 +227,7 @@ public class AiImageService : ApplicationService
         RefAsync<int> total = 0;
         var output = await _imageTaskRepository._DbQueryable
             .Where(x => x.UserId == userId)
-            .WhereIF(input.TaskStatus is not null, x => x.TaskStatus == input.TaskStatus)
+            .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
             .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
             .WhereIF(input.PublishStatus is not null, x => x.PublishStatus == input.PublishStatus)
             .WhereIF(input.StartTime is not null && input.EndTime is not null,
@@ -237,7 +238,7 @@ public class AiImageService : ApplicationService
                 Id = x.Id,
                 Prompt = x.Prompt,
                 StoreUrl = x.StoreUrl,
-                TaskStatus = x.TaskStatus,
+                TaskStatusEnum = x.TaskStatus,
                 PublishStatus = x.PublishStatus,
                 Categories = x.Categories,
                 CreationTime = x.CreationTime,
@@ -273,8 +274,8 @@ public class AiImageService : ApplicationService
         RefAsync<int> total = 0;
         var output = await _imageTaskRepository._DbQueryable
             .Where(x => x.PublishStatus == PublishStatus.Published)
-            .Where(x => x.TaskStatus == TaskStatus.Success)
-            .WhereIF(input.TaskStatus is not null, x => x.TaskStatus == input.TaskStatus)
+            .Where(x => x.TaskStatus == TaskStatusEnum.Success)
+            .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
             .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
             .WhereIF(!string.IsNullOrWhiteSpace(input.Categories),
                 x => SqlFunc.JsonLike(x.Categories, input.Categories))
@@ -288,7 +289,7 @@ public class AiImageService : ApplicationService
                 Prompt = x.Prompt,
                 IsAnonymous = x.IsAnonymous,
                 StoreUrl = x.StoreUrl,
-                TaskStatus = x.TaskStatus,
+                TaskStatusEnum = x.TaskStatus,
                 PublishStatus = x.PublishStatus,
                 Categories = x.Categories,
                 CreationTime = x.CreationTime,
@@ -326,7 +327,7 @@ public class AiImageService : ApplicationService
             throw new UserFriendlyException("任务不存在或无权访问");
         }
 
-        if (task.TaskStatus != TaskStatus.Success)
+        if (task.TaskStatus != TaskStatusEnum.Success)
         {
             throw new UserFriendlyException("只有已完成的任务才能发布");
         }
@@ -350,7 +351,7 @@ public class AiImageService : ApplicationService
     public async Task<List<ModelGetListOutput>> GetModelAsync()
     {
         var output = await _aiModelRepository._DbQueryable
-            .Where(x=>x.IsEnabled==true)
+            .Where(x => x.IsEnabled == true)
             .Where(x => x.ModelType == ModelType.Image)
             .Where(x => x.ModelApiType == ModelApiType.GenerateContent)
             .OrderByDescending(x => x.OrderNum)
