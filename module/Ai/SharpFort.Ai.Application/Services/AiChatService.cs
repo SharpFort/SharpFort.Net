@@ -64,7 +64,7 @@ public class AiChatService : ApplicationService, IAiChatService
     {
         var entities = await _aiModelRepository._DbQueryable
             .Where(x => x.IsEnabled == true)
-            .Where(x => x.ModelType == ModelTypeEnum.Chat)
+            .Where(x => x.ModelType == ModelType.Chat)
             .OrderByDescending(x => x.OrderNum)
             .ToListAsync();
 
@@ -86,7 +86,7 @@ public class AiChatService : ApplicationService, IAiChatService
     /// 统一发送消息 - 支持多种API类型
     /// </summary>
     public async Task UnifiedSendAsync(
-        ModelApiTypeEnum apiType,
+        ModelApiType apiType,
         JsonElement input,
         string modelId,
         Guid? sessionId)
@@ -121,7 +121,7 @@ public class AiChatService : ApplicationService, IAiChatService
     /// <summary>
     /// 从请求体中提取模型ID
     /// </summary>
-    private string ExtractModelIdFromRequest(ModelApiTypeEnum apiType, JsonElement input)
+    private string ExtractModelIdFromRequest(ModelApiType apiType, JsonElement input)
     {
         try
         {

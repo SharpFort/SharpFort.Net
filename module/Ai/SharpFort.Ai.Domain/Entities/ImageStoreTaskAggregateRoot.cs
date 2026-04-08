@@ -34,7 +34,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 任务状态
     /// </summary>
-    public TaskStatusEnum TaskStatus { get; set; } = TaskStatusEnum.Processing;
+    public TaskStatus TaskStatus { get; set; } = TaskStatus.Processing;
 
     /// <summary>
     /// 用户id
@@ -60,7 +60,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 发布状态
     /// </summary>
-    public PublishStatusEnum PublishStatus { get; set; } = PublishStatusEnum.Unpublished;
+    public PublishStatus PublishStatus { get; set; } = PublishStatus.Unpublished;
 
     /// <summary>
     /// 分类标签
@@ -84,7 +84,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <param name="storeUrl"></param>
     public void SetSuccess(string storeUrl)
     {
-        TaskStatus = TaskStatusEnum.Success;
+        TaskStatus = TaskStatus.Success;
         StoreUrl = storeUrl;
     }
 
@@ -95,7 +95,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <param name="categories"></param>
     public void SetPublish(bool isAnonymous,List<string> categories)
     {
-        this.PublishStatus = PublishStatusEnum.Published;
+        this.PublishStatus = PublishStatus.Published;
         this.IsAnonymous = isAnonymous;
         this.Categories = categories;
     }

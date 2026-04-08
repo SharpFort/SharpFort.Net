@@ -39,7 +39,7 @@ public class MessageLogAggregateRoot : Entity<Guid>
     /// <summary>
     /// api类型
     /// </summary>
-    public ModelApiTypeEnum ApiType { get; set; }
+    public ModelApiType ApiType { get; set; }
 
     /// <summary>
     /// api类型名称

@@ -13,7 +13,7 @@ namespace SharpFort.Core.Enums
     /// 用于定义系统支持的文件类型分类
     /// 主要用于文件上传和存储时的类型区分
     /// </remarks>
-    public enum FileTypeEnum
+    public enum FileType
     {
         /// <summary>
         /// 普通文件

@@ -69,7 +69,7 @@ public class AiGateWayManager : DomainService
     /// <param name="modelApiType"></param>
     /// <param name="modelId"></param>
     /// <returns></returns>
-    public async Task<AiModelDescribe> GetModelAsync(ModelApiTypeEnum modelApiType, string modelId)
+    public async Task<AiModelDescribe> GetModelAsync(ModelApiType modelApiType, string modelId)
     {
         var aiModelDescribe = await _aiModelRepository._DbQueryable
             .LeftJoin<AiProvider>((model, app) => model.AiProviderId == app.Id)
@@ -125,7 +125,7 @@ public class AiGateWayManager : DomainService
         var response = httpContext.Response;
         // 设置响应头，声明是 json
         //response.ContentType = "application/json; charset=UTF-8";
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Completions, request.Model);
+        var modelDescribe = await GetModelAsync(ModelApiType.Completions, request.Model);
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IChatCompletionService>(modelDescribe.HandlerName);
 
@@ -188,7 +188,7 @@ public class AiGateWayManager : DomainService
 
 
         _specialCompatible.Compatible(request);
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Completions, request.Model);
+        var modelDescribe = await GetModelAsync(ModelApiType.Completions, request.Model);
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IChatCompletionService>(modelDescribe.HandlerName);
 
@@ -322,7 +322,7 @@ public class AiGateWayManager : DomainService
             var model = request.Model;
             if (string.IsNullOrEmpty(model)) model = "dall-e-2";
 
-            var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Completions, model);
+            var modelDescribe = await GetModelAsync(ModelApiType.Completions, model);
 
             // 获取渠道指定的实现类型的服务
             var imageService =
@@ -385,7 +385,7 @@ public class AiGateWayManager : DomainService
             using var embedding =
                 Activity.Current?.Source.StartActivity("向量模型调用");
 
-            var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Completions, input.Model);
+            var modelDescribe = await GetModelAsync(ModelApiType.Completions, input.Model);
 
             // 获取渠道指定的实现类型的服务
             var embeddingService =
@@ -499,7 +499,7 @@ public class AiGateWayManager : DomainService
         var response = httpContext.Response;
         // 设置响应头，声明是 json
         //response.ContentType = "application/json; charset=UTF-8";
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Messages, request.Model);
+        var modelDescribe = await GetModelAsync(ModelApiType.Messages, request.Model);
 
         var sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
@@ -568,7 +568,7 @@ public class AiGateWayManager : DomainService
         // 注意：SSE响应头推迟到第一条消息成功获取后再设置
 
         _specialCompatible.AnthropicCompatible(request);
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Messages, request.Model);
+        var modelDescribe = await GetModelAsync(ModelApiType.Messages, request.Model);
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IAnthropicChatCompletionService>(modelDescribe.HandlerName);
 
@@ -680,7 +680,7 @@ public class AiGateWayManager : DomainService
         var response = httpContext.Response;
         // 设置响应头，声明是 json
         //response.ContentType = "application/json; charset=UTF-8";
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Responses, request.Model);
+        var modelDescribe = await GetModelAsync(ModelApiType.Responses, request.Model);
 
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IOpenAiResponseService>(modelDescribe.HandlerName);
@@ -748,7 +748,7 @@ public class AiGateWayManager : DomainService
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.Responses, request.Model);
+        var modelDescribe = await GetModelAsync(ModelApiType.Responses, request.Model);
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IOpenAiResponseService>(modelDescribe.HandlerName);
         var sourceModelId = request.Model;
@@ -830,7 +830,7 @@ public class AiGateWayManager : DomainService
         CancellationToken cancellationToken = default)
     {
         var response = httpContext.Response;
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.GenerateContent, modelId);
+        var modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
 
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
@@ -838,7 +838,7 @@ public class AiGateWayManager : DomainService
 
         var tokenUsage = GeminiGenerateContentAcquirer.GetUsage(data);
         //如果是图片模型，单独扣费
-        if (modelDescribe.ModelType == ModelTypeEnum.Image)
+        if (modelDescribe.ModelType == ModelType.Image)
         {
             tokenUsage = new ThorUsageResponse
             {
@@ -903,7 +903,7 @@ public class AiGateWayManager : DomainService
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.GenerateContent, modelId);
+        var modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
 
@@ -917,7 +917,7 @@ public class AiGateWayManager : DomainService
                 {
                     tokenUsage = GeminiGenerateContentAcquirer.GetUsage(responseResult!.Value);
                     //如果是图片模型，单独扣费
-                    if (modelDescribe.ModelType == ModelTypeEnum.Image)
+                    if (modelDescribe.ModelType == ModelType.Image)
                     {
                         tokenUsage = new ThorUsageResponse
                         {
@@ -986,7 +986,7 @@ public class AiGateWayManager : DomainService
         CancellationToken cancellationToken = default)
     {
         var imageStoreTask = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == taskId);
-        var modelDescribe = await GetModelAsync(ModelApiTypeEnum.GenerateContent, modelId);
+        var modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
 
         var chatService =
             LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
@@ -1044,7 +1044,7 @@ public class AiGateWayManager : DomainService
     /// </summary>
     public async Task UnifiedStreamForStatisticsAsync(
         HttpContext httpContext,
-        ModelApiTypeEnum apiType,
+        ModelApiType apiType,
         JsonElement requestBody,
         string modelId,
         Guid? userId = null,
@@ -1096,16 +1096,16 @@ public class AiGateWayManager : DomainService
 
         switch (apiType)
         {
-            case ModelApiTypeEnum.Completions:
+            case ModelApiType.Completions:
                 processResult = await ProcessCompletionsStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
                 break;
-            case ModelApiTypeEnum.Messages:
+            case ModelApiType.Messages:
                 processResult = await ProcessAnthropicStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
                 break;
-            case ModelApiTypeEnum.Responses:
+            case ModelApiType.Responses:
                 processResult = await ProcessOpenAiResponsesStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
                 break;
-            case ModelApiTypeEnum.GenerateContent:
+            case ModelApiType.GenerateContent:
                 processResult = await ProcessGeminiStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
                 break;
             default:
@@ -1477,7 +1477,7 @@ public class AiGateWayManager : DomainService
                 {
                     tokenUsage = GeminiGenerateContentAcquirer.GetUsage(responseResult!.Value);
                     // 如果是图片模型，单独扣费
-                    if (modelDescribe.ModelType == ModelTypeEnum.Image)
+                    if (modelDescribe.ModelType == ModelType.Image)
                     {
                         tokenUsage = new ThorUsageResponse
                         {

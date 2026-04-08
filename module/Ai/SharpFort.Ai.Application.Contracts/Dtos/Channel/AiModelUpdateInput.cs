@@ -63,13 +63,13 @@ public class AiModelUpdateInput
     /// 模型类型
     /// </summary>
     [Required(ErrorMessage = "模型类型不能为空")]
-    public ModelTypeEnum ModelType { get; set; }
+    public ModelType ModelType { get; set; }
 
     /// <summary>
     /// 模型API类型
     /// </summary>
     [Required(ErrorMessage = "模型API类型不能为空")]
-    public ModelApiTypeEnum ModelApiType { get; set; }
+    public ModelApiType ModelApiType { get; set; }
 
     /// <summary>
     /// 模型倍率

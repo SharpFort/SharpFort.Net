@@ -64,7 +64,7 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
             };
         }
 
-        this.MessageType = sessionId is null ? MessageTypeEnum.Api : MessageTypeEnum.Web;
+        this.MessageType = sessionId is null ? MessageType.Api : MessageType.Web;
     }
 
     public Guid? UserId { get; set; }
@@ -85,7 +85,7 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
     [SugarColumn(IsOwnsOne = true)] 
     public TokenUsageValueObject TokenUsage { get; set; } = new TokenUsageValueObject();
 
-    public MessageTypeEnum MessageType { get; set; }
+    public MessageType MessageType { get; set; }
 
     /// <summary>
     /// 是否隐藏

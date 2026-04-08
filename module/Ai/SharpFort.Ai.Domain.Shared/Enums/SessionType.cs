@@ -3,7 +3,7 @@ namespace SharpFort.Ai.Domain.Shared.Enums;
 /// <summary>
 /// 会话类型枚举
 /// </summary>
-public enum SessionTypeEnum
+public enum SessionType
 {
     /// <summary>
     /// 普通聊天

@@ -50,12 +50,12 @@ public class AiModelDto
     /// <summary>
     /// 模型类型
     /// </summary>
-    public ModelTypeEnum ModelType { get; set; }
+    public ModelType ModelType { get; set; }
 
     /// <summary>
     /// 模型API类型
     /// </summary>
-    public ModelApiTypeEnum ModelApiType { get; set; }
+    public ModelApiType ModelApiType { get; set; }
 
     /// <summary>
     /// 模型倍率

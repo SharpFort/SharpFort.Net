@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace SharpFort.Ai.Domain.Shared.Enums;
 
-public enum ModelApiTypeEnum
+public enum ModelApiType
 {
     [Description("OpenAi Completions")]
     Completions,

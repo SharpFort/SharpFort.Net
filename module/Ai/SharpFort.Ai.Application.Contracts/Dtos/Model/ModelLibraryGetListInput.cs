@@ -21,10 +21,10 @@ public class ModelLibraryGetListInput : PagedAllResultRequestDto
     /// <summary>
     /// 模型类型筛选
     /// </summary>
-    public List<ModelTypeEnum>? ModelTypes { get; set; }
+    public List<ModelType>? ModelTypes { get; set; }
 
     /// <summary>
     /// API类型筛选
     /// </summary>
-    public List<ModelApiTypeEnum>? ModelApiTypes { get; set; }
+    public List<ModelApiType>? ModelApiTypes { get; set; }
 }

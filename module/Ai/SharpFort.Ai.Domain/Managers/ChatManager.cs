@@ -85,7 +85,7 @@ public class ChatManager : DomainService
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var modelDescribe = await _aiGateWayManager.GetModelAsync(ModelApiTypeEnum.Completions, modelId);
+        var modelDescribe = await _aiGateWayManager.GetModelAsync(ModelApiType.Completions, modelId);
 
         //token状态检查，在应用层统一处理
         var client = new OpenAIClient(new ApiKeyCredential(token),

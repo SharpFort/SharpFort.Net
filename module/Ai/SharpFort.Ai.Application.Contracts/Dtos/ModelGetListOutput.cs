@@ -39,7 +39,7 @@ public class ModelGetListOutput
     /// <summary>
     /// 模型Api类型，现支持同一个模型id，多种接口格式
     /// </summary>
-    public ModelApiTypeEnum ModelApiType { get; set; }
+    public ModelApiType ModelApiType { get; set; }
     
     /// <summary>
     /// 模型图标URL

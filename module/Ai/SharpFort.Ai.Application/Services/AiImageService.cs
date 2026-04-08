@@ -83,7 +83,7 @@ public class AiImageService : ApplicationService
             Prompt = input.Prompt,
             ReferenceImagesPrefixBase64 = input.ReferenceImagesPrefixBase64 ?? new List<string>(),
             ReferenceImagesUrl = new List<string>(),
-            TaskStatus = TaskStatusEnum.Processing,
+            TaskStatus = TaskStatus.Processing,
             UserId = userId,
             UserName = CurrentUser.UserName,
             TokenId = input.TokenId,
@@ -272,8 +272,8 @@ public class AiImageService : ApplicationService
     {
         RefAsync<int> total = 0;
         var output = await _imageTaskRepository._DbQueryable
-            .Where(x => x.PublishStatus == PublishStatusEnum.Published)
-            .Where(x => x.TaskStatus == TaskStatusEnum.Success)
+            .Where(x => x.PublishStatus == PublishStatus.Published)
+            .Where(x => x.TaskStatus == TaskStatus.Success)
             .WhereIF(input.TaskStatus is not null, x => x.TaskStatus == input.TaskStatus)
             .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
             .WhereIF(!string.IsNullOrWhiteSpace(input.Categories),
@@ -326,12 +326,12 @@ public class AiImageService : ApplicationService
             throw new UserFriendlyException("任务不存在或无权访问");
         }
 
-        if (task.TaskStatus != TaskStatusEnum.Success)
+        if (task.TaskStatus != TaskStatus.Success)
         {
             throw new UserFriendlyException("只有已完成的任务才能发布");
         }
 
-        if (task.PublishStatus == PublishStatusEnum.Published)
+        if (task.PublishStatus == PublishStatus.Published)
         {
             throw new UserFriendlyException("该任务已发布");
         }
@@ -351,8 +351,8 @@ public class AiImageService : ApplicationService
     {
         var output = await _aiModelRepository._DbQueryable
             .Where(x=>x.IsEnabled==true)
-            .Where(x => x.ModelType == ModelTypeEnum.Image)
-            .Where(x => x.ModelApiType == ModelApiTypeEnum.GenerateContent)
+            .Where(x => x.ModelType == ModelType.Image)
+            .Where(x => x.ModelApiType == ModelApiType.GenerateContent)
             .OrderByDescending(x => x.OrderNum)
             .Select(x => new ModelGetListOutput
             {

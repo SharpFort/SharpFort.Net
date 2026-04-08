@@ -11,5 +11,5 @@ public class ChatMessageDto : FullAuditedEntityDto<Guid>
     public string Role { get; set; }
     public string ModelId { get; set; }
     public string Remark { get; set; }
-    public MessageTypeEnum MessageType { get; set; }
+    public MessageType MessageType { get; set; }
 }

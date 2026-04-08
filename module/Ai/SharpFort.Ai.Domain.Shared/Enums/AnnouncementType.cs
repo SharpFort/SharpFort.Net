@@ -1,17 +1,16 @@
 namespace SharpFort.Ai.Domain.Shared.Enums;
 
 /// <summary>
-/// 排行榜类型枚举
+/// 公告类型枚举
 /// </summary>
-public enum RankingTypeEnum
+public enum AnnouncementType
 {
     /// <summary>
-    /// 模型
+    /// 活动公告
     /// </summary>
-    Model = 0,
-
+    Activity=1,
     /// <summary>
-    /// 工具
+    /// 系统公告
     /// </summary>
-    Tool = 1
+    System=2
 }

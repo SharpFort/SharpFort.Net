@@ -26,7 +26,7 @@ public class ModelLibraryDto
     /// <summary>
     /// 模型类型
     /// </summary>
-    public ModelTypeEnum ModelType { get; set; }
+    public ModelType ModelType { get; set; }
 
     /// <summary>
     /// 模型类型名称
@@ -65,7 +65,7 @@ public class ModelApiTypeOutput
     /// <summary>
     /// 模型类型
     /// </summary>
-    public ModelApiTypeEnum ModelApiType { get; set; }
+    public ModelApiType ModelApiType { get; set; }
 
     /// <summary>
     /// 模型类型名称

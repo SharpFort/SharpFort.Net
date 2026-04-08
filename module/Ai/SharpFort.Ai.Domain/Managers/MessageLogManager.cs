@@ -17,7 +17,7 @@ public class MessageLogManager : DomainService
     /// <summary>
     /// 创建消息日志
     /// </summary>
-    public async Task CreateAsync(string requestBody, string apiKey, string apiKeyName, string modelId, ModelApiTypeEnum apiType)
+    public async Task CreateAsync(string requestBody, string apiKey, string apiKeyName, string modelId, ModelApiType apiType)
     {
         var entity = new MessageLogAggregateRoot
         {

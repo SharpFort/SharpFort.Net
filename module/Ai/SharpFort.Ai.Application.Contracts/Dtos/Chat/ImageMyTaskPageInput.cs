@@ -17,10 +17,10 @@ public class ImageMyTaskPageInput: PagedAllResultRequestDto
     /// <summary>
     /// 任务状态筛选（可选）
     /// </summary>
-    public TaskStatusEnum? TaskStatus { get; set; }
+    public TaskStatus? TaskStatus { get; set; }
     
     /// <summary>
     /// 发布状态
     /// </summary>
-    public PublishStatusEnum? PublishStatus { get; set; }
+    public PublishStatus? PublishStatus { get; set; }
 }

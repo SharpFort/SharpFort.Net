@@ -13,7 +13,7 @@ namespace SharpFort.Core.Enums
     /// 定义API接口统一的返回状态码
     /// 遵循HTTP状态码规范
     /// </remarks>
-    public enum ResultCodeEnum
+    public enum ResultCode
     {
         /// <summary>
         /// 操作成功

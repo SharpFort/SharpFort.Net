@@ -85,7 +85,7 @@ public class OpenApiService : ApplicationService
         // 记录请求日志
         if (tokenValidation.IsEnableLog)
         {
-            FireAndForgetMessageLog(JsonSerializer.Serialize(input), tokenValidation.Token, tokenValidation.TokenName, input.Model, ModelApiTypeEnum.Completions);
+            FireAndForgetMessageLog(JsonSerializer.Serialize(input), tokenValidation.Token, tokenValidation.TokenName, input.Model, ModelApiType.Completions);
         }
     }
 
@@ -134,7 +134,7 @@ public class OpenApiService : ApplicationService
     public async Task<ModelsListDto> ModelsAsync()
     {
         var data = await _aiModelRepository._DbQueryable
-            .Where(x => x.ModelType == ModelTypeEnum.Chat)
+            .Where(x => x.ModelType == ModelType.Chat)
             .OrderByDescending(x => x.OrderNum)
             .Select(x => new ModelsDataDto
             {
@@ -188,7 +188,7 @@ public class OpenApiService : ApplicationService
         // 记录请求日志
         if (tokenValidation.IsEnableLog)
         {
-            FireAndForgetMessageLog(JsonSerializer.Serialize(input), tokenValidation.Token, tokenValidation.TokenName, input.Model, ModelApiTypeEnum.Messages);
+            FireAndForgetMessageLog(JsonSerializer.Serialize(input), tokenValidation.Token, tokenValidation.TokenName, input.Model, ModelApiType.Messages);
         }
     }
 
@@ -228,7 +228,7 @@ public class OpenApiService : ApplicationService
         // 记录请求日志
         if (tokenValidation.IsEnableLog)
         {
-            FireAndForgetMessageLog(JsonSerializer.Serialize(input), tokenValidation.Token, tokenValidation.TokenName, input.Model, ModelApiTypeEnum.Responses);
+            FireAndForgetMessageLog(JsonSerializer.Serialize(input), tokenValidation.Token, tokenValidation.TokenName, input.Model, ModelApiType.Responses);
         }
     }
 
@@ -276,7 +276,7 @@ public class OpenApiService : ApplicationService
         // 记录请求日志
         if (tokenValidation.IsEnableLog)
         {
-            FireAndForgetMessageLog(input.GetRawText(), tokenValidation.Token, tokenValidation.TokenName, modelId, ModelApiTypeEnum.GenerateContent);
+            FireAndForgetMessageLog(input.GetRawText(), tokenValidation.Token, tokenValidation.TokenName, modelId, ModelApiType.GenerateContent);
         }
     }
 
@@ -317,7 +317,7 @@ public class OpenApiService : ApplicationService
         }
     }
 
-    private void FireAndForgetMessageLog(string requestBody, string apiKey, string apiKeyName, string modelId, ModelApiTypeEnum apiType)
+    private void FireAndForgetMessageLog(string requestBody, string apiKey, string apiKeyName, string modelId, ModelApiType apiType)
     {
         _ = Task.Run(async () =>
         {

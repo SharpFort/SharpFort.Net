@@ -22,5 +22,5 @@ public interface IAiChatService : IApplicationService
     /// <param name="input">原始请求体JsonElement</param>
     /// <param name="modelId">模型ID</param>
     /// <param name="sessionId">会话ID</param>
-    Task UnifiedSendAsync(ModelApiTypeEnum apiType, JsonElement input, string modelId, Guid? sessionId);
+    Task UnifiedSendAsync(ModelApiType apiType, JsonElement input, string modelId, Guid? sessionId);
 }

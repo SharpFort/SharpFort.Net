@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace SharpFort.Ai.Domain.Shared.Enums;
 
-public enum TradeStatusEnum
+public enum TradeStatus
 {
     /// <summary>
     /// 准备发起

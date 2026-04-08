@@ -69,5 +69,5 @@ public class AiModelDescribe
     /// <summary>
     /// 模型类型(聊天/图片等)
     /// </summary>
-    public ModelTypeEnum ModelType { get; set; }
+    public ModelType ModelType { get; set; }
 }

@@ -13,7 +13,7 @@ namespace SharpFort.Core.Enums
     /// 用于定义数据查询时的排序方向
     /// 常用于列表数据排序
     /// </remarks>
-    public enum OrderByEnum
+    public enum OrderBy
     {
         /// <summary>
         /// 升序排列

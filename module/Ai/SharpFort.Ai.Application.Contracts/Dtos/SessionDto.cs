@@ -12,5 +12,5 @@ public class SessionDto : FullAuditedEntityDto<Guid>
     /// <summary>
     /// 会话类型
     /// </summary>
-    public SessionTypeEnum SessionType { get; set; }
+    public SessionType SessionType { get; set; }
 }

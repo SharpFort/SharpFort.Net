@@ -1,0 +1,17 @@
+namespace SharpFort.Ai.Domain.Shared.Enums;
+
+/// <summary>
+/// 发布状态枚举
+/// </summary>
+public enum PublishStatus
+{
+    /// <summary>
+    /// 未发布
+    /// </summary>
+    Unpublished = 0,
+
+    /// <summary>
+    /// 已发布
+    /// </summary>
+    Published = 1
+}

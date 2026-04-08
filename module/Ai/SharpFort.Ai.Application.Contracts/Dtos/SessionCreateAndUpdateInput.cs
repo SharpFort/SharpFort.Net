@@ -11,5 +11,5 @@ public class SessionCreateAndUpdateInput
     /// <summary>
     /// 会话类型
     /// </summary>
-    public SessionTypeEnum SessionType { get; set; } = SessionTypeEnum.Chat;
+    public SessionType SessionType { get; set; } = SessionType.Chat;
 }

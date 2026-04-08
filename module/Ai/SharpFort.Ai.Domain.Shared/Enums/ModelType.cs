@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace SharpFort.Ai.Domain.Shared.Enums;
 
-public enum ModelTypeEnum
+public enum ModelType
 {
     [Description("聊天")]
     Chat = 0,
