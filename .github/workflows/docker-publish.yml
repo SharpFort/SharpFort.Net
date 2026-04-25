@@ -2,9 +2,11 @@ name: Build and Publish Docker Image
 
 # 触发条件：当你推送以 'v' 开头的 Tag 时触发 (例如: v1.0.0)
 on:
+  workflow_dispatch:
   push:
     tags:
-      - 'v0.9'
+      - 'v*'
+
 
 env:
   REGISTRY: ghcr.io
