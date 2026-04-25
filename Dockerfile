@@ -25,7 +25,7 @@ WORKDIR /src
 
 # 拷贝全局配置文件 (利用层缓存优化)
 COPY ["Sf.Abp.sln", "./"]
-COPY["common.props", "./"]
+COPY ["common.props", "./"]
 COPY ["usings.props", "./"]
 COPY ["version.props", "./"]
 
