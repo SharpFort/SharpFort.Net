@@ -20,6 +20,7 @@ ENV ASPNETCORE_HTTP_PORTS=19001
 # 2. 编译构建阶段 (Build)
 # ==========================================
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+RUN apt-get update && apt-get install -y fontconfig libfontconfig1 && rm -rf /var/lib/apt/lists/*
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 

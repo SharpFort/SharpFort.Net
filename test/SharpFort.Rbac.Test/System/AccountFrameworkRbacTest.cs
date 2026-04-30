@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Http;
 using Shouldly;
 using Volo.Abp.Domain.Repositories;
 using Xunit;
-using SharpFort.Rbac.Application.Contracts.Dtos.Account;
-using SharpFort.Rbac.Application.Contracts.Dtos.User;
-using SharpFort.Rbac.Application.Contracts.IServices;
-using SharpFort.Rbac.Application.Services.System;
-using SharpFort.Rbac.Domain.Entities;
-using SharpFort.Rbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.Account;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.User;
+using SharpFort.CasbinRbac.Application.Contracts.IServices;
+using SharpFort.CasbinRbac.Application.Services.System;
+using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.Rbac.Test;
 using SharpFort.SqlSugarCore.Abstractions;
 
@@ -33,7 +33,7 @@ namespace SharpFort.Rbac.Test.System
         /// 注册
         /// </summary>
         [Fact]
-        public async Task Register_Test()
+        public async Task RegisterTest()
         {
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "RegisterTest", Password = "123456", Phone = 15945645645 });
             var user = await _userRepository._DbQueryable.Where(user => user.UserName == "RegisterTest").FirstAsync();
@@ -46,7 +46,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Register_UserNameRepeat_Error_Test()
+        public async Task RegisterUserNameRepeatErrorTest()
         {
             try
             {
@@ -64,7 +64,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Register_PhoneRepeat_Error_Test()
+        public async Task RegisterPhoneRepeatErrorTest()
         {
             try
             {
@@ -83,13 +83,13 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Login_Test()
+        public async Task LoginTest()
         {
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "LoginTest", Password = "123456", Phone = 13845645645 });
             var result = await _accountService.PostLoginAsync(new LoginInputVo { UserName = "LoginTest", Password = "123456" });
 
-            result.GetType().GetProperty("Token").GetValue(result, null).ToString().ShouldNotBeNull();
-            result.GetType().GetProperty("RefreshToken").GetValue(result, null).ToString().ShouldNotBeNull();
+            result.GetType().GetProperty("Token")!.GetValue(result, null)!.ToString().ShouldNotBeNull();
+            result.GetType().GetProperty("RefreshToken")!.GetValue(result, null)!.ToString().ShouldNotBeNull();
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Reset_Passworld_Test()
+        public async Task ResetPasswordTest()
         {
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "ResetPassworldTest", Password = "123456", Phone = 15945645555 });
             var user = await _userRepository._DbQueryable.Where(user => user.UserName == "ResetPassworldTest").FirstAsync();

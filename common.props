@@ -3,6 +3,7 @@
 	<Import Project="version.props" />
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
+		<RollForward>LatestMinor</RollForward>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Authors>SharpFort Team</Authors>
@@ -31,10 +32,5 @@
 
   <ItemGroup>
     <Content Remove="$(UserProfile)\.nuget\packages\*\*\contentFiles\any\*\*.abppkg*.json" />
-  </ItemGroup>
-	
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
-	
+  </ItemGroup>	
 </Project>

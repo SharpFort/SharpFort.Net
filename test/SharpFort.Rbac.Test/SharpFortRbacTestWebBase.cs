@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,15 +12,15 @@ using NSubstitute.Extensions;
 
 namespace SharpFort.Rbac.Test
 {
-    public class SharpFortRbacTestWebBase : SharpFortRbacTestBase
+    public class SharpFortRbacTestWebBase : SharpFortCasbinRbacTestBase
     {
         public HttpContext HttpContext { get; private set; }
         public SharpFortRbacTestWebBase() : base()
         {
-            HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext;
+            HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext!;
             ConfigureHttpContext(httpContext);
             HttpContext = httpContext;
-            IApplicationBuilder app = new ApplicationBuilder(ServiceProvider);
+            var app = new ApplicationBuilder(ServiceProvider);
             RequestDelegate httpDelegate = app.Build();
             httpDelegate.Invoke(httpContext);
         }
@@ -37,7 +37,7 @@ namespace SharpFort.Rbac.Test
         }
     }
 }
-internal class DefaultHttpContextAccessor : IHttpContextAccessor
+internal sealed class DefaultHttpContextAccessor : IHttpContextAccessor
 {
     internal static HttpContext? CurrentHttpContext { get; set; } = new DefaultHttpContext();
     public HttpContext? HttpContext { get => CurrentHttpContext; set => throw new NotImplementedException(); }

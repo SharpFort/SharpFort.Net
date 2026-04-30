@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Auditing;
 using Volo.Abp.Autofac;
 using Volo.Abp.BackgroundWorkers;
@@ -32,7 +32,7 @@ namespace SharpFort.Rbac.Test
             });
             Configure<DbConnOptions>(options =>
             {
-                options.Url = $"DataSource=yi-rbac-test-{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.db";
+                options.Url = $"DataSource=yi-rbac-test-{DateTime.Now.ToString("yyyyMMdd_HHmmss", global::System.Globalization.CultureInfo.InvariantCulture)}.db";
             });
         }
 
@@ -45,8 +45,8 @@ namespace SharpFort.Rbac.Test
             var roleRep = services.GetRequiredService<ISqlSugarRepository<Role>>();
             var menuRep = services.GetRequiredService<ISqlSugarRepository<Menu>>();
             var defaultRoleEntity = await roleRep._DbQueryable.Where(x => x.RoleCode == UserConst.DefaultRoleCode).FirstAsync();
-            var menuIds = await menuRep._DbQueryable.Where(x => x.PermissionCode.Contains("user")).Select(x => x.Id).ToListAsync();
-            await roleManager.GiveRoleSetMenuAsync(new List<Guid> { defaultRoleEntity.Id }, menuIds);
+            var menuIds = await menuRep._DbQueryable.Where(x => x.PermissionCode!.Contains("user")).Select(x => x.Id).ToListAsync();
+            await roleManager.GiveRoleSetMenuAsync(new List<Guid> { defaultRoleEntity!.Id }, menuIds);
             #endregion
         }
 

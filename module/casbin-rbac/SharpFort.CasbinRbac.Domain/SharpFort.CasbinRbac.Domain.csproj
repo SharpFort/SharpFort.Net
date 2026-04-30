@@ -14,8 +14,8 @@
 
     <PackageReference Include="Volo.Abp.AspNetCore.SignalR" Version="10.2.0" />
 
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.2.0" />
-	  <PackageReference Include="Volo.Abp.Caching" Version="10.2.0" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.3.0" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="10.3.0" />
     <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="10.2.0" />
     <PackageReference Include="Casbin.NET.Adapter.SqlSugar" Version="1.0.3" />
     <PackageReference Include="Casbin.NET.Watcher.Redis" Version="2.0.0" />

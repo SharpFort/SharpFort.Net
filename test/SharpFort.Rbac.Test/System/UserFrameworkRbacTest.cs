@@ -1,19 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using TencentCloud.Ame.V20190916.Models;
 using TencentCloud.Tiw.V20190919.Models;
 using Volo.Abp.Domain.Repositories;
 using Xunit;
-using SharpFort.Rbac.Application.Contracts.Dtos.User;
-using SharpFort.Rbac.Application.Contracts.IServices;
-using SharpFort.Rbac.Domain.Entities;
-using SharpFort.Rbac.Domain.Shared.Consts;
-using SharpFort.Rbac.Domain.Shared.Enums;
+using SharpFort.CasbinRbac.Application.Contracts.Dtos.User;
+using SharpFort.CasbinRbac.Application.Contracts.IServices;
+using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.Domain.Shared.Enums;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Rbac.Test.System
 {
-    public class UserFrameworkRbacTest : SharpFortRbacTestBase
+    public class UserFrameworkRbacTest : SharpFortCasbinRbacTestBase
     {
         private IUserService _userService;
         private ISqlSugarRepository<User> _repository;
@@ -28,7 +28,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Get_User_Test()
+        public async Task GetUserTest()
         {
             var user = await _userService.GetListAsync(new UserGetListInputVo { UserName = UserConst.Admin });
             user.ShouldNotBeNull();
@@ -40,7 +40,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Create_User_Test()
+        public async Task CreateUserTest()
         {
             await _userService.CreateAsync(new UserCreateInputVo { UserName = "CreateUserTest", Password = "654321" });
             var user = await _userService.GetListAsync(new UserGetListInputVo { UserName = "CreateUserTest" });
@@ -52,7 +52,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Update_User_Test()
+        public async Task UpdateUserTest()
         {
             var createdUser = await _userService.CreateAsync(new UserCreateInputVo { Nick = "nickTest", Gender = Gender.Female, UserName = "UpdateUserTest", Password = "654321" });
             await _userService.UpdateAsync(createdUser.Id, new UserUpdateInputVo { Nick = "nickTest2", Gender = Gender.Female, UserName = "UpdateUserTest", Password = "123456888abc" });
@@ -69,7 +69,7 @@ namespace SharpFort.Rbac.Test.System
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Delete_User_Test()
+        public async Task DeleteUserTest()
         {
             var createdUser = await _userService.CreateAsync(new UserCreateInputVo { UserName = "DeleteUserTest", Password = "123456" });
 

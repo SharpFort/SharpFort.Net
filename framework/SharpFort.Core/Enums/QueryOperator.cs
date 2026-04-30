@@ -13,7 +13,7 @@ namespace SharpFort.Core.Enums
     /// 定义查询条件中支持的操作符类型
     /// 用于构建动态查询条件
     /// </remarks>
-    public enum QueryOperatorEnum
+    public enum QueryOperator
     {
         /// <summary>
         /// 等于

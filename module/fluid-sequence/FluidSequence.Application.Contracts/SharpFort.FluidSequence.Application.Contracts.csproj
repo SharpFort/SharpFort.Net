@@ -6,7 +6,7 @@
     <ProjectReference Include="..\FluidSequence.Domain.Shared\SharpFort.FluidSequence.Domain.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="10.2.0" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="10.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dtos\" />
