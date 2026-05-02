@@ -1,13 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Role
+namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Role;
+
+public class RoleAuthUserCreateOrDeleteInput
 {
-    public class RoleAuthUserCreateOrDeleteInput
-    {
-        [Required]
-        public Guid RoleId { get; set; }
+    [Required]
+    public Guid RoleId { get; set; }
 
-        [Required]
-        public List<Guid> UserIds { get; set; }
-    }
+    [Required]
+    public required List<Guid> UserIds { get; set; }
 }

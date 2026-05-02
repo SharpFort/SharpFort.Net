@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using SqlSugar;
 using Volo.Abp.Domain.Services;
@@ -45,7 +45,7 @@ namespace SharpFort.CodeGen.Domain.Managers
             return Task.FromResult(tables);
         }
 
-        private Table EntityTypeMapperToTable(Type entityType)
+        private static Table EntityTypeMapperToTable(Type entityType)
         {
             var table = new Table();
             table.Fields = new List<Field>();
@@ -62,7 +62,7 @@ namespace SharpFort.CodeGen.Domain.Managers
         }
 
 
-        private Field PropertyMapperToFiled(PropertyInfo propertyInfo)
+        private static Field PropertyMapperToFiled(PropertyInfo propertyInfo)
         {
             var fieldEntity = new Field();
             fieldEntity.Name = propertyInfo.Name;
@@ -90,7 +90,7 @@ namespace SharpFort.CodeGen.Domain.Managers
             }
             else
             {
-                fieldEntity.FieldType = (FieldType)Enum.Parse(typeof(FieldType), enumName);
+                fieldEntity.FieldType = Enum.Parse<FieldType>(enumName);
             }
 
             //判断是否可空

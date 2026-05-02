@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using Volo.Abp.Application.Dtos;
 using SharpFort.CodeGen.Application.Contracts.Dtos.Template;
@@ -20,7 +20,7 @@ public class TemplateService : SfCrudAppService<Template, TemplateDto, Guid, Tem
     public async override Task<PagedResultDto<TemplateDto>> GetListAsync([FromQuery] TemplateGetListInput input)
     {
         RefAsync<int> total = 0;
-        var entities = await _repository._DbQueryable.WhereIF(input.Name is not null, x => x.Name.Equals(input.Name!))
+        var entities = await _repository._DbQueryable.WhereIF(input.Name is not null, x => x.Name == input.Name)
                   .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
         return new PagedResultDto<TemplateDto>

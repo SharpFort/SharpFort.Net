@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -96,12 +96,14 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
             var authenticateResult = await HttpContext.AuthenticateAsync(scheme);
             if (!authenticateResult.Succeeded)
             {
-                throw new UserFriendlyException(authenticateResult.Failure.Message);
+                throw new UserFriendlyException(authenticateResult.Failure?.Message ?? "OAuth 认证失败");
             }
 
-            var openidClaim = authenticateResult.Principal.Claims.Where(x => x.Type == "urn:openid").FirstOrDefault();
-            var nameClaim = authenticateResult.Principal.Claims.Where(x => x.Type == "urn:name").FirstOrDefault();
-            return (openidClaim.Value, nameClaim.Value);
+            // authenticateResult.Succeeded 为 true 时，Principal 非 null
+            var openidClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:openid");
+            var nameClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:name");
+            if (openidClaim is null) throw new UserFriendlyException("未能获取第三方 OpenId");
+            return (openidClaim.Value, nameClaim?.Value ?? string.Empty);
         }
 
 

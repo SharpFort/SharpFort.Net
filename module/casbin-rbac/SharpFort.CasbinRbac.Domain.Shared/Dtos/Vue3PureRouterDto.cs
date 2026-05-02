@@ -5,18 +5,20 @@ public class Vue3PureRouterDto
     public Guid Id { get; set; }
     public int OrderNum { get; set; }
     public Guid ParentId { get; set; }
-    public string Path { get; set; }
-    public string Name { get; set; }
+    public required string Path { get; set; }
+    public required string Name { get; set; }
     public MetaPureRouterDto Meta { get; set; } = new MetaPureRouterDto();
-    
+
     public string? component { get; set; }
     public List<Vue3PureRouterDto>? Children { get; set; }
 }
 
 public class MetaPureRouterDto
 {
-    public string Icon { get; set; }
-    public string Title { get; set; }
+    /// <summary>菜单图标，由路由构建框架赋值</summary>
+    public string Icon { get; set; } = string.Empty;
+    /// <summary>菜单标题，由路由构建框架赋值</summary>
+    public string Title { get; set; } = string.Empty;
 
     public List<string>? Roles { get; set; }
 
@@ -29,4 +31,4 @@ public class MetaPureRouterDto
     public bool? KeepAlive { get; set; }
 
     public bool? showLink { get; set; }
-}
+}

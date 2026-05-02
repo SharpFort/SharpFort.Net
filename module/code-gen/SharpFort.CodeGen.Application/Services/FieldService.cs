@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -29,8 +29,8 @@ namespace SharpFort.CodeGen.Application.Services
         public async override Task<PagedResultDto<FieldDto>> GetListAsync([FromQuery] FieldGetListInput input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable.WhereIF(input.TableId is not null, x => x.TableId.Equals(input.TableId!))
-                      .WhereIF(input.Name is not null, x => x.Name!.Contains(input.Name!))
+            var entities = await _repository._DbQueryable.WhereIF(input.TableId is not null, x => x.TableId == input.TableId)
+                      .WhereIF(input.Name is not null, x => x.Name.Contains(input.Name!))
 
                       .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
@@ -46,9 +46,11 @@ namespace SharpFort.CodeGen.Application.Services
         /// </summary>
         /// <returns></returns>
         [Route("field/type")]
+#pragma warning disable CA1822 // ABP requires instance methods for AutoAPI
         public object GetFieldType()
         {
-            return typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Select(x => new { lable = x.Name, value = (int)Enum.Parse(typeof(FieldType), x.Name) }).ToList();
+            return typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Select(x => new { lable = x.Name, value = (int)Enum.Parse<FieldType>(x.Name) }).ToList();
         }
+#pragma warning restore CA1822
     }
 }

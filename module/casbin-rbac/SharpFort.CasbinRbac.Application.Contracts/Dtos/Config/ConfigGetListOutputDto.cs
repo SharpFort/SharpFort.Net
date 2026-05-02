@@ -4,7 +4,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Config
 {
     public class ConfigGetListOutputDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
+        public new Guid Id { get; set; }
         /// <summary>
         /// Config Name
         /// </summary>

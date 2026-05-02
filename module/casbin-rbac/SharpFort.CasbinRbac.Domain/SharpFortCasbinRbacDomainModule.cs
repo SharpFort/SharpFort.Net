@@ -49,10 +49,10 @@ namespace SharpFort.CasbinRbac.Domain
             {
                 context.Services.AddSingleton<IDistributedLockProvider>(sp =>
                 {
-                    var connection = ConnectionMultiplexer
-                        .Connect(configuration["Redis:Configuration"]);
-                    return new 
-                        RedisDistributedSynchronizationProvider(connection.GetDatabase());
+                    var redisConfig = configuration["Redis:Configuration"]
+                        ?? throw new InvalidOperationException("Redis:Configuration \u914d\u7f6e\u4e0d\u80fd\u4e3a\u7a7a\u3002\u8bf7\u5728 appsettings.json \u4e2d\u914d\u7f6e Redis \u8fde\u63a5\u5b57\u7b26\u4e32\u3002");
+                    var connection = ConnectionMultiplexer.Connect(redisConfig);
+                    return new RedisDistributedSynchronizationProvider(connection.GetDatabase());
                 });
             }
 

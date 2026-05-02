@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mapster;
-using Volo.Abp.Guids; // 引用 Guid 生成器命名空间
+using Volo.Abp.Guids;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
@@ -19,32 +14,33 @@ namespace SharpFort.CasbinRbac.Domain.EventHandlers
     {
         private readonly ILogger<LoginEventHandler> _logger;
         private readonly IRepository<LoginLog> _loginLogRepository;
-        private readonly IGuidGenerator _guidGenerator; // 1. 注入 Guid 生成器
+        private readonly IGuidGenerator _guidGenerator;
+
         public LoginEventHandler(
-            ILogger<LoginEventHandler> logger, 
+            ILogger<LoginEventHandler> logger,
             IRepository<LoginLog> loginLogRepository,
-             IGuidGenerator guidGenerator) { _logger = logger; _loginLogRepository = loginLogRepository; }
+            IGuidGenerator guidGenerator)
+        {
+            _logger = logger;
+            _loginLogRepository = loginLogRepository;
+            _guidGenerator = guidGenerator; // 修复 Bug: 之前构造函数未赋值，导致 _guidGenerator 永远是 null
+        }
+
         public async Task HandleEventAsync(LoginEventArgs eventData)
         {
-            _logger.LogInformation($"用户【{eventData.UserId}:{eventData.UserName}】登入系统");
-            //var loginLogEntity = eventData.Adapt<LoginLog>();
-            //loginLogEntity.LogMsg = eventData.UserName + "登录系统";
-            //loginLogEntity.LoginUser = eventData.UserName;
-            // 2. 使用构造函数创建实体
-            // 不再使用 eventData.Adapt<LoginLog>(); 
-            // 显式创建更清晰，且解决了 protected set 的问题
+            _logger.LogInformation("用户【{UserId}:{UserName}】登入系统", eventData.UserId, eventData.UserName);
+
             var loginLogEntity = new LoginLog(
                 id: _guidGenerator.Create(),
                 loginUser: eventData.UserName,
                 logMsg: eventData.UserName + "登录系统",
-                loginIp: eventData.LoginIp, // <--- 传入 IP
-                loginLocation: eventData.LoginLocation, // 传入登录地点
-                browser: eventData.Browser, // 如果 Event 里有就传，没有就传 null
-                os: eventData.Os,           // 同上
+                loginIp: eventData.LoginIp ?? string.Empty, // CS8604: LoginIp 可能为 null，使用空字符串替代
+                loginLocation: eventData.LoginLocation,
+                browser: eventData.Browser,
+                os: eventData.Os,
                 creatorId: eventData.UserId
             );
             loginLogEntity.CreatorId = eventData.UserId;
-            //异步插入
             await _loginLogRepository.InsertAsync(loginLogEntity);
         }
     }

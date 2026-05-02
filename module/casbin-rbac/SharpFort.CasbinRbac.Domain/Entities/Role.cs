@@ -65,14 +65,14 @@ public class Role : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMultiTen
     /// 角色名称
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string RoleName { get; protected set; }
+    public string RoleName { get; protected set; } = null!;
 
     /// <summary>
     /// 角色编码
     /// 核心业务标识，建议仅允许创建时设置，或通过特定更名方法修改
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string RoleCode { get; protected set; }
+    public string RoleCode { get; protected set; } = null!;
 
     /// <summary>
     /// 备注

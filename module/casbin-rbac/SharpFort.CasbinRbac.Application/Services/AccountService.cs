@@ -391,7 +391,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             var user = await _userRepository._DbQueryable
                 .WhereIF(userName is not null, x => x.UserName == userName)
                 .WhereIF(phone is not null, x => x.Phone == phone)
-                .Where(x => x.State == true)
+                .Where(x => x.State)  // CA1862: bool direct comparison
                 .FirstAsync();
 
             //该用户不存在
@@ -417,7 +417,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <returns></returns>
         [Authorize]
         [Route("account/Vue3Router/{routerType?}")]
-        public async Task<object> GetVue3Router([FromRoute] string? routerType)
+        public async Task<object?> GetVue3Router([FromRoute] string? routerType)
         {
             var userId = _currentUser.Id;
             if (_currentUser.Id is null)
@@ -434,7 +434,7 @@ namespace SharpFort.CasbinRbac.Application.Services
                 menus = ObjectMapper.Map<List<Menu>, List<MenuDto>>(await _menuRepository.GetListAsync());
             }
 
-            object output = null;
+            object? output = null;
             if (routerType is null || routerType == "ruoyi")
             {
                 //将后端菜单转换成前端路由，组件级别需要过滤

@@ -1,4 +1,4 @@
-using SqlSugar;
+﻿using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -6,17 +6,17 @@ namespace SharpFort.CasbinRbac.Domain.Entities;
 
 /// <summary>
 /// 角色-菜单关联实体
-/// 用于存储角色拥有的菜单/权限
+/// 用于存储角色拥有的菜�?权限
 /// </summary>
 [SugarTable("casbin_sys_role_menu")]
 // 核心约束：防止重复授权，建立联合唯一索引
 [SugarIndex("index_role_menu_unique", nameof(RoleId), OrderByType.Asc, nameof(MenuId), OrderByType.Asc, IsUnique = true)]
 public class RoleMenu : CreationAuditedEntity<Guid>
 {
-    #region 构造函数
+    #region 构造函�?
 
     /// <summary>
-    /// ORM 专用无参构造函数
+    /// ORM 专用无参构造函�?
     /// </summary>
     public RoleMenu() { }
 
@@ -32,7 +32,7 @@ public class RoleMenu : CreationAuditedEntity<Guid>
     }
 
     /// <summary>
-    /// 构造函数重载 (带ID)
+    /// 构造函数重�?(带ID)
     /// </summary>
     public RoleMenu(Guid id, Guid roleId, Guid menuId) : base(id)
     {
@@ -42,7 +42,7 @@ public class RoleMenu : CreationAuditedEntity<Guid>
 
     #endregion
 
-    #region 核心属性
+    #region 核心属�?
 
     /// <summary>
     /// 主键
@@ -62,18 +62,18 @@ public class RoleMenu : CreationAuditedEntity<Guid>
 
     #endregion
 
-    #region 导航属性 (仅供查询)
+    #region 导航属�?(仅供查询)
 
     /// <summary>
-    /// 关联的角色
-    /// [Navigate] 仅用于查询
+    /// 关联的角�?
+    /// [Navigate] 仅用于查�?
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(RoleId))]
     public Role? Role { get; set; }
 
     /// <summary>
-    /// 关联的菜单
-    /// [Navigate] 仅用于查询
+    /// 关联的菜�?
+    /// [Navigate] 仅用于查�?
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(MenuId))]
     public Menu? Menu { get; set; }

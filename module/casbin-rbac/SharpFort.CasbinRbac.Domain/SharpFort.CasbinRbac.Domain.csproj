@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\..\..\common.props" />
 
+  <PropertyGroup>
+    <!-- XML 文档注释不一致警告（CS1572/CS1573/CS1574/CS1587）、文档推断（CS1591）-->
+    <!-- CS0649: 其中部分字段由 ABP DI 框架注入，非实际未赋値 -->
+    <!-- CA1716: 模块使用 ABP 框架保留关键字命名（架构约束） -->
+    <!-- CA1725: ABP 接口实现参数名与接口不一致（框架级配置） -->
+    <NoWarn>$(NoWarn);CS1591;CS1572;CS1573;CS1574;CS1587;CS0649;CA1716;CA1725</NoWarn>
+  </PropertyGroup>
+
 
   <ItemGroup>
 

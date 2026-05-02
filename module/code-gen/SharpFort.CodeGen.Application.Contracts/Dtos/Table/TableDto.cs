@@ -1,4 +1,4 @@
-﻿using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Dtos;
 using SharpFort.CodeGen.Application.Contracts.Dtos.Field;
 
 namespace SharpFort.CodeGen.Application.Contracts.Dtos.Table
@@ -9,7 +9,7 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Table
         /// <summary>
         /// 表名
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// 备注

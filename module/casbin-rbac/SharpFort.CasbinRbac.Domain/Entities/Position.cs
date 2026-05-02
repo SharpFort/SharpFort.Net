@@ -67,13 +67,13 @@ public class Position : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMult
     /// 核心业务字段，创建后一般不允许随意变更，修改需通过特定业务流程
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string PostCode { get; protected set; }
+    public string PostCode { get; protected set; } = null!;
 
     /// <summary>
     /// 岗位名称
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string PostName { get; protected set; }
+    public string PostName { get; protected set; } = null!;
 
     /// <summary>
     /// 备注

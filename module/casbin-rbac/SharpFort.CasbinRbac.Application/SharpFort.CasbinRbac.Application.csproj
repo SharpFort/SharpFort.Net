@@ -1,5 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+    <!-- XML 文档注释不一致（CS1572/CS1573/CS1587）、缺失文档（CS1591）-->
+    <NoWarn>$(NoWarn);CS1591;CS1572;CS1573;CS1574;CS1587</NoWarn>
+  </PropertyGroup>
+
 	<ItemGroup>
 	  <Compile Remove="Events\**" />
 	  <EmbeddedResource Remove="Events\**" />

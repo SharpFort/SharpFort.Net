@@ -1,6 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\..\..\common.props" />
 
+  <PropertyGroup>
+    <!-- CA1716: .Shared 命名空间与 VB 保留关键字冲突，ABP 框架约定不可更名 -->
+    <!-- CA1725: 接口/基类参数名不匹配，受框架约束 -->
+    <!-- CS1591: 无 XML 注释（部分 DTO 无需注释） -->
+    <NoWarn>$(NoWarn);CA1716;CA1725;CS1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\framework\SharpFort.Ddd.Application.Contracts\SharpFort.Ddd.Application.Contracts.csproj" />
     <ProjectReference Include="..\SharpFort.CasbinRbac.Domain.Shared\SharpFort.CasbinRbac.Domain.Shared.csproj" />

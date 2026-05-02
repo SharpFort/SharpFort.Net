@@ -119,7 +119,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
         /// <summary>
         /// 排序
         /// </summary>
-        public int OrderNum { get; set; } = 0;
+        public int OrderNum { get; set; }
 
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
         /// <summary>
         /// 排序
         /// </summary>
-        public int OrderNum { get; set; } = 0;
+        public int OrderNum { get; set; }
 
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
         /// <summary>
         /// 排序
         /// </summary>
-        public int OrderNum { get; set; } = 0;
+        public int OrderNum { get; set; }
 
         /// <summary>
         /// 状态

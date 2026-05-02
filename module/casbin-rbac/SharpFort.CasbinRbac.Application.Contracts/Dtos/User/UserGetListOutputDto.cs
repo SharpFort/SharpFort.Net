@@ -23,7 +23,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.User
         public DateTime CreationTime { get; set; } = DateTime.Now;
         public Guid? CreatorId { get; set; }
         public bool State { get; set; }
-        public string DeptName { get; set; }
+        public string DeptName { get; set; } = string.Empty;
         public List<RoleGetListOutputDto>? Roles { get; set; }
         public List<PostGetListOutputDto>? Posts { get; set; }
     }

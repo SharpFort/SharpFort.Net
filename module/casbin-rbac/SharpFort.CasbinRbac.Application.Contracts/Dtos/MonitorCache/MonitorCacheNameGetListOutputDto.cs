@@ -1,8 +1,7 @@
-﻿namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.MonitorCache
+namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.MonitorCache;
+
+public class MonitorCacheNameGetListOutputDto
 {
-    public class MonitorCacheNameGetListOutputDto
-    {
-        public string CacheName { get; set; }
-        public string? Remark { get; set; }
-    }
+    public required string CacheName { get; set; }
+    public string? Remark { get; set; }
 }

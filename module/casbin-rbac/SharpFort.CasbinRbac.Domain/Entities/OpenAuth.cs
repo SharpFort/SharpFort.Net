@@ -70,13 +70,13 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 建议使用常量或字符串 (如: "Gitee", "WeChat")，比枚举更灵活，方便插件化扩展
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string AuthType { get; protected set; }
+        public string AuthType { get; protected set; } = null!;
 
         /// <summary>
         /// 第三方唯一标识 (OpenId)
         /// </summary>
         [SugarColumn(Length = 128)]
-        public string OpenId { get; protected set; }
+        public string OpenId { get; protected set; } = null!;
 
         /// <summary>
         /// 第三方昵称

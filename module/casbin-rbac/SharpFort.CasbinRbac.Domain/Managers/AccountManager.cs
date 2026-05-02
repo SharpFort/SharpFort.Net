@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Mapster;
@@ -143,7 +143,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <param name="password"></param>
         /// <param name="userAction"></param>
         /// <returns></returns>
-        public async Task LoginValidationAsync(string userName, string password, Action<User> userAction = null)
+        public async Task LoginValidationAsync(string userName, string password, Action<User>? userAction = null)
         {
             var user = new User();
             if (await ExistAsync(userName, o => user = o))
@@ -156,7 +156,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 if (user.VerifyAndUpgradePassword(password))
                 {
                     // 如果密码被升级到 BCrypt，保存更新
-                    if (user.Password.StartsWith("$2"))
+                    if (user.Password.StartsWith("$2", StringComparison.Ordinal))
                     {
                         await _repository.UpdateAsync(user);
                     }
@@ -173,7 +173,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <param name="userName"></param>
         /// <param name="userAction"></param>
         /// <returns></returns>
-        public async Task<bool> ExistAsync(string userName, Action<User> userAction = null)
+        public async Task<bool> ExistAsync(string userName, Action<User>? userAction = null)
         {
             var user = await _repository.GetFirstAsync(u => u.UserName == userName && u.State == true);
             if (userAction is not null)
@@ -203,7 +203,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             AddToClaim(claims, AbpClaimTypes.UserName, dto.User.UserName);
             if (dto.User.DepartmentId is not null)
             {
-                AddToClaim(claims, TokenTypeConst.DepartmentId, dto.User.DepartmentId.ToString());
+                AddToClaim(claims, TokenTypeConst.DepartmentId, dto.User.DepartmentId!.ToString()!);
             }
             if (dto.User.Email is not null)
             {
@@ -211,7 +211,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             if (dto.User.Phone is not null)
             {
-                AddToClaim(claims, AbpClaimTypes.PhoneNumber, dto.User.Phone.ToString());
+                AddToClaim(claims, AbpClaimTypes.PhoneNumber, dto.User.Phone!.ToString()!);
             }
             if (dto.Roles.Count > 0)
             {

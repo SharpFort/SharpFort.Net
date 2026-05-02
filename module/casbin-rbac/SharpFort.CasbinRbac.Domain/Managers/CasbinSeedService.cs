@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -87,7 +88,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     State: (bool)r.state
                 )).ToList();
 
-                _logger.LogInformation($"[READ] Role: {roleData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+                _logger.LogInformation("[READ] Role: {Count} rows, {ElapsedMs}ms", roleData.Count, stepSw.ElapsedMilliseconds);
 
                 stepSw.Restart();
                 _logger.LogInformation("[READ] Reading Menu table...");
@@ -107,7 +108,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     State: (bool)m.state
                 )).ToList();
 
-                _logger.LogInformation($"[READ] Menu: {menuData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+                _logger.LogInformation("[READ] Menu: {Count} rows, {ElapsedMs}ms", menuData.Count, stepSw.ElapsedMilliseconds);
 
                 stepSw.Restart();
                 _logger.LogInformation("[READ] Reading RoleMenu table...");
@@ -123,7 +124,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     MenuId: (Guid)rm.menu_id
                 )).ToList();
 
-                _logger.LogInformation($"[READ] RoleMenu: {roleMenuData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+                _logger.LogInformation("[READ] RoleMenu: {Count} rows, {ElapsedMs}ms", roleMenuData.Count, stepSw.ElapsedMilliseconds);
 
                 stepSw.Restart();
                 _logger.LogInformation("[READ] Reading UserRole table...");
@@ -139,10 +140,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     RoleId: (Guid)ur.role_id
                 )).ToList();
 
-                _logger.LogInformation($"[READ] UserRole: {userRoleData.Count} rows, {stepSw.ElapsedMilliseconds}ms");
+                _logger.LogInformation("[READ] UserRole: {Count} rows, {ElapsedMs}ms", userRoleData.Count, stepSw.ElapsedMilliseconds);
             }
             // *** READ CLIENT IS NOW DISPOSED ***
-            _logger.LogInformation($"[PHASE 1] READ phase COMPLETE. Connection CLOSED. Total: {phaseSw.ElapsedMilliseconds}ms");
+            _logger.LogInformation("[PHASE 1] READ phase COMPLETE. Total: {ElapsedMs}ms", phaseSw.ElapsedMilliseconds);
 
             // Small delay to ensure connection is fully released
             await Task.Delay(100);
@@ -161,10 +162,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 }
                 else
                 {
-                    _logger.LogWarning($"[PROCESS] Skipping role {r.Id} - RoleCode is empty");
+                    _logger.LogWarning("[PROCESS] Skipping role {RoleId} - RoleCode is empty", r.Id);
                 }
             }
-            _logger.LogInformation($"[PROCESS] Loaded {roleDic.Count} valid roles");
+            _logger.LogInformation("[PROCESS] Loaded {Count} valid roles", roleDic.Count);
 
             var menuDic = new Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)>();
             int menuWithApiCount = 0;
@@ -176,7 +177,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     menuWithApiCount++;
                 }
             }
-            _logger.LogInformation($"[PROCESS] Loaded {menuDic.Count} menus, {menuWithApiCount} with API URLs");
+            _logger.LogInformation("[PROCESS] Loaded {MenuCount} menus, {ApiCount} with API URLs", menuDic.Count, menuWithApiCount);
 
             var rulesToInsert = new List<CasbinRule>();
 
@@ -205,7 +206,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     continue;
                 }
 
-                var method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper();
+                var method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper(global::System.Globalization.CultureInfo.InvariantCulture);
 
                 rulesToInsert.Add(new CasbinRule
                 {
@@ -218,9 +219,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             int pRuleCount = rulesToInsert.Count;
-            _logger.LogInformation($"[PROCESS] Built {pRuleCount} p-rules (role-permission)");
-            if (skippedRoles > 0) _logger.LogWarning($"[PROCESS] Skipped {skippedRoles} role-menu relations (role not found)");
-            if (skippedMenus > 0) _logger.LogWarning($"[PROCESS] Skipped {skippedMenus} role-menu relations (menu not found)");
+            _logger.LogInformation("[PROCESS] Built {Count} p-rules (role-permission)", pRuleCount);
+            if (skippedRoles > 0) _logger.LogWarning("[PROCESS] Skipped {Count} role-menu relations (role not found)", skippedRoles);
+            if (skippedMenus > 0) _logger.LogWarning("[PROCESS] Skipped {Count} role-menu relations (menu not found)", skippedMenus);
 
             // Build g rules (user-role)
             _logger.LogInformation("[PROCESS] Building g-rules (user-role)...");
@@ -244,22 +245,22 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             int gRuleCount = rulesToInsert.Count - pRuleCount;
-            _logger.LogInformation($"[PROCESS] Built {gRuleCount} g-rules (user-role)");
-            if (skippedUserRoles > 0) _logger.LogWarning($"[PROCESS] Skipped {skippedUserRoles} user-role relations (role not found)");
+            _logger.LogInformation("[PROCESS] Built {Count} g-rules (user-role)", gRuleCount);
+            if (skippedUserRoles > 0) _logger.LogWarning("[PROCESS] Skipped {Count} user-role relations (role not found)", skippedUserRoles);
 
-            _logger.LogInformation($"[PHASE 2] PROCESSING phase COMPLETE. Total rules: {rulesToInsert.Count}, {phaseSw.ElapsedMilliseconds}ms");
+            _logger.LogInformation("[PHASE 2] PROCESSING COMPLETE. Total rules: {TotalRules}, {ElapsedMs}ms", rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
 
             // Log sample data for verification
             _logger.LogInformation("[PHASE 2] Sample p-rules:");
             foreach (var rule in rulesToInsert.Where(r => r.PType == "p").Take(5))
             {
-                _logger.LogInformation($"  p, {rule.V0}, {rule.V1}, {rule.V2}, {rule.V3}");
+                _logger.LogInformation("  p, {V0}, {V1}, {V2}, {V3}", rule.V0, rule.V1, rule.V2, rule.V3);
             }
 
             _logger.LogInformation("[PHASE 2] Sample g-rules:");
             foreach (var rule in rulesToInsert.Where(r => r.PType == "g").Take(5))
             {
-                _logger.LogInformation($"  g, {rule.V0}, {rule.V1}, {rule.V2}");
+                _logger.LogInformation("  g, {V0}, {V1}, {V2}", rule.V0, rule.V1, rule.V2);
             }
 
             // ========== PHASE 3: WRITE TO DATABASE ==========
@@ -269,7 +270,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             if (rulesToInsert.Count == 0)
             {
                 _logger.LogWarning("[PHASE 3] No rules to insert! Check your role-menu and user-role configurations.");
-                _logger.LogInformation($"========== CASBIN MIGRATION COMPLETED (NO DATA). Total time: {totalSw.ElapsedMilliseconds}ms ==========");
+                _logger.LogInformation("========== CASBIN MIGRATION COMPLETED (NO DATA). Total time: {ElapsedMs}ms ==========", totalSw.ElapsedMilliseconds);
                 return;
             }
 
@@ -296,10 +297,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     // Clear old data
                     _logger.LogInformation("[WRITE] Clearing old casbin_rule data...");
                     var deletedCount = await writeClient.Deleteable<CasbinRule>().ExecuteCommandAsync();
-                    _logger.LogInformation($"[WRITE] Deleted {deletedCount} old rules.");
+                    _logger.LogInformation("[WRITE] Deleted {Count} old rules.", deletedCount);
 
                     // Insert new rules in batches
-                    _logger.LogInformation($"[WRITE] Inserting {rulesToInsert.Count} new rules...");
+                    _logger.LogInformation("[WRITE] Inserting {Count} new rules...", rulesToInsert.Count);
                     var batchSize = 500;
                     int totalInserted = 0;
 
@@ -308,10 +309,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                         var batch = rulesToInsert.Skip(i).Take(batchSize).ToList();
                         var insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
                         totalInserted += insertedCount;
-                        _logger.LogInformation($"[WRITE] Batch {i / batchSize + 1}: inserted {insertedCount} rules (total: {totalInserted}/{rulesToInsert.Count})");
+                        _logger.LogInformation("[WRITE] Batch {BatchNum}: inserted {Count} rules (total: {Total}/{Max})", i / batchSize + 1, insertedCount, totalInserted, rulesToInsert.Count);
                     }
 
-                    _logger.LogInformation($"[WRITE] All {totalInserted} rules inserted successfully.");
+                    _logger.LogInformation("[WRITE] All {Count} rules inserted successfully.", totalInserted);
                 }
                 catch (Exception ex)
                 {
@@ -320,7 +321,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 }
             }
             // *** WRITE CLIENT IS NOW DISPOSED ***
-            _logger.LogInformation($"[PHASE 3] WRITE phase COMPLETE. {rulesToInsert.Count} rules inserted, {phaseSw.ElapsedMilliseconds}ms");
+            _logger.LogInformation("[PHASE 3] WRITE phase COMPLETE. {Count} rules inserted, {ElapsedMs}ms", rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
 
             // ========== PHASE 4: RELOAD ENFORCER ==========
             _logger.LogInformation("[PHASE 4] Reloading Casbin Enforcer...");
@@ -329,12 +330,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             try
             {
                 await _enforcer.LoadPolicyAsync();
-                _logger.LogInformation($"[PHASE 4] Enforcer reloaded successfully. {phaseSw.ElapsedMilliseconds}ms");
+                _logger.LogInformation("[PHASE 4] Enforcer reloaded successfully. {ElapsedMs}ms", phaseSw.ElapsedMilliseconds);
 
                 // Verify loaded policies (use synchronous methods)
                 var loadedPolicies = _enforcer.GetPolicy().ToList();
                 var loadedGroupings = _enforcer.GetGroupingPolicy().ToList();
-                _logger.LogInformation($"[PHASE 4] Verification: {loadedPolicies.Count} policies, {loadedGroupings.Count} groupings loaded");
+                _logger.LogInformation("[PHASE 4] Verification: {PolicyCount} policies, {GroupingCount} groupings loaded", loadedPolicies.Count, loadedGroupings.Count);
             }
             catch (Exception ex)
             {
@@ -343,7 +344,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             totalSw.Stop();
-            _logger.LogInformation($"========== CASBIN MIGRATION COMPLETED SUCCESSFULLY. Total time: {totalSw.ElapsedMilliseconds}ms ==========");
+            _logger.LogInformation("========== CASBIN MIGRATION COMPLETED SUCCESSFULLY. Total time: {ElapsedMs}ms ==========", totalSw.ElapsedMilliseconds);
         }
 
         /// <summary>

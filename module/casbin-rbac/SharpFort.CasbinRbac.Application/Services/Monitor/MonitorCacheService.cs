@@ -1,4 +1,4 @@
-﻿using FreeRedis;
+using FreeRedis;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -14,7 +14,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
 {
     public class MonitorCacheService : ApplicationService, IMonitorCacheService
     {
-        public IAbpLazyServiceProvider LazyServiceProvider { get; set; }
+
 
         /// <summary>
         /// 缓存前缀

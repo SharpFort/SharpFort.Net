@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Server.IISIntegration;
 using SqlSugar;
 using Volo.Abp;
 using Volo.Abp.Auditing;
@@ -52,10 +51,8 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             Remark = remark;
             ListClass = listClass;
 
-        // 默认值
-            IsDeleted = false;
+        // 默认启用（IsDefault 和 IsDeleted 无需显式赋值为 false）
             State = true;
-            IsDefault = false;
         }
 
         #endregion
@@ -73,21 +70,21 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 核心分组字段，如 "sys_user_sex"
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string DictType { get; protected set; }
+        public string DictType { get; protected set; } = null!;
 
         /// <summary>
         /// 字典标签
         /// 用于前端展示，如 "男"
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string DictLabel { get; protected set; }
+        public string DictLabel { get; protected set; } = null!;
 
         /// <summary>
         /// 字典键值
         /// 实际存储值，如 "1" 或 "male"
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string DictValue { get; protected set; }
+        public string DictValue { get; protected set; } = null!;
 
         /// <summary>
         /// 是否默认值

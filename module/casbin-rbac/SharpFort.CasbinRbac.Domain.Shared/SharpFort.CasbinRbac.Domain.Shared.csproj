@@ -6,6 +6,14 @@
     <None Remove="Authorization\**" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- CA1716: .Shared 命名空间与 VB 保留关键字冲突，ABP 框架约定不可更名 -->
+    <!-- CA1707: 常量/枚举成员使用下划线（业务命名约定） -->
+    <!-- CA1711: 类型名称以 EventArgs/EventHandler 结尾（业务 ETO 约定） -->
+    <!-- CS1591: 无 XML 注释（部分 DTO 无需注释） -->
+    <NoWarn>$(NoWarn);CA1716;CA1707;CA1711;CS1591</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="10.3.0" />
   </ItemGroup>

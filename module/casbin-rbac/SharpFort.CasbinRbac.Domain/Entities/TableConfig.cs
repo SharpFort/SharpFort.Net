@@ -23,18 +23,18 @@ public class TableConfig : CreationAuditedEntity<Guid>
     /// 表名 (如 sys_user)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string TableName { get; set; }
+    public string TableName { get; set; } = null!;
 
     /// <summary>
     /// 字段名 (如 phone)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string FieldName { get; set; }
+    public string FieldName { get; set; } = null!;
 
     /// <summary>
     /// 字段中文描述 (如 手机号)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string FieldRemark { get; set; }
+    public string FieldRemark { get; set; } = null!;
 }
 

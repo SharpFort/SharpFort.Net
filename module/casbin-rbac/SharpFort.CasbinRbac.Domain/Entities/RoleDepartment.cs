@@ -1,4 +1,4 @@
-using SqlSugar;
+﻿using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -8,12 +8,12 @@ namespace SharpFort.CasbinRbac.Domain.Entities;
 /// 角色-部门关联实体
 /// 用于存储“自定义数据权限”的具体部门范围
 /// </summary>
-[SugarTable("casbin_sys_role_Department")] // 建议缩写表名，保持简洁
+[SugarTable("casbin_sys_role_Department")] // 建议缩写表名，保持简�?
 // 核心约束：同一个角色不能重复绑定同一个部门，设置联合唯一索引
 [SugarIndex("index_role_Department_unique", nameof(RoleId),OrderByType.Asc, nameof(DepartmentId),OrderByType.Asc, IsUnique = true)]
 public class RoleDepartment : CreationAuditedEntity<Guid>
 {
-    #region 构造函数
+    #region 构造函�?
 
     /// <summary>
     /// ORM 专用
@@ -25,24 +25,24 @@ public class RoleDepartment : CreationAuditedEntity<Guid>
     /// </summary>
     /// <param name="roleId">角色ID</param>
     /// <param name="DepartmentId">部门ID</param>
-    public RoleDepartment(Guid roleId, Guid DepartmentId)
+    public RoleDepartment(Guid roleId, Guid departmentId)
     {
         RoleId = roleId;
-        DepartmentId = DepartmentId;
+        DepartmentId = departmentId; // 修复 CS1717 Bug: 参数名首字母大写与属性同名，导致属性从未被赋�?
     }
 
     /// <summary>
-    /// 构造函数重载（带主键生成策略，如果需要手动指定Id）
+    /// 构造函数重载（带主键生成策略，如果需要手动指定Id�?
     /// </summary>
-    public RoleDepartment(Guid id, Guid roleId, Guid DepartmentId) : base(id)
+    public RoleDepartment(Guid id, Guid roleId, Guid departmentId) : base(id)
     {
         RoleId = roleId;
-        DepartmentId = DepartmentId;
+        DepartmentId = departmentId; // 修复 CS1717 Bug
     }
 
     #endregion
 
-    #region 核心属性
+    #region 核心属�?
 
     ///// <summary>
     ///// 主键
@@ -62,24 +62,24 @@ public class RoleDepartment : CreationAuditedEntity<Guid>
 
     #endregion
 
-    #region 导航属性 (仅供查询)
+    #region 导航属�?(仅供查询)
 
-    // 即使是中间表，加上导航属性也可以方便进行“Include/Join”查询
-    // 例如：查询某个关联记录时，顺便带出部门名称
+    // 即使是中间表，加上导航属性也可以方便进行“Include/Join”查�?
+    // 例如：查询某个关联记录时，顺便带出部门名�?
 
     /// <summary>
-    /// 关联的角色
-    /// [Navigate] 仅用于查询
+    /// 关联的角�?
+    /// [Navigate] 仅用于查�?
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(RoleId))]
     public Role? Role { get; set; }
 
     /// <summary>
-    /// 关联的部门
-    /// [Navigate] 仅用于查询
+    /// 关联的部�?
+    /// [Navigate] 仅用于查�?
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(DepartmentId))]
-    // 假设您的部门实体类名为 Department 或 Department
+    // 假设您的部门实体类名�?Department �?Department
     public Department? Department { get; set; }
 
     #endregion

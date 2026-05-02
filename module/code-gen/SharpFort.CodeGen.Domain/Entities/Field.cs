@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using SharpFort.CodeGen.Domain.Shared.Enums;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -36,7 +36,7 @@ public class Field : FullAuditedEntity<Guid>
     /// 规则：必填，长度 64，同一表下唯一
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
-    public string Name { get; set;  }
+    public string Name { get; set;  } = null!;
 
     /// <summary>
     /// 字段描述/注释

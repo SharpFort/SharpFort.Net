@@ -186,7 +186,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private async Task<UserRoleMenuDto> GetInfoByCacheAsync(Guid userId)
         {
-            UserRoleMenuDto output = null;
+            UserRoleMenuDto? output = null;
             var tokenExpiresMinuteTime = LazyServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value.ExpiresMinuteTime;
             var cacheData = await _userCache.GetOrAddAsync(new UserInfoCacheKey(userId),
                async () =>

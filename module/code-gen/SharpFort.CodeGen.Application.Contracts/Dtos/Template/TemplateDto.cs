@@ -1,4 +1,4 @@
-﻿using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Dtos;
 
 namespace SharpFort.CodeGen.Application.Contracts.Dtos.Template
 {
@@ -9,18 +9,18 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Template
         /// <summary>
         /// 模板字符串
         /// </summary>
-        public string TemplateStr { get; set; } = string.Empty;
+        public required string TemplateStr { get; set; } = string.Empty;
 
         /// <summary>
         /// 生成路径
         /// </summary>
-        public string BuildPath { get; set; }
+        public required string BuildPath { get; set; }
 
 
         /// <summary>
         /// 模板名称
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// 备注

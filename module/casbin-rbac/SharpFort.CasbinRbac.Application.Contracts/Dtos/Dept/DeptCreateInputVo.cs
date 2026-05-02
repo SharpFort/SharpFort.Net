@@ -1,15 +1,12 @@
-namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Dept
+namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Dept;
+
+/// <summary>Dept输入创建对象</summary>
+public class DeptCreateInputVo
 {
-    /// <summary>
-    /// Dept输入创建对象
-    /// </summary>
-    public class DeptCreateInputVo
-    {
-        public bool State { get; set; }
-        public string DeptName { get; set; }
-        public string DeptCode { get; set; } 
-        public string? Leader { get; set; }
-        public Guid? ParentId { get; set; }=Guid.Empty;
-        public string? Remark { get; set; }
-    }
+    public bool State { get; set; }
+    public required string DeptName { get; set; }
+    public required string DeptCode { get; set; }
+    public string? Leader { get; set; }
+    public Guid? ParentId { get; set; }
+    public string? Remark { get; set; }
 }

@@ -5,8 +5,8 @@ namespace SharpFort.CasbinRbac.Domain.Entities;
 
 /// <summary>
 /// 角色-字段权限 (Field Level Security)
-/// 存储角色的字段黑名单。
-/// 逻辑：如果存在记录 (RoleId + TableName + FieldName)，则表示该角色【无权访问】该字段。
+/// 存储角色的字段黑名单�?
+/// 逻辑：如果存在记�?(RoleId + TableName + FieldName)，则表示该角色【无权访问】该字段�?
 /// </summary>
 [SugarTable("casbin_sys_role_field")]
 public class RoleField : CreationAuditedEntity<Guid>
@@ -26,15 +26,15 @@ public class RoleField : CreationAuditedEntity<Guid>
     public Guid RoleId { get; set; }
 
     /// <summary>
-    /// 表名 (数据库表名，如 sys_user)
+    /// 表名 (数据库表名，�?sys_user)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string TableName { get; set; }
+    public string TableName { get; set; } = null!;
 
     /// <summary>
-    /// 字段名 (数据库列名，如 phone)
+    /// 字段�?(数据库列名，�?phone)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string FieldName { get; set; }
+    public string FieldName { get; set; } = null!;
 }
 

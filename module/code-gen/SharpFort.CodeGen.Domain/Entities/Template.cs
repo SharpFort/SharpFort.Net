@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities;
 using System;
 using Volo.Abp;
@@ -27,7 +27,7 @@ public class Template : FullAuditedAggregateRoot<Guid>
     /// 规则：必填，唯一，长度 64
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
 
     /// <summary>
     /// 建议生成路径
@@ -35,14 +35,14 @@ public class Template : FullAuditedAggregateRoot<Guid>
     /// 规则：必填，长度 256
     /// </summary>
     [SugarColumn(ColumnName = "build_path", Length = 256, IsNullable = false)]
-    public string BuildPath { get; private set; }
+    public string BuildPath { get; private set; } = null!;
 
     /// <summary>
     /// 模板内容
     /// 规则：大文本，存储 Razor/Scriban 脚本
     /// </summary>
     [SugarColumn(ColumnName = "content", ColumnDataType = "text", IsNullable = false)]
-    public string Content { get; private set; }
+    public string Content { get; private set; } = null!;
 
     /// <summary>
     /// 备注/说明

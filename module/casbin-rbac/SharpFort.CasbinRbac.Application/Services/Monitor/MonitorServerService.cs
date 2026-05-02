@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -26,8 +27,8 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
             _httpContextAccessor = httpContextAccessor;
         }
 
-        private static List<NetworkAdapterDto> _cachedNetworks;
-        private static List<AssemblyInfoDto> _cachedAssemblies;
+        private static List<NetworkAdapterDto> _cachedNetworks = null!;
+        private static List<AssemblyInfoDto> _cachedAssemblies = null!;
         private static DateTime _lastStaticCacheTime = DateTime.MinValue;
         private static readonly object _staticCacheLock = new object();
 
@@ -40,7 +41,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 
                 // PERFORMANCE FIX: Never call RefreshAll() in a request loop! It queries BIOS, Motherboard, Batteries, etc., and blocks the thread.
                 // Create a scoped instance and ONLY refresh what we specifically need (Memory and CPU are fast).
-                IHardwareInfo hardwareInfo = new HardwareInfo();
+                HardwareInfo hardwareInfo = new HardwareInfo();  // CA1859: use concrete type
                 hardwareInfo.RefreshMemoryStatus();
                 hardwareInfo.RefreshCPUList();
 
@@ -61,7 +62,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 var currentProcess = Process.GetCurrentProcess();
                 var programStartTime = currentProcess.StartTime;
                 string programRunTime = DateTimeHelper.FormatTime((long)(DateTime.Now - programStartTime).TotalMilliseconds);
-                string appRAM = ((double)currentProcess.WorkingSet64 / 1048576).ToString("N2") + " MB";
+                string appRAM = ((double)currentProcess.WorkingSet64 / 1048576).ToString("N2", global::System.Globalization.CultureInfo.InvariantCulture) + " MB";
                 
                 dto.App = new AppInfoDto
                 {
@@ -70,7 +71,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                     WebRootPath = _hostEnvironment.WebRootPath,
                     Version = RuntimeInformation.FrameworkDescription,
                     AppRAM = appRAM,
-                    StartTime = programStartTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    StartTime = programStartTime.ToString("yyyy-MM-dd HH:mm:ss", global::System.Globalization.CultureInfo.InvariantCulture),
                     RunTime = programRunTime,
                     Host = serverIp ?? "未知"
                 };
@@ -142,7 +143,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                             .Where(a => !a.IsDynamic)
                             .Select(a => new AssemblyInfoDto
                             {
-                                Name = a.GetName().Name,
+                                Name = a.GetName().Name ?? "Unknown",  // CS8601: Name is string?
                                 Version = a.GetName().Version?.ToString()
                             })
                             .OrderBy(a => a.Name)

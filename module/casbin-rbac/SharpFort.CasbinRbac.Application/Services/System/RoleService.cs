@@ -1,4 +1,5 @@
 using Casbin;
+using System.Globalization;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
@@ -55,7 +56,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (input.DataScope == DataScope.CUSTOM)
             {
                 await _roleDeptRepository.DeleteAsync(x => x.RoleId == input.RoleId);
-                var insertEntities = input.DepartmentIds.Select(x => new RoleDepartment { DepartmentId = x, RoleId = input.RoleId })
+                var insertEntities = (input.DepartmentIds ?? new List<Guid>())
+                    .Select(x => new RoleDepartment { DepartmentId = x, RoleId = input.RoleId })
                     .ToList();
                 await _roleDeptRepository.InsertRangeAsync(insertEntities);
             }
@@ -134,7 +136,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             await _repository.UpdateAsync(entity);
 
-            await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { id }, input.MenuIds);
+            await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { id }, input.MenuIds ?? new List<Guid>());
 
             // /* 原代码注释保留 */
             // // Casbin 同步：更新角色权限
@@ -148,7 +150,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             return dto;
         }
 
-        private async Task SyncCasbinRolePermissions(Guid roleId, List<Guid> menuIds, string roleCode)
+        private static async Task SyncCasbinRolePermissions(Guid roleId, List<Guid> menuIds, string roleCode)
         {
             // /* 原代码注释保留，该方法已经废弃，统一使用 CasbinPolicyManager 处理 */
             // if (menuIds == null || !menuIds.Any()) return;
@@ -241,8 +243,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var output = await _userRoleRepository._DbQueryable
                 .LeftJoin<User>((ur, u) => ur.UserId == u.Id && ur.RoleId == roleId)
                 .Where((ur, u) => ur.RoleId == roleId)
-                .WhereIF(!string.IsNullOrEmpty(input.UserName), (ur, u) => u.UserName.Contains(input.UserName))
-                .WhereIF(input.Phone is not null, (ur, u) => u.Phone.ToString().Contains(input.Phone.ToString()))
+                .WhereIF(!string.IsNullOrEmpty(input.UserName), (ur, u) => u.UserName.Contains(input.UserName!))
+                .WhereIF(input.Phone is not null, (ur, u) => u.Phone.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture)))
                 .Select((ur, u) => new UserGetListOutputDto { Id = u.Id }, true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             return new PagedResultDto<UserGetListOutputDto>(total, output);
@@ -255,8 +257,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var entities = await _userRoleRepository._Db.Queryable<User>()
                 .Where(u => SqlFunc.Subqueryable<UserRole>().Where(x => x.RoleId == roleId)
                     .Where(x => x.UserId == u.Id).NotAny())
-                .WhereIF(!string.IsNullOrEmpty(input.UserName), u => u.UserName.Contains(input.UserName))
-                .WhereIF(input.Phone is not null, u => u.Phone.ToString().Contains(input.Phone.ToString()))
+                .WhereIF(!string.IsNullOrEmpty(input.UserName), u => u.UserName.Contains(input.UserName!))
+                .WhereIF(input.Phone is not null, u => u.Phone.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture)))
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             var output = entities.Adapt<List<UserGetListOutputDto>>();
             return new PagedResultDto<UserGetListOutputDto>(total, output);

@@ -1,24 +1,16 @@
-﻿namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Account;
+namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Account;
 
 public class RetrievePasswordDto
 {
-    /// <summary>
-    /// 密码
-    /// </summary>
-    public string Password { get; set; }
+    /// <summary>密码</summary>
+    public required string Password { get; set; }
 
-    /// <summary>
-    /// 唯一标识码
-    /// </summary>
+    /// <summary>唯一标识码</summary>
     public string? Uuid { get; set; }
 
-    /// <summary>
-    /// 电话
-    /// </summary>
+    /// <summary>电话</summary>
     public long Phone { get; set; }
 
-    /// <summary>
-    /// 验证码
-    /// </summary>
+    /// <summary>验证码</summary>
     public string? Code { get; set; }
-}
+}

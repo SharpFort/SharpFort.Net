@@ -1,4 +1,4 @@
-﻿using Volo.Abp.Domain.Services;
+using Volo.Abp.Domain.Services;
 using SharpFort.CodeGen.Domain.Entities;
 using SharpFort.CodeGen.Domain.Handlers;
 using SharpFort.SqlSugarCore.Abstractions;
@@ -24,9 +24,11 @@ namespace SharpFort.CodeGen.Domain.Managers
             var templates = await _repository.GetListAsync();
             foreach (var template in templates)
             {
-                var handledTempalte = new HandledTemplate();
-                handledTempalte.TemplateStr = template.Content;
-                handledTempalte.BuildPath = template.BuildPath;
+                var handledTempalte = new HandledTemplate
+                {
+                    TemplateStr = template.Content,
+                    BuildPath = template.BuildPath
+                };
                 foreach (var templateHandler in _templateHandlers)
                 {
                     templateHandler.SetTable(tableEntity);
@@ -38,11 +40,12 @@ namespace SharpFort.CodeGen.Domain.Managers
         }
 
 
-        private async Task BuildToFileAsync(HandledTemplate handledTemplate)
+        private static async Task BuildToFileAsync(HandledTemplate handledTemplate)
         {
-            if (!Directory.Exists(Path.GetDirectoryName(handledTemplate.BuildPath)))
+            var dir = Path.GetDirectoryName(handledTemplate.BuildPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(handledTemplate.BuildPath));
+                Directory.CreateDirectory(dir);
             }
             await File.WriteAllTextAsync(handledTemplate.BuildPath, handledTemplate.TemplateStr);
         }

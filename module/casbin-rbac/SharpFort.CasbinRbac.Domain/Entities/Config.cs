@@ -63,21 +63,21 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 用于前端显示，如 "系统名称"
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string ConfigName { get; protected set; }
+        public string ConfigName { get; protected set; } = null!;
 
         /// <summary>
         /// 配置键
         /// 用于程序读取，如 "sys.app.name"，不可重复
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string ConfigKey { get; protected set; }
+        public string ConfigKey { get; protected set; } = null!;
 
         /// <summary>
         /// 配置值
         /// 实际参数值，可能包含 JSON 或长字符串，建议设置较长
         /// </summary>
         [SugarColumn(Length = 2000)]
-        public string ConfigValue { get; protected set; }
+        public string ConfigValue { get; protected set; } = null!;
 
         /// <summary>
         /// 配置分类/类别

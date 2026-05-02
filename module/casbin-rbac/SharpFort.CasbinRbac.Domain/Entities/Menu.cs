@@ -1,6 +1,4 @@
-using NUglify.Helpers;
 using SqlSugar;
-using System.Web;
 using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
@@ -61,13 +59,11 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             MenuIcon = menuIcon;
             OrderNum = orderNum;
 
-            // 默认值
+            // 非 false 的业务默认值（CA1805: IsLink=false/IsDeleted=false 无需显式赋值）
             State = true;
             IsShow = true;
             IsCache = true;
-            IsLink = false;
-            IsDeleted= false;
-            MenuSource = MenuSource.Ruoyi; // 默认来源，可调整
+            MenuSource = MenuSource.Ruoyi; // 默认来源
         }
 
         #endregion
@@ -84,7 +80,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 菜单名称 (Title)
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string MenuName { get; protected set; }
+        public string MenuName { get; protected set; } = null!;
 
         /// <summary>
         /// 菜单类型 (目录/菜单/按钮)
@@ -201,7 +197,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// [Navigate] 用于递归加载树
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(ParentId))]
-        public List<Menu> Children { get; set; }
+        public List<Menu> Children { get; set; } = null!;
 
         #endregion
 
@@ -253,7 +249,7 @@ public static class MenuEntityExtensions
     public static List<Vue3RouterDto> Vue3RuoSfRouterBuild(this List<Menu> menus)
     {
         menus = menus
-            .Where(m => m.State == true)
+            .Where(m => m.State)
             .Where(m => m.MenuType != MenuType.Component)
             .Where(m => m.MenuSource == MenuSource.Ruoyi)
             .ToList();
@@ -324,20 +320,20 @@ public static class MenuEntityExtensions
     {
         //pure的菜单为树形
         var allRouters = menus
-            .Where(m => m.State == true)
+            .Where(m => m.State)
             .Where(m => m.MenuType != MenuType.Component)
             .Where(m => m.MenuSource == MenuSource.Pure)
             .Select(m => new Vue3PureRouterDto
             {
-                Path = m.Router.StartsWith("/") ? m.Router : "/" + m.Router,
-                Name = m.IsLink == true ? "Link" : m.RouterName,
+                Path = m.Router!.StartsWith("/", StringComparison.Ordinal) ? m.Router : "/" + m.Router,
+                Name = m.IsLink ? "Link" : (m.RouterName ?? string.Empty), // CS8601: RouterName 是 string?
                 component = m.Component,
                 Meta = new MetaPureRouterDto()
                 {
                     showLink = m.IsShow,
-                    FrameSrc = m.IsLink == true ? m.Router : null,
-                    Auths = new List<string>() { m.PermissionCode },
-                    Icon = m.MenuIcon,
+                    FrameSrc = m.IsLink ? m.Router : null,
+                    Auths = m.PermissionCode is not null ? new List<string> { m.PermissionCode } : null, // CS8604
+                    Icon = m.MenuIcon ?? string.Empty, // CS8601: MenuIcon 是 string?
                     Title = m.MenuName,
                 },
                 OrderNum = m.OrderNum,

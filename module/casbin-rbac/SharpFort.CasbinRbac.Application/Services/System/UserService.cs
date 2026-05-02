@@ -71,7 +71,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             List<Guid> ids = input.Ids?.Split(",").Select(x => Guid.Parse(x)).ToList();
             var outPut = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.UserName),
                     x => x.UserName.Contains(input.UserName!))
-                .WhereIF(input.Phone is not null, x => x.Phone.ToString()!.Contains(input.Phone.ToString()!))
+                .WhereIF(input.Phone is not null, x => x.Phone.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture)))
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name!.Contains(input.Name!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
                 .WhereIF(input.StartTime is not null && input.EndTime is not null,
@@ -126,8 +126,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             entitiy.SetPassword(password);
 
             await _userManager.CreateAsync(entitiy);
-            await _userManager.GiveUserSetRoleAsync(new List<Guid> { entitiy.Id }, input.RoleIds);
-            await _userManager.GiveUserSetPostAsync(new List<Guid> { entitiy.Id }, input.PostIds);
+            await _userManager.GiveUserSetRoleAsync(new List<Guid> { entitiy.Id }, input.RoleIds ?? new List<Guid>());
+            await _userManager.GiveUserSetPostAsync(new List<Guid> { entitiy.Id }, input.PostIds ?? new List<Guid>());
 
             // 同步 Casbin 用户角色关系 (g)
             // 需要获取角色编码，这里假设 RoleIds 对应角色的 Code 需要查询
@@ -222,14 +222,14 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await MapToEntityAsync(input, entity);
 
             var res1 = await _repository.UpdateAsync(entity);
-            await _userManager.GiveUserSetRoleAsync(new List<Guid> { id }, input.RoleIds);
-            await _userManager.GiveUserSetPostAsync(new List<Guid> { id }, input.PostIds);
+            await _userManager.GiveUserSetRoleAsync(new List<Guid> { id }, input.RoleIds ?? new List<Guid>());
+            await _userManager.GiveUserSetPostAsync(new List<Guid> { id }, input.PostIds ?? new List<Guid>());
 
             // Casbin 同步：更新用户角色
             // 先删除旧的
             await _enforcer.RemoveFilteredGroupingPolicyAsync(0, id.ToString());
             // 再添加新的
-            await SyncCasbinUserRoles(id, input.RoleIds);
+            await SyncCasbinUserRoles(id, input.RoleIds ?? new List<Guid>());
 
             return await MapToGetOutputDtoAsync(entity);
         }
@@ -242,7 +242,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("更新个人信息", OperationType.Update)]
         public async Task<UserGetOutputDto> UpdateProfileAsync(ProfileUpdateInputVo input)
         {
-            var entity = await _repository.GetByIdAsync(_currentUser.Id);
+            var entity = await _repository.GetByIdAsync(_currentUser.Id.GetValueOrDefault());
             ObjectMapper.Map(input, entity);
 
             await _repository.UpdateAsync(entity);

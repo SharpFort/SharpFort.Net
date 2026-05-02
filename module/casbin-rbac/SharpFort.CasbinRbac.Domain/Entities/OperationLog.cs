@@ -1,4 +1,4 @@
-using SqlSugar;
+﻿using SqlSugar;
 using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -8,11 +8,11 @@ using SharpFort.CasbinRbac.Domain.Shared.OperLog;
 namespace SharpFort.CasbinRbac.Domain.Entities
 {
     /// <summary>
-    /// 操作日志聚合根
-    /// 记录系统关键操作行为，用于审计追踪
+    /// 操作日志聚合�?
+    /// 记录系统关键操作行为，用于审计追�?
     /// </summary>
     [SugarTable("casbin_sys_operation_log")]
-    // 索引1：按时间倒序查询（日志最常用）
+    // 索引1：按时间倒序查询（日志最常用�?
     [SugarIndex($"index_{nameof(CreationTime)}", nameof(CreationTime), OrderByType.Desc)]
     // 索引2：按操作人员查询
     [SugarIndex($"index_{nameof(OperUser)}", nameof(OperUser), OrderByType.Asc)]
@@ -20,10 +20,10 @@ namespace SharpFort.CasbinRbac.Domain.Entities
     [SugarIndex($"index_{nameof(Title)}", nameof(Title), OrderByType.Asc)]
     public class OperationLog : CreationAuditedAggregateRoot<Guid>
     {
-        #region 构造函数
+        #region 构造函�?
 
         /// <summary>
-        /// ORM 专用无参构造函数
+        /// ORM 专用无参构造函�?
         /// </summary>
         protected OperationLog() { }
 
@@ -66,13 +66,13 @@ namespace SharpFort.CasbinRbac.Domain.Entities
 
         #endregion
 
-        #region 核心属性
+        #region 核心属�?
         [SugarColumn(IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }
 
         /// <summary>
         /// 操作模块 / 标题
-        /// 如：用户管理、角色管理
+        /// 如：用户管理、角色管�?
         /// </summary>
         [SugarColumn(ColumnName = "Title" ,Length = 64, IsNullable = true)]
         public string? Title { get; protected set; }
@@ -92,14 +92,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
 
         /// <summary>
         /// 方法名称
-        /// 通常记录 Controller.Action 或 Class.Method
+        /// 通常记录 Controller.Action �?Class.Method
         /// </summary>
         [SugarColumn(ColumnName = "Method",Length = 255, IsNullable = true)]
         public string? Method { get; protected set; }
 
         /// <summary>
         /// 操作人员账号
-        /// (CreatorId 记录的是 Guid，这里记录可读的账号名)
+        /// (CreatorId 记录的是 Guid，这里记录可读的账号�?
         /// </summary>
         [SugarColumn(ColumnName = "OperUser",Length = 64, IsNullable = true)]
         public string? OperUser { get; protected set; }
@@ -118,14 +118,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
 
         /// <summary>
         /// 请求参数
-        /// 记录 JSON 数据，可能很大
+        /// 记录 JSON 数据，可能很�?
         /// </summary>
         [SugarColumn(ColumnName = "RequestParam",ColumnDataType = "text")]
         public string? RequestParam { get; protected set; }
 
         /// <summary>
         /// 请求结果
-        /// 记录 JSON 数据，可能很大
+        /// 记录 JSON 数据，可能很�?
         /// </summary>
         [SugarColumn(ColumnName = "RequestResult",ColumnDataType = "text")]
         public string? RequestResult { get; protected set; }

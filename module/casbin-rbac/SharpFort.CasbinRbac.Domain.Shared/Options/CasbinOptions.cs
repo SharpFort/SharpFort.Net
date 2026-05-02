@@ -13,7 +13,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Options
         /// 是否启用调试模式
         /// 启用后支持 X-Casbin-Debug 头
         /// </summary>
-        public bool EnableDebugMode { get; set; } = false;
+        public bool EnableDebugMode { get; set; }
         
         /// <summary>
         /// 忽略的 URL 前缀列表 (小写)
@@ -33,6 +33,6 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Options
         /// 仅在多实例部署时需要启用，需要配置 Redis 连接
         /// 默认: false
         /// </summary>
-        public bool EnableRedisWatcher { get; set; } = false;
+        public bool EnableRedisWatcher { get; set; }
     }
 }

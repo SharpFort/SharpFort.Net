@@ -1,4 +1,5 @@
 using SqlSugar;
+using System.Globalization;
 using Volo.Abp.Application.Dtos;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu;
@@ -53,7 +54,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 处理 ApiMethod 转大写
             if (!string.IsNullOrEmpty(input.ApiMethod))
             {
-                input.ApiMethod = input.ApiMethod.ToUpper();
+                input.ApiMethod = input.ApiMethod.ToUpper(global::System.Globalization.CultureInfo.InvariantCulture);  // CA1304
             }
             return await base.CreateAsync(input);
         }
@@ -89,7 +90,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (isApiChanged)
             {
                 var roleIds = await _roleMenuRepository._DbQueryable.Where(x => x.MenuId == id).Select(x => x.RoleId).ToListAsync();
-                if (roleIds.Any())
+                if (roleIds.Count > 0)  // CA1860: prefer Count > 0
                 {
                     var roles = await _roleRepository.GetListAsync(x => roleIds.Contains(x.Id));
                     foreach (var role in roles)
@@ -161,7 +162,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await base.DeleteAsync(ids);
 
             // 物理删除后，刷新受影响角色的 Casbin 权限
-            if (affectedRoleIds.Any())
+            if (affectedRoleIds.Count > 0)  // CA1860: prefer Count > 0
             {
                 var roles = await _roleRepository.GetListAsync(x => affectedRoleIds.Contains(x.Id));
                 foreach (var role in roles)

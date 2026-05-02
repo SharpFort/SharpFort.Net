@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
 using SharpFort.CodeGen.Domain.Shared.Enums;
@@ -9,9 +9,11 @@ namespace SharpFort.CodeGen.Domain.Handlers
     {
         public HandledTemplate Invoker(string str, string path)
         {
-            var output = new HandledTemplate();
-            output.TemplateStr = str.Replace("@field", BuildFields());
-            output.BuildPath = path;
+            var output = new HandledTemplate
+            {
+                TemplateStr = str.Replace("@field", BuildFields()),
+                BuildPath = path
+            };
             return output;
         }
 
@@ -27,7 +29,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
 
             foreach (var field in Table.Fields)
             {
-                var typeStr = typeof(FieldType).GetFields().Where(x => x.Name == field.FieldType.ToString())?.FirstOrDefault().GetCustomAttribute<DisplayAttribute>().Name;
+                var typeStr = typeof(FieldType).GetFields().FirstOrDefault(x => x.Name == field.FieldType.ToString())?.GetCustomAttribute<DisplayAttribute>()?.Name;
 
                 if (typeStr is null)
                 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +16,6 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
         private AccountManager _accountManager;
         public RefreshTokenMiddleware(AccountManager accountManager)
         {
-
             _accountManager = accountManager;
         }
 
@@ -30,19 +24,15 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             var refreshToken = context.Request.Headers["refresh_token"].ToString();
             if (!string.IsNullOrEmpty(refreshToken))
             {
-                //每个用户的token刷新频率可以进行控制，防止刷新token当访问token使用
                 var authResult = await context.AuthenticateAsync(TokenTypeConst.Refresh);
-                //token鉴权刷新成功
                 if (authResult.Succeeded)
                 {
-                    var userId = Guid.Parse(authResult.Principal.FindFirst(AbpClaimTypes.UserId).Value.ToString());
+                    // authResult.Principal 在 Succeeded == true 时非 null，FindFirst 在 JWT 标准 claim 中也非 null
+                    var userId = Guid.Parse(authResult.Principal!.FindFirst(AbpClaimTypes.UserId)!.Value);
                     var access_Token = await _accountManager.GetTokenByUserIdAsync(userId);
                     var refresh_Token = _accountManager.CreateRefreshToken(userId);
                     context.Response.Headers["access_token"] = access_Token;
                     context.Response.Headers["refresh_token"] = refresh_Token;
-
-
-                    //请求头替换，补充后续鉴权逻辑
                     context.Request.Headers["Authorization"] = "Bearer " + access_Token;
                 }
             }

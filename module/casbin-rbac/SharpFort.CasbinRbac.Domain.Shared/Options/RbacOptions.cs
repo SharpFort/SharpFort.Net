@@ -1,9 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SharpFort.CasbinRbac.Domain.Shared.Options
 {
     public class RbacOptions
@@ -21,16 +15,16 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Options
         /// <summary>
         /// 是否开启登录验证码
         /// </summary>
-        public bool EnableCaptcha { get; set; } = false;
+        public bool EnableCaptcha { get; set; }
 
         /// <summary>
         /// 是否开启用户注册功能
         /// </summary>
-        public bool EnableRegister { get; set; } = false;
+        public bool EnableRegister { get; set; }
 
         /// <summary>
         /// 是否开启数据库备份
         /// </summary>
-        public bool EnableDataBaseBackup { get; set; } = false;
+        public bool EnableDataBaseBackup { get; set; }
     }
 }

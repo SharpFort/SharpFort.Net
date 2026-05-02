@@ -74,14 +74,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 用户名
         /// 业务主键，不可变
         /// </summary>
-        public string UserName { get; protected set; }
+        public string UserName { get; protected set; } = null!;
 
         /// <summary>
         /// 密码哈希值
         /// 存储 BCrypt 加密后的字符串
         /// </summary>
         [SugarColumn(Length = 128)]
-        public string Password { get; protected set; }
+        public string Password { get; protected set; } = null!;
 
         /// <summary>
         /// 姓名 (实名)
@@ -185,14 +185,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 跨聚合关系，通过中间表 UserRole 连接
         /// </summary>
         [Navigate(typeof(UserRole), nameof(UserRole.UserId), nameof(UserRole.RoleId))]
-        public List<Role> Roles { get;  set; }
+        public List<Role> Roles { get;  set; } = null!;
 
         /// <summary>
         /// 岗位集合
         /// 跨聚合关系，通过中间表 UserPosition 连接
         /// </summary>
         [Navigate(typeof(UserPosition), nameof(UserPosition.UserId), nameof(UserPosition.PostId))]
-        public List<Position> Posts { get;  set; }
+        public List<Position> Posts { get;  set; } = null!;
 
         #endregion
 
@@ -224,7 +224,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             }
 
             // 1. 标准 BCrypt 验证 (以 $2a$, $2b$, $2y$ 开头)
-            if (Password.StartsWith("$2"))
+            if (Password.StartsWith("$2", StringComparison.Ordinal))
             {
                 try
                 {
@@ -253,7 +253,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             }
 
             // 2. 检查是否需要升级 (如果不是 BCrypt 格式)
-            if (!Password.StartsWith("$2"))
+            if (!Password.StartsWith("$2", StringComparison.Ordinal))
             {
                 SetPassword(rawPassword);
                 // 注意：调用方（应用服务）需要执行 Repository.UpdateAsync(user) 以持久化新密码

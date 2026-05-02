@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
@@ -87,13 +87,15 @@ namespace SharpFort.CodeGen.Application.Services
             {
                 path = Uri.UnescapeDataString(path);
                 //去除包含@的目录
-                path = string.Join("\\", path.Split("\\").Where(x => !x.Contains("@")).ToList());
+                path = string.Join('\\', path.Split('\\').Where(x => !x.Contains('@')));
                 Process.Start("explorer.exe", path);
             }
             else
             {
                 throw new UserFriendlyException("当前操作系统不支持打开目录");
             }
+            
+            await Task.CompletedTask;
         }
     }
 }

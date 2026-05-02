@@ -67,14 +67,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 部门名称
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string DeptName { get; protected set; }
+        public string DeptName { get; protected set; } = null!;
 
         /// <summary>
         /// 部门编码
         /// 业务唯一标识
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string DeptCode { get; protected set; }
+        public string DeptCode { get; protected set; } = null!;
 
         /// <summary>
         /// 父级ID
@@ -88,7 +88,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 用于高效查询所有子节点: Where(d => d.Ancestors.StartsWith("0,100%"))
         /// </summary>
         [SugarColumn(Length = 500)]
-        public string Ancestors { get; protected set; }
+        public string Ancestors { get; protected set; } = null!;
 
         /// <summary>
         /// 负责人
@@ -130,7 +130,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// [Navigate] 用于向下递归查找
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(ParentId))]
-        public List<Department> Children { get; set; }
+        public List<Department> Children { get; set; } = null!;
 
         #endregion
 
