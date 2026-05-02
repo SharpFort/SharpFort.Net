@@ -6,22 +6,22 @@ namespace FluidSequence.Domain.Services.Strategies
 {
     public class ContextStrategy : IPlaceholderStrategy, ISingletonDependency
     {
-        public bool CanHandle(string key)
+        public bool CanHandle(string placeholderKey)
         {
-            return key == "UserCode" || key == "DeptCode" || key == "TenantCode" || key.StartsWith("Param:");
+            return placeholderKey == "UserCode" || placeholderKey == "DeptCode" || placeholderKey == "TenantCode" || placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal);
         }
 
-        public string Handle(string key, SysSequenceRule rule, Dictionary<string, string> context)
+        public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
             if (context == null) return "";
             
-            if (key.StartsWith("Param:"))
+            if (placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal))
             {
-                 var paramKey = key.Substring(6);
-                 return context.ContainsKey(paramKey) ? context[paramKey] : "";
+                 var paramKey = placeholderKey.Substring(6);
+                 return context.TryGetValue(paramKey, out var val1) ? val1 : "";
             }
             
-            return context.ContainsKey(key) ? context[key] : "";
+            return context.TryGetValue(placeholderKey, out var val2) ? val2 : "";
         }
     }
 }

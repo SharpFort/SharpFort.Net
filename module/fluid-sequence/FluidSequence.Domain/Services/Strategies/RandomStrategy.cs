@@ -13,19 +13,19 @@ namespace FluidSequence.Domain.Services.Strategies
         private const string SafeChars = "ABCDEFGHJKLMNPQRSTUVWXY3456789"; 
         private const string MixChars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
 
-        public bool CanHandle(string key)
+        public bool CanHandle(string placeholderKey)
         {
-            return key.StartsWith("RAND:");
+            return placeholderKey.StartsWith("RAND:", StringComparison.Ordinal);
         }
 
-        public string Handle(string key, SysSequenceRule rule, Dictionary<string, string> context)
+        public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
             // RAND:NUM:4
-            var parts = key.Split(':');
-            if (parts.Length < 3) return key;
+            var parts = placeholderKey.Split(':');
+            if (parts.Length < 3) return placeholderKey;
 
             string type = parts[1];
-            if (!int.TryParse(parts[2], out int len)) return key;
+            if (!int.TryParse(parts[2], out int len)) return placeholderKey;
 
             char[] buffer = new char[len];
             string source = "";
@@ -36,7 +36,7 @@ namespace FluidSequence.Domain.Services.Strategies
                 case "CHAR": source = Chars; break;
                 case "SAFE": source = SafeChars; break;
                 case "MIX": source = MixChars; break;
-                default: return key;
+                default: return placeholderKey;
             }
 
             lock(_random)

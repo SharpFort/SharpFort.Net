@@ -4,9 +4,9 @@ namespace FluidSequence.Domain.Services
 {
     public class PlaceholderMeta
     {
-        public string Key { get; set; }
-        public string Label { get; set; }
-        public string Group { get; set; }
+        public string Key { get; set; } = null!;
+        public string Label { get; set; } = null!;
+        public string Group { get; set; } = null!;
     }
 
     public static class PlaceholderRegistry

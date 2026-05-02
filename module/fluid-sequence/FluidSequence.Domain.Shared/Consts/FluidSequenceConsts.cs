@@ -1,3 +1,4 @@
+#pragma warning disable CA1716
 namespace FluidSequence.Domain.Shared.Consts
 {
     public static class FluidSequenceConsts

@@ -7,41 +7,41 @@ namespace FluidSequence.Domain.Services.Strategies
 {
     public class TimeStrategy : IPlaceholderStrategy
     {
-        public bool CanHandle(string key)
+        public bool CanHandle(string placeholderKey)
         {
-            return key == "yyyy" || key == "yy" || key == "MM" || key == "dd" 
-                || key == "HH" || key == "mm" || key == "ss" 
-                || key == "ww" || key == "QQ" || key == "FY";
+            return placeholderKey == "yyyy" || placeholderKey == "yy" || placeholderKey == "MM" || placeholderKey == "dd" 
+                || placeholderKey == "HH" || placeholderKey == "mm" || placeholderKey == "ss" 
+                || placeholderKey == "ww" || placeholderKey == "QQ" || placeholderKey == "FY";
         }
 
-        public string Handle(string key, SysSequenceRule rule, Dictionary<string, string> context)
+        public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
             var now = DateTime.Now;
-            switch (key)
+            switch (placeholderKey)
             {
-                case "yyyy": return now.ToString("yyyy");
-                case "yy": return now.ToString("yy");
-                case "MM": return now.ToString("MM");
-                case "dd": return now.ToString("dd");
-                case "HH": return now.ToString("HH");
-                case "mm": return now.ToString("mm");
-                case "ss": return now.ToString("ss");
+                case "yyyy": return now.ToString("yyyy", CultureInfo.InvariantCulture);
+                case "yy": return now.ToString("yy", CultureInfo.InvariantCulture);
+                case "MM": return now.ToString("MM", CultureInfo.InvariantCulture);
+                case "dd": return now.ToString("dd", CultureInfo.InvariantCulture);
+                case "HH": return now.ToString("HH", CultureInfo.InvariantCulture);
+                case "mm": return now.ToString("mm", CultureInfo.InvariantCulture);
+                case "ss": return now.ToString("ss", CultureInfo.InvariantCulture);
                 case "ww": 
-                    return ISOWeek.GetWeekOfYear(now).ToString("D2");
+                    return ISOWeek.GetWeekOfYear(now).ToString("D2", CultureInfo.InvariantCulture);
                 case "QQ":
                     int q = (now.Month - 1) / 3 + 1;
                     return $"Q{q}";
                 case "FY":
                    int startMonth = 1;
-                   if (rule.ExtensionProps != null && rule.ExtensionProps.ContainsKey("FiscalYearStartMonth"))
+                   if (rule.ExtensionProps != null && rule.ExtensionProps.TryGetValue("FiscalYearStartMonth", out var startMonthObj))
                    {
-                       startMonth = Convert.ToInt32(rule.ExtensionProps["FiscalYearStartMonth"]);
+                       startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
                    }
                    int fy = now.Year;
                    if (now.Month < startMonth) fy--;
-                   return fy.ToString();
+                   return fy.ToString(CultureInfo.InvariantCulture);
             }
-            return key;
+            return placeholderKey;
         }
     }
 }

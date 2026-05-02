@@ -26,19 +26,19 @@ namespace FluidSequence.Domain.Entities
         /// 规则名称 (如：采购订单号)
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "规则名称", IsNullable = false)]
-        public string RuleName { get; set; }
+        public string RuleName { get; set; } = null!;
 
         /// <summary>
         /// 规则编码 (业务唯一键，如：PO_NO)
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "规则编码", IsNullable = false)]
-        public string RuleCode { get; set; }
+        public string RuleCode { get; set; } = null!;
 
         /// <summary>
         /// 生成模板 (如：PO-{DeptCode}-{yyyy}{MM}-{SEQ})
         /// </summary>
         [SugarColumn(Length = 100, ColumnDescription = "生成模板", IsNullable = false)]
-        public string Template { get; set; }
+        public string Template { get; set; } = null!;
 
         /// <summary>
         /// 当前计数值 (核心状态，持久化存储)
@@ -108,7 +108,7 @@ namespace FluidSequence.Domain.Entities
         /// 扩展属性 (JSON格式)
         /// </summary>
         [SugarColumn(IsJson = true, ColumnDescription = "扩展属性", IsNullable = true)]
-        public Dictionary<string, object> ExtensionProps { get; set; }
+        public Dictionary<string, object>? ExtensionProps { get; set; }
 
         public bool TryReset(DateTime now)
         {
@@ -153,9 +153,9 @@ namespace FluidSequence.Domain.Entities
                 case SequenceResetType.FiscalYearly:
                      // Needs ExtensionProps configuration
                      int startMonth = 1;
-                     if (ExtensionProps != null && ExtensionProps.ContainsKey("FiscalYearStartMonth"))
+                     if (ExtensionProps != null && ExtensionProps.TryGetValue("FiscalYearStartMonth", out object? startMonthObj))
                      {
-                         startMonth = Convert.ToInt32(ExtensionProps["FiscalYearStartMonth"]);
+                         startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
                      }
                      int lastFy = last.Year;
                      if (last.Month < startMonth) lastFy--;

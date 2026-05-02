@@ -6,19 +6,19 @@ namespace FluidSequence.Domain.Services.Strategies
 {
     public class SequenceStrategy : IPlaceholderStrategy, ISingletonDependency
     {
-        public bool CanHandle(string key)
+        public bool CanHandle(string placeholderKey)
         {
-            return key == "SEQ" || key == "SEQ36";
+            return placeholderKey == "SEQ" || placeholderKey == "SEQ36";
         }
 
-        public string Handle(string key, SysSequenceRule rule, Dictionary<string, string> context)
+        public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
-             if (key == "SEQ") return rule.CurrentValue.ToString().PadLeft(rule.SeqLength, '0');
-             if (key == "SEQ36") return ConvertToBase36(rule.CurrentValue); 
-             return key;
+             if (placeholderKey == "SEQ") return rule.CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(rule.SeqLength, '0');
+             if (placeholderKey == "SEQ36") return ConvertToBase36(rule.CurrentValue); 
+             return placeholderKey;
         }
 
-        private string ConvertToBase36(long value)
+        private static string ConvertToBase36(long value)
         {
             const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             if (value == 0) return "0";
