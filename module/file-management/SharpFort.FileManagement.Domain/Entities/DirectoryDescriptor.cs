@@ -52,7 +52,7 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// 目录名称
         /// </summary>
         [SugarColumn(Length = FileManagementConsts.MaxDirectoryNameLength)]
-        public string Name { get; protected set; }
+        public string Name { get; protected set; } = null!;
 
         /// <summary>
         /// 父级目录ID (null 表示根目录)

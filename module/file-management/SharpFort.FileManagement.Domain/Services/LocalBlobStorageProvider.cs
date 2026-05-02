@@ -6,8 +6,14 @@ namespace SharpFort.FileManagement.Domain.Services
     /// <summary>
     /// 本地文件系统 Blob 存储提供者
     /// </summary>
-    public class LocalBlobStorageProvider : IBlobStorageProvider
+    public partial class LocalBlobStorageProvider : IBlobStorageProvider
     {
+        [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "File saved to local: {FilePath}")]
+        private partial void LogFileSavedToLocal(string filePath);
+
+        [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "File deleted from local: {FilePath}")]
+        private partial void LogFileDeletedFromLocal(string filePath);
+
         private readonly ILogger<LocalBlobStorageProvider> _logger;
 
         public LocalBlobStorageProvider(ILogger<LocalBlobStorageProvider> logger)
@@ -29,7 +35,7 @@ namespace SharpFort.FileManagement.Domain.Services
             using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
 
-            _logger.LogDebug("File saved to local: {FilePath}", filePath);
+            LogFileSavedToLocal(filePath);
         }
 
         public Task<Stream?> GetAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
@@ -50,7 +56,7 @@ namespace SharpFort.FileManagement.Domain.Services
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
-                _logger.LogDebug("File deleted from local: {FilePath}", filePath);
+                LogFileDeletedFromLocal(filePath);
             }
             return Task.CompletedTask;
         }

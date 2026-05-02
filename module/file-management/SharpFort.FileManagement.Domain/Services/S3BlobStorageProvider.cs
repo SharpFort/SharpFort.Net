@@ -16,8 +16,20 @@ namespace SharpFort.FileManagement.Domain.Services
     /// - AccessKey: R2 API Token 的 Access Key ID
     /// - SecretKey: R2 API Token 的 Secret Access Key
     /// </remarks>
-    public class S3BlobStorageProvider : IBlobStorageProvider
+    public partial class S3BlobStorageProvider : IBlobStorageProvider
     {
+        [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "S3BlobStorageProvider.SaveAsync: S3 SDK 尚未接入，请安装 AWSSDK.S3 后实现此方法")]
+        private partial void LogSaveSdkNotImplemented();
+
+        [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "S3BlobStorageProvider.GetAsync: S3 SDK 尚未接入")]
+        private partial void LogGetSdkNotImplemented();
+
+        [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "S3BlobStorageProvider.DeleteAsync: S3 SDK 尚未接入")]
+        private partial void LogDeleteSdkNotImplemented();
+
+        [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "S3BlobStorageProvider.ExistsAsync: S3 SDK 尚未接入")]
+        private partial void LogExistsSdkNotImplemented();
+
         private readonly ILogger<S3BlobStorageProvider> _logger;
 
         public S3BlobStorageProvider(ILogger<S3BlobStorageProvider> logger)
@@ -42,7 +54,7 @@ namespace SharpFort.FileManagement.Domain.Services
             // };
             // await s3Client.PutObjectAsync(putRequest);
 
-            _logger.LogWarning("S3BlobStorageProvider.SaveAsync: S3 SDK 尚未接入，请安装 AWSSDK.S3 后实现此方法");
+            LogSaveSdkNotImplemented();
             await Task.CompletedTask;
         }
 
@@ -51,7 +63,7 @@ namespace SharpFort.FileManagement.Domain.Services
             ValidateConfig(config);
 
             // TODO: 接入 AWS SDK S3
-            _logger.LogWarning("S3BlobStorageProvider.GetAsync: S3 SDK 尚未接入");
+            LogGetSdkNotImplemented();
             return await Task.FromResult<Stream?>(null);
         }
 
@@ -60,7 +72,7 @@ namespace SharpFort.FileManagement.Domain.Services
             ValidateConfig(config);
 
             // TODO: 接入 AWS SDK S3
-            _logger.LogWarning("S3BlobStorageProvider.DeleteAsync: S3 SDK 尚未接入");
+            LogDeleteSdkNotImplemented();
             await Task.CompletedTask;
         }
 
@@ -92,7 +104,7 @@ namespace SharpFort.FileManagement.Domain.Services
             ValidateConfig(config);
 
             // TODO: 接入 AWS SDK S3
-            _logger.LogWarning("S3BlobStorageProvider.ExistsAsync: S3 SDK 尚未接入");
+            LogExistsSdkNotImplemented();
             return await Task.FromResult(false);
         }
 

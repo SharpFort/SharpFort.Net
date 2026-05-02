@@ -16,8 +16,13 @@ namespace SharpFort.FileManagement.Domain.Managers
     /// 文件管理器领域服务
     /// 迁移自 CasbinRbac.Domain.Managers.FileManager 并增强
     /// </summary>
-    public class FileManager : DomainService, IFileManager
+    public partial class FileManager : DomainService, IFileManager
     {
+        [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "未找到名为 {ProviderName} 的 Blob 存储提供者，回退到本地存储")]
+        private static partial void LogProviderNotFound(ILogger logger, string providerName);
+
+        [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "生成缩略图失败，文件ID: {FileId}")]
+        private static partial void LogThumbnailGenerationFailed(ILogger logger, Exception ex, Guid fileId);
         private readonly IGuidGenerator _guidGenerator;
         private readonly IRepository<FileDescriptor> _fileRepository;
         private readonly IRepository<FileStorageProvider> _providerRepository;
@@ -202,8 +207,7 @@ namespace SharpFort.FileManagement.Domain.Managers
             var provider = _blobProviders.FirstOrDefault(x => x.ProviderName == providerName);
             if (provider == null)
             {
-                LoggerFactory.CreateLogger<FileManager>()
-                    .LogWarning("未找到名为 {ProviderName} 的 Blob 存储提供者，回退到本地存储", providerName);
+                LogProviderNotFound(LoggerFactory.CreateLogger<FileManager>(), providerName!);
                 return _blobProviders.First(x => x.ProviderName == "Local");
             }
 
@@ -270,8 +274,7 @@ namespace SharpFort.FileManagement.Domain.Managers
             }
             catch (Exception ex)
             {
-                LoggerFactory.CreateLogger<FileManager>()
-                    .LogWarning(ex, "生成缩略图失败，文件ID: {FileId}", file.Id);
+                LogThumbnailGenerationFailed(LoggerFactory.CreateLogger<FileManager>(), ex, file.Id);
             }
         }
 

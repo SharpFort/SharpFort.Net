@@ -58,7 +58,7 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// 提供者显示名称
         /// </summary>
         [SugarColumn(Length = FileManagementConsts.MaxProviderNameLength)]
-        public string Name { get; protected set; }
+        public string Name { get; protected set; } = null!;
 
         /// <summary>
         /// 存储提供者类型
@@ -69,7 +69,7 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// 存储桶名称 (Bucket)
         /// </summary>
         [SugarColumn(Length = FileManagementConsts.MaxBucketNameLength)]
-        public string BucketName { get; protected set; }
+        public string BucketName { get; protected set; } = null!;
 
         /// <summary>
         /// 访问密钥 (AccessKey / SecretId)

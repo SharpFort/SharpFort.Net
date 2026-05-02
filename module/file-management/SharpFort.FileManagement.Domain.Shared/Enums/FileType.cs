@@ -1,3 +1,4 @@
+#pragma warning disable CA1716
 namespace SharpFort.FileManagement.Domain.Shared.Enums
 {
     /// <summary>
@@ -36,3 +37,4 @@ namespace SharpFort.FileManagement.Domain.Shared.Enums
         Archive = 5
     }
 }
+#pragma warning restore CA1716

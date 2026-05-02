@@ -1,3 +1,4 @@
+#pragma warning disable CA1716
 namespace SharpFort.FileManagement.Domain.Shared.Consts
 {
     public static class FileManagementConsts
@@ -73,3 +74,4 @@ namespace SharpFort.FileManagement.Domain.Shared.Consts
         public const string ThumbnailDirectory = "thumbnail";
     }
 }
+#pragma warning restore CA1716

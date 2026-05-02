@@ -92,19 +92,19 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// 原始文件名（用户上传时的文件名）
         /// </summary>
         [SugarColumn(Length = FileManagementConsts.MaxFileNameLength)]
-        public string Name { get; protected set; }
+        public string Name { get; protected set; } = null!;
 
         /// <summary>
         /// Blob 存储名称（实际存储时使用的名称，通常为 {Id}{Extension}）
         /// </summary>
         [SugarColumn(Length = FileManagementConsts.MaxBlobNameLength)]
-        public string BlobName { get; protected set; }
+        public string BlobName { get; protected set; } = null!;
 
         /// <summary>
         /// MIME 类型
         /// </summary>
         [SugarColumn(Length = FileManagementConsts.MaxMimeTypeLength)]
-        public string MimeType { get; protected set; }
+        public string MimeType { get; protected set; } = null!;
 
         /// <summary>
         /// 文件大小 (字节)
