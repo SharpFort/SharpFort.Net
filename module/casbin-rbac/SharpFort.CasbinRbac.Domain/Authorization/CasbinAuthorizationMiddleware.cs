@@ -37,12 +37,11 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             var path = context.Request.Path.Value;
 
             // 0. Check configured IgnoreUrls from appsettings.json
-            if (!string.IsNullOrEmpty(path) && _options.IgnoreUrls != null && _options.IgnoreUrls.Any())
+            if (!string.IsNullOrEmpty(path) && _options.IgnoreUrls != null && _options.IgnoreUrls.Count > 0)
             {
-                var pathLower = path.ToLower();
                 foreach (var ignoreUrl in _options.IgnoreUrls)
                 {
-                    if (pathLower.StartsWith(ignoreUrl.ToLower()))
+                    if (path.StartsWith(ignoreUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         await next(context);
                         return;
@@ -83,7 +82,7 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             var obj = path; //.ToLower(); // Decided to keep case for now, assuming DB matches registration.
 
             // 5. Action (act)
-            var act = context.Request.Method.ToUpper();
+            var act = context.Request.Method.ToUpperInvariant();
 
             // 6. Enforce
             bool allowed = await _enforcer.EnforceAsync(sub, dom, obj, act);

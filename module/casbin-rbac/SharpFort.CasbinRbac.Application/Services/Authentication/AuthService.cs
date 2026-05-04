@@ -155,12 +155,12 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         /// <summary>
         /// 删除第三方授权
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [RemoteService(IsEnabled = true)]
-        public override Task DeleteAsync(IEnumerable<Guid> id)
+        public override Task DeleteAsync(IEnumerable<Guid> ids)
         {
-            return base.DeleteAsync(id);
+            return base.DeleteAsync(ids);
         }
         
         [RemoteService(IsEnabled = false)]

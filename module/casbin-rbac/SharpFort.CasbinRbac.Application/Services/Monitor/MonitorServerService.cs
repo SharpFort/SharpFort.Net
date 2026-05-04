@@ -143,8 +143,8 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                             .Where(a => !a.IsDynamic)
                             .Select(a => new AssemblyInfoDto
                             {
-                                Name = a.GetName().Name ?? "Unknown",  // CS8601: Name is string?
-                                Version = a.GetName().Version?.ToString()
+                                Name = a.GetName().Name ?? "Unknown",
+                                Version = a.GetName().Version?.ToString() ?? string.Empty
                             })
                             .OrderBy(a => a.Name)
                             .ToList();

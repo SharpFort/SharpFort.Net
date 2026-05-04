@@ -45,7 +45,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             var expUser = Expressionable.Create<User>();
             
             // 如果无角色信息，默认只能看自己
-            if (roleInfo == null || !roleInfo.Any())
+            if (roleInfo == null || roleInfo.Count == 0)
             {
                 expUser.Or(u => u.Id == CurrentUser.Id);
                 sqlSugarClient.QueryFilter.AddTableFilter(expUser.ToExpression());
@@ -82,9 +82,9 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                         {
                             // 优化：利用 Ancestors 字段进行子查询
                             // 这里的 Contains 对于 Guid 来说是相对安全的
-                            string currentDeptIdStr = currentDeptId.ToString();
+                            string currentDeptIdStr = currentDeptId.ToString()!;
                             expUser.Or(u => SqlFunc.Subqueryable<Department>()
-                                .Where(d => d.Id == u.DepartmentId && 
+                                .Where(d => d.Id == u.DepartmentId &&
                                            (d.Id == currentDeptId || d.Ancestors.Contains(currentDeptIdStr)))
                                 .Any());
                         }

@@ -17,6 +17,7 @@
 	  <PackageReference Include="Hardware.Info" Version="101.1.1.1" />
 	  <PackageReference Include="Lazy.Captcha.Core" Version="2.2.4" />
 	  <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.9" />
+	  <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.7" />
 	  <PackageReference Include="Volo.Abp.BackgroundJobs.Hangfire" Version="10.2.0" />
 	 
   </ItemGroup>

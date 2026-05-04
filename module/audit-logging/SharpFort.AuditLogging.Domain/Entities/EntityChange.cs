@@ -13,7 +13,10 @@ namespace SharpFort.AuditLogging.Domain.Entities
     [SugarIndex($"index_{nameof(TenantId)}_{nameof(EntityId)}", nameof(TenantId), OrderByType.Asc, nameof(EntityTypeFullName), OrderByType.Asc, nameof(EntityId), OrderByType.Asc)]
     public class EntityChange : Entity<Guid>, IMultiTenant
     {
-        public EntityChange() { }
+        public EntityChange()
+        {
+            PropertyChanges = new List<EntityPropertyChange>();
+        }
 
         [SugarColumn(ColumnName = "Id", IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }

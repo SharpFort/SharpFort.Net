@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Globalization;
 using Lazy.Captcha.Core;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
@@ -163,15 +164,15 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <summary>
         /// 刷新token
         /// </summary>
-        /// <param name="refresh_token"></param>
+        /// <param name="refreshToken"></param>
         /// <returns></returns>
         [Authorize(AuthenticationSchemes = TokenTypeConst.Refresh)]
-        public async Task<object> PostRefreshAsync([FromQuery] string refresh_token)
+        public async Task<object> PostRefreshAsync([FromQuery] string refreshToken)
         {
-            var userId = CurrentUser.Id.Value;
+            var userId = CurrentUser.Id!.Value;
             var accessToken = await _accountManager.GetTokenByUserIdAsync(userId);
-            var refreshToken = _accountManager.CreateRefreshToken(userId);
-            return new { Token = accessToken, RefreshToken = refreshToken };
+            var newRefreshToken = _accountManager.CreateRefreshToken(userId);
+            return new { Token = accessToken, RefreshToken = newRefreshToken };
         }
 
         /// <summary>
@@ -190,8 +191,8 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <summary>
         /// 验证电话号码
         /// </summary>
-        /// <param name="str_handset"></param>
-        private async Task ValidationPhone(string phone)
+        /// <param name="phone"></param>
+        private static async Task ValidationPhone(string phone)
         {
             var res = Regex.IsMatch(phone, @"^\d{11}$");
             if (res == false)
@@ -250,7 +251,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             await ValidationPhone(input.Phone);
             
             if (validationPhoneType == PhoneValidationType.Register &&
-                await _userRepository.IsAnyAsync(x => x.Phone.ToString() == input.Phone))
+                await _userRepository.IsAnyAsync(x => x.Phone!.Value.ToString(CultureInfo.InvariantCulture) == input.Phone))
             {
                 throw new UserFriendlyException("该手机号已被注册！");
             }
@@ -285,8 +286,8 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task ValidationPhoneCaptchaAsync(PhoneValidationType validationPhoneType, long phone,
             string code)
         {
-            var item = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, phone.ToString()));
-            if (item is not null && item.Code.Equals($"{code}"))
+            var item = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, phone.ToString(CultureInfo.InvariantCulture)));
+            if (item is not null && item.Code.Equals($"{code}", StringComparison.Ordinal))
             {
                 //成功，需要清空
                 await _phoneCache.RemoveAsync(new CaptchaPhoneCacheKey(validationPhoneType, code.ToString()));
@@ -305,7 +306,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task<string> PostRetrievePasswordAsync(RetrievePasswordDto input)
         {
             //校验验证码，根据电话号码获取 value，比对验证码已经uuid
-            await ValidationPhoneCaptchaAsync(PhoneValidationType.RetrievePassword, input.Phone, input.Code);
+            await ValidationPhoneCaptchaAsync(PhoneValidationType.RetrievePassword, input.Phone, input.Code!);
 
             var entity = await _userRepository.GetFirstAsync(x => x.Phone == input.Phone);
             if (entity is null)
@@ -338,7 +339,7 @@ namespace SharpFort.CasbinRbac.Application.Services
                 throw new UserFriendlyException("手机号不能为空");
             }
             //临时账号
-            if (input.UserName.StartsWith("ls_"))
+            if (input.UserName.StartsWith("ls_", StringComparison.Ordinal))
             {
                 throw new UserFriendlyException("注册账号不能以ls_字符开头");
             }
@@ -346,7 +347,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             if (_rbacOptions.EnableCaptcha)
             {
                 //校验验证码，根据电话号码获取 value，比对验证码已经uuid
-                await ValidationPhoneCaptchaAsync(PhoneValidationType.Register, input.Phone.Value, input.Code);
+                await ValidationPhoneCaptchaAsync(PhoneValidationType.Register, input.Phone.Value, input.Code!);
             }
 
             //注册领域逻辑
@@ -401,7 +402,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             }
 
             //注意用户名大小写数据库不敏感问题
-            if (userName is not null && !user.UserName.Equals(userName))
+            if (userName is not null && !user.UserName.Equals(userName, StringComparison.Ordinal))
             {
                 throw new UserFriendlyException($"该用户名不存在或已禁用-{userName}");
             }
@@ -429,7 +430,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             var menus = data.Menus.ToList();
 
             //为超级管理员直接给全部路由
-            if (UserConst.Admin.Equals(data.User.UserName))
+            if (UserConst.Admin.Equals(data.User.UserName, StringComparison.Ordinal))
             {
                 menus = ObjectMapper.Map<List<Menu>, List<MenuDto>>(await _menuRepository.GetListAsync());
             }
@@ -477,7 +478,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <returns></returns>
         public async Task<bool> UpdatePasswordAsync(UpdatePasswordDto input)
         {
-            if (input.OldPassword.Equals(input.NewPassword))
+            if (input.OldPassword.Equals(input.NewPassword, StringComparison.Ordinal))
             {
                 throw new UserFriendlyException("无效更新！输入的数据，新密码不能与老密码相同");
             }

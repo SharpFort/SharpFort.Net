@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TencentCloud.Common.Profile;
 using TencentCloud.Common;
 using TencentCloud.Sms.V20210111.Models;
@@ -12,9 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public class TencentCloudManager : DomainService
+    public partial class TencentCloudManager : DomainService
     {
-        private ILogger<TencentCloudManager> _logger;
+        private readonly ILogger<TencentCloudManager> _logger;
         public TencentCloudManager(ILogger<TencentCloudManager> logger)
         {
             _logger= logger;
@@ -48,12 +43,23 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 // 返回的resp是一个SendSmsResponse的实例，与请求对象对应
                 SendSmsResponse resp = await client.SendSms(req);
                 // 输出json格式的字符串回包
-                _logger.LogInformation("腾讯云Sms返回："+AbstractModel.ToJsonString(resp));
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+#pragma warning disable CA1873 // IsEnabled 已保护此调用
+                    LogSmsResponse(AbstractModel.ToJsonString(resp));
+#pragma warning restore CA1873
+                }
             }
             catch (Exception e)
             {
-                _logger.LogError(e,e.ToString());
+                LogSmsError(e);
             }
         }
+
+        [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "腾讯云Sms返回：{Response}")]
+        private partial void LogSmsResponse(string response);
+
+        [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "腾讯云短信发送失败")]
+        private partial void LogSmsError(Exception ex);
     }
 }

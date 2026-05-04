@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
     /// Casbin Data Migration Service
     /// Migrates role, menu, and user-role data to Casbin policy table
     /// </summary>
-    public class CasbinSeedService : DomainService
+    public partial class CasbinSeedService : DomainService
     {
         private readonly IEnforcer _enforcer;
         private readonly ISqlSugarRepository<Role> _roleRepo;
@@ -45,14 +44,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public async Task MigrateAllAsync()
         {
             var totalSw = Stopwatch.StartNew();
-            _logger.LogInformation("========== CASBIN MIGRATION START ==========");
+            LogMigrationStart();
 
             var connectionString = _roleRepo._Db.CurrentConnectionConfig.ConnectionString;
             var dbType = _roleRepo._Db.CurrentConnectionConfig.DbType;
             string domain = "default";
 
             // ========== PHASE 1: READ DATA ==========
-            _logger.LogInformation("[PHASE 1] Starting READ phase...");
+            LogReadPhaseStart();
             var phaseSw = Stopwatch.StartNew();
 
             // Use anonymous types to avoid protected setter issues
@@ -71,7 +70,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }))
             {
                 var stepSw = Stopwatch.StartNew();
-                _logger.LogInformation("[READ] Reading Role table...");
+                LogReadingRoleTable();
 
                 // Use raw SQL to avoid entity mapping issues with TenantId field
                 // We only need: id, role_code, role_name, state (no tenant_id needed)
@@ -88,10 +87,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     State: (bool)r.state
                 )).ToList();
 
-                _logger.LogInformation("[READ] Role: {Count} rows, {ElapsedMs}ms", roleData.Count, stepSw.ElapsedMilliseconds);
+                LogTableReadComplete("Role", roleData.Count, stepSw.ElapsedMilliseconds);
 
                 stepSw.Restart();
-                _logger.LogInformation("[READ] Reading Menu table...");
+                LogReadingMenuTable();
 
                 // Use raw SQL for Menu table
                 var menuQuery = @"
@@ -108,10 +107,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     State: (bool)m.state
                 )).ToList();
 
-                _logger.LogInformation("[READ] Menu: {Count} rows, {ElapsedMs}ms", menuData.Count, stepSw.ElapsedMilliseconds);
+                LogTableReadComplete("Menu", menuData.Count, stepSw.ElapsedMilliseconds);
 
                 stepSw.Restart();
-                _logger.LogInformation("[READ] Reading RoleMenu table...");
+                LogReadingRoleMenuTable();
 
                 // Use raw SQL for RoleMenu table
                 var roleMenuQuery = @"
@@ -124,10 +123,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     MenuId: (Guid)rm.menu_id
                 )).ToList();
 
-                _logger.LogInformation("[READ] RoleMenu: {Count} rows, {ElapsedMs}ms", roleMenuData.Count, stepSw.ElapsedMilliseconds);
+                LogTableReadComplete("RoleMenu", roleMenuData.Count, stepSw.ElapsedMilliseconds);
 
                 stepSw.Restart();
-                _logger.LogInformation("[READ] Reading UserRole table...");
+                LogReadingUserRoleTable();
 
                 // Use raw SQL for UserRole table
                 var userRoleQuery = @"
@@ -140,16 +139,16 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     RoleId: (Guid)ur.role_id
                 )).ToList();
 
-                _logger.LogInformation("[READ] UserRole: {Count} rows, {ElapsedMs}ms", userRoleData.Count, stepSw.ElapsedMilliseconds);
+                LogTableReadComplete("UserRole", userRoleData.Count, stepSw.ElapsedMilliseconds);
             }
             // *** READ CLIENT IS NOW DISPOSED ***
-            _logger.LogInformation("[PHASE 1] READ phase COMPLETE. Total: {ElapsedMs}ms", phaseSw.ElapsedMilliseconds);
+            LogReadPhaseComplete(phaseSw.ElapsedMilliseconds);
 
             // Small delay to ensure connection is fully released
             await Task.Delay(100);
 
             // ========== PHASE 2: BUILD RULES IN MEMORY ==========
-            _logger.LogInformation("[PHASE 2] Starting PROCESSING phase (in-memory)...");
+            LogProcessPhaseStart();
             phaseSw.Restart();
 
             // Build dictionaries for fast lookup
@@ -162,10 +161,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 }
                 else
                 {
-                    _logger.LogWarning("[PROCESS] Skipping role {RoleId} - RoleCode is empty", r.Id);
+                    LogSkippingEmptyRoleCode(r.Id);
                 }
             }
-            _logger.LogInformation("[PROCESS] Loaded {Count} valid roles", roleDic.Count);
+            LogValidRolesLoaded(roleDic.Count);
 
             var menuDic = new Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)>();
             int menuWithApiCount = 0;
@@ -177,12 +176,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     menuWithApiCount++;
                 }
             }
-            _logger.LogInformation("[PROCESS] Loaded {MenuCount} menus, {ApiCount} with API URLs", menuDic.Count, menuWithApiCount);
+            LogMenusLoaded(menuDic.Count, menuWithApiCount);
 
             var rulesToInsert = new List<CasbinRule>();
 
             // Build p rules (role-permission)
-            _logger.LogInformation("[PROCESS] Building p-rules (role-permission)...");
+            LogBuildingPRules();
             int skippedMenus = 0;
             int skippedRoles = 0;
 
@@ -219,12 +218,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             int pRuleCount = rulesToInsert.Count;
-            _logger.LogInformation("[PROCESS] Built {Count} p-rules (role-permission)", pRuleCount);
-            if (skippedRoles > 0) _logger.LogWarning("[PROCESS] Skipped {Count} role-menu relations (role not found)", skippedRoles);
-            if (skippedMenus > 0) _logger.LogWarning("[PROCESS] Skipped {Count} role-menu relations (menu not found)", skippedMenus);
+            LogPRulesBuilt(pRuleCount);
+            if (skippedRoles > 0) LogSkippedRoleMenuRoleNotFound(skippedRoles);
+            if (skippedMenus > 0) LogSkippedRoleMenuMenuNotFound(skippedMenus);
 
             // Build g rules (user-role)
-            _logger.LogInformation("[PROCESS] Building g-rules (user-role)...");
+            LogBuildingGRules();
             int skippedUserRoles = 0;
 
             foreach (var ur in userRoleData)
@@ -245,32 +244,32 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             int gRuleCount = rulesToInsert.Count - pRuleCount;
-            _logger.LogInformation("[PROCESS] Built {Count} g-rules (user-role)", gRuleCount);
-            if (skippedUserRoles > 0) _logger.LogWarning("[PROCESS] Skipped {Count} user-role relations (role not found)", skippedUserRoles);
+            LogGRulesBuilt(gRuleCount);
+            if (skippedUserRoles > 0) LogSkippedUserRoleNotFound(skippedUserRoles);
 
-            _logger.LogInformation("[PHASE 2] PROCESSING COMPLETE. Total rules: {TotalRules}, {ElapsedMs}ms", rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
+            LogProcessPhaseComplete(rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
 
             // Log sample data for verification
-            _logger.LogInformation("[PHASE 2] Sample p-rules:");
+            LogSamplePRulesHeader();
             foreach (var rule in rulesToInsert.Where(r => r.PType == "p").Take(5))
             {
-                _logger.LogInformation("  p, {V0}, {V1}, {V2}, {V3}", rule.V0, rule.V1, rule.V2, rule.V3);
+                LogSamplePRule(rule.V0, rule.V1, rule.V2, rule.V3);
             }
 
-            _logger.LogInformation("[PHASE 2] Sample g-rules:");
+            LogSampleGRulesHeader();
             foreach (var rule in rulesToInsert.Where(r => r.PType == "g").Take(5))
             {
-                _logger.LogInformation("  g, {V0}, {V1}, {V2}", rule.V0, rule.V1, rule.V2);
+                LogSampleGRule(rule.V0, rule.V1, rule.V2);
             }
 
             // ========== PHASE 3: WRITE TO DATABASE ==========
-            _logger.LogInformation("[PHASE 3] Starting WRITE phase...");
+            LogWritePhaseStart();
             phaseSw.Restart();
 
             if (rulesToInsert.Count == 0)
             {
-                _logger.LogWarning("[PHASE 3] No rules to insert! Check your role-menu and user-role configurations.");
-                _logger.LogInformation("========== CASBIN MIGRATION COMPLETED (NO DATA). Total time: {ElapsedMs}ms ==========", totalSw.ElapsedMilliseconds);
+                LogNoRulesToInsert();
+                LogMigrationCompletedNoData(totalSw.ElapsedMilliseconds);
                 return;
             }
 
@@ -295,12 +294,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 try
                 {
                     // Clear old data
-                    _logger.LogInformation("[WRITE] Clearing old casbin_rule data...");
+                    LogClearingOldRules();
                     var deletedCount = await writeClient.Deleteable<CasbinRule>().ExecuteCommandAsync();
-                    _logger.LogInformation("[WRITE] Deleted {Count} old rules.", deletedCount);
+                    LogOldRulesDeleted(deletedCount);
 
                     // Insert new rules in batches
-                    _logger.LogInformation("[WRITE] Inserting {Count} new rules...", rulesToInsert.Count);
+                    LogInsertingRules(rulesToInsert.Count);
                     var batchSize = 500;
                     int totalInserted = 0;
 
@@ -309,42 +308,42 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                         var batch = rulesToInsert.Skip(i).Take(batchSize).ToList();
                         var insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
                         totalInserted += insertedCount;
-                        _logger.LogInformation("[WRITE] Batch {BatchNum}: inserted {Count} rules (total: {Total}/{Max})", i / batchSize + 1, insertedCount, totalInserted, rulesToInsert.Count);
+                        LogBatchInserted(i / batchSize + 1, insertedCount, totalInserted, rulesToInsert.Count);
                     }
 
-                    _logger.LogInformation("[WRITE] All {Count} rules inserted successfully.", totalInserted);
+                    LogAllRulesInserted(totalInserted);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "[WRITE] Failed to write casbin_rule data");
+                    LogWriteFailed(ex);
                     throw;
                 }
             }
             // *** WRITE CLIENT IS NOW DISPOSED ***
-            _logger.LogInformation("[PHASE 3] WRITE phase COMPLETE. {Count} rules inserted, {ElapsedMs}ms", rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
+            LogWritePhaseComplete(rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
 
             // ========== PHASE 4: RELOAD ENFORCER ==========
-            _logger.LogInformation("[PHASE 4] Reloading Casbin Enforcer...");
+            LogReloadingEnforcer();
             phaseSw.Restart();
 
             try
             {
                 await _enforcer.LoadPolicyAsync();
-                _logger.LogInformation("[PHASE 4] Enforcer reloaded successfully. {ElapsedMs}ms", phaseSw.ElapsedMilliseconds);
+                LogEnforcerReloaded(phaseSw.ElapsedMilliseconds);
 
                 // Verify loaded policies (use synchronous methods)
                 var loadedPolicies = _enforcer.GetPolicy().ToList();
                 var loadedGroupings = _enforcer.GetGroupingPolicy().ToList();
-                _logger.LogInformation("[PHASE 4] Verification: {PolicyCount} policies, {GroupingCount} groupings loaded", loadedPolicies.Count, loadedGroupings.Count);
+                LogVerificationResult(loadedPolicies.Count, loadedGroupings.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[PHASE 4] Failed to reload Casbin Enforcer");
+                LogReloadFailed(ex);
                 throw;
             }
 
             totalSw.Stop();
-            _logger.LogInformation("========== CASBIN MIGRATION COMPLETED SUCCESSFULLY. Total time: {ElapsedMs}ms ==========", totalSw.ElapsedMilliseconds);
+            LogMigrationCompleted(totalSw.ElapsedMilliseconds);
         }
 
         /// <summary>
@@ -375,6 +374,131 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             return result.ToString();
         }
+
+        #region LoggerMessage Definitions
+
+        // Migration lifecycle
+        [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "========== CASBIN MIGRATION START ==========")]
+        private partial void LogMigrationStart();
+
+        [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "========== CASBIN MIGRATION COMPLETED SUCCESSFULLY. Total time: {ElapsedMs}ms ==========")]
+        private partial void LogMigrationCompleted(long elapsedMs);
+
+        [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "========== CASBIN MIGRATION COMPLETED (NO DATA). Total time: {ElapsedMs}ms ==========")]
+        private partial void LogMigrationCompletedNoData(long elapsedMs);
+
+        // Phase 1 - Read
+        [LoggerMessage(EventId = 10, Level = LogLevel.Information, Message = "[PHASE 1] Starting READ phase...")]
+        private partial void LogReadPhaseStart();
+
+        [LoggerMessage(EventId = 11, Level = LogLevel.Information, Message = "[PHASE 1] READ phase COMPLETE. Total: {ElapsedMs}ms")]
+        private partial void LogReadPhaseComplete(long elapsedMs);
+
+        [LoggerMessage(EventId = 12, Level = LogLevel.Information, Message = "[READ] Reading Role table...")]
+        private partial void LogReadingRoleTable();
+
+        [LoggerMessage(EventId = 13, Level = LogLevel.Information, Message = "[READ] {TableName}: {Count} rows, {ElapsedMs}ms")]
+        private partial void LogTableReadComplete(string tableName, int count, long elapsedMs);
+
+        [LoggerMessage(EventId = 14, Level = LogLevel.Information, Message = "[READ] Reading Menu table...")]
+        private partial void LogReadingMenuTable();
+
+        [LoggerMessage(EventId = 15, Level = LogLevel.Information, Message = "[READ] Reading RoleMenu table...")]
+        private partial void LogReadingRoleMenuTable();
+
+        [LoggerMessage(EventId = 16, Level = LogLevel.Information, Message = "[READ] Reading UserRole table...")]
+        private partial void LogReadingUserRoleTable();
+
+        // Phase 2 - Process
+        [LoggerMessage(EventId = 20, Level = LogLevel.Information, Message = "[PHASE 2] Starting PROCESSING phase (in-memory)...")]
+        private partial void LogProcessPhaseStart();
+
+        [LoggerMessage(EventId = 21, Level = LogLevel.Warning, Message = "[PROCESS] Skipping role {RoleId} - RoleCode is empty")]
+        private partial void LogSkippingEmptyRoleCode(Guid roleId);
+
+        [LoggerMessage(EventId = 22, Level = LogLevel.Information, Message = "[PROCESS] Loaded {Count} valid roles")]
+        private partial void LogValidRolesLoaded(int count);
+
+        [LoggerMessage(EventId = 23, Level = LogLevel.Information, Message = "[PROCESS] Loaded {MenuCount} menus, {ApiCount} with API URLs")]
+        private partial void LogMenusLoaded(int menuCount, int apiCount);
+
+        [LoggerMessage(EventId = 24, Level = LogLevel.Information, Message = "[PROCESS] Building p-rules (role-permission)...")]
+        private partial void LogBuildingPRules();
+
+        [LoggerMessage(EventId = 25, Level = LogLevel.Information, Message = "[PROCESS] Built {Count} p-rules (role-permission)")]
+        private partial void LogPRulesBuilt(int count);
+
+        [LoggerMessage(EventId = 26, Level = LogLevel.Warning, Message = "[PROCESS] Skipped {Count} role-menu relations (role not found)")]
+        private partial void LogSkippedRoleMenuRoleNotFound(int count);
+
+        [LoggerMessage(EventId = 27, Level = LogLevel.Warning, Message = "[PROCESS] Skipped {Count} role-menu relations (menu not found)")]
+        private partial void LogSkippedRoleMenuMenuNotFound(int count);
+
+        [LoggerMessage(EventId = 28, Level = LogLevel.Information, Message = "[PROCESS] Building g-rules (user-role)...")]
+        private partial void LogBuildingGRules();
+
+        [LoggerMessage(EventId = 29, Level = LogLevel.Information, Message = "[PROCESS] Built {Count} g-rules (user-role)")]
+        private partial void LogGRulesBuilt(int count);
+
+        [LoggerMessage(EventId = 30, Level = LogLevel.Warning, Message = "[PROCESS] Skipped {Count} user-role relations (role not found)")]
+        private partial void LogSkippedUserRoleNotFound(int count);
+
+        [LoggerMessage(EventId = 31, Level = LogLevel.Information, Message = "[PHASE 2] PROCESSING COMPLETE. Total rules: {TotalRules}, {ElapsedMs}ms")]
+        private partial void LogProcessPhaseComplete(int totalRules, long elapsedMs);
+
+        [LoggerMessage(EventId = 32, Level = LogLevel.Information, Message = "[PHASE 2] Sample p-rules:")]
+        private partial void LogSamplePRulesHeader();
+
+        [LoggerMessage(EventId = 33, Level = LogLevel.Information, Message = "  p, {V0}, {V1}, {V2}, {V3}")]
+        private partial void LogSamplePRule(string v0, string v1, string v2, string v3);
+
+        [LoggerMessage(EventId = 34, Level = LogLevel.Information, Message = "[PHASE 2] Sample g-rules:")]
+        private partial void LogSampleGRulesHeader();
+
+        [LoggerMessage(EventId = 35, Level = LogLevel.Information, Message = "  g, {V0}, {V1}, {V2}")]
+        private partial void LogSampleGRule(string v0, string v1, string v2);
+
+        // Phase 3 - Write
+        [LoggerMessage(EventId = 40, Level = LogLevel.Information, Message = "[PHASE 3] Starting WRITE phase...")]
+        private partial void LogWritePhaseStart();
+
+        [LoggerMessage(EventId = 41, Level = LogLevel.Warning, Message = "[PHASE 3] No rules to insert! Check your role-menu and user-role configurations.")]
+        private partial void LogNoRulesToInsert();
+
+        [LoggerMessage(EventId = 42, Level = LogLevel.Information, Message = "[WRITE] Clearing old casbin_rule data...")]
+        private partial void LogClearingOldRules();
+
+        [LoggerMessage(EventId = 43, Level = LogLevel.Information, Message = "[WRITE] Deleted {Count} old rules.")]
+        private partial void LogOldRulesDeleted(int count);
+
+        [LoggerMessage(EventId = 44, Level = LogLevel.Information, Message = "[WRITE] Inserting {Count} new rules...")]
+        private partial void LogInsertingRules(int count);
+
+        [LoggerMessage(EventId = 45, Level = LogLevel.Information, Message = "[WRITE] Batch {BatchNum}: inserted {Count} rules (total: {Total}/{Max})")]
+        private partial void LogBatchInserted(int batchNum, int count, int total, int max);
+
+        [LoggerMessage(EventId = 46, Level = LogLevel.Information, Message = "[WRITE] All {Count} rules inserted successfully.")]
+        private partial void LogAllRulesInserted(int count);
+
+        [LoggerMessage(EventId = 47, Level = LogLevel.Error, Message = "[WRITE] Failed to write casbin_rule data")]
+        private partial void LogWriteFailed(Exception ex);
+
+        [LoggerMessage(EventId = 48, Level = LogLevel.Information, Message = "[PHASE 3] WRITE phase COMPLETE. {Count} rules inserted, {ElapsedMs}ms")]
+        private partial void LogWritePhaseComplete(int count, long elapsedMs);
+
+        // Phase 4 - Reload
+        [LoggerMessage(EventId = 50, Level = LogLevel.Information, Message = "[PHASE 4] Reloading Casbin Enforcer...")]
+        private partial void LogReloadingEnforcer();
+
+        [LoggerMessage(EventId = 51, Level = LogLevel.Information, Message = "[PHASE 4] Enforcer reloaded successfully. {ElapsedMs}ms")]
+        private partial void LogEnforcerReloaded(long elapsedMs);
+
+        [LoggerMessage(EventId = 52, Level = LogLevel.Information, Message = "[PHASE 4] Verification: {PolicyCount} policies, {GroupingCount} groupings loaded")]
+        private partial void LogVerificationResult(int policyCount, int groupingCount);
+
+        [LoggerMessage(EventId = 53, Level = LogLevel.Error, Message = "[PHASE 4] Failed to reload Casbin Enforcer")]
+        private partial void LogReloadFailed(Exception ex);
+
+        #endregion
     }
 }
-

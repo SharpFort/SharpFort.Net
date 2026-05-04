@@ -88,15 +88,15 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
             if (httpContext == null)
             {
                 // 无上下文 (如后台任务)，默认全输出 (通过默认 WriteObject 防止递归)
-                WriteObjectDefault(writer, value, options, null);
+                WriteObjectDefault(writer, value, options, null!);
                 return;
             }
 
             // 2. 获取服务
             var currentUser = httpContext.RequestServices.GetService<ICurrentUser>();
             var cache = httpContext.RequestServices.GetService<IFieldPermissionCache>();
-            
-            HashSet<string> denyFields = null;
+
+            HashSet<string>? denyFields = null;
 
             if (currentUser != null && currentUser.IsAuthenticated && cache != null && currentUser.Roles != null)
             {
@@ -105,10 +105,10 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
             }
 
             // 3. 序列化
-            WriteObjectDefault(writer, value, options, denyFields);
+            WriteObjectDefault(writer, value, options, denyFields!);
         }
 
-        private void WriteObjectDefault(Utf8JsonWriter writer, T value, JsonSerializerOptions options, HashSet<string> denyFields)
+        private static void WriteObjectDefault(Utf8JsonWriter writer, T value, JsonSerializerOptions options, HashSet<string> denyFields)
         {
             writer.WriteStartObject();
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Net.Http;
 using Volo.Abp.AspNetCore.SignalR;
 using SharpFort.Core.Helper;
@@ -14,16 +15,17 @@ namespace SharpFort.CasbinRbac.Application.SignalRHubs
     [HubRoute("/hub/main")]
     //开放不需要授权
     //[Authorize]
-    public class OnlineHub : AbpHub
+    public partial class OnlineHub : AbpHub
     {
         public static ConcurrentDictionary<string, OnlineUserModel> ClientUsersDic { get; set; } = new();
 
         private readonly HttpContext? _httpContext;
-        private ILogger<OnlineHub> _logger => LoggerFactory.CreateLogger<OnlineHub>();
+        private readonly ILogger<OnlineHub> _logger;
 
-        public OnlineHub(IHttpContextAccessor httpContextAccessor)
+        public OnlineHub(IHttpContextAccessor httpContextAccessor, ILogger<OnlineHub> logger)
         {
             _httpContext = httpContextAccessor?.HttpContext;
+            _logger = logger;
         }
 
 
@@ -56,8 +58,11 @@ namespace SharpFort.CasbinRbac.Application.SignalRHubs
             if (CurrentUser.IsAuthenticated)
             {
                 ClientUsersDic.RemoveAll(u => u.Value.UserId == CurrentUser.Id);
-                _logger.LogDebug(
-                    $"{DateTime.Now}：{name},{Context.ConnectionId}连接服务端success，当前已连接{ClientUsersDic.Count}个");
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    LogUserConnected(timestamp, name ?? "Unknown", Context.ConnectionId, ClientUsersDic.Count);
+                }
             }
 
             ClientUsersDic.AddOrUpdate(Context.ConnectionId, user, (_, _) => user);
@@ -80,11 +85,17 @@ namespace SharpFort.CasbinRbac.Application.SignalRHubs
             if (CurrentUser.IsAuthenticated)
             {
                 ClientUsersDic.RemoveAll(u => u.Value.UserId == CurrentUser.Id);
-                _logger.LogDebug($"用户{CurrentUser?.UserName}离开了，当前已连接{ClientUsersDic.Count}个");
+                LogUserDisconnected(CurrentUser?.UserName ?? "Unknown", ClientUsersDic.Count);
             }
             ClientUsersDic.Remove(Context.ConnectionId, out _);
             Clients.All.SendAsync("onlineNum", ClientUsersDic.Count);
             return base.OnDisconnectedAsync(exception);
         }
+
+        [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "{Time}：{UserName},{ConnectionId}连接服务端success，当前已连接{Count}个")]
+        private partial void LogUserConnected(string time, string userName, string connectionId, int count);
+
+        [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "用户{UserName}离开了，当前已连接{Count}个")]
+        private partial void LogUserDisconnected(string userName, int count);
     }
 }

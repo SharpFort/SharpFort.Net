@@ -236,10 +236,12 @@ namespace SharpFort.CasbinRbac.Domain.Entities
     }
 }
 
-/// <summary>
-/// 实体扩展
-/// </summary>
-public static class MenuEntityExtensions
+namespace SharpFort.CasbinRbac.Domain.Entities
+{
+    /// <summary>
+    /// 实体扩展
+    /// </summary>
+    public static class MenuEntityExtensions
 {
     /// <summary>
     /// 构建vue3路由
@@ -263,7 +265,7 @@ public static class MenuEntityExtensions
             r.ParentId = m.ParentId;
 
             //开头大写
-            r.Name = routerName?.First().ToString().ToUpper() + routerName?.Substring(1);
+            r.Name = string.Concat(routerName?.First().ToString().ToUpperInvariant(), routerName.AsSpan(1));
             r.Path = m.Router!;
             r.Hidden = !m.IsShow;
 
@@ -325,7 +327,7 @@ public static class MenuEntityExtensions
             .Where(m => m.MenuSource == MenuSource.Pure)
             .Select(m => new Vue3PureRouterDto
             {
-                Path = m.Router!.StartsWith("/", StringComparison.Ordinal) ? m.Router : "/" + m.Router,
+                Path = m.Router!.StartsWith('/') ? m.Router : "/" + m.Router,
                 Name = m.IsLink ? "Link" : (m.RouterName ?? string.Empty), // CS8601: RouterName 是 string?
                 component = m.Component,
                 Meta = new MetaPureRouterDto()
@@ -363,4 +365,5 @@ public static class MenuEntityExtensions
 
         return rootRouters.OrderBy(x => x.OrderNum).ThenBy(x => x.Id).ToList();
     }
+}
 }

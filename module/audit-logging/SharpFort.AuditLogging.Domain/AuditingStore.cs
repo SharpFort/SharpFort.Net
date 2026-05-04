@@ -10,7 +10,7 @@ using SharpFort.Core.Helper;
 
 namespace SharpFort.AuditLogging.Domain;
 
-public class AuditingStore : IAuditingStore, ITransientDependency
+public partial class AuditingStore : IAuditingStore, ITransientDependency
 {
     public ILogger<AuditingStore> Logger { get; set; }
     protected IAuditLogRepository AuditLogRepository { get; }
@@ -46,21 +46,31 @@ public class AuditingStore : IAuditingStore, ITransientDependency
         }
         catch (Exception ex)
         {
-            Logger.LogWarning("Could not save the audit log object: " + Environment.NewLine + auditInfo.ToString());
+            LogCouldNotSaveAuditLog(auditInfo.ToString());
             Logger.LogException(ex, LogLevel.Error);
         }
     }
 
     protected virtual async Task SaveLogAsync(AuditLogInfo auditInfo)
     {
-        Logger.LogDebug("Sf-请求追踪:" + JsonConvert.SerializeObject(auditInfo, new JsonSerializerSettings
+        if (Logger.IsEnabled(LogLevel.Debug))
         {
-            DateFormatString = "yyyy-MM-dd HH:mm:ss"
-        }));
+            var auditInfoJson = JsonConvert.SerializeObject(auditInfo, new JsonSerializerSettings
+            {
+                DateFormatString = "yyyy-MM-dd HH:mm:ss"
+            });
+            LogRequestTracking(auditInfoJson);
+        }
         using (var uow = UnitOfWorkManager.Begin())
         {
             await AuditLogRepository.InsertAsync(await Converter.ConvertAsync(auditInfo));
             await uow.CompleteAsync();
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Could not save the audit log object: {AuditInfo}")]
+    private partial void LogCouldNotSaveAuditLog(string auditInfo);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "Sf-请求追踪:{AuditInfoJson}")]
+    private partial void LogRequestTracking(string auditInfoJson);
 }

@@ -1,4 +1,4 @@
-﻿using AlibabaCloud.SDK.Dysmsapi20170525;
+using AlibabaCloud.SDK.Dysmsapi20170525;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
@@ -7,9 +7,9 @@ using SharpFort.CasbinRbac.Domain.Shared.Options;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public class AliyunManger : DomainService, IAliyunManger
+    public partial class AliyunManger : DomainService, IAliyunManger
     {
-        private ILogger<AliyunManger> _logger;
+        private readonly ILogger<AliyunManger> _logger;
         private AliyunOptions Options { get; set; }
         public AliyunManger(ILogger<AliyunManger> logger, IOptions<AliyunOptions> options)
         {
@@ -40,7 +40,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <returns></returns>
         public async Task SendSmsAsync(string phoneNumbers, string code)
         {
-          
+
             try
             {
                 var _aliyunClient = CreateClient();
@@ -57,10 +57,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             catch (Exception _error)
             {
-                _logger.LogError(_error, "阿里云短信发送错误:" + _error.Message);
+                LogAliyunSmsError(_error, _error.Message);
                 throw new UserFriendlyException("阿里云短信发送错误:" + _error.Message);
             }
         }
+
+        [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "阿里云短信发送错误: {ErrorMessage}")]
+        private partial void LogAliyunSmsError(Exception ex, string errorMessage);
     }
 
     public interface IAliyunManger
@@ -68,4 +71,3 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         Task SendSmsAsync(string phoneNumbers, string code);
     }
 }
-

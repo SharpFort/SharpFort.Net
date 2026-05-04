@@ -4,7 +4,7 @@ namespace SharpFort.AuditLogging.Domain;
 
 public class EntityChangeWithUsername
 {
-    public EntityChange EntityChange { get; set; }
+    public required EntityChange EntityChange { get; set; }
 
-    public string UserName { get; set; }
+    public required string UserName { get; set; }
 }

@@ -48,7 +48,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
             return output;
         }
 
-        private List<string> GroupedKeys(List<string> keys)
+        private static List<string> GroupedKeys(List<string> keys)
         {
             HashSet<string> resultSet = new HashSet<string>();
             foreach (string str in keys)

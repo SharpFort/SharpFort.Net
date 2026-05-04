@@ -44,11 +44,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
                 foreach (var rule in group)
                 {
-                    if (!resourceMap.ContainsKey(rule.TableName))
+                    if (!resourceMap.TryGetValue(rule.TableName, out var fieldSet))
                     {
-                        resourceMap[rule.TableName] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        fieldSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        resourceMap[rule.TableName] = fieldSet;
                     }
-                    resourceMap[rule.TableName].Add(rule.FieldName);
+                    fieldSet.Add(rule.FieldName);
                 }
                 newCache[roleId] = resourceMap;
             }

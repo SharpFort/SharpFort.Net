@@ -26,7 +26,7 @@ namespace SharpFort.CasbinRbac.Application.Services.RecordLog
             RefAsync<int> total = 0;
             //if (input.Sorting.IsNullOrWhiteSpace())
             //    input.Sorting = $"{nameof(OperationLogEntity.CreationTime)} Desc";
-            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.OperUser), x => x.OperUser.Contains(input.OperUser!))
+            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.OperUser), x => x.OperUser!.Contains(input.OperUser!))
                           .WhereIF(input.OperationType is not null, x => x.OperationType == input.OperationType)
                           .WhereIF(input.StartTime is not null && input.EndTime is not null, x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
                           .OrderByDescending(it => it.CreationTime) //降序

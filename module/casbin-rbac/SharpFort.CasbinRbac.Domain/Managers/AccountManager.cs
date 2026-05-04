@@ -78,7 +78,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             {
                 throw new UserFriendlyException(UserConst.No_Role);
             }
-            if (!userInfo.PermissionCodes.Any())
+            if (userInfo.PermissionCodes.Count == 0)
             {
                 throw new UserFriendlyException(UserConst.No_Permission);
             }
@@ -88,7 +88,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 getUserInfo(userInfo);
             }
             
-            var accessToken = CreateToken(this.UserInfoToClaim(userInfo));
+            var accessToken = CreateToken(UserInfoToClaim(userInfo));
             //将用户信息添加到缓存中，需要考虑的是更改了用户、角色、菜单等整个体系都需要将缓存进行刷新，看具体业务进行选择
             return accessToken;
         }
@@ -196,7 +196,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <param name="dto"></param>
         /// <returns></returns>
 
-        public List<KeyValuePair<string, string>> UserInfoToClaim(UserRoleMenuDto dto)
+        public static List<KeyValuePair<string, string>> UserInfoToClaim(UserRoleMenuDto dto)
         {
             var claims = new List<KeyValuePair<string, string>>();
             AddToClaim(claims, AbpClaimTypes.UserId, dto.User.Id.ToString());
@@ -211,13 +211,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             if (dto.User.Phone is not null)
             {
-                AddToClaim(claims, AbpClaimTypes.PhoneNumber, dto.User.Phone!.ToString()!);
+                AddToClaim(claims, AbpClaimTypes.PhoneNumber, dto.User.Phone.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
             if (dto.Roles.Count > 0)
             {
                 AddToClaim(claims, TokenTypeConst.RoleInfo, JsonConvert.SerializeObject(dto.Roles.Select(x => new RoleTokenInfoModel { Id = x.Id, DataScope = x.DataScope })));
             }
-            if (UserConst.Admin.Equals(dto.User.UserName))
+            if (UserConst.Admin.Equals(dto.User.UserName, StringComparison.Ordinal))
             {
                 AddToClaim(claims, TokenTypeConst.Permission, UserConst.AdminPermissionCode);
                 AddToClaim(claims, TokenTypeConst.Roles, UserConst.AdminRolesCode);
@@ -232,7 +232,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         }
 
 
-        private void AddToClaim(List<KeyValuePair<string, string>> claims, string key, string value)
+        private static void AddToClaim(List<KeyValuePair<string, string>> claims, string key, string value)
         {
             claims.Add(new KeyValuePair<string, string>(key, value));
         }

@@ -201,7 +201,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var entity = await _repository.GetByIdAsync(id);
             if (entity is null)
             {
-                throw new ApplicationException("角色未存在");
+                throw new UserFriendlyException("角色未存在");
             }
 
             entity.State = state;
@@ -223,7 +223,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             PagedResultDto<UserGetListOutputDto> output;
             //角色下已授权用户
-            if (isAllocated == true)
+            if (isAllocated)
             {
                 output = await GetAllocatedAuthUserByRoleIdAsync(roleId, input);
             }
@@ -244,7 +244,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .LeftJoin<User>((ur, u) => ur.UserId == u.Id && ur.RoleId == roleId)
                 .Where((ur, u) => ur.RoleId == roleId)
                 .WhereIF(!string.IsNullOrEmpty(input.UserName), (ur, u) => u.UserName.Contains(input.UserName!))
-                .WhereIF(input.Phone is not null, (ur, u) => u.Phone.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture)))
+                .WhereIF(input.Phone is not null, (ur, u) => u.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .Select((ur, u) => new UserGetListOutputDto { Id = u.Id }, true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             return new PagedResultDto<UserGetListOutputDto>(total, output);
@@ -258,7 +258,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .Where(u => SqlFunc.Subqueryable<UserRole>().Where(x => x.RoleId == roleId)
                     .Where(x => x.UserId == u.Id).NotAny())
                 .WhereIF(!string.IsNullOrEmpty(input.UserName), u => u.UserName.Contains(input.UserName!))
-                .WhereIF(input.Phone is not null, u => u.Phone.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture)))
+                .WhereIF(input.Phone is not null, u => u.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             var output = entities.Adapt<List<UserGetListOutputDto>>();
             return new PagedResultDto<UserGetListOutputDto>(total, output);

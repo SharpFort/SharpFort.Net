@@ -13,13 +13,15 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     /// 用于将 casbin_sys_role、casbin_sys_menu、casbin_sys_role_menu、casbin_sys_user_role 表的数据
     /// 迁移到 casbin_rule 表中，生成 Casbin 权限策略
     /// </summary>
-    public class CasbinMigrationService : ApplicationService, ICasbinMigrationService
+    public partial class CasbinMigrationService : ApplicationService, ICasbinMigrationService
     {
         private readonly CasbinSeedService _casbinSeedService;
+        private readonly ILogger<CasbinMigrationService> _logger;
 
-        public CasbinMigrationService(CasbinSeedService casbinSeedService)
+        public CasbinMigrationService(CasbinSeedService casbinSeedService, ILogger<CasbinMigrationService> logger)
         {
             _casbinSeedService = casbinSeedService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -46,7 +48,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Casbin 权限数据迁移失败");
+                LogMigrationFailed(ex);
 
                 return new
                 {
@@ -57,5 +59,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 };
             }
         }
+
+        [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Casbin 权限数据迁移失败")]
+        private partial void LogMigrationFailed(Exception ex);
     }
 }

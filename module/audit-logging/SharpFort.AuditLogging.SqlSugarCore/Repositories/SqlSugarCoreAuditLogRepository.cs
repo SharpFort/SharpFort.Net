@@ -1,4 +1,5 @@
-﻿using System.Linq.Dynamic.Core;
+﻿#pragma warning disable CS8767 // 接口可空性不匹配 - 继承自框架基类
+using System.Linq.Dynamic.Core;
 using System.Net;
 using SqlSugar;
 using Volo.Abp.Auditing;
@@ -32,18 +33,18 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
     }
 
     public virtual async Task<List<AuditLog>> GetListAsync(
-        string sorting = null,
+        string? sorting = null,
         int maxResultCount = 50,
         int skipCount = 0,
         DateTime? startTime = null,
         DateTime? endTime = null,
-        string httpMethod = null,
-        string url = null,
+        string? httpMethod = null,
+        string? url = null,
         Guid? userId = null,
-        string userName = null,
-        string applicationName = null,
-        string clientIpAddress = null,
-        string correlationId = null,
+        string? userName = null,
+        string? applicationName = null,
+        string? clientIpAddress = null,
+        string? correlationId = null,
         int? maxExecutionDuration = null,
         int? minExecutionDuration = null,
         bool? hasException = null,
@@ -77,13 +78,13 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
     public virtual async Task<long> GetCountAsync(
         DateTime? startTime = null,
         DateTime? endTime = null,
-        string httpMethod = null,
-        string url = null,
+        string? httpMethod = null,
+        string? url = null,
         Guid? userId = null,
-        string userName = null,
-        string applicationName = null,
-        string clientIpAddress = null,
-        string correlationId = null,
+        string? userName = null,
+        string? applicationName = null,
+        string? clientIpAddress = null,
+        string? correlationId = null,
         int? maxExecutionDuration = null,
         int? minExecutionDuration = null,
         bool? hasException = null,
@@ -106,7 +107,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
             httpStatusCode
         );
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         return totalCount;
     }
@@ -114,13 +115,13 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
     protected virtual async Task<ISugarQueryable<AuditLog>> GetListQueryAsync(
         DateTime? startTime = null,
         DateTime? endTime = null,
-        string httpMethod = null,
-        string url = null,
+        string? httpMethod = null,
+        string? url = null,
         Guid? userId = null,
-        string userName = null,
-        string applicationName = null,
-        string clientIpAddress = null,
-        string correlationId = null,
+        string? userName = null,
+        string? applicationName = null,
+        string? clientIpAddress = null,
+        string? correlationId = null,
         int? maxExecutionDuration = null,
         int? minExecutionDuration = null,
         bool? hasException = null,
@@ -134,7 +135,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
             .WhereIF(hasException.HasValue && hasException.Value, auditLog => auditLog.Exceptions != null && auditLog.Exceptions != "")
             .WhereIF(hasException.HasValue && !hasException.Value, auditLog => auditLog.Exceptions == null || auditLog.Exceptions == "")
             .WhereIF(httpMethod != null, auditLog => auditLog.HttpMethod == httpMethod)
-            .WhereIF(url != null, auditLog => auditLog.Url != null && auditLog.Url.Contains(url))
+            .WhereIF(url != null, auditLog => auditLog.Url != null && auditLog.Url.Contains(url!))
             .WhereIF(userId != null, auditLog => auditLog.UserId == userId)
             .WhereIF(userName != null, auditLog => auditLog.UserName == userName)
             .WhereIF(applicationName != null, auditLog => auditLog.ApplicationName == applicationName)
@@ -153,11 +154,11 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
         var result = await _DbQueryable
             .Where(a => a.ExecutionTime < endDate.AddDays(1) && a.ExecutionTime > startDate)
             .OrderBy(t => t.ExecutionTime)
-            .GroupBy(t => new { t.ExecutionTime.Value.Date })
+            .GroupBy(t => new { t.ExecutionTime!.Value.Date })
             .Select(g => new { Day = SqlFunc.AggregateMin(g.ExecutionTime), avgExecutionTime = SqlFunc.AggregateAvg(g.ExecutionDuration) })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
-        return result.ToDictionary(element => element.Day.Value.ClearTime(), element => (double)element.avgExecutionTime);
+        return result.ToDictionary(element => element.Day!.Value.ClearTime(), element => (double)element.avgExecutionTime!);
     }
 
 
@@ -168,7 +169,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
         var entityChange = await (await GetDbContextAsync()).Queryable<EntityChange>()
                                 .Where(x => x.Id == entityChangeId)
                                 .OrderBy(x => x.Id)
-                                .FirstAsync();
+                                .FirstAsync(cancellationToken);
 
         if (entityChange == null)
         {
@@ -179,22 +180,22 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
     }
 
     public virtual async Task<List<EntityChange>> GetEntityChangeListAsync(
-        string sorting = null,
+        string? sorting = null,
         int maxResultCount = 50,
         int skipCount = 0,
         Guid? auditLogId = null,
         DateTime? startTime = null,
         DateTime? endTime = null,
         EntityChangeType? changeType = null,
-        string entityId = null,
-        string entityTypeFullName = null,
+        string? entityId = null,
+        string? entityTypeFullName = null,
         bool includeDetails = false,
         CancellationToken cancellationToken = default)
     {
         var query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName, includeDetails);
 
         return await query.OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(EntityChange.ChangeTime) + " DESC") : sorting)
-            .ToPageListAsync(skipCount, maxResultCount);
+            .ToPageListAsync(skipCount, maxResultCount, cancellationToken);
     }
 
     public virtual async Task<long> GetEntityChangeCountAsync(
@@ -202,13 +203,13 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
         DateTime? startTime = null,
         DateTime? endTime = null,
         EntityChangeType? changeType = null,
-        string entityId = null,
-        string entityTypeFullName = null,
+        string? entityId = null,
+        string? entityTypeFullName = null,
         CancellationToken cancellationToken = default)
     {
         var query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName);
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         return totalCount;
     }
@@ -222,7 +223,7 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
         return new EntityChangeWithUsername()
         {
             EntityChange = auditLog.EntityChanges.First(x => x.Id == entityChangeId),
-            UserName = auditLog.UserName
+            UserName = auditLog.UserName!
         };
     }
 
@@ -236,8 +237,8 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
         var query = dbContext.Queryable<EntityChange>()
                             .Where(x => x.EntityId == entityId && x.EntityTypeFullName == entityTypeFullName);
         return await query.LeftJoin<AuditLog>((x, audit) => x.AuditLogId == audit.Id)
-             .Select((x, audit) => new EntityChangeWithUsername { EntityChange = x, UserName = audit.UserName })
-                .OrderByDescending(x => x.EntityChange.ChangeTime).ToListAsync();
+             .Select((x, audit) => new EntityChangeWithUsername { EntityChange = x, UserName = audit.UserName! })
+                .OrderByDescending(x => x.EntityChange.ChangeTime).ToListAsync(cancellationToken);
     }
 
     protected virtual async Task<ISugarQueryable<EntityChange>> GetEntityChangeListQueryAsync(
@@ -245,8 +246,8 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
         DateTime? startTime = null,
         DateTime? endTime = null,
         EntityChangeType? changeType = null,
-        string entityId = null,
-        string entityTypeFullName = null,
+        string? entityId = null,
+        string? entityTypeFullName = null,
         bool includeDetails = false)
     {
         return (await GetDbContextAsync())
@@ -256,6 +257,6 @@ public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>
             .WhereIF(endTime.HasValue, e => e.ChangeTime <= endTime)
             .WhereIF(changeType.HasValue, e => e.ChangeType == changeType)
             .WhereIF(!string.IsNullOrWhiteSpace(entityId), e => e.EntityId == entityId)
-            .WhereIF(!string.IsNullOrWhiteSpace(entityTypeFullName), e => e.EntityTypeFullName.Contains(entityTypeFullName));
+            .WhereIF(!string.IsNullOrWhiteSpace(entityTypeFullName), e => e.EntityTypeFullName!.Contains(entityTypeFullName!));
     }
 }

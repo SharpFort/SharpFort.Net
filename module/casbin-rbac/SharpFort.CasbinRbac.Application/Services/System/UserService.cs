@@ -1,6 +1,7 @@
 using Casbin;
 using Microsoft.AspNetCore.Mvc;
 using MiniExcelLibs;
+using System.Globalization;
 using System.IO;
 using SqlSugar;
 using TencentCloud.Tcr.V20190924.Models;
@@ -61,32 +62,32 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task<PagedResultDto<UserGetListOutputDto>> GetListAsync(UserGetListInputVo input)
         {
             RefAsync<int> total = 0;
-            List<Guid> deptIds = null;
+            List<Guid>? deptIds = null;
             if (input.DepartmentId is not null)
             {
                 deptIds = await _deptService.GetChildListAsync(input.DepartmentId ?? Guid.Empty);
             }
 
 
-            List<Guid> ids = input.Ids?.Split(",").Select(x => Guid.Parse(x)).ToList();
+            List<Guid>? ids = input.Ids?.Split(",").Select(x => Guid.Parse(x)).ToList();
             var outPut = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.UserName),
                     x => x.UserName.Contains(input.UserName!))
-                .WhereIF(input.Phone is not null, x => x.Phone.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(global::System.Globalization.CultureInfo.InvariantCulture)))
+                .WhereIF(input.Phone is not null, x => x.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name!.Contains(input.Name!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
                 .WhereIF(input.StartTime is not null && input.EndTime is not null,
                     x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
 
                 //这个为过滤当前部门，加入数据权限后，将由数据权限控制
-                .WhereIF(input.DepartmentId is not null, x => deptIds.Contains(x.DepartmentId ?? Guid.Empty))
-                .WhereIF(ids is not null, x => ids.Contains(x.Id))
+                .WhereIF(input.DepartmentId is not null, x => deptIds!.Contains(x.DepartmentId ?? Guid.Empty))
+                .WhereIF(ids is not null, x => ids!.Contains(x.Id))
                 .LeftJoin<Department>((user, dept) => user.DepartmentId == dept.Id)
                 .OrderByDescending(user => user.CreationTime)
                 .Select((user, dept) => new UserGetListOutputDto(), true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
             var userIds = outPut.Select(x => x.Id).ToList();
-            if (userIds.Any())
+            if (userIds.Count > 0)
             {
                 var usersWithRelations = await _repository._DbQueryable
                     .Includes(u => u.Roles)
@@ -144,7 +145,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             
             // Casbin 同步逻辑放入 GiveUserSetRoleAsync 或者在这里显式调用
             // 建议：封装一个私有方法或领域服务处理 Casbin 同步
-            await SyncCasbinUserRoles(entitiy.Id, input.RoleIds);
+            await SyncCasbinUserRoles(entitiy.Id, input.RoleIds ?? new List<Guid>());
 
             var result = await MapToGetOutputDtoAsync(entitiy);
             return result;
@@ -152,7 +153,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         private async Task SyncCasbinUserRoles(Guid userId, List<Guid> roleIds)
         {
-            if (roleIds == null || !roleIds.Any()) return;
+            if (roleIds.Count == 0) return;
 
             // 获取当前用户的域 (假设单域，或者从 User.DepartmentId 推导，或者默认 "default")
             // 方案 V1.2: g = _, _, _ (user, role, domain)
@@ -207,7 +208,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 throw new UserFriendlyException(UserConst.Name_Not_Allowed);
             }
 
-            if (await _repository.IsAnyAsync(u => input.UserName!.Equals(u.UserName) && !id.Equals(u.Id)))
+            if (await _repository.IsAnyAsync(u => input.UserName!.Equals(u.UserName, StringComparison.Ordinal) && !id.Equals(u.Id)))
             {
                 throw new UserFriendlyException(UserConst.Exist);
             }
@@ -264,7 +265,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var entity = await _repository.GetByIdAsync(id);
             if (entity is null)
             {
-                throw new ApplicationException("用户未存在");
+                throw new UserFriendlyException("用户未存在");
             }
 
             entity.State = state;

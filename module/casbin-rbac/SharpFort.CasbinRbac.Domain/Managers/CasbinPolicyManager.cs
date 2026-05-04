@@ -31,8 +31,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         #region Helper Methods
 
-        private string GetUserSubject(Guid userId) => userId.ToString();
-        private string GetRoleSubject(string roleCode) => roleCode;
+        private static string GetUserSubject(Guid userId) => userId.ToString();
+        private static string GetRoleSubject(string roleCode) => roleCode;
         private string GetTenantDomain(Guid? tenantId)
         {
             var finalTenantId = tenantId ?? _currentTenant.Id;
@@ -115,7 +115,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain).ExecuteCommandAsync();
             
             // 批量插入新关联
-            if (roles.Any())
+            if (roles.Count > 0)
             {
                 var newRules = roles.Select(r => new CasbinRule
                 {
@@ -136,7 +136,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             // 插入新数据
-            if (roles.Any())
+            if (roles.Count > 0)
             {
                 var policies = roles.Select(r => new[] { 
                     sub, 
@@ -189,7 +189,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             // 批量插入
-            if (newRules.Any())
+            if (newRules.Count > 0)
             {
                 await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
             }
@@ -197,9 +197,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 2. 内存更新
             // 先清理 (Memory way)
             await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
- 
+
             // 插入新数据
-            if (newPolicies.Any())
+            if (newPolicies.Count > 0)
             {
                 await _enforcer.AddPoliciesAsync(newPolicies);
             }

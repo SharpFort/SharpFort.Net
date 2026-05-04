@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿#nullable disable
+using Mapster;
 using SqlSugar;
 using Volo.Abp.DependencyInjection;
 using SharpFort.CasbinRbac.Domain.Entities;

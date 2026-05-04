@@ -77,7 +77,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 获取旧菜单数据
             var oldMenu = await _repository.GetByIdAsync(id);
             bool isApiChanged = oldMenu != null &&
-                (oldMenu.ApiUrl != input.ApiUrl || (oldMenu.ApiMethod?.ToUpper() ?? "") != (input.ApiMethod?.ToUpper() ?? ""));
+                (oldMenu.ApiUrl != input.ApiUrl || (oldMenu.ApiMethod?.ToUpper(CultureInfo.InvariantCulture) ?? "") != (input.ApiMethod?.ToUpper(CultureInfo.InvariantCulture) ?? ""));
 
             // /* 原代码注释保留 */
             // // TODO: 如果菜单的 ApiUrl/ApiMethod 变更，需要同步更新 Casbin 策略

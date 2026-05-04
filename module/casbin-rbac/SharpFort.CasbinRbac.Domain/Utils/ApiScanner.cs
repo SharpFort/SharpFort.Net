@@ -54,7 +54,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                     fullPath = ReplacePlaceholders(fullPath, controller.Name, method.Name);
 
                     // 规范化路径
-                    if (!fullPath.StartsWith("/")) fullPath = "/" + fullPath;
+                    if (!fullPath.StartsWith('/')) fullPath = "/" + fullPath;
 
                     // 检查是否已存在
                     var exists = await _menuRepo.IsAnyAsync(m => m.ApiUrl == fullPath && m.ApiMethod == httpMethod);
@@ -82,23 +82,23 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                 }
             }
 
-            if (newMenus.Any())
+            if (newMenus.Count > 0)
             {
                 await _menuRepo.InsertRangeAsync(newMenus);
             }
         }
 
-        private string CombinePaths(string p1, string p2)
+        private static string CombinePaths(string p1, string p2)
         {
             if (string.IsNullOrEmpty(p1)) return p2;
             if (string.IsNullOrEmpty(p2)) return p1;
             return $"{p1.TrimEnd('/')}/{p2.TrimStart('/')}";
         }
 
-        private string ReplacePlaceholders(string path, string controllerName, string actionName)
+        private static string ReplacePlaceholders(string path, string controllerName, string actionName)
         {
             // ControllerName usually ends with "Controller"
-            var cName = controllerName.EndsWith("Controller") ? controllerName.Substring(0, controllerName.Length - 10) : controllerName;
+            var cName = controllerName.EndsWith("Controller", StringComparison.Ordinal) ? controllerName.Substring(0, controllerName.Length - 10) : controllerName;
             
             path = path.Replace("[controller]", cName, StringComparison.OrdinalIgnoreCase);
             path = path.Replace("[action]", actionName, StringComparison.OrdinalIgnoreCase);

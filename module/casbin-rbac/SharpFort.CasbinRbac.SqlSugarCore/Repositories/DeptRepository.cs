@@ -1,4 +1,5 @@
-﻿using SqlSugar;
+﻿#nullable disable
+using SqlSugar;
 using Volo.Abp.DependencyInjection;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Repositories;

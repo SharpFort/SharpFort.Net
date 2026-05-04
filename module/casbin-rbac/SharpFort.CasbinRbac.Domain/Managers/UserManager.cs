@@ -21,9 +21,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 {
     public class UserManager : DomainService
     {
-        public readonly ISqlSugarRepository<User> _repository;
-        public readonly ISqlSugarRepository<UserRole> _repositoryUserRole;
-        public readonly ISqlSugarRepository<UserPosition> _repositoryUserPost;
+        private readonly ISqlSugarRepository<User> _repository;
+        private readonly ISqlSugarRepository<UserRole> _repositoryUserRole;
+        private readonly ISqlSugarRepository<UserPosition> _repositoryUserPost;
         private readonly ISqlSugarRepository<Role> _roleRepository;
         private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache;
         private readonly IGuidGenerator _guidGenerator;
@@ -81,7 +81,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 2. Casbin 同步逻辑
             var users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
             var roles = new List<Role>();
-            if (roleIds is not null && roleIds.Any())
+            if (roleIds is not null && roleIds.Count > 0)
             {
                 roles = await _roleRepository.GetListAsync(r => roleIds.Contains(r.Id));
             }
@@ -152,7 +152,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
         }
 
-        private void ValidateUserName(User input)
+        private static void ValidateUserName(User input)
         {
             if (input.UserName == UserConst.Admin || input.UserName == UserConst.TenantAdmin)
             {
@@ -220,7 +220,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             return output;
         }
 
-        private UserRoleMenuDto EntityMapToDto(User user)
+        private static UserRoleMenuDto EntityMapToDto(User user)
         {
             var userRoleMenu = new UserRoleMenuDto();
             if (user is null)
@@ -229,7 +229,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             //超级管理员特殊处理
-            if (UserConst.Admin.Equals(user.UserName))
+            if (UserConst.Admin.Equals(user.UserName, StringComparison.Ordinal))
             {
                 userRoleMenu.User = user.Adapt<UserDto>();
                 userRoleMenu.User.Password = string.Empty;
