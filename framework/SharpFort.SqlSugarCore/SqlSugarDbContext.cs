@@ -18,7 +18,7 @@ public abstract class SqlSugarDbContext : ISqlSugarDbContextDependencies
     /// <summary>
     /// 数据库客户端实例
     /// </summary>
-    protected ISqlSugarClient SqlSugarClient { get; private set; }
+    protected ISqlSugarClient SqlSugarClient { get; private set; } = null!;
 
     /// <summary>
     /// 执行顺序
@@ -63,14 +63,14 @@ public abstract class SqlSugarDbContext : ISqlSugarDbContextDependencies
     /// <summary>
     /// SQL执行前事件
     /// </summary>
-    public virtual void OnLogExecuting(string sql, SugarParameter[] pars)
+    public virtual void OnLogExecuting(string sql, SugarParameter[] parameters)
     {
     }
 
     /// <summary>
     /// SQL执行后事件
     /// </summary>
-    public virtual void OnLogExecuted(string sql, SugarParameter[] pars)
+    public virtual void OnLogExecuted(string sql, SugarParameter[] parameters)
     {
     }
 

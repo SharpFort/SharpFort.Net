@@ -51,7 +51,7 @@ public class TenantConfigurationWrapper : ITransientDependency
             var config = await TenantStoreService.FindAsync(CurrentTenantService.Id.Value);
             if (config == null)
             {
-                throw new ApplicationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}");
+                throw new InvalidOperationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}");
             }
             return config;
         }
@@ -62,7 +62,7 @@ public class TenantConfigurationWrapper : ITransientDependency
             var config = await TenantStoreService.FindAsync(CurrentTenantService.Name);
             if (config == null)
             {
-                throw new ApplicationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}");
+                throw new InvalidOperationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}");
             }
             return config;
         }
@@ -77,7 +77,7 @@ public class TenantConfigurationWrapper : ITransientDependency
     /// <returns></returns>
     public async Task<string> GetCurrentConnectionStringAsync()
     {
-        return  (await GetAsync()).ConnectionStrings.Default!;
+        return  (await GetAsync())!.ConnectionStrings!.Default!;
     }
     /// <summary>
     /// 获取当前连接名
@@ -85,7 +85,7 @@ public class TenantConfigurationWrapper : ITransientDependency
     /// <returns></returns>
     public async Task<string> GetCurrentConnectionNameAsync()
     {
-        return  (await GetAsync()).Name;
+        return  (await GetAsync())!.Name;
     }
 }
 
@@ -97,7 +97,7 @@ public static class TenantConfigurationExtensions
     /// <returns></returns>
     public static string GetCurrentConnectionString(this TenantConfiguration tenantConfiguration)
     {
-        return  tenantConfiguration.ConnectionStrings.Default!;
+        return  tenantConfiguration.ConnectionStrings!.Default!;
     }
     
     /// <summary>

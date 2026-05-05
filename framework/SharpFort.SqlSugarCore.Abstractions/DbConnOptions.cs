@@ -22,17 +22,17 @@ namespace SharpFort.SqlSugarCore.Abstractions
         /// <summary>
         /// 是否启用种子数据初始化
         /// </summary>
-        public bool EnabledDbSeed { get; set; } = false;
+        public bool EnabledDbSeed { get; set; }
 
         /// <summary>
         /// 是否启用驼峰命名转下划线命名
         /// </summary>
-        public bool EnableUnderLine { get; set; } = false;
+        public bool EnableUnderLine { get; set; }
 
         /// <summary>
         /// 是否启用Code First模式
         /// </summary>
-        public bool EnabledCodeFirst { get; set; } = false;
+        public bool EnabledCodeFirst { get; set; }
 
         /// <summary>
         /// 是否启用SQL日志记录
@@ -47,7 +47,7 @@ namespace SharpFort.SqlSugarCore.Abstractions
         /// <summary>
         /// 是否启用读写分离
         /// </summary>
-        public bool EnabledReadWrite { get; set; } = false;
+        public bool EnabledReadWrite { get; set; }
 
         /// <summary>
         /// 只读数据库连接字符串列表
@@ -57,6 +57,6 @@ namespace SharpFort.SqlSugarCore.Abstractions
         /// <summary>
         /// 是否启用SaaS多租户
         /// </summary>
-        public bool EnabledSaasMultiTenancy { get; set; } = false;
+        public bool EnabledSaasMultiTenancy { get; set; }
     }
 }

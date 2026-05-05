@@ -1,4 +1,6 @@
-﻿using Volo.Abp;
+﻿using System.Globalization;
+using System.Text;
+using Volo.Abp;
 using Volo.Abp.MultiTenancy;
 
 namespace SharpFort.TenantManagement.Domain;
@@ -7,9 +9,9 @@ namespace SharpFort.TenantManagement.Domain;
 [IgnoreMultiTenancy]
 public class TenantCacheItem
 {
-    private const string CacheKeyFormat = "i:{0},n:{1}";
+    private static readonly CompositeFormat CacheKeyFormat = CompositeFormat.Parse("i:{0},n:{1}");
 
-    public TenantConfiguration Value { get; set; }
+    public TenantConfiguration Value { get; set; } = null!;
 
     public TenantCacheItem()
     {
@@ -28,7 +30,7 @@ public class TenantCacheItem
             throw new AbpException("Both id and name can't be invalid.");
         }
 
-        return string.Format(CacheKeyFormat,
+        return string.Format(CultureInfo.InvariantCulture, CacheKeyFormat,
             id?.ToString() ?? "null",
             name.IsNullOrWhiteSpace() ? "null" : name);
     }

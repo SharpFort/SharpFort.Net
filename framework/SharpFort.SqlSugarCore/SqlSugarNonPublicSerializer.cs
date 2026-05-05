@@ -52,21 +52,21 @@ public class SqlSugarNonPublicSerializer : ISerializeService
     /// <returns></returns>
     public T DeserializeObject<T>(string value)
     {
-        if (typeof(T).FullName.StartsWith("System.Text.Json."))
+        if (typeof(T).FullName!.StartsWith("System.Text.Json.", StringComparison.Ordinal))
         {
             // 动态创建一个 JsonSerializer 实例
-            Type serializerType =typeof(T).Assembly.GetType("System.Text.Json.JsonSerializer");
+            Type? serializerType =typeof(T).Assembly.GetType("System.Text.Json.JsonSerializer");
 
-            var methods = serializerType
+            var methods = serializerType!
                 .GetMethods().Where(it=>it.Name== "Deserialize")
                 .Where(it=>it.GetParameters().Any(z=>z.ParameterType==typeof(string))).First();
 
             // 调用 SerializeObject 方法序列化对象
-            T json = (T)methods.MakeGenericMethod(typeof(T))
+            T? json = (T?)methods.MakeGenericMethod(typeof(T))
                 .Invoke(null, new object[] { value, null! });
             return json!;
         }
-        var jSetting = new JsonSerializerSettings 
+        var jSetting = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
             ContractResolver =new NonPublicPropertiesResolver() //替换默认解析器使能支持protect

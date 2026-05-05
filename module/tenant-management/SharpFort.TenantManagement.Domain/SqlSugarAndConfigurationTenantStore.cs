@@ -1,5 +1,4 @@
-﻿using System.Xml.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.Caching;
@@ -27,7 +26,7 @@ namespace SharpFort.TenantManagement.Domain
             _unitOfWorkManager = unitOfWorkManager;
         }
 
-        public new TenantConfiguration? Find(string name)
+        public new TenantConfiguration? Find(string normalizedName)
         {
             throw new NotImplementedException("请使用异步方法");
         }
@@ -37,13 +36,13 @@ namespace SharpFort.TenantManagement.Domain
             throw new NotImplementedException("请使用异步方法");
         }
 
-        public new async Task<TenantConfiguration?> FindAsync(string name)
+        public new async Task<TenantConfiguration?> FindAsync(string normalizedName)
         {
-            var tenantFromOptions = await base.FindAsync(name);
+            var tenantFromOptions = await base.FindAsync(normalizedName);
             //如果配置文件不存在改租户
             if (tenantFromOptions is null)
             {
-                return (await GetCacheItemAsync(null, name)).Value;
+                return (await GetCacheItemAsync(null, normalizedName)).Value;
             }
             else
             {
@@ -68,9 +67,9 @@ namespace SharpFort.TenantManagement.Domain
 
 
 
-        protected virtual async Task<TenantCacheItem> GetCacheItemAsync(Guid? id, string name)
+        protected virtual async Task<TenantCacheItem> GetCacheItemAsync(Guid? id, string? name)
         {
-            var cacheKey = CalculateCacheKey(id, name);
+            var cacheKey = CalculateCacheKey(id, name!);
 
             var cacheItem = await Cache.GetAsync(cacheKey, considerUow: true);
             if (cacheItem != null)
@@ -82,13 +81,13 @@ namespace SharpFort.TenantManagement.Domain
             {
                 using (CurrentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
                 {
-                    Tenant tenant = null;
+                    Tenant? tenant = null;
                     using (var uow=_unitOfWorkManager.Begin(isTransactional:false))
                     {
-                         tenant = await TenantRepository.FindAsync(id.Value); 
+                         tenant = await TenantRepository.FindAsync(id.Value);
                         await uow.CompleteAsync();
                     }
-                  
+
                     return await SetCacheAsync(cacheKey, tenant);
                 }
             }
@@ -104,15 +103,15 @@ namespace SharpFort.TenantManagement.Domain
             throw new AbpException("Both id and name can't be invalid.");
         }
 
-        protected virtual async Task<TenantCacheItem> SetCacheAsync(string cacheKey, [CanBeNull] Tenant tenant)
+        protected virtual async Task<TenantCacheItem> SetCacheAsync(string cacheKey, [CanBeNull] Tenant? tenant)
         {
             var tenantConfiguration = tenant != null ? MapToConfiguration(tenant) : null;
-            var cacheItem = new TenantCacheItem(tenantConfiguration);
+            var cacheItem = new TenantCacheItem(tenantConfiguration!);
             await Cache.SetAsync(cacheKey, cacheItem, considerUow: true);
             return cacheItem;
         }
 
-        private TenantConfiguration MapToConfiguration(Tenant Tenant)
+        private static TenantConfiguration MapToConfiguration(Tenant Tenant)
         {
             var tenantConfiguration = new TenantConfiguration();
             tenantConfiguration.Id = Tenant.Id;
@@ -122,7 +121,7 @@ namespace SharpFort.TenantManagement.Domain
             return tenantConfiguration;
         }
 
-        private ConnectionStrings? MaptoString(string tenantConnectionString)
+        private static ConnectionStrings? MaptoString(string tenantConnectionString)
         {
             var connectionStrings = new ConnectionStrings();
             connectionStrings[ConnectionStrings.DefaultConnectionStringName] = tenantConnectionString;

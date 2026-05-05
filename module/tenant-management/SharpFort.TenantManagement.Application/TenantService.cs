@@ -105,11 +105,11 @@ namespace SharpFort.TenantManagement.Application
         /// <summary>
         /// 租户删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
-        public override Task DeleteAsync(IEnumerable<Guid> id)
+        public override Task DeleteAsync(IEnumerable<Guid> ids)
         {
-            return base.DeleteAsync(id);
+            return base.DeleteAsync(ids);
         }
 
 
@@ -121,7 +121,7 @@ namespace SharpFort.TenantManagement.Application
         [HttpPut("tenant/init/{id}")]
         public async Task InitAsync([FromRoute] Guid id)
         {
-            await CurrentUnitOfWork.SaveChangesAsync();
+            await CurrentUnitOfWork!.SaveChangesAsync();
             using (CurrentTenant.Change(id))
             {
                 await CodeFirst(this.LazyServiceProvider);

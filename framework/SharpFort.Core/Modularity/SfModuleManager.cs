@@ -12,7 +12,7 @@ namespace SharpFort.Core.Modularity;
 /// Sf框架模块管理器
 /// </summary>
 [Dependency(ReplaceServices = true)]
-public class SfModuleManager : ModuleManager, IModuleManager, ISingletonDependency
+public partial class SfModuleManager : ModuleManager, IModuleManager, ISingletonDependency
 {
     private readonly IModuleContainer _moduleContainer;
     private readonly IEnumerable<IModuleLifecycleContributor> _lifecycleContributors;
@@ -42,8 +42,8 @@ public class SfModuleManager : ModuleManager, IModuleManager, ISingletonDependen
     /// <param name="context">应用程序初始化上下文</param>
     public override async Task InitializeModulesAsync(ApplicationInitializationContext context)
     {
-        _logger.LogDebug("==========模块Initialize初始化统计-跳过0ms模块==========");
-        
+        LogModuleInitStart();
+
         var moduleCount = 0;
         var stopwatch = new Stopwatch();
         var totalTime = 0L;
@@ -57,17 +57,15 @@ public class SfModuleManager : ModuleManager, IModuleManager, ISingletonDependen
                     stopwatch.Restart();
                     await contributor.InitializeAsync(context, module.Instance);
                     stopwatch.Stop();
-                    
+
                     totalTime += stopwatch.ElapsedMilliseconds;
                     moduleCount++;
 
                     // 仅记录耗时超过1ms的模块
-                    if (stopwatch.ElapsedMilliseconds > 1)
+                    if (stopwatch.ElapsedMilliseconds > 1 && _logger.IsEnabled(LogLevel.Debug))
                     {
-                        _logger.LogDebug(
-                            "耗时-{Time}ms,已加载模块-{ModuleName}", 
-                            stopwatch.ElapsedMilliseconds,
-                            module.Assembly.GetName().Name);
+                        var moduleName = module.Assembly.GetName().Name ?? "Unknown";
+                        LogModuleLoaded(stopwatch.ElapsedMilliseconds, moduleName);
                     }
                 }
                 catch (Exception ex)
@@ -79,10 +77,15 @@ public class SfModuleManager : ModuleManager, IModuleManager, ISingletonDependen
             }
         }
 
-        _logger.LogInformation(
-            "==========【{Count}】个模块初始化执行完毕，总耗时【{Time}ms】==========",
-            moduleCount,
-            totalTime);
+        LogModuleInitComplete(moduleCount, totalTime);
     }
-    
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "==========模块Initialize初始化统计-跳过0ms模块==========")]
+    private partial void LogModuleInitStart();
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "耗时-{Time}ms,已加载模块-{ModuleName}")]
+    private partial void LogModuleLoaded(long time, string moduleName);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "==========【{Count}】个模块初始化执行完毕，总耗时【{Time}ms】==========")]
+    private partial void LogModuleInitComplete(int count, long time);
 }

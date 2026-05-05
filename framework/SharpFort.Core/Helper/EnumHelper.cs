@@ -13,7 +13,7 @@ namespace SharpFort.Core.Helper
         /// <summary>
         /// 将一个枚举类型转换为另一个枚举类型（基于枚举值）
         /// </summary>
-        /// <typeparam name="New">目标枚举类型</typeparam>
+        /// <typeparam name="TNew">目标枚举类型</typeparam>
         /// <param name="oldEnum">源枚举值</param>
         /// <returns>转换后的枚举值</returns>
         /// <exception cref="ArgumentNullException">源枚举为 null</exception>
@@ -22,13 +22,10 @@ namespace SharpFort.Core.Helper
         /// enum NewStatus { Active = 1, Inactive = 2 }
         /// OldStatus.Active.EnumToEnum&lt;NewStatus&gt;() => NewStatus.Active
         /// </example>
-        public static New EnumToEnum<New>(this object oldEnum)
+        public static TNew EnumToEnum<TNew>(this object oldEnum)
         {
-            if (oldEnum is null)
-            {
-                throw new ArgumentNullException(nameof(oldEnum));
-            }
-            return (New)Enum.ToObject(typeof(New), oldEnum.GetHashCode());
+            ArgumentNullException.ThrowIfNull(oldEnum);
+            return (TNew)Enum.ToObject(typeof(TNew), oldEnum.GetHashCode());
         }
 
         /// <summary>

@@ -70,7 +70,7 @@ namespace SharpFort.Core.Helper
             byte[] bytes = new byte[numBytes];
 
             // all UPPERCASE chars
-            str = str.ToUpper();
+            str = str.ToUpper(System.Globalization.CultureInfo.InvariantCulture);
 
             int bit_buffer;
             int currentCharIndex;

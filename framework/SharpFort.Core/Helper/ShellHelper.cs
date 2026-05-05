@@ -101,7 +101,7 @@ namespace SharpFort.Core.Helper
 
             using (var process = Process.Start(info))
             {
-                output = process.StandardOutput.ReadToEnd();
+                output = process!.StandardOutput.ReadToEnd();
             }
             return output;
         }

@@ -45,6 +45,7 @@ namespace SharpFort.SqlSugarCore.Uow
         public void Dispose()
         {
             _dbContext.SqlSugarClient.Ado.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

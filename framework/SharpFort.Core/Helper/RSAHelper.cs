@@ -40,8 +40,8 @@ namespace SharpFort.Core.Helper
     /// </remarks>
     public class RSAHelper
     {
-        public readonly RSA? _privateKeyRsaProvider;
-        public readonly RSA? _publicKeyRsaProvider;
+        private readonly RSA? _privateKeyRsaProvider;
+        private readonly RSA? _publicKeyRsaProvider;
         private readonly HashAlgorithmName _hashAlgorithmName;
         private readonly Encoding _encoding;
 
@@ -143,7 +143,7 @@ namespace SharpFort.Core.Helper
         {
             if (_privateKeyRsaProvider == null)
             {
-                throw new Exception("_privateKeyRsaProvider is null");
+                throw new InvalidOperationException("_privateKeyRsaProvider is null");
             }
             var bufferSize = _privateKeyRsaProvider.KeySize / 8;
             byte[] buffer = new byte[bufferSize];//待解密块  
@@ -201,7 +201,7 @@ namespace SharpFort.Core.Helper
         {
             if (_publicKeyRsaProvider == null)
             {
-                throw new Exception("_publicKeyRsaProvider is null");
+                throw new InvalidOperationException("_publicKeyRsaProvider is null");
             }
             var bufferSize = _publicKeyRsaProvider.KeySize / 8 - 11;
             byte[] buffer = new byte[bufferSize];//待加密块
@@ -230,7 +230,7 @@ namespace SharpFort.Core.Helper
         /// </summary>
         /// <param name="privateKey"></param>
         /// <returns></returns>
-        private RSA CreateRsaProviderFromPrivateKey(string privateKey)
+        private static RSA CreateRsaProviderFromPrivateKey(string privateKey)
         {
             var privateKeyBits = Convert.FromBase64String(privateKey);
 
@@ -247,15 +247,15 @@ namespace SharpFort.Core.Helper
                 else if (twobytes == 0x8230)
                     binr.ReadInt16();
                 else
-                    throw new Exception("Unexpected value read binr.ReadUInt16()");
+                    throw new InvalidOperationException("Unexpected value read binr.ReadUInt16()");
 
                 twobytes = binr.ReadUInt16();
                 if (twobytes != 0x0102)
-                    throw new Exception("Unexpected version");
+                    throw new InvalidOperationException("Unexpected version");
 
                 bt = binr.ReadByte();
                 if (bt != 0x00)
-                    throw new Exception("Unexpected value read binr.ReadByte()");
+                    throw new InvalidOperationException("Unexpected value read binr.ReadByte()");
 
                 rsaParameters.Modulus = binr.ReadBytes(GetIntegerSize(binr));
                 rsaParameters.Exponent = binr.ReadBytes(GetIntegerSize(binr));
@@ -279,7 +279,7 @@ namespace SharpFort.Core.Helper
         /// </summary>
         /// <param name="publicKeyString"></param>
         /// <returns></returns>
-        public RSA? CreateRsaProviderFromPublicKey(string publicKeyString)
+        public static RSA? CreateRsaProviderFromPublicKey(string publicKeyString)
         {
             // encoded OID sequence for  PKCS #1 rsaEncryption szOID_RSA_RSA = "1.2.840.113549.1.1.1"
             byte[] seqOid = { 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00 };
@@ -376,7 +376,7 @@ namespace SharpFort.Core.Helper
 
         #region 导入密钥算法
 
-        private int GetIntegerSize(BinaryReader binr)
+        private static int GetIntegerSize(BinaryReader binr)
         {
             byte bt = 0;
             int count = 0;
@@ -408,7 +408,7 @@ namespace SharpFort.Core.Helper
             return count;
         }
 
-        private bool CompareBytearrays(byte[] a, byte[] b)
+        private static bool CompareBytearrays(byte[] a, byte[] b)
         {
             if (a.Length != b.Length)
                 return false;

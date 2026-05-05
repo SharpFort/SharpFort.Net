@@ -6,15 +6,15 @@ namespace SharpFort.TenantManagement.Domain
     {
         Task<Tenant> FindByNameAsync(string name, bool includeDetails = true);
 
-        Task<List<Tenant>> GetListAsync(string sorting = null,
+        Task<List<Tenant>> GetListAsync(string? sorting = null,
             int maxResultCount = int.MaxValue,
             int skipCount = 0,
-      string filter = null,
+      string? filter = null,
       bool includeDetails = false);
 
 
         Task<long> GetCountAsync(
-            string filter = null);
+            string? filter = null);
 
     }
 }

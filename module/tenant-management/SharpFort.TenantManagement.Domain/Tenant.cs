@@ -25,10 +25,10 @@ namespace SharpFort.TenantManagement.Domain
 
         [SugarColumn(IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }
-        public virtual string Name { get; protected set; }
+        public virtual string Name { get; protected set; } = null!;
         public int EntityVersion { get; protected set; }
 
-        public string TenantConnectionString { get; protected set; }
+        public string TenantConnectionString { get; protected set; } = null!;
 
         public DbType DbType { get; protected set; }
 

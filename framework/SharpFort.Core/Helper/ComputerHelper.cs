@@ -1,10 +1,12 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 
 namespace SharpFort.Core.Helper
 {
     public class ComputerHelper
     {
+        private static readonly char[] NewLineSeparators = ['\n', '\r'];
 
         /// <summary>
         /// 将 object 转换为 long，若转换失败，则返回 0。不抛出异常。
@@ -15,7 +17,7 @@ namespace SharpFort.Core.Helper
         {
             try
             {
-                return long.Parse(obj.ToString());
+                return long.Parse(obj.ToString()!, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -36,9 +38,9 @@ namespace SharpFort.Core.Helper
                 {
                     return DateTime.MinValue;
                 }
-                if (str.Contains("-") || str.Contains("/"))
+                if (str.Contains('-') || str.Contains('/'))
                 {
-                    return DateTime.Parse(str);
+                    return DateTime.Parse(str, CultureInfo.InvariantCulture);
                 }
                 else
                 {
@@ -71,7 +73,7 @@ namespace SharpFort.Core.Helper
         {
             try
             {
-                return double.Parse(obj.ToString());
+                return double.Parse(obj.ToString()!, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -100,13 +102,12 @@ namespace SharpFort.Core.Helper
         {
             try
             {
-                MemoryMetricsClient client = new();
-                MemoryMetrics memoryMetrics = IsUnix() ? client.GetUnixMetrics() : client.GetWindowsMetrics();
+                MemoryMetrics memoryMetrics = IsUnix() ? MemoryMetricsClient.GetUnixMetrics() : MemoryMetricsClient.GetWindowsMetrics();
 
                 memoryMetrics.FreeRam = Math.Round(memoryMetrics.Free / 1024, 2) + "GB";
                 memoryMetrics.UsedRam = Math.Round(memoryMetrics.Used / 1024, 2) + "GB";
                 memoryMetrics.TotalRAM = Math.Round(memoryMetrics.Total / 1024, 2) + "GB";
-                memoryMetrics.RAMRate = Math.Ceiling(100 * memoryMetrics.Used / memoryMetrics.Total).ToString() + "%";
+                memoryMetrics.RAMRate = Math.Ceiling(100 * memoryMetrics.Used / memoryMetrics.Total).ToString(CultureInfo.InvariantCulture) + "%";
   
                 return memoryMetrics;
             }
@@ -141,10 +142,10 @@ namespace SharpFort.Core.Helper
                     DiskInfo diskInfo = new()
                     {
                         DiskName = "/",
-                        TotalSize = long.Parse(rootDisk[0]) / 1024,
-                        Used = long.Parse(rootDisk[1]) / 1024,
-                        AvailableFreeSpace = long.Parse(rootDisk[2]) / 1024,
-                        AvailablePercent = decimal.Parse(rootDisk[3].Replace("%", ""))
+                        TotalSize = long.Parse(rootDisk[0], CultureInfo.InvariantCulture) / 1024,
+                        Used = long.Parse(rootDisk[1], CultureInfo.InvariantCulture) / 1024,
+                        AvailableFreeSpace = long.Parse(rootDisk[2], CultureInfo.InvariantCulture) / 1024,
+                        AvailablePercent = decimal.Parse(rootDisk[3].Replace("%", ""), CultureInfo.InvariantCulture)
                     };
                     diskInfos.Add(diskInfo);
                 }
@@ -216,7 +217,7 @@ namespace SharpFort.Core.Helper
                 if (IsUnix())
                 {
                     string output = ShellHelper.Bash("uptime -s").Trim();
-                    runTime = DateTimeHelper.FormatTime(ParseToLong((DateTime.Now - ParseToDateTime(output)).TotalMilliseconds.ToString().Split('.')[0]));
+                    runTime = DateTimeHelper.FormatTime(ParseToLong((DateTime.Now - ParseToDateTime(output)).TotalMilliseconds.ToString(CultureInfo.InvariantCulture).Split('.')[0]));
                 }
                 else
                 {
@@ -224,7 +225,7 @@ namespace SharpFort.Core.Helper
                     string[] outputArr = output.Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
                     if (outputArr.Length == 2)
                     {
-                        runTime = DateTimeHelper.FormatTime(ParseToLong((DateTime.Now - ParseToDateTime( outputArr[1].Split('.')[0])).TotalMilliseconds.ToString().Split('.')[0]));
+                        runTime = DateTimeHelper.FormatTime(ParseToLong((DateTime.Now - ParseToDateTime( outputArr[1].Split('.')[0])).TotalMilliseconds.ToString(CultureInfo.InvariantCulture).Split('.')[0]));
                     }
                 }
             }
@@ -245,23 +246,23 @@ namespace SharpFort.Core.Helper
             if (IsUnix())
             {
                 string logicalOutput = ShellHelper.Bash("lscpu | grep '^CPU(s):' | awk '{print $2}'");
-                logicalProcessors = int.Parse(logicalOutput.Trim());
+                logicalProcessors = int.Parse(logicalOutput.Trim(), CultureInfo.InvariantCulture);
 
                 string coresOutput = ShellHelper.Bash("lscpu | grep 'Core(s) per socket:' | awk '{print $4}'");
                 string socketsOutput = ShellHelper.Bash("lscpu | grep 'Socket(s):' | awk '{print $2}'");
-                cores = int.Parse(coresOutput.Trim()) * int.Parse(socketsOutput.Trim());
+                cores = int.Parse(coresOutput.Trim(), CultureInfo.InvariantCulture) * int.Parse(socketsOutput.Trim(), CultureInfo.InvariantCulture);
             }
             else
             {
                 string output = ShellHelper.Cmd("wmic", "cpu get NumberOfCores,NumberOfLogicalProcessors /format:csv");
-                var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                var lines = output.Split(NewLineSeparators, StringSplitOptions.RemoveEmptyEntries);
 
                 if (lines.Length > 1)
                 {
                     var values = lines[1].Split(',');
                   
-                    cores =  int.Parse(values[1].Trim());
-                    logicalProcessors =int.Parse(values[2].Trim());
+                    cores =  int.Parse(values[1].Trim(), CultureInfo.InvariantCulture);
+                    logicalProcessors =int.Parse(values[2].Trim(), CultureInfo.InvariantCulture);
                 }
             }
 
@@ -309,20 +310,20 @@ namespace SharpFort.Core.Helper
         [JsonIgnore]
         public double Free { get; set; }
 
-        public string UsedRam { get; set; }
-   
+        public string UsedRam { get; set; } = string.Empty;
+
         /// <summary>
         /// 总内存 GB
         /// </summary>
-        public string TotalRAM { get; set; }
+        public string TotalRAM { get; set; } = string.Empty;
         /// <summary>
         /// 内存使用率 %
         /// </summary>
-        public string RAMRate { get; set; }
+        public string RAMRate { get; set; } = string.Empty;
         /// <summary>
         /// 空闲内存
         /// </summary>
-        public string FreeRam { get; set; }
+        public string FreeRam { get; set; } = string.Empty;
     }
 
     public class DiskInfo
@@ -330,8 +331,8 @@ namespace SharpFort.Core.Helper
         /// <summary>
         /// 磁盘名
         /// </summary>
-        public string DiskName { get; set; }
-        public string TypeName { get; set; }
+        public string DiskName { get; set; } = string.Empty;
+        public string TypeName { get; set; } = string.Empty;
         public long TotalFree { get; set; }
         public long TotalSize { get; set; }
         /// <summary>
@@ -353,7 +354,7 @@ namespace SharpFort.Core.Helper
         /// windows系统获取内存信息
         /// </summary>
         /// <returns></returns>
-        public MemoryMetrics GetWindowsMetrics()
+        public static MemoryMetrics GetWindowsMetrics()
         {
             string output = ShellHelper.Cmd("wmic", "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value");
             var metrics = new MemoryMetrics();
@@ -364,8 +365,8 @@ namespace SharpFort.Core.Helper
             var freeMemoryParts = lines[0].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
             var totalMemoryParts = lines[1].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
 
-            metrics.Total = Math.Round(double.Parse(totalMemoryParts[1]) / 1024, 0);
-            metrics.Free = Math.Round(double.Parse(freeMemoryParts[1]) / 1024, 0);//m
+            metrics.Total = Math.Round(double.Parse(totalMemoryParts[1], CultureInfo.InvariantCulture) / 1024, 0);
+            metrics.Free = Math.Round(double.Parse(freeMemoryParts[1], CultureInfo.InvariantCulture) / 1024, 0);//m
             metrics.Used = metrics.Total - metrics.Free;
 
             return metrics;
@@ -375,7 +376,7 @@ namespace SharpFort.Core.Helper
         /// Unix系统获取
         /// </summary>
         /// <returns></returns>
-        public MemoryMetrics GetUnixMetrics()
+        public static MemoryMetrics GetUnixMetrics()
         {
             string output = ShellHelper.Bash(@"
 # 从 /proc/meminfo 文件中提取总内存
@@ -392,9 +393,9 @@ echo $total_mem $used_mem $free_mem
                 var memory = output.Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
                 if (memory.Length >= 2)
                 {
-                    metrics.Total =  Math.Round(double.Parse(memory[0]) / 1024, 0);
-               
-                    metrics.Free = Math.Round(double.Parse(memory[1])/ 1024, 0);//m
+                    metrics.Total =  Math.Round(double.Parse(memory[0], CultureInfo.InvariantCulture) / 1024, 0);
+
+                    metrics.Free = Math.Round(double.Parse(memory[1], CultureInfo.InvariantCulture)/ 1024, 0);//m
                     metrics.Used =   metrics.Total   - metrics.Free;
                 }
             }

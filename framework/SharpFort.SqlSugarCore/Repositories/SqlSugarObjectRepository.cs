@@ -14,8 +14,10 @@ namespace SharpFort.SqlSugarCore.Repositories
 {
     public class SqlSugarObjectRepository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
+#pragma warning disable CA1707 // 框架约定命名，与接口 ISqlSugarRepository._Db 保持一致
         public ISqlSugarClient _Db => GetDbContextAsync().Result;
-        private ISugarDbContextProvider<ISqlSugarDbContext> _sugarDbContextProvider;
+#pragma warning restore CA1707
+        private readonly ISugarDbContextProvider<ISqlSugarDbContext> _sugarDbContextProvider = null!;
         /// <summary>
         /// 获取DB
         /// </summary>
@@ -35,7 +37,9 @@ namespace SharpFort.SqlSugarCore.Repositories
         /// <summary>
         /// 实体名称
         /// </summary>
+#pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配
         public string EntityName { get; set; } = typeof(TEntity).Name;
+#pragma warning restore CS8767
 
         /// <summary>
         /// 提供程序名称
@@ -139,6 +143,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         }
     }
 
+#pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配（继承自基类）
     public class SqlSugarObjectRepository<TEntity, TKey> : SqlSugarObjectRepository<TEntity>,  IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     {
         public Task DeleteAsync(TKey id, bool autoSave = false, CancellationToken cancellationToken = default)

@@ -18,12 +18,14 @@ namespace SharpFort.SqlSugarCore.Abstractions
         /// <summary>
         /// 获取SqlSugar客户端实例
         /// </summary>
+#pragma warning disable CA1707 // 框架约定命名，重命名为破坏性变更
         ISqlSugarClient _Db { get; }
 
         /// <summary>
         /// 获取查询构造器
         /// </summary>
         ISugarQueryable<TEntity> _DbQueryable { get; }
+#pragma warning restore CA1707
 
         /// <summary>
         /// 异步获取数据库上下文

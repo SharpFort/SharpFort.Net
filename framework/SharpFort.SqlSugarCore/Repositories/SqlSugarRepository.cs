@@ -17,16 +17,18 @@ namespace SharpFort.SqlSugarCore.Repositories
 {
     public class SqlSugarRepository<TEntity> : ISqlSugarRepository<TEntity>, IRepository<TEntity> where TEntity : class, IEntity, new()
     {
+#pragma warning disable CA1707 // 框架约定命名，与接口 ISqlSugarRepository._Db 保持一致
         public ISqlSugarClient _Db => AsyncContext.Run(async () => await GetDbContextAsync());
 
         public ISugarQueryable<TEntity> _DbQueryable => _Db.Queryable<TEntity>();
+#pragma warning restore CA1707
 
         private readonly ISugarDbContextProvider<ISqlSugarDbContext> _dbContextProvider;
-        
+
         /// <summary>
         /// 异步查询执行器
         /// </summary>
-        public IAsyncQueryableExecuter AsyncExecuter { get; }
+        public IAsyncQueryableExecuter AsyncExecuter { get; } = null!;
 
         /// <summary>
         /// 是否启用变更追踪
@@ -36,7 +38,9 @@ namespace SharpFort.SqlSugarCore.Repositories
         /// <summary>
         /// 实体名称
         /// </summary>
+#pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配
         public string EntityName { get; set; } = typeof(TEntity).Name;
+#pragma warning restore CS8767
 
         /// <summary>
         /// 提供程序名称
@@ -224,9 +228,9 @@ namespace SharpFort.SqlSugarCore.Repositories
         #endregion
 
         #region SimpleClient模块
-        public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await (await GetDbSimpleClientAsync()).CountAsync(whereExpression);
+            return await (await GetDbSimpleClientAsync()).CountAsync(predicate);
         }
 
         public virtual async Task<bool> DeleteAsync(TEntity deleteObj)
@@ -256,15 +260,15 @@ namespace SharpFort.SqlSugarCore.Repositories
             }
         }
 
-        public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> predicate)
         {
             if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
             {
-                return await (await GetDbSimpleClientAsync()).AsUpdateable().SetColumns(nameof(ISoftDelete.IsDeleted), true).Where(whereExpression).ExecuteCommandAsync() > 0;
+                return await (await GetDbSimpleClientAsync()).AsUpdateable().SetColumns(nameof(ISoftDelete.IsDeleted), true).Where(predicate).ExecuteCommandAsync() > 0;
             }
             else
             {
-                return await (await GetDbSimpleClientAsync()).DeleteAsync(whereExpression);
+                return await (await GetDbSimpleClientAsync()).DeleteAsync(predicate);
             }
 
         }
@@ -312,9 +316,9 @@ namespace SharpFort.SqlSugarCore.Repositories
 
 
 
-        public virtual async Task<TEntity> GetFirstAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<TEntity> GetFirstAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await (await GetDbSimpleClientAsync()).GetFirstAsync(whereExpression);
+            return await (await GetDbSimpleClientAsync()).GetFirstAsync(predicate);
         }
 
         public virtual async Task<List<TEntity>> GetListAsync()
@@ -322,24 +326,24 @@ namespace SharpFort.SqlSugarCore.Repositories
             return await (await GetDbSimpleClientAsync()).GetListAsync();
         }
 
-        public virtual async Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await (await GetDbSimpleClientAsync()).GetListAsync(whereExpression);
+            return await (await GetDbSimpleClientAsync()).GetListAsync(predicate);
         }
 
-        public virtual async Task<List<TEntity>> GetPageListAsync(Expression<Func<TEntity, bool>> whereExpression, int pageNum, int pageSize)
+        public virtual async Task<List<TEntity>> GetPageListAsync(Expression<Func<TEntity, bool>> predicate, int pageIndex, int pageSize)
         {
-            return await (await GetDbSimpleClientAsync()).GetPageListAsync(whereExpression, new PageModel() { PageIndex = pageNum, PageSize = pageSize });
+            return await (await GetDbSimpleClientAsync()).GetPageListAsync(predicate, new PageModel() { PageIndex = pageIndex, PageSize = pageSize });
         }
 
-        public virtual async Task<List<TEntity>> GetPageListAsync(Expression<Func<TEntity, bool>> whereExpression, int pageNum, int pageSize, Expression<Func<TEntity, object>>? orderByExpression = null, OrderByType orderByType = OrderByType.Asc)
+        public virtual async Task<List<TEntity>> GetPageListAsync(Expression<Func<TEntity, bool>> predicate, int pageIndex, int pageSize, Expression<Func<TEntity, object>>? orderByExpression = null, OrderByType orderByType = OrderByType.Asc)
         {
-            return await (await GetDbSimpleClientAsync()).GetPageListAsync(whereExpression, new PageModel { PageIndex = pageNum, PageSize = pageSize }, orderByExpression, orderByType);
+            return await (await GetDbSimpleClientAsync()).GetPageListAsync(predicate, new PageModel { PageIndex = pageIndex, PageSize = pageSize }, orderByExpression, orderByType);
         }
 
-        public virtual async Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await (await GetDbSimpleClientAsync()).GetSingleAsync(whereExpression);
+            return await (await GetDbSimpleClientAsync()).GetSingleAsync(predicate);
         }
 
         public virtual async Task<bool> InsertAsync(TEntity insertObj)
@@ -357,9 +361,9 @@ namespace SharpFort.SqlSugarCore.Repositories
             return await (await GetDbSimpleClientAsync()).InsertOrUpdateAsync(datas);
         }
 
-        public virtual async Task<bool> InsertRangeAsync(List<TEntity> insertObjs)
+        public virtual async Task<bool> InsertRangeAsync(List<TEntity> entities)
         {
-            return await (await GetDbSimpleClientAsync()).InsertRangeAsync(insertObjs);
+            return await (await GetDbSimpleClientAsync()).InsertRangeAsync(entities);
         }
 
         public virtual async Task<long> InsertReturnBigIdentityAsync(TEntity insertObj)
@@ -382,9 +386,9 @@ namespace SharpFort.SqlSugarCore.Repositories
             return await (await GetDbSimpleClientAsync()).InsertReturnSnowflakeIdAsync(insertObj);
         }
 
-        public virtual async Task<bool> IsAnyAsync(Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<bool> IsAnyAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return await (await GetDbSimpleClientAsync()).IsAnyAsync(whereExpression);
+            return await (await GetDbSimpleClientAsync()).IsAnyAsync(predicate);
         }
 
         public virtual async Task<bool> UpdateAsync(TEntity updateObj)
@@ -406,21 +410,22 @@ namespace SharpFort.SqlSugarCore.Repositories
             return await (await GetDbSimpleClientAsync()).UpdateAsync(updateObj);
         }
 
-        public virtual async Task<bool> UpdateAsync(Expression<Func<TEntity, TEntity>> columns, Expression<Func<TEntity, bool>> whereExpression)
+        public virtual async Task<bool> UpdateAsync(Expression<Func<TEntity, TEntity>> columns, Expression<Func<TEntity, bool>> predicate)
         {
-            return await (await GetDbSimpleClientAsync()).UpdateAsync(columns, whereExpression);
+            return await (await GetDbSimpleClientAsync()).UpdateAsync(columns, predicate);
         }
 
 
 
-        public virtual async Task<bool> UpdateRangeAsync(List<TEntity> updateObjs)
+        public virtual async Task<bool> UpdateRangeAsync(List<TEntity> entities)
         {
-            return await (await GetDbSimpleClientAsync()).UpdateRangeAsync(updateObjs);
+            return await (await GetDbSimpleClientAsync()).UpdateRangeAsync(entities);
         }
 
         #endregion
     }
 
+#pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配（继承自基类）
     public class SqlSugarRepository<TEntity, TKey> : SqlSugarRepository<TEntity>, ISqlSugarRepository<TEntity, TKey>, IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
     {
         public SqlSugarRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
@@ -429,22 +434,22 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task DeleteAsync(TKey id, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await DeleteByIdAsync(id);
+            await DeleteByIdAsync(id!);
         }
 
         public virtual async Task DeleteManyAsync(IEnumerable<TKey> ids, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await DeleteByIdsAsync(ids.Select(x => (object)x).ToArray());
+            await DeleteByIdsAsync(ids.Select(x => (object)x!).ToArray());
         }
 
         public virtual async Task<TEntity?> FindAsync(TKey id, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-            return await GetByIdAsync(id);
+            return await GetByIdAsync(id!);
         }
 
         public virtual async Task<TEntity> GetAsync(TKey id, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-            return await GetByIdAsync(id);
+            return await GetByIdAsync(id!);
         }
     }
 }

@@ -9,6 +9,6 @@ namespace SharpFort.TenantManagement.Application.Contracts.Dtos
 {
     public class TenantSelectOutputDto : EntityDto<Guid>
     {
-        public string Name { get; set; }
+        public required string Name { get; set; }
     }
 }

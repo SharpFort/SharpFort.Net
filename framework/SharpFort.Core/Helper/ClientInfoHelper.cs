@@ -12,10 +12,10 @@ namespace SharpFort.Core.Helper
     {
         public class ClientResult
         {
-            public string LoginIp { get; set; }
-            public string LoginLocation { get; set; }
-            public string Browser { get; set; }
-            public string Os { get; set; }
+            public string LoginIp { get; set; } = string.Empty;
+            public string LoginLocation { get; set; } = string.Empty;
+            public string Browser { get; set; } = string.Empty;
+            public string Os { get; set; } = string.Empty;
         }
 
         public static ClientResult GetClientInfo(HttpContext context)

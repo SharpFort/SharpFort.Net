@@ -21,7 +21,7 @@ namespace SharpFort.SqlSugarCore.Uow
         /// <summary>
         /// 服务提供者
         /// </summary>
-        public IServiceProvider ServiceProvider { get; set; }
+        public IServiceProvider ServiceProvider { get; set; } = null!;
 
         /// <summary>
         /// 数据库上下文访问器实例
@@ -55,8 +55,8 @@ namespace SharpFort.SqlSugarCore.Uow
         public virtual async Task<TDbContext> GetDbContextAsync()
         {
             // 获取当前租户配置
-            var tenantConfiguration = await _tenantConfigurationWrapper.GetAsync();
-            
+            var tenantConfiguration = (await _tenantConfigurationWrapper.GetAsync())!;
+
             // 获取连接字符串信息
             var connectionStringName = tenantConfiguration.GetCurrentConnectionName();
             var connectionString = tenantConfiguration.GetCurrentConnectionString();

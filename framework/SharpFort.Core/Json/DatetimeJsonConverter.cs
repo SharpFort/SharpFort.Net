@@ -45,6 +45,6 @@ public class DatetimeJsonConverter : JsonConverter<DateTime>
     /// <param name="options">JSON序列化选项</param>
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.ToString(_dateFormat));
+        writer.WriteStringValue(value.ToString(_dateFormat, System.Globalization.CultureInfo.InvariantCulture));
     }
 }

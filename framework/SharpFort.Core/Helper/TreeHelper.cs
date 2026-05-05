@@ -12,9 +12,9 @@ namespace SharpFort.Core.Helper
         {
             if (list is not null && list.Count > 0)
             {
-                IList<T> result = new List<T>();
+                List<T> result = new List<T>();
                 Guid pid = list.Min(m => (m as ITreeModel<T>)!.ParentId);
-                IList<T> t = list.Where(m => (m as ITreeModel<T>)!.ParentId == pid).ToList();
+                List<T> t = list.Where(m => (m as ITreeModel<T>)!.ParentId == pid).ToList();
                 foreach (T model in t)
                 {
                     if (action is not null)
@@ -23,7 +23,7 @@ namespace SharpFort.Core.Helper
                     }
                     result.Add(model);
                     var item = model as ITreeModel<T>;
-                    IList<T> children = list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id).ToList();
+                    List<T> children = list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id).ToList();
                     if (children.Count > 0)
                     {
                         SetTreeChildren(list, children, model, action!);
@@ -45,7 +45,7 @@ namespace SharpFort.Core.Helper
                 }
                 mm.Children.Add(item);
                 var _item = item as ITreeModel<T>;
-                IList<T> _children = list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id).ToList();
+                List<T> _children = list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id).ToList();
                 if (_children.Count > 0)
                 {
                     SetTreeChildren(list, _children, item, action!);

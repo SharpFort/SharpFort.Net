@@ -72,7 +72,7 @@ namespace SharpFort.SqlSugarCore
             });
         }
 
-        private void RegisterRepositories(IServiceCollection services)
+        private static void RegisterRepositories(IServiceCollection services)
         {
             services.TryAddScoped<ISqlSugarDbContext, SqlSugarDbContextFactory>();
             services.AddTransient(typeof(IRepository<>), typeof(SqlSugarRepository<>));
@@ -93,8 +93,8 @@ namespace SharpFort.SqlSugarCore
                 // 规范化租户名称
                 foreach (var tenant in tenants)
                 {
-                    tenant.NormalizedName = tenant.Name.Contains("@") 
-                        ? tenant.Name.Substring(0, tenant.Name.LastIndexOf("@")) 
+                tenant.NormalizedName = tenant.Name.Contains('@')
+                        ? tenant.Name[..tenant.Name.LastIndexOf('@')]
                         : tenant.Name;
                 }
 
@@ -115,7 +115,7 @@ namespace SharpFort.SqlSugarCore
             });
         }
 
-        private SequentialGuidType GetSequentialGuidType(DbType? dbType)
+        private static SequentialGuidType GetSequentialGuidType(DbType? dbType)
         {
             return dbType switch
             {
@@ -148,23 +148,25 @@ namespace SharpFort.SqlSugarCore
             }
         }
 
-        private void LogConfiguration(ILogger logger, DbConnOptions options)
+        private static void LogConfiguration(ILogger logger, DbConnOptions options)
         {
             var logMessage = new StringBuilder()
                 .AppendLine()
                 .AppendLine("==========Sf-SQL配置:==========")
-                .AppendLine($"数据库连接字符串：{options.Url}")
-                .AppendLine($"数据库类型：{options.DbType}")
-                .AppendLine($"是否开启种子数据：{options.EnabledDbSeed}")
-                .AppendLine($"是否开启CodeFirst：{options.EnabledCodeFirst}")
-                .AppendLine($"是否开启Saas多租户：{options.EnabledSaasMultiTenancy}")
+                .Append("数据库连接字符串：").AppendLine(options.Url)
+                .Append("数据库类型：").AppendLine(options.DbType?.ToString())
+                .Append("是否开启种子数据：").AppendLine(options.EnabledDbSeed.ToString())
+                .Append("是否开启CodeFirst：").AppendLine(options.EnabledCodeFirst.ToString())
+                .Append("是否开启Saas多租户：").AppendLine(options.EnabledSaasMultiTenancy.ToString())
                 .AppendLine("===============================")
                 .ToString();
 
-            logger.LogInformation(logMessage);
+#pragma warning disable CA1848, CA1873 // 启动时仅调用一次，无性能影响
+            logger.LogInformation("{SqlConfiguration}", logMessage);
+#pragma warning restore CA1848, CA1873
         }
 
-        private async Task InitializeDatabase(IServiceProvider serviceProvider)
+        private static async Task InitializeDatabase(IServiceProvider serviceProvider)
         {
             var moduleContainer = serviceProvider.GetRequiredService<IModuleContainer>();
             var db = serviceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
@@ -202,13 +204,13 @@ namespace SharpFort.SqlSugarCore
                     && t.GetCustomAttribute<SplitTableAttribute>() == null)
                 .ToList();
 
-            if (entityTypes.Any())
+            if (entityTypes.Count > 0)
             {
                 db.CopyNew().CodeFirst.InitTables(entityTypes.ToArray());
             }
         }
 
-        private async Task InitializeSeedData(IServiceProvider serviceProvider)
+        private static async Task InitializeSeedData(IServiceProvider serviceProvider)
         {
             var dataSeeder = serviceProvider.GetRequiredService<IDataSeeder>();
             await dataSeeder.SeedAsync();

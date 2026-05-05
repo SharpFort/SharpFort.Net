@@ -5,31 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#pragma warning disable CA1716
-namespace SharpFort.CodeGen.Domain.Shared.Enums
+
+namespace SharpFort.CodeGen.Domain.Shared.Enums; 
+
+public enum FieldType
 {
-    public enum FieldType
-    {
-        [Display(Name = "string", Description = "String")]
-        String,
+    [Display(Name = "string", Description = "String")]
+    String =1,
 
-        [Display(Name = "int", Description = "Int32")]
-        Int,
+    [Display(Name = "int", Description = "Int32")]
+    Int =2,
 
-        [Display(Name = "long", Description = "Int64")]
-        Long,
+    [Display(Name = "long", Description = "Int64")]
+    Long =3,
 
-        [Display(Name = "bool", Description = "Boolean")]
-        Bool,
+    [Display(Name = "bool", Description = "Boolean")]
+    Bool =4,
 
-        [Display(Name = "decimal", Description = "Decimal")]
-        Decimal,
+    [Display(Name = "decimal", Description = "Decimal")]
+    Decimal =5,
 
-        [Display(Name = "DateTime", Description = "DateTime")]
-        DateTime,
+    [Display(Name = "DateTime", Description = "DateTime")]
+    DateTime =6,
 
-        [Display(Name = "Guid", Description = "Guid")]
-        Guid
-    }
-
+    [Display(Name = "Guid", Description = "Guid")]
+    Guid =7
 }
+
+

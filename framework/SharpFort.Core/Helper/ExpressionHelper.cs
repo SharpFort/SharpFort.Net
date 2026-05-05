@@ -82,7 +82,7 @@ namespace SharpFort.Core.Helper
         /// <returns></returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (map.TryGetValue(node, out ParameterExpression expression))
+            if (map.TryGetValue(node, out ParameterExpression? expression))
             {
                 node = expression;
             }

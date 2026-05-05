@@ -41,7 +41,7 @@ namespace SharpFort.Core.Helper
             object? o = Ts.GetProperty(FieldName)?.GetValue(obj, null);
             if (o == null)
                 return null;
-            string Value = Convert.ToString(o) ?? string.Empty;
+            string Value = Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
             if (string.IsNullOrEmpty(Value))
                 return null;
             return Value;

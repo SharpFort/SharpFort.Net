@@ -138,11 +138,11 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
     /// </summary>
     private void HandleUpdateAuditFields(object oldValue, DataFilterModel entityInfo)
     {
-        if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.LastModificationTime)))
+        if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.LastModificationTime), StringComparison.Ordinal))
         {
             entityInfo.SetValue(DateTime.MinValue.Equals(oldValue) ? null : DateTime.Now);
         }
-        else if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.LastModifierId)) 
+        else if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.LastModifierId), StringComparison.Ordinal)
                  && entityInfo.EntityColumnInfo.PropertyInfo.PropertyType == typeof(Guid?))
         {
             entityInfo.SetValue(Guid.Empty.Equals(oldValue) ? null : CurrentUserService.Id);
@@ -154,7 +154,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
     /// </summary>
     private void HandleInsertAuditFields(object oldValue, DataFilterModel entityInfo)
     {
-        if (entityInfo.PropertyName.Equals(nameof(IEntity<Guid>.Id)))
+        if (entityInfo.PropertyName.Equals(nameof(IEntity<Guid>.Id), StringComparison.Ordinal))
         {
             if (typeof(Guid) == entityInfo.EntityColumnInfo.PropertyInfo.PropertyType)
             {
@@ -164,14 +164,14 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
                 }
             }
         }
-        else if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.CreationTime)))
+        else if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.CreationTime), StringComparison.Ordinal))
         {
             if (DateTime.MinValue.Equals(oldValue))
             {
                 entityInfo.SetValue(DateTime.Now);
             }
         }
-        else if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.CreatorId)))
+        else if (entityInfo.PropertyName.Equals(nameof(IAuditedObject.CreatorId), StringComparison.Ordinal))
         {
             if (typeof(Guid?) == entityInfo.EntityColumnInfo.PropertyInfo.PropertyType)
             {
@@ -181,7 +181,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
                 }
             }
         }
-        else if (entityInfo.PropertyName.Equals(nameof(IMultiTenant.TenantId)))
+        else if (entityInfo.PropertyName.Equals(nameof(IMultiTenant.TenantId), StringComparison.Ordinal))
         {
             if (CurrentTenantService.Id is not null)
             {
@@ -245,7 +245,10 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
         if (entityInfo.PropertyName == nameof(IEntity<object>.Id))
         {
             var eventReport = CreateEventReport(entityInfo.EntityValue);
-            PublishEntityEvents(eventReport);
+            if (eventReport is not null)
+            {
+                PublishEntityEvents(eventReport);
+            }
         }
     }
 
@@ -266,7 +269,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
         }
 
         var localEvents = generatesDomainEventsEntity.GetLocalEvents()?.ToArray();
-        if (localEvents != null && localEvents.Any())
+        if (localEvents != null && localEvents.Length > 0)
         {
             eventReport.DomainEvents.AddRange(
                 localEvents.Select(
@@ -281,7 +284,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
         }
 
         var distributedEvents = generatesDomainEventsEntity.GetDistributedEvents()?.ToArray();
-        if (distributedEvents != null && distributedEvents.Any())
+        if (distributedEvents != null && distributedEvents.Length > 0)
         {
             eventReport.DistributedEvents.AddRange(
                 distributedEvents.Select(
@@ -320,25 +323,29 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
 
     #endregion
 
-    public override void OnLogExecuting(string sql, SugarParameter[] pars)
+    public override void OnLogExecuting(string sql, SugarParameter[] parameters)
     {
         if (DbOptions.EnabledSqlLog)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine();
             sb.AppendLine("==========Sf-SQL执行:==========");
-            sb.AppendLine(UtilMethods.GetSqlString(DbType.SqlServer, sql, pars));
+            sb.AppendLine(UtilMethods.GetSqlString(DbType.SqlServer, sql, parameters));
             sb.AppendLine("===============================");
-            LoggerFactory.CreateLogger<DefaultSqlSugarDbContext>().LogDebug(sb.ToString());
+#pragma warning disable CA1848, CA1873 // DbOptions.EnabledSqlLog 已保护此调用
+            LoggerFactory.CreateLogger<DefaultSqlSugarDbContext>().LogDebug("{SqlLog}", sb.ToString());
+#pragma warning restore CA1848, CA1873
         }
     }
 
-    public override void OnLogExecuted(string sql, SugarParameter[] pars)
+    public override void OnLogExecuted(string sql, SugarParameter[] parameters)
     {
         if (DbOptions.EnabledSqlLog)
         {
             var sqllog = $"=========Sf-SQL耗时{SqlSugarClient.Ado.SqlExecutionTime.TotalMilliseconds}毫秒=====";
-            LoggerFactory.CreateLogger<SqlSugarDbContext>().LogDebug(sqllog.ToString());
+#pragma warning disable CA1848, CA1873 // DbOptions.EnabledSqlLog 已保护此调用
+            LoggerFactory.CreateLogger<SqlSugarDbContext>().LogDebug("{SqlTimingLog}", sqllog);
+#pragma warning restore CA1848, CA1873
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using Volo.Abp.DependencyInjection;
+﻿#nullable disable
+using Volo.Abp.DependencyInjection;
 using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.SqlSugarCore.Repositories;
 using SharpFort.TenantManagement.Domain;

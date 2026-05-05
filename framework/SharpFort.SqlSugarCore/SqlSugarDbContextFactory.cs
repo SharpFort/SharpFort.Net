@@ -82,8 +82,8 @@ namespace SharpFort.SqlSugarCore
             // 构建数据库连接配置
             var connectionConfig = BuildConnectionConfig(options =>
             {
-                options.ConnectionString = tenantConfiguration.GetCurrentConnectionString();
-                options.DbType = GetCurrentDbType(tenantConfiguration.GetCurrentConnectionName());
+            options.ConnectionString = tenantConfiguration!.GetCurrentConnectionString();
+                options.DbType = GetCurrentDbType(tenantConfiguration!.GetCurrentConnectionName());
             });
 
             // 创建SqlSugar客户端实例
@@ -137,11 +137,11 @@ namespace SharpFort.SqlSugarCore
             sqlSugarClient.CurrentConnectionConfig.ConfigureExternalServices.SerializeService = SerializeService;
 
             // 初始化AOP事件处理器
-            Action<string, SugarParameter[]> onLogExecuting = null;
-            Action<string, SugarParameter[]> onLogExecuted = null;
-            Action<object, DataFilterModel> dataExecuting = null;
-            Action<object, DataAfterModel> dataExecuted = null;
-            Action<ISqlSugarClient> onClientConfig = null;
+            Action<string, SugarParameter[]>? onLogExecuting = null;
+            Action<string, SugarParameter[]>? onLogExecuted = null;
+            Action<object, DataFilterModel>? dataExecuting = null;
+            Action<object, DataAfterModel>? dataExecuted = null;
+            Action<ISqlSugarClient>? onClientConfig = null;
 
             // 按执行顺序聚合所有依赖项的AOP处理器
             foreach (var dependency in SqlSugarDbContextDependencies.OrderBy(x => x.ExecutionOrder))
@@ -168,7 +168,7 @@ namespace SharpFort.SqlSugarCore
         /// </summary>
         /// <param name="configAction">配置操作委托</param>
         /// <returns>连接配置对象</returns>
-        protected virtual ConnectionConfig BuildConnectionConfig(Action<ConnectionConfig> configAction = null)
+        protected virtual ConnectionConfig BuildConnectionConfig(Action<ConnectionConfig>? configAction = null)
         {
             var dbConnOptions = DbConnectionOptions;
 
@@ -241,7 +241,7 @@ namespace SharpFort.SqlSugarCore
                     }
 
                     // 聚合所有依赖项的实体服务
-                    Action<PropertyInfo, EntityColumnInfo> entityService = null;
+                    Action<PropertyInfo, EntityColumnInfo>? entityService = null;
                     foreach (var dependency in SqlSugarDbContextDependencies.OrderBy(x => x.ExecutionOrder))
                     {
                         entityService += dependency.EntityService;
@@ -269,7 +269,7 @@ namespace SharpFort.SqlSugarCore
         /// 从租户名称解析数据库类型
         /// 格式：TenantName@DbType
         /// </summary>
-        private DbType? GetDbTypeFromTenantName(string name)
+        private static DbType? GetDbTypeFromTenantName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
