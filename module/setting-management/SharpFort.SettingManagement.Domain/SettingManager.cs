@@ -33,21 +33,21 @@ public class SettingManager : ISettingManager, ISingletonDependency
         _lazyProviders = new Lazy<List<ISettingManagementProvider>>(
             () => Options
                 .Providers
-                .Select(c => serviceProvider.GetRequiredService(c) as ISettingManagementProvider)
+                .Select(c => (serviceProvider.GetRequiredService(c) as ISettingManagementProvider)!)
                 .ToList(),
             true
         );
     }
 
-    public virtual Task<string> GetOrNullAsync(string name, string providerName, string providerKey, bool fallback = true)
+    public virtual async Task<string> GetOrNullAsync(string name, string providerName, string? providerKey, bool fallback = true)
     {
         Check.NotNull(name, nameof(name));
         Check.NotNull(providerName, nameof(providerName));
 
-        return GetOrNullInternalAsync(name, providerName, providerKey, fallback);
+        return (await GetOrNullInternalAsync(name, providerName, providerKey, fallback))!;
     }
 
-    public virtual async Task<List<SettingValue>> GetAllAsync(string providerName, string providerKey, bool fallback = true)
+    public virtual async Task<List<SettingValue>> GetAllAsync(string providerName, string? providerKey, bool fallback = true)
     {
         Check.NotNull(providerName, nameof(providerName));
 
@@ -62,7 +62,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
         var providerList = providers.Reverse().ToList();
 
-        if (!providerList.Any())
+        if (providerList.Count == 0)
         {
             return new List<SettingValue>();
         }
@@ -71,7 +71,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
         foreach (var setting in settingDefinitions)
         {
-            string value = null;
+            string? value = null;
 
             if (setting.IsInherited)
             {
@@ -109,7 +109,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
         return settingValues.Values.ToList();
     }
 
-    public virtual async Task SetAsync(string name, string value, string providerName, string providerKey, bool forceToSet = false)
+    public virtual async Task SetAsync(string name, string? value, string providerName, string? providerKey, bool forceToSet = false)
     {
         Check.NotNull(name, nameof(name));
         Check.NotNull(providerName, nameof(providerName));
@@ -121,7 +121,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
             .SkipWhile(p => p.Name != providerName)
             .ToList();
 
-        if (!providers.Any())
+        if (providers.Count == 0)
         {
             return;
         }
@@ -161,7 +161,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
         }
     }
 
-    protected virtual async Task<string> GetOrNullInternalAsync(string name, string providerName, string providerKey, bool fallback = true)
+    protected virtual async Task<string?> GetOrNullInternalAsync(string name, string providerName, string? providerKey, bool fallback = true)
     {
         var setting =await SettingDefinitionManager.GetAsync(name);
         var providers = Enumerable
@@ -177,7 +177,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
             providers = providers.TakeWhile(c => c.Name == providerName);
         }
 
-        string value = null;
+        string? value = null;
         foreach (var provider in providers)
         {
             value = await provider.GetOrNullAsync(

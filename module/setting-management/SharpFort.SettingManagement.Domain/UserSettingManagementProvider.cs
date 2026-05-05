@@ -18,7 +18,7 @@ public class UserSettingManagementProvider : SettingManagementProvider, ITransie
         CurrentUser = currentUser;
     }
 
-    protected override string NormalizeProviderKey(string providerKey)
+    protected override string? NormalizeProviderKey(string? providerKey)
     {
         if (providerKey != null)
         {

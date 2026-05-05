@@ -9,7 +9,7 @@ namespace SharpFort.Tool.Commands
 {
     public class ClearCommand : ICommand
     {
-        public List<string> CommandStrs => ["clear"];
+        public static List<string> CommandStrs => ["clear"];
       
 
         public string Command => "clear";

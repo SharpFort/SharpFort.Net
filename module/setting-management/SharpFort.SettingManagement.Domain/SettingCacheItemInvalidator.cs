@@ -19,8 +19,8 @@ public class SettingCacheItemInvalidator : ILocalEventHandler<EntityChangedEvent
     {
         var cacheKey = CalculateCacheKey(
             eventData.Entity.Name,
-            eventData.Entity.ProviderName,
-            eventData.Entity.ProviderKey
+            eventData.Entity.ProviderName!,
+            eventData.Entity.ProviderKey!
         );
 
         await Cache.RemoveAsync(cacheKey, considerUow: true);

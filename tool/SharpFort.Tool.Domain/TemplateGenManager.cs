@@ -90,7 +90,7 @@ namespace SharpFort.Tool.Domain
         /// 替换内容,key为要替换的内容，value为替换成的内容
         /// </summary>
         /// <returns></returns>
-        private async Task ReplaceContentAsync(string rootDirectory, Dictionary<string, string> dic)
+        private static async Task ReplaceContentAsync(string rootDirectory, Dictionary<string, string> dic)
         {
             foreach (var dicEntry in dic)
             {
@@ -119,7 +119,7 @@ namespace SharpFort.Tool.Domain
                 string newDirectoryName = directoryName.Replace(searchString, replaceString);
                 if (directoryName != newDirectoryName)
                 {
-                    string parentDirectory = Path.GetDirectoryName(directoryPath);
+                    string parentDirectory = Path.GetDirectoryName(directoryPath)!;
                     string newDirectoryPath = Path.Combine(parentDirectory, newDirectoryName);
                     Directory.Move(directoryPath, newDirectoryPath);
                     directoryPath = newDirectoryPath;

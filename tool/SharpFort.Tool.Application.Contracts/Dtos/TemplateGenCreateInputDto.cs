@@ -12,17 +12,17 @@ namespace SharpFort.Tool.Application.Contracts.Dtos
         /// <summary>
         /// 模块名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// 模块类型
         /// </summary>
-        public string ModuleSoure { get; set; }
+        public string ModuleSoure { get; set; } = null!;
 
         /// <summary>
         /// 数据库提供者
         /// </summary>
-        public DbmsEnum Dbms { get; set; }
+        public Dbms Dbms { get; set; }
 
 
         /// <summary>

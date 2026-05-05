@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.CommandLineUtils;
 using Volo.Abp.DependencyInjection;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SharpFort.Tool
 {
@@ -23,9 +20,9 @@ namespace SharpFort.Tool
         }
 
         private void InitCommand()
-        {    
+        {
             Application.HelpOption("-h|--help");
-            Application.VersionOption("-v|--versions", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Application.VersionOption("-v|--versions", Assembly.GetExecutingAssembly().GetName().Version!.ToString());
             foreach (var command in _commands)
             {
                 CommandLineApplication childrenCommandLineApplication = new CommandLineApplication(true)

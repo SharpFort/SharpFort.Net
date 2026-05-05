@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Globalization;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.CommandLineUtils;
 using SharpFort.Tool.Application.Contracts;
 using SharpFort.Tool.Application.Contracts.Dtos;
@@ -121,7 +116,7 @@ namespace SharpFort.Tool.Commands
                 //如果创建解决方案文件夹
                 if (csfOption.HasValue())
                 {
-                    var moduleName = moduleNameArgument.Value.ToLower().Replace(".", "-");
+                    var moduleName = moduleNameArgument.Value.ToLower(CultureInfo.InvariantCulture).Replace(".", "-");
 
                     unzipDirPath = Path.Combine(path, moduleName);
                     if (Directory.Exists(unzipDirPath))

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SharpFort.Tool;
-class Program
+sealed class Program
 {
     static async Task Main(string[] args)
     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#pragma warning disable CA1716
 
 namespace SharpFort.Tool.Domain.Shared.Options
 {
@@ -11,6 +7,6 @@ namespace SharpFort.Tool.Domain.Shared.Options
         /// <summary>
         /// 临时文件目录
         /// </summary>
-        public string TempDirPath { get; set; }
+        public string TempDirPath { get; set; } = null!;
     }
 }

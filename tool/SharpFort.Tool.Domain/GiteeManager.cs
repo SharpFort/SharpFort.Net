@@ -7,7 +7,7 @@ namespace SharpFort.Tool.Domain;
 
 public class GiteeManager : ITransientDependency
 {
-    private readonly string _accessToken;
+    private readonly string? _accessToken;
     private readonly IHttpClientFactory _httpClientFactory;
     private const string GiteeHost = "https://gitee.com/api/v5";
     private const string Owner = "ccnetcore";
@@ -57,7 +57,7 @@ public class GiteeManager : ITransientDependency
        foreach (JObject obj in jsonArray)
        {
            // 获取 name 字段的值
-           string name = obj["name"]?.ToString();
+           string? name = obj["name"]?.ToString();
            if (name != null)
            {
                names.Add(name);

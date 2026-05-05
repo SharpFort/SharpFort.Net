@@ -18,7 +18,7 @@ public class TenantSettingManagementProvider : SettingManagementProvider, ITrans
         CurrentTenant = currentTenant;
     }
 
-    protected override string NormalizeProviderKey(string providerKey)
+    protected override string? NormalizeProviderKey(string? providerKey)
     {
         if (providerKey != null)
         {

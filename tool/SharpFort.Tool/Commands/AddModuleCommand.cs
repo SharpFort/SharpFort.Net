@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.CommandLineUtils;
 
 namespace SharpFort.Tool.Commands
@@ -24,7 +23,7 @@ namespace SharpFort.Tool.Commands
                 var moduleName = moduleNameArgument.Value;
   
                 //模块路径默认按小写规则，默认在模块路径下一层
-                var modulePath =moduleName.ToLower().Replace(".", "-");
+                var modulePath =moduleName.ToLower(CultureInfo.InvariantCulture).Replace(".", "-");
                 if (modulePathOption.HasValue())
                 {
                     modulePath = modulePathOption.Value();
@@ -57,7 +56,7 @@ namespace SharpFort.Tool.Commands
         /// 获取一个sln解决方案，多个将报错
         /// </summary>
         /// <returns></returns>
-        private string CheckFirstSlnPath(string slnPath)
+        private static string CheckFirstSlnPath(string slnPath)
         {
             string[] slnFiles = Directory.GetFiles(slnPath, "*.sln");
             if (slnFiles.Length > 1)
@@ -77,7 +76,7 @@ namespace SharpFort.Tool.Commands
         /// 执行cmd命令
         /// </summary>
         /// <param name="cmdCommands"></param>
-        private void StartCmd(params string[] cmdCommands)
+        private static void StartCmd(params string[] cmdCommands)
         {
             ProcessStartInfo psi = new ProcessStartInfo
             {
@@ -117,7 +116,7 @@ namespace SharpFort.Tool.Commands
         /// </summary>
         /// <param name="paths"></param>
         /// <exception cref="UserFriendlyException"></exception>
-        private void CheckPathExist(string[] paths)
+        private static void CheckPathExist(string[] paths)
         {
             foreach (string path in paths)
             {

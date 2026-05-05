@@ -13,7 +13,7 @@ public class GlobalSettingManagementProvider : SettingManagementProvider, ITrans
 
     }
 
-    protected override string NormalizeProviderKey(string providerKey)
+    protected override string? NormalizeProviderKey(string? providerKey)
     {
         return null;
     }

@@ -101,7 +101,7 @@ namespace SharpFort.Tool.Web
                             ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
                     }
                     context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                    context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.");
+                    context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", _);
 
                     return new ValueTask();
                 };

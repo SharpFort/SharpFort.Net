@@ -32,7 +32,7 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
     [UnitOfWork]
     public virtual async Task<string> GetOrNullAsync(string name, string providerName, string providerKey)
     {
-        return (await GetCacheItemAsync(name, providerName, providerKey)).Value;
+        return (await GetCacheItemAsync(name, providerName, providerKey)).Value!;
     }
 
     [UnitOfWork]
@@ -50,7 +50,7 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
             await SettingRepository.UpdateAsync(setting);
         }
 
-        await Cache.SetAsync(CalculateCacheKey(name, providerName, providerKey), new SettingCacheItem(setting?.Value), considerUow: true);
+        await Cache.SetAsync(CalculateCacheKey(name, providerName, providerKey), new SettingCacheItem(setting.Value), considerUow: true);
     }
 
     public virtual async Task<List<SettingValue>> GetListAsync(string providerName, string providerKey)
@@ -150,7 +150,7 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
 
         if (cacheItems.All(x => x.Value != null))
         {
-            return cacheItems;
+            return cacheItems.Select(kvp => new KeyValuePair<string, SettingCacheItem>(kvp.Key, kvp.Value!)).ToList();
         }
 
         var notCacheKeys = cacheItems.Where(x => x.Value == null).Select(x => x.Key).ToList();
@@ -163,10 +163,12 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
             var item = newCacheItems.FirstOrDefault(x => x.Key == key);
             if (item.Value == null)
             {
+#pragma warning disable CS8619 // cacheItems FirstOrDefault 类型可空性不匹配
                 item = cacheItems.FirstOrDefault(x => x.Key == key);
+#pragma warning restore CS8619
             }
 
-            result.Add(new KeyValuePair<string, SettingCacheItem>(key, item.Value));
+            result.Add(new KeyValuePair<string, SettingCacheItem>(key, item.Value!));
         }
 
         return result;
@@ -209,6 +211,6 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
     protected virtual string GetSettingNameFormCacheKeyOrNull(string key)
     {
         //TODO: throw ex when name is null?
-        return SettingCacheItem.GetSettingNameFormCacheKeyOrNull(key);
+        return SettingCacheItem.GetSettingNameFormCacheKeyOrNull(key)!;
     }
 }

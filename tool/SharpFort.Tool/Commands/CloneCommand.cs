@@ -32,7 +32,7 @@ namespace SharpFort.Tool.Commands
         /// 执行cmd命令
         /// </summary>
         /// <param name="cmdCommands"></param>
-        private void StartCmd(params string[] cmdCommands)
+        private static void StartCmd(params string[] cmdCommands)
         {
             ProcessStartInfo psi = new ProcessStartInfo
             {

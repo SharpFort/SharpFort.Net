@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Globalization;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Caching.Distributed;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
@@ -20,7 +21,7 @@ namespace SharpFort.Tool.Domain
             })!;
         }
 
-        private HtmlDocument HtmlDoc { get; set; }
+        private HtmlDocument HtmlDoc { get; set; } = null!;
         private NugetResult NugetResult { get; set; } = new NugetResult();
 
         private NugetResult InitData()
@@ -73,14 +74,14 @@ namespace SharpFort.Tool.Domain
                 HtmlDoc.DocumentNode.SelectNodes(
                     "//*[@id=\"skippedToContent\"]/section/div/aside/div[1]/div[2]/div[1]/span[2]");
             var downLoadNumber = spanDoc.First().InnerText;
-            if (downLoadNumber.Contains("K"))
+            if (downLoadNumber.Contains('K'))
             {
                 downLoadNumber = downLoadNumber.TrimEnd('K');
-                return (long)Math.Round(decimal.Parse(downLoadNumber) * 1000);
+                return (long)Math.Round(decimal.Parse(downLoadNumber, CultureInfo.InvariantCulture) * 1000);
             }
 
 
-            return long.Parse(downLoadNumber);
+            return long.Parse(downLoadNumber, CultureInfo.InvariantCulture);
         }
     }
 
@@ -88,6 +89,12 @@ namespace SharpFort.Tool.Domain
     public class NugetResult
     {
         public long DownloadNumber { get; set; }
+
         public List<string> Versions { get; set; }
+
+        public NugetResult()
+        {
+            Versions = new List<string>();
+        }
     }
 }
