@@ -9,9 +9,11 @@ namespace SharpFort.AspNetCore;
 /// <summary>
 /// 真实IP地址提供程序,支持代理服务器场景
 /// </summary>
-public class RealIpHttpContextWebClientInfoProvider : HttpContextWebClientInfoProvider
+public partial class RealIpHttpContextWebClientInfoProvider : HttpContextWebClientInfoProvider
 {
     private const string XForwardedForHeader = "X-Forwarded-For";
+
+    private readonly ILogger _logger;
 
     /// <summary>
     /// 初始化真实IP地址提供程序的新实例
@@ -19,9 +21,10 @@ public class RealIpHttpContextWebClientInfoProvider : HttpContextWebClientInfoPr
     public RealIpHttpContextWebClientInfoProvider(
         ILogger<HttpContextWebClientInfoProvider> logger,
         IHttpContextAccessor httpContextAccessor,
-        IHttpUserAgentParserProvider httpUserAgentParser) 
+        IHttpUserAgentParserProvider httpUserAgentParser)
         : base(logger, httpContextAccessor, httpUserAgentParser)
     {
+        _logger = logger;
     }
 
     /// <summary>
@@ -39,10 +42,9 @@ public class RealIpHttpContextWebClientInfoProvider : HttpContextWebClientInfoPr
             }
 
             var headers = httpContext.Request?.Headers;
-            if (headers != null && headers.ContainsKey(XForwardedForHeader))
+            if (headers != null && headers.TryGetValue(XForwardedForHeader, out var forwardedValues))
             {
-                // 从X-Forwarded-For获取真实客户端IP
-                var forwardedIp = headers[XForwardedForHeader].FirstOrDefault();
+                var forwardedIp = forwardedValues.FirstOrDefault();
                 if (!string.IsNullOrEmpty(forwardedIp))
                 {
                     httpContext.Connection.RemoteIpAddress = IPAddress.Parse(forwardedIp);
@@ -53,8 +55,11 @@ public class RealIpHttpContextWebClientInfoProvider : HttpContextWebClientInfoPr
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "获取客户端IP地址时发生异常");
+            LogClientIpError(ex);
             return null;
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "获取客户端IP地址时发生异常")]
+    private partial void LogClientIpError(Exception ex);
 }

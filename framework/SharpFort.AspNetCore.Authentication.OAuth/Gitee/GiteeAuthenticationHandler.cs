@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,7 +40,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.Gitee
                 new Claim(Claims.AvatarUrl, userInfoMdoel.avatar_url),
                 new Claim(Claims.Url, userInfoMdoel.url),
 
-                new Claim(AuthenticationConstants.OpenId,userInfoMdoel.id.ToString()),
+                new Claim(AuthenticationConstants.OpenId,userInfoMdoel.id.ToString(CultureInfo.InvariantCulture)),
                 new Claim(AuthenticationConstants.Name, userInfoMdoel.name),
                 new Claim(AuthenticationConstants.AccessToken, tokenModel.access_token)
             };

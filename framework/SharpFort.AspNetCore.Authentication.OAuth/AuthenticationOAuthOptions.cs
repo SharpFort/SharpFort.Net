@@ -10,6 +10,6 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
     public class AuthenticationOAuthOptions:OAuthOptions
     {
 
-        public string RedirectUri { get; set; }
+        public string RedirectUri { get; set; } = null!;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -33,6 +33,12 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
     /// 排序属性
     /// </summary>
     public int Order => FilterOrder;
+
+    private static readonly JsonSerializerOptions _validationJsonOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
+    };
 
     /// <summary>
     /// 处理规范化结果
@@ -72,7 +78,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
                     // 如果 Response 已经完成输出，则禁止写入
                     if (httpContext.Response.HasStarted) return;
                     await unifyRes.OnResponseStatusCodes(httpContext, statusCode,
-                        httpContext.RequestServices.GetService<IOptions<UnifyResultSettingsOptions>>()?.Value);
+                        httpContext.RequestServices.GetService<IOptions<UnifyResultSettingsOptions>>()!.Value);
                 }
 
                 return;
@@ -89,27 +95,27 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         // if (!UnifyContext.CheckSupportMvcController(context.HttpContext, actionDescriptor, out _)) return;
 
         // 判断是否跳过规范化处理，检测NonUnifyAttribute而已
-        if (CheckSucceededNonUnify(actionDescriptor.MethodInfo))
+        if (actionDescriptor != null && CheckSucceededNonUnify(actionDescriptor.MethodInfo))
         {
             return;
         }
-        IUnifyResultProvider  unifyResult = context.GetRequiredService<IUnifyResultProvider>();
-        
+        IUnifyResultProvider unifyResult = context.GetRequiredService<IUnifyResultProvider>();
+
         // 处理 BadRequestObjectResult 类型规范化处理
         if (actionExecutedContext.Result is BadRequestObjectResult badRequestObjectResult)
         {
             // 解析验证消息
-            var validationMetadata = GetValidationMetadata(badRequestObjectResult.Value);
+            var validationMetadata = GetValidationMetadata(badRequestObjectResult.Value!);
 
             var result = unifyResult.OnValidateFailed(context, validationMetadata);
             if (result != null) actionExecutedContext.Result = result;
         }
         else
         {
-            IActionResult result = default;
+            IActionResult? result = default;
 
             // 检查是否是有效的结果（可进行规范化的结果）
-            if (CheckVaildResult(actionExecutedContext.Result, out var data))
+            if (CheckVaildResult(actionExecutedContext.Result!, out var data))
             {
                 result = unifyResult.OnSucceeded(actionExecutedContext, data);
             }
@@ -120,17 +126,17 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             actionExecutedContext.Result = result;
         }
     }
-    
-        /// <summary>
+
+    /// <summary>
     /// 获取验证错误信息
     /// </summary>
     /// <param name="errors"></param>
     /// <returns></returns>
     private static ValidationMetadata GetValidationMetadata(object errors)
     {
-        ModelStateDictionary _modelState = null;
-        object validationResults = null;
-        (string message, string firstErrorMessage, string firstErrorProperty) = (default, default, default);
+        ModelStateDictionary? _modelState = null;
+        object? validationResults = null;
+        (string? message, string? firstErrorMessage, string? firstErrorProperty) = (default, default, default);
 
         // 判断是否是集合类型
         if (errors is IEnumerable && errors is not string)
@@ -140,8 +146,8 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             {
                 _modelState = modelState;
                 // 将验证错误信息转换成字典并序列化成 Json
-                validationResults = modelState.Where(u => modelState[u.Key].ValidationState == ModelValidationState.Invalid)
-                        .ToDictionary(u => u.Key, u => modelState[u.Key].Errors.Select(c => c.ErrorMessage).ToArray());
+                validationResults = modelState.Where(u => modelState[u.Key]!.ValidationState == ModelValidationState.Invalid)
+                        .ToDictionary(u => u.Key, u => modelState[u.Key]!.Errors.Select(c => c.ErrorMessage).ToArray());
             }
             // 如果是 ValidationProblemDetails 特殊类型
             else if (errors is ValidationProblemDetails validation)
@@ -155,39 +161,38 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
                 validationResults = dicResults;
             }
 
-            message = JsonSerializer.Serialize(validationResults, new JsonSerializerOptions
+            message = JsonSerializer.Serialize(validationResults, _validationJsonOptions);
+            if (validationResults is Dictionary<string, string[]> dict)
             {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                WriteIndented = true
-            });
-            firstErrorMessage = (validationResults as Dictionary<string, string[]>).First().Value[0];
-            firstErrorProperty = (validationResults as Dictionary<string, string[]>).First().Key;
+                firstErrorMessage = dict.First().Value[0];
+                firstErrorProperty = dict.First().Key;
+            }
         }
         // 其他类型
         else
         {
-            validationResults = firstErrorMessage = message = errors?.ToString();
+            validationResults = firstErrorMessage = message = errors?.ToString() ?? string.Empty;
         }
 
         return new ValidationMetadata
         {
-            ValidationResult = validationResults,
-            Message = message,
-            ModelState = _modelState,
-            FirstErrorProperty = firstErrorProperty,
-            FirstErrorMessage = firstErrorMessage
+            ValidationResult = validationResults!,
+            Message = message!,
+            ModelState = _modelState!,
+            FirstErrorProperty = firstErrorProperty!,
+            FirstErrorMessage = firstErrorMessage!
         };
     }
-        
+
     /// <summary>
     /// 检查是否是有效的结果（可进行规范化的结果）
     /// </summary>
     /// <param name="result"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    private bool CheckVaildResult(IActionResult result, out object data)
+    private static bool CheckVaildResult(IActionResult result, out object data)
     {
-        data = default;
+        data = null!;
 
         // 排除以下结果，跳过规范化处理
         var isDataResult = result switch
@@ -215,18 +220,18 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         if (isDataResult) data = result switch
         {
             // 处理内容结果
-            ContentResult content => content.Content,
+            ContentResult content => content.Content!,
             // 处理对象结果
-            ObjectResult obj => obj.Value,
+            ObjectResult obj => obj.Value!,
             // 处理 JSON 对象
-            JsonResult json => json.Value,
-            _ => null,
+            JsonResult json => json.Value!,
+            _ => null!,
         };
 
         return isDataResult;
     }
-    
-    
+
+
     /// <summary>
     /// 检查短路状态码（>=400）是否进行规范化处理
     /// </summary>
@@ -237,15 +242,15 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
     {
         // 获取终点路由特性
         var endpointFeature = context.Features.Get<IEndpointFeature>();
-        if (endpointFeature == null) return (unifyResult = null) == null;
+        if (endpointFeature == null) return (unifyResult = null!) == null;
 
         // 判断是否跳过规范化处理
-        var isSkip = context.GetEndpoint()?.Metadata?.GetMetadata<NonUnifyAttribute>()!= null
+        var isSkip = context.GetEndpoint()?.Metadata?.GetMetadata<NonUnifyAttribute>() != null
                      || endpointFeature?.Endpoint?.Metadata?.GetMetadata<NonUnifyAttribute>() != null
                      || context.Request.Headers["accept"].ToString().Contains("odata.metadata=", StringComparison.OrdinalIgnoreCase)
                      || context.Request.Headers["accept"].ToString().Contains("odata.streaming=", StringComparison.OrdinalIgnoreCase);
 
-        if (isSkip == true) unifyResult = null;
+        if (isSkip == true) unifyResult = null!;
         else
         {
             unifyResult = context.RequestServices.GetRequiredService<IUnifyResultProvider>();
@@ -253,19 +258,19 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
 
         return unifyResult == null || isSkip;
     }
-    
+
     /// <summary>
     /// 检查请求成功是否进行规范化处理
     /// </summary>
     /// <param name="method"></param>
     /// <param name="isWebRequest"></param>
     /// <returns>返回 true 跳过处理，否则进行规范化处理</returns>
-    private  bool CheckSucceededNonUnify(MethodInfo method, bool isWebRequest = true)
+    private static bool CheckSucceededNonUnify(MethodInfo method, bool isWebRequest = true)
     {
         // 判断是否跳过规范化处理
-        var isSkip =  method.CustomAttributes.Any(x => typeof(NonUnifyAttribute).IsAssignableFrom(x.AttributeType) || typeof(ProducesResponseTypeAttribute).IsAssignableFrom(x.AttributeType) || typeof(IApiResponseMetadataProvider).IsAssignableFrom(x.AttributeType))
-                     || method.ReflectedType.IsDefined(typeof(NonUnifyAttribute), true)
-                     || method.DeclaringType.Assembly.GetName().Name.StartsWith("Microsoft.AspNetCore.OData");
+        var isSkip = method.CustomAttributes.Any(x => typeof(NonUnifyAttribute).IsAssignableFrom(x.AttributeType) || typeof(ProducesResponseTypeAttribute).IsAssignableFrom(x.AttributeType) || typeof(IApiResponseMetadataProvider).IsAssignableFrom(x.AttributeType))
+                     || method.ReflectedType!.IsDefined(typeof(NonUnifyAttribute), true)
+                     || method.DeclaringType!.Assembly.GetName().Name!.StartsWith("Microsoft.AspNetCore.OData", StringComparison.Ordinal);
 
         if (!isWebRequest)
         {

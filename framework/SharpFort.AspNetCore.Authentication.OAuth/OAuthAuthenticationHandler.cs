@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
@@ -10,7 +10,6 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
     public abstract class OauthAuthenticationHandler<TOptions> : AuthenticationHandler<TOptions> where TOptions : AuthenticationSchemeOptions, new()
     {
         public abstract string AuthenticationSchemeNmae { get; }
-        private AuthenticationScheme _scheme;
 
         public OauthAuthenticationHandler(IOptionsMonitor<TOptions> options, ILoggerFactory logger, UrlEncoder encoder, IHttpClientFactory httpClientFactory) : base(options, logger, encoder)
         {
@@ -36,28 +35,22 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
             return new AuthenticationTicket(principal, AuthenticationSchemeNmae);
         }
 
-        protected async Task<HttpModel> SendHttpRequestAsync<HttpModel>(string url, IEnumerable<KeyValuePair<string, string?>> query, HttpMethod? httpMethod = null)
+        protected async Task<THttpModel> SendHttpRequestAsync<THttpModel>(string url, IEnumerable<KeyValuePair<string, string?>> query, HttpMethod? httpMethod = null)
         {
-            httpMethod = httpMethod ?? HttpMethod.Get;
+            httpMethod ??= HttpMethod.Get;
 
             var queryUrl = QueryHelpers.AddQueryString(url, query);
-            HttpResponseMessage response = null;
-            if (httpMethod == HttpMethod.Get)
-            {
-                response = await HttpClient.GetAsync(queryUrl);
-            }
-            else if (httpMethod == HttpMethod.Post)
-            {
-                response = await HttpClient.PostAsync(queryUrl, null);
-            }
+            var response = httpMethod == HttpMethod.Get
+                ? await HttpClient.GetAsync(queryUrl)
+                : await HttpClient.PostAsync(queryUrl, null);
 
             var content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"授权服务器请求错误,请求地址:{queryUrl},错误信息：{content}");
+                throw new InvalidOperationException($"授权服务器请求错误,请求地址:{queryUrl},错误信息：{content}");
             }
             VerifyErrResponse(content);
-            var model = Newtonsoft.Json.JsonConvert.DeserializeObject<HttpModel>(content);
+            var model = Newtonsoft.Json.JsonConvert.DeserializeObject<THttpModel>(content);
             return model!;
         }
 
@@ -77,7 +70,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
             }
             var code = Context.Request.Query["code"].ToString();
 
-            List<Claim> authTicket = null;
+            List<Claim> authTicket;
             try
             {
                 authTicket = await GetAuthTicketAsync(code);
@@ -86,11 +79,8 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
             {
                 return AuthenticateResult.Fail(ex.Message ?? "未知错误");
             }
-            //成功
             var result = AuthenticateResult.Success(TicketConver(authTicket));
             return result;
         }
     }
 }
-
-

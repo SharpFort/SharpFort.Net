@@ -28,7 +28,7 @@ public class RESTfulResult<T>
     /// <summary>
     /// 数据
     /// </summary>
-    public T Data { get; set; }
+    public T Data { get; set; } = default!;
 
     /// <summary>
     /// 执行成功
@@ -38,12 +38,12 @@ public class RESTfulResult<T>
     /// <summary>
     /// 错误信息
     /// </summary>
-    public object Errors { get; set; }
+    public object Errors { get; set; } = null!;
 
     /// <summary>
     /// 附加数据
     /// </summary>
-    public object Extras { get; set; }
+    public object Extras { get; set; } = null!;
 
     /// <summary>
     /// 时间戳

@@ -10,10 +10,10 @@ namespace SharpFort.SettingManagement.Domain;
 public class SettingAggregateRoot : Entity<Guid>, IAggregateRoot<Guid>
 {
     [NotNull]
-    public virtual string Name { get; protected set; }
+    public virtual string Name { get; protected set; } = null!;
 
     [NotNull]
-    public virtual string Value { get; internal set; }
+    public virtual string Value { get; internal set; } = null!;
 
     [CanBeNull]
     public virtual string? ProviderName { get; protected set; }
@@ -30,8 +30,8 @@ public class SettingAggregateRoot : Entity<Guid>, IAggregateRoot<Guid>
         Guid id,
         [NotNull] string name,
         [NotNull] string value,
-        [CanBeNull] string providerName = null,
-        [CanBeNull] string providerKey = null)
+        [CanBeNull] string? providerName = null,
+        [CanBeNull] string? providerKey = null)
     {
         Check.NotNull(name, nameof(name));
         Check.NotNull(value, nameof(value));

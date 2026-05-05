@@ -39,7 +39,7 @@ namespace SharpFort.AspNetCore.Mvc
             string controllerName,
             ActionModel action,
             string httpMethod,
-            [CanBeNull] ConventionalControllerSetting configuration)
+            ConventionalControllerSetting? configuration)
         {
             // 获取API路由前缀
             var apiRoutePrefix = GetApiRoutePrefix(action, configuration);
@@ -56,10 +56,10 @@ namespace SharpFort.AspNetCore.Mvc
             var url = $"{rootPath}/{NormalizeControllerNameCase(normalizedControllerName, configuration)}";
 
             // 处理ID参数路由
-            url = BuildIdParameterRoute(url, action, configuration);
+            url = BuildIdParameterRoute(url, action, configuration!);
 
             // 处理Action名称路由
-            url = BuildActionNameRoute(url, rootPath, controllerName, action, httpMethod, configuration);
+            url = BuildActionNameRoute(url, rootPath, controllerName, action, httpMethod, configuration!);
 
             return url;
         }

@@ -20,10 +20,7 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
             this IApplicationBuilder app,
             params SwaggerConfiguration[] swaggerConfigs)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
+            ArgumentNullException.ThrowIfNull(app);
 
             var mvcOptions = app.ApplicationServices
                 .GetRequiredService<IOptions<AbpAspNetCoreMvcOptions>>()
@@ -45,7 +42,7 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
                 }
 
                 // 如果没有配置任何终结点，使用默认配置
-                if (!conventionalSettings.Any() && (swaggerConfigs == null || !swaggerConfigs.Any()))
+                if (conventionalSettings.Count == 0 && (swaggerConfigs == null || swaggerConfigs.Length == 0))
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "SharpFort");
                     return;

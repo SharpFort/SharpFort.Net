@@ -44,6 +44,6 @@ public class QQAuthenticationOptions : AuthenticationOAuthOptions
     /// <summary>
     /// Gets or sets the URL of the user identification endpoint (a.k.a. the "OpenID endpoint").
     /// </summary>
-    public string UserIdentificationEndpoint { get; set; }
+    public string UserIdentificationEndpoint { get; set; } = null!;
 
 }

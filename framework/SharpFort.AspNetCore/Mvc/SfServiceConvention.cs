@@ -130,10 +130,10 @@ namespace SharpFort.AspNetCore.Mvc
         /// <summary>
         /// 规范化特性路由模板
         /// </summary>
-        private void NormalizeAttributeRouteTemplate(SelectorModel selector, string rootPath)
+        private static void NormalizeAttributeRouteTemplate(SelectorModel selector, string rootPath)
         {
-            var template = selector.AttributeRouteModel.Template;
-            if (!template.StartsWith("/"))
+            var template = selector.AttributeRouteModel!.Template;
+            if (!template!.StartsWith('/'))
             {
                 selector.AttributeRouteModel.Template = $"{rootPath}/{template}";
             }
@@ -142,7 +142,7 @@ namespace SharpFort.AspNetCore.Mvc
         /// <summary>
         /// 确保HTTP方法约束存在
         /// </summary>
-        private void EnsureHttpMethodConstraint(SelectorModel selector, string httpMethod)
+        private static void EnsureHttpMethodConstraint(SelectorModel selector, string httpMethod)
         {
             if (!selector.ActionConstraints.OfType<HttpMethodActionConstraint>().Any())
             {

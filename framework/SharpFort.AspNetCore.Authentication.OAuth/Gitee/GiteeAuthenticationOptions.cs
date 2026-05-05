@@ -40,5 +40,5 @@ public class GiteeAuthenticationOptions : AuthenticationOAuthOptions
     /// Gets or sets the address of the endpoint exposing
     /// the email addresses associated with the logged in user.
     /// </summary>
-    public string UserEmailsEndpoint { get; set; }
+    public string UserEmailsEndpoint { get; set; } = null!;
 }

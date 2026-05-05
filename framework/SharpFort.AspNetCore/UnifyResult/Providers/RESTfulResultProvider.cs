@@ -32,7 +32,7 @@ public class RESTfulResultProvider : IUnifyResultProvider,ITransientDependency
     /// <param name="context"></param>
     /// <param name="statusCode"></param>
     /// <param name="unifyResultSettings"></param>
-    public  static void SetResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions unifyResultSettings)
+    public static void SetResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions? unifyResultSettings)
     {
         if (unifyResultSettings == null) return;
 
@@ -94,7 +94,7 @@ public class RESTfulResultProvider : IUnifyResultProvider,ITransientDependency
     /// <param name="statusCode"></param>
     /// <param name="unifyResultSettings"></param>
     /// <returns></returns>
-    public async Task OnResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions unifyResultSettings)
+    public async Task OnResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions? unifyResultSettings)
     {
         // 设置响应状态码
         SetResponseStatusCodes(context, statusCode, unifyResultSettings);
@@ -122,14 +122,14 @@ public class RESTfulResultProvider : IUnifyResultProvider,ITransientDependency
     /// <param name="data"></param>
     /// <param name="errors"></param>
     /// <returns></returns>
-    public static RESTfulResult<object> RESTfulResult(int statusCode, bool succeeded = default, object data = default, object errors = default)
+    public static RESTfulResult<object> RESTfulResult(int statusCode, bool succeeded = default, object? data = default, object? errors = default)
     {
         return new RESTfulResult<object>
         {
             StatusCode = statusCode,
             Succeeded = succeeded,
-            Data = data,
-            Errors = errors,
+            Data = data!,
+            Errors = errors!,
             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
     }

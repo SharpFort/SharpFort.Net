@@ -54,5 +54,5 @@ public interface IUnifyResultProvider
     /// <param name="statusCode"></param>
     /// <param name="unifyResultSettings"></param>
     /// <returns></returns>
-    Task OnResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions unifyResultSettings = default);
+    Task OnResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions? unifyResultSettings = default);
 }

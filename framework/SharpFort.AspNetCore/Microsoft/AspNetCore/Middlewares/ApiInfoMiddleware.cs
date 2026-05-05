@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Volo.Abp.DependencyInjection;
 using SharpFort.Core.Extensions;
@@ -44,7 +45,7 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Middlewares
             }
 
             var contentType = context.Response.Headers["Content-Type"].ToString();
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
             // 处理Excel文件下载
             if (contentType == "application/vnd.ms-excel")

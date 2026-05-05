@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -168,7 +169,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
 
             if (schema is not OpenApiSchema openApiSchema) return;
 
-            openApiSchema.Enum.Clear();
+            openApiSchema.Enum!.Clear();
             openApiSchema.Type = JsonSchemaType.String;
             openApiSchema.Format = null;
 
@@ -177,10 +178,10 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
             {
                 var enumValue = (Enum)Enum.Parse(context.Type, enumName);
                 var description = GetEnumDescription(enumValue);
-                var enumIntValue = Convert.ToInt64(enumValue);
+                var enumIntValue = Convert.ToInt64(enumValue, CultureInfo.InvariantCulture);
 
                 openApiSchema.Enum.Add(JsonValue.Create(enumName));
-                enumDescriptions.AppendLine(
+                enumDescriptions.AppendLine(CultureInfo.InvariantCulture,
                     $"【枚举：{enumName}{(description is null ? string.Empty : $"({description})")}={enumIntValue}】");
             }
             openApiSchema.Description = enumDescriptions.ToString();
@@ -191,8 +192,8 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// </summary>
         private static string? GetEnumDescription(Enum value)
         {
-            var fieldInfo = value.GetType().GetField(value.ToString());
-            var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            var fieldInfo = value.GetType().GetField(value.ToString()!);
+            var attributes = (DescriptionAttribute[])fieldInfo!.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : null;
         }
     }
