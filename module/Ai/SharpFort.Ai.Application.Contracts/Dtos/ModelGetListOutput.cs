@@ -8,16 +8,16 @@ public class ModelGetListOutput
     /// 模型ID
     /// </summary>
     public Guid Id { get; set; }
-    
+
     /// <summary>
     /// 模型id
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 模型名称
     /// </summary>
-    public string ModelName { get; set; }
+    public string ModelName { get; set; } = null!;
 
     /// <summary>
     /// 模型描述
@@ -35,12 +35,12 @@ public class ModelGetListOutput
     /// 是否免费模型
     /// </summary>
     public bool IsFree { get; set; }
-    
+
     /// <summary>
     /// 模型Api类型，现支持同一个模型id，多种接口格式
     /// </summary>
     public ModelApiType ModelApiType { get; set; }
-    
+
     /// <summary>
     /// 模型图标URL
     /// </summary>

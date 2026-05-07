@@ -20,5 +20,5 @@ public class MessageDeleteInput
     /// <summary>
     /// 是否同时隐藏后续消息（同一会话中时间大于当前消息的所有消息）
     /// </summary>
-    public bool IsDeleteSubsequent { get; set; } = false;
+    public bool IsDeleteSubsequent { get; set; }
 }

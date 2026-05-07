@@ -7,9 +7,9 @@ public class ChatMessageDto : FullAuditedEntityDto<Guid>
 {
     public Guid UserId { get; set; }
     public Guid SessionId { get; set; }
-    public string Content { get; set; }
-    public string Role { get; set; }
-    public string ModelId { get; set; }
-    public string Remark { get; set; }
+    public string Content { get; set; } = null!;
+    public string Role { get; set; } = null!;
+    public string ModelId { get; set; } = null!;
+    public string Remark { get; set; } = null!;
     public MessageType MessageType { get; set; }
 }

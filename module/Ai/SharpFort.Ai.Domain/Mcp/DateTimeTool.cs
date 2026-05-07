@@ -8,7 +8,7 @@ namespace SharpFort.Ai.Domain.Mcp;
 public class DateTimeTool:ISingletonDependency
 {
     [SfAgentTool("时间"), DisplayName("DateTime"), Description("获取当前日期与时间")]
-    public DateTime DateTime()
+    public static DateTime DateTime()
     {
         return System.DateTime.Now;
     }

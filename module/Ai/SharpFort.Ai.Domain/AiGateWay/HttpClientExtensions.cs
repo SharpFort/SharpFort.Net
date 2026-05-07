@@ -129,7 +129,7 @@ public static class HttpClientExtensions
 
     public static async Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string url,
         object? postData,
-        string token)
+        string? token)
     {
         HttpRequestMessage req = new(HttpMethod.Post, url);
 
@@ -158,7 +158,7 @@ public static class HttpClientExtensions
 
     public static async Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string url,
         object? postData,
-        string token, Dictionary<string, string> headers)
+        string? token, Dictionary<string, string> headers)
     {
         HttpRequestMessage req = new(HttpMethod.Post, url);
 
@@ -190,7 +190,7 @@ public static class HttpClientExtensions
     }
 
     public static Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string url, object? postData,
-        string token, string tokenKey)
+        string? token, string tokenKey)
     {
         HttpRequestMessage req = new(HttpMethod.Post, url);
 

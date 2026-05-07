@@ -11,12 +11,12 @@ public class ModelLibraryDto
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 模型名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 模型描述
@@ -36,9 +36,9 @@ public class ModelLibraryDto
     /// <summary>
     /// 模型支持的API类型
     /// </summary>
-    public List<ModelApiTypeOutput> ModelApiTypes { get; set; }
+    public List<ModelApiTypeOutput> ModelApiTypes { get; set; } = new List<ModelApiTypeOutput>();
 
-    
+
     /// <summary>
     /// 模型显示倍率
     /// </summary>
@@ -53,7 +53,7 @@ public class ModelLibraryDto
     /// 模型图标URL
     /// </summary>
     public string? IconUrl { get; set; }
-    
+
     /// <summary>
     /// 排序
     /// </summary>

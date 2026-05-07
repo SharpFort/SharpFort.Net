@@ -1,3 +1,5 @@
+#pragma warning disable CA1720 // Identifier contains type name — enum members match JSON Schema type names
+
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -58,9 +60,9 @@ public class ThorToolFunctionPropertyDefinition
         Null
     }
 
-    public string typeStr = "object";
+    private string typeStr = "object";
 
-    public string[] Types;
+    private string[] Types = null!;
 
     /// <summary>
     /// 必填的。函数参数对象类型。默认值为“object”。
@@ -84,16 +86,16 @@ public class ThorToolFunctionPropertyDefinition
                 switch (str.ValueKind)
                 {
                     case JsonValueKind.String:
-                        typeStr = value?.ToString();
+                        typeStr = str.GetString()!;
                         break;
                     case JsonValueKind.Array:
-                        Types = JsonSerializer.Deserialize<string[]>(value?.ToString());
+                        Types = JsonSerializer.Deserialize<string[]>(str.GetRawText())!;
                         break;
                 }
             }
             else
             {
-                typeStr = value?.ToString();
+                typeStr = value?.ToString() ?? string.Empty;
             }
         }
     }

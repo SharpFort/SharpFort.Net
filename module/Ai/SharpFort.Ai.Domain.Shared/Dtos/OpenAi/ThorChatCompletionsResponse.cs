@@ -12,7 +12,7 @@ public record ThorChatCompletionsResponse
     /// 聊天完成的唯一标识符。如果是流式对话，每个区块都具有相同的 ID。
     /// </summary>
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
     /// <summary>
     /// 用于对话补全的模型。
@@ -53,7 +53,7 @@ public record ThorChatCompletionsResponse
     /// 可以与 seed 请求参数结合使用，以了解何时进行了可能影响确定性的后端更改。
     /// </summary>
     [JsonPropertyName("system_fingerprint")]
-    public string SystemFingerPrint { get; set; }
+    public string SystemFingerPrint { get; set; } = null!;
 
     /// <summary>
     /// 错误信息

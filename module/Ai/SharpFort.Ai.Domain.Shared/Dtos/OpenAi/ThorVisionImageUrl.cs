@@ -13,7 +13,7 @@ public class ThorVisionImageUrl
     /// 要看底层平台具体要求 
     /// </summary>
     [JsonPropertyName("url")]
-    public string Url { get; set; }
+    public string Url { get; set; } = null!;
 
     /// <summary>
     /// 指定图像的细节级别。在愿景指南中了解更多信息。https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding

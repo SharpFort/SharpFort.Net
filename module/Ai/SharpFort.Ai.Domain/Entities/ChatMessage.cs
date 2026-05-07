@@ -78,8 +78,8 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
     [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString)]
     public string? Content { get; set; }
 
-    public string Role { get; set; }
-    public string ModelId { get; set; }
+    public string Role { get; set; } = null!;
+    public string ModelId { get; set; } = null!;
     public string? Remark { get; set; }
 
     [SugarColumn(IsOwnsOne = true)] 
@@ -90,5 +90,5 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 是否隐藏
     /// </summary>
-    public bool IsHidden { get; set; } = false;
+    public bool IsHidden { get; set; }
 }

@@ -8,6 +8,13 @@
   <ItemGroup>
     <PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="10.3.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- CA1716: "Shared" is a framework convention namespace (ABP DDD) -->
+    <!-- CA1711: Enum/EventHandler naming follows framework conventions -->
+    <NoWarn>$(NoWarn);CA1716;CA1711</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Consts\" />
     <Folder Include="Dtos\" />

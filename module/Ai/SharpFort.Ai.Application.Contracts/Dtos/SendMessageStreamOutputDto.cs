@@ -1,3 +1,5 @@
+#pragma warning disable CA1720 // Identifier contains type name — 'Object' matches OpenAI API schema
+
 namespace SharpFort.Ai.Application.Contracts.Dtos;
 
 public class SendMessageStreamOutputDto
@@ -5,12 +7,12 @@ public class SendMessageStreamOutputDto
     /// <summary>
     /// 唯一标识符
     /// </summary>
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
     /// <summary>
     /// 对象类型
     /// </summary>
-    public string Object { get; set; }
+    public string Object { get; set; } = null!;
 
     /// <summary>
     /// 创建时间，Unix时间戳格式
@@ -20,22 +22,22 @@ public class SendMessageStreamOutputDto
     /// <summary>
     /// 模型名称
     /// </summary>
-    public string Model { get; set; }
+    public string Model { get; set; } = null!;
 
     /// <summary>
     /// 选择项列表
     /// </summary>
-    public List<Choice> Choices { get; set; }
+    public List<Choice> Choices { get; set; } = new List<Choice>();
 
     /// <summary>
     /// 系统指纹（可能为空）
     /// </summary>
-    public string SystemFingerprint { get; set; }
+    public string SystemFingerprint { get; set; } = null!;
 
     /// <summary>
     /// 使用情况信息
     /// </summary>
-    public Usage Usage { get; set; }
+    public Usage Usage { get; set; } = null!;
 }
 
 /// <summary>
@@ -51,7 +53,7 @@ public class Choice
     /// <summary>
     /// 变化内容，包括内容字符串和角色
     /// </summary>
-    public Delta Delta { get; set; }
+    public Delta Delta { get; set; } = null!;
 
     /// <summary>
     /// 结束原因，可能为空
@@ -61,7 +63,7 @@ public class Choice
     /// <summary>
     /// 内容过滤结果
     /// </summary>
-    public ContentFilterResults ContentFilterResults { get; set; }
+    public ContentFilterResults ContentFilterResults { get; set; } = null!;
 }
 
 /// <summary>
@@ -72,12 +74,12 @@ public class Delta
     /// <summary>
     /// 内容文本
     /// </summary>
-    public string Content { get; set; }
+    public string Content { get; set; } = null!;
 
     /// <summary>
     /// 角色，例如"assistant"
     /// </summary>
-    public string Role { get; set; }
+    public string Role { get; set; } = null!;
 }
 
 /// <summary>
@@ -85,12 +87,12 @@ public class Delta
 /// </summary>
 public class ContentFilterResults
 {
-    public FilterStatus Hate { get; set; }
-    public FilterStatus SelfHarm { get; set; }
-    public FilterStatus Sexual { get; set; }
-    public FilterStatus Violence { get; set; }
-    public FilterStatus Jailbreak { get; set; }
-    public FilterStatus Profanity { get; set; }
+    public FilterStatus Hate { get; set; } = null!;
+    public FilterStatus SelfHarm { get; set; } = null!;
+    public FilterStatus Sexual { get; set; } = null!;
+    public FilterStatus Violence { get; set; } = null!;
+    public FilterStatus Jailbreak { get; set; } = null!;
+    public FilterStatus Profanity { get; set; } = null!;
 }
 
 /// <summary>
@@ -132,12 +134,12 @@ public class Usage
     /// <summary>
     /// 提示词详细信息
     /// </summary>
-    public PromptTokensDetails PromptTokensDetails { get; set; }
+    public PromptTokensDetails PromptTokensDetails { get; set; } = null!;
 
     /// <summary>
     /// 补全文字详细信息
     /// </summary>
-    public CompletionTokensDetails CompletionTokensDetails { get; set; }
+    public CompletionTokensDetails CompletionTokensDetails { get; set; } = null!;
 }
 
 /// <summary>

@@ -15,11 +15,11 @@ public class AgentResultOutput
     /// 类型
     /// </summary>
     public string Type => TypeEnum.GetJsonName();
-    
+
     /// <summary>
     /// 内容载体
     /// </summary>
-    public object Content { get; set; }
+    public object Content { get; set; } = null!;
 }
 
 public enum AgentResultTypeEnum
@@ -34,19 +34,19 @@ public enum AgentResultTypeEnum
     /// </summary>
     [JsonPropertyName("toolCalling")]
     ToolCalling,
-    
+
     /// <summary>
     /// 工具调用完成
     /// </summary>
     [JsonPropertyName("toolCalled")]
     ToolCalled,
-    
+
     /// <summary>
     /// 用量
     /// </summary>
     [JsonPropertyName("usage")]
     Usage,
-    
+
     /// <summary>
     /// 工具调用用量
     /// </summary>

@@ -13,12 +13,12 @@ public class TokenGetListOutputDto
     /// <summary>
     /// 名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// Token密钥
     /// </summary>
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 过期时间（空为永不过期）

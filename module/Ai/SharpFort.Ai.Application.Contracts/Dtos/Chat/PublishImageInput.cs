@@ -8,7 +8,7 @@ public class PublishImageInput
     /// <summary>
     /// 是否匿名
     /// </summary>
-    public bool IsAnonymous { get; set; } = false;
+    public bool IsAnonymous { get; set; }
 
     /// <summary>
     /// 任务ID

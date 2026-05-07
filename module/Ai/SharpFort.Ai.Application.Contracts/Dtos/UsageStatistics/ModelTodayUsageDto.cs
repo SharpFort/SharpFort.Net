@@ -8,7 +8,7 @@ public class ModelTodayUsageDto
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 今日使用次数
@@ -19,7 +19,7 @@ public class ModelTodayUsageDto
     /// 今日消耗总Token数
     /// </summary>
     public long TotalTokens { get; set; }
-    
+
     /// <summary>
     /// 模型图标URL
     /// </summary>

@@ -44,7 +44,7 @@ public class ThorToolChoice
     /// 使用<see cref="ThorToolChoiceTypeConst"/> 赋值
     /// </summary>
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public string Type { get; set; } = null!;
 
     /// <summary>
     /// 调用的函数定义

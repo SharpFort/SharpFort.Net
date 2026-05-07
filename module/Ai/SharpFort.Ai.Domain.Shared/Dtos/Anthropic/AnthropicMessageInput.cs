@@ -6,11 +6,11 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.Anthropic;
 
 public class AnthropicMessageInput
 {
-    [JsonPropertyName("role")] 
-    public string Role { get; set; }
+    [JsonPropertyName("role")]
+    public string Role { get; set; } = null!;
 
     [JsonIgnore]
-    public string? Content;
+    public string? Content { get; private set; }
 
     [JsonPropertyName("content")]
     public object? ContentCalculated
@@ -43,7 +43,7 @@ public class AnthropicMessageInput
                 }
                 else if (str.ValueKind == JsonValueKind.Array)
                 {
-                    Contents = JsonSerializer.Deserialize<IList<AnthropicMessageContent>>(value?.ToString(),ThorJsonSerializer.DefaultOptions);
+                    Contents = JsonSerializer.Deserialize<IList<AnthropicMessageContent>>(str.GetRawText(), ThorJsonSerializer.DefaultOptions);
                 }
             }
             else
@@ -54,5 +54,5 @@ public class AnthropicMessageInput
     }
 
     [JsonIgnore]
-    public IList<AnthropicMessageContent>? Contents;
+    public IList<AnthropicMessageContent>? Contents { get; private set; }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
@@ -13,7 +14,6 @@ using Volo.Abp.Domain.Services;
 using SharpFort.Ai.Domain.AiGateWay;
 using SharpFort.Ai.Domain.AiGateWay.Exceptions;
 using SharpFort.Ai.Domain.Entities;
-using SharpFort.Ai.Domain.Entities;
 using SharpFort.Ai.Domain.Shared.Consts;
 using ModelConst = SharpFort.Ai.Domain.Shared.Consts.ModelConst;
 using SharpFort.Ai.Domain.Shared.Dtos;
@@ -26,7 +26,6 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Responses;
 using SharpFort.Ai.Domain.Shared.Enums;
 using SharpFort.Ai.Application.Contracts.Dtos.Chat;
 using SharpFort.Ai.Application.Contracts.Dtos.ChatMessage;
-using SharpFort.Ai.Application.Contracts.Dtos.Chat;
 using SharpFort.Ai.Domain.Shared.Extensions;
 using SharpFort.Core.Extensions;
 using SharpFort.SqlSugarCore.Abstractions;
@@ -139,7 +138,7 @@ public class AiGateWayManager : DomainService
             await _aiMessageManager.CreateUserMessageAsync(userId.Value, sessionId,
                 new MessageInputDto
                 {
-                    Content = sessionId is null ? "不予存储" : request.Messages?.LastOrDefault().Content ?? string.Empty,
+                    Content = sessionId is null ? "不予存储" : request.Messages?.LastOrDefault()?.Content ?? string.Empty,
                     ModelId = sourceModelId,
                     TokenUsage = data.Usage,
                 }, tokenId);
@@ -244,14 +243,16 @@ public class AiGateWayManager : DomainService
                 }
 
                 var message = JsonSerializer.Serialize(data, ThorJsonSerializer.DefaultOptions);
-                backupSystemContent.Append(data.Choices.FirstOrDefault()?.Delta.Content);
+                backupSystemContent.Append(data.Choices?.FirstOrDefault()?.Delta.Content);
                 // 将消息加入队列而不是直接写入
                 messageQueue.Enqueue($"data: {message}\n\n");
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Ai对话异常，用户ID：{userId}");
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
+            _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             var model = new ThorChatCompletionsResponse()
             {
@@ -380,7 +381,7 @@ public class AiGateWayManager : DomainService
     {
         try
         {
-            if (input == null) throw new Exception("模型校验异常");
+            if (input == null) throw new ArgumentNullException(nameof(input), "模型校验异常");
 
             using var embedding =
                 Activity.Current?.Source.StartActivity("向量模型调用");
@@ -411,7 +412,7 @@ public class AiGateWayManager : DomainService
                 }
                 else
                 {
-                    throw new Exception("Input，输入格式错误，非string或Array类型");
+                    throw new FormatException("Input，输入格式错误，非string或Array类型");
                 }
             }
             else if (input.Input is string strInput)
@@ -420,7 +421,7 @@ public class AiGateWayManager : DomainService
             }
             else
             {
-                throw new Exception("Input，输入格式错误，未找到类型");
+                throw new FormatException("Input，输入格式错误，未找到类型");
             }
 
 
@@ -466,7 +467,7 @@ public class AiGateWayManager : DomainService
         {
             context.Response.StatusCode = 429;
         }
-        catch (UnauthorizedAccessException e)
+        catch (UnauthorizedAccessException)
         {
             context.Response.StatusCode = 401;
         }
@@ -599,10 +600,10 @@ public class AiGateWayManager : DomainService
                 //部分供应商message_start放一部分
                 if (responseResult.Item1.Contains("message_start"))
                 {
-                    var currentTokenUsage = responseResult.Item2.Message.Usage;
+                    var currentTokenUsage = responseResult.Item2!.Message!.Usage!;
                     if ((currentTokenUsage.InputTokens ?? 0) != 0)
                     {
-                        tokenUsage.InputTokens = (currentTokenUsage?.InputTokens??0) + (currentTokenUsage?.CacheCreationInputTokens??0)+ (currentTokenUsage?.CacheReadInputTokens??0);
+                        tokenUsage.InputTokens = (currentTokenUsage.InputTokens ?? 0) + (currentTokenUsage.CacheCreationInputTokens ?? 0) + (currentTokenUsage.CacheReadInputTokens ?? 0);
                     }
                     if ((currentTokenUsage.OutputTokens ?? 0) != 0)
                     {
@@ -613,11 +614,11 @@ public class AiGateWayManager : DomainService
                 //message_delta又放一部分
                 if (responseResult.Item1.Contains("message_delta"))
                 {
-                    var currentTokenUsage = responseResult.Item2.Usage;
+                    var currentTokenUsage = responseResult.Item2!.Usage!;
 
                     if ((currentTokenUsage.InputTokens ?? 0) != 0)
                     {
-                        tokenUsage.InputTokens =  (currentTokenUsage?.InputTokens??0) + (currentTokenUsage?.CacheCreationInputTokens??0)+ (currentTokenUsage?.CacheReadInputTokens??0);;
+                        tokenUsage.InputTokens = (currentTokenUsage.InputTokens ?? 0) + (currentTokenUsage.CacheCreationInputTokens ?? 0) + (currentTokenUsage.CacheReadInputTokens ?? 0);
                     }
                     if ((currentTokenUsage.OutputTokens ?? 0) != 0)
                     {
@@ -632,7 +633,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Ai对话异常，用户ID：{userId}");
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
+            _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{sourceModelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
@@ -693,9 +696,9 @@ public class AiGateWayManager : DomainService
 
         var tokenUsage = new ThorUsageResponse
         {
-            InputTokens = data.Usage.InputTokens,
-            OutputTokens = data.Usage.OutputTokens,
-            TotalTokens = data.Usage.InputTokens + data.Usage.OutputTokens,
+            InputTokens = data.Usage!.InputTokens,
+            OutputTokens = data.Usage!.OutputTokens,
+            TotalTokens = data.Usage!.InputTokens + data.Usage!.OutputTokens,
         };
         if (userId is not null)
         {
@@ -766,8 +769,8 @@ public class AiGateWayManager : DomainService
                     var obj = responseResult.Item2!.Value;
                     int inputTokens = obj.GetPath("response", "usage", "input_tokens").GetInt();
                     int outputTokens = obj.GetPath("response", "usage", "output_tokens").GetInt();
-                    inputTokens = Convert.ToInt32(inputTokens * modelDescribe.Multiplier);
-                    outputTokens = Convert.ToInt32(outputTokens * modelDescribe.Multiplier);
+                    inputTokens = Convert.ToInt32(inputTokens * modelDescribe.Multiplier, CultureInfo.InvariantCulture);
+                    outputTokens = Convert.ToInt32(outputTokens * modelDescribe.Multiplier, CultureInfo.InvariantCulture);
                     tokenUsage = new ThorUsageResponse
                     {
                         PromptTokens = inputTokens,
@@ -784,7 +787,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Ai响应异常，用户ID：{userId}");
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
+            _logger.LogError(e, "Ai响应异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"响应Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
@@ -939,7 +944,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Ai生成异常，用户ID：{userId}");
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
+            _logger.LogError(e, "Ai生成异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"生成Ai异常，异常信息：\n当前Ai模型：{modelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
@@ -996,7 +1003,9 @@ public class AiGateWayManager : DomainService
         var rawResponse = data.GetRawText();
         if (rawResponse.Contains("policies.google.com/terms/generative-ai/use-policy"))
         {
-            _logger.LogWarning($"图片生成被内容安全策略拦截，模型:【{modelId}】，请求信息：【{request}】");
+#pragma warning disable CA1848 // Business guard protects this call
+            _logger.LogWarning("图片生成被内容安全策略拦截，模型:【{ModelId}】，请求信息：【{Request}】", modelId, request);
+#pragma warning restore CA1848
             throw new UserFriendlyException("您的提示词涉及敏感信息，已被大模型拦截，请调整提示词后再试！");
         }
 
@@ -1004,7 +1013,9 @@ public class AiGateWayManager : DomainService
         var imagePrefixBase64 = GeminiGenerateContentAcquirer.GetImagePrefixBase64(data);
         if (string.IsNullOrWhiteSpace(imagePrefixBase64))
         {
-            _logger.LogError($"图片生成解析失败，模型:【{modelId}】，请求信息：【{request}】，请求响应信息：【{data}】");
+#pragma warning disable CA1848 // Business guard protects this call
+            _logger.LogError("图片生成解析失败，模型:【{ModelId}】，请求信息：【{Request}】，请求响应信息：【{Data}】", modelId, request, data);
+#pragma warning restore CA1848
             throw new UserFriendlyException("大模型没有返回图片，请调整提示词或稍后再试");
         }
 
@@ -1162,7 +1173,7 @@ public class AiGateWayManager : DomainService
     /// <summary>
     /// 流式处理结果，包含用户输入、系统输出和 token 使用情况
     /// </summary>
-    private class StreamProcessResult
+    private sealed class StreamProcessResult
     {
         public string UserContent { get; set; } = string.Empty;
         public string SystemContent { get; set; } = string.Empty;
@@ -1216,7 +1227,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             var model = new ThorChatCompletionsResponse()
@@ -1334,7 +1347,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             throw new UserFriendlyException(errorContent);
@@ -1411,8 +1426,8 @@ public class AiGateWayManager : DomainService
                     var obj = responseResult.Item2!.Value;
                     int inputTokens = obj.GetPath("response", "usage", "input_tokens").GetInt();
                     int outputTokens = obj.GetPath("response", "usage", "output_tokens").GetInt();
-                    inputTokens = Convert.ToInt32(inputTokens * modelDescribe.Multiplier);
-                    outputTokens = Convert.ToInt32(outputTokens * modelDescribe.Multiplier);
+                    inputTokens = Convert.ToInt32(inputTokens * modelDescribe.Multiplier, CultureInfo.InvariantCulture);
+                    outputTokens = Convert.ToInt32(outputTokens * modelDescribe.Multiplier, CultureInfo.InvariantCulture);
                     tokenUsage = new ThorUsageResponse
                     {
                         PromptTokens = inputTokens,
@@ -1430,7 +1445,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai响应异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"响应Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             throw new UserFriendlyException(errorContent);
@@ -1497,7 +1514,9 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai生成异常，用户ID：{UserId}", userId);
+#pragma warning restore CA1848
             var errorContent = $"生成Ai异常，异常信息：\n当前Ai模型：{modelDescribe.ModelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             throw new UserFriendlyException(errorContent);

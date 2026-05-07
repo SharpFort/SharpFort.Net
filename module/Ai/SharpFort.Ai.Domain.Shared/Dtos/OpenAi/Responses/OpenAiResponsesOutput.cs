@@ -1,3 +1,5 @@
+#pragma warning disable CA1720 // Identifier contains type name — 'Object' matches OpenAI API schema
+
 using System.Text.Json.Serialization;
 
 namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Responses;
@@ -60,7 +62,7 @@ public class OpenAiResponsesOutput
             this.Usage.InputTokens =
                 (int)Math.Round((this.Usage?.InputTokens ?? 0) * multiplier);
 
-            this.Usage.OutputTokens =
+            this.Usage!.OutputTokens =
                 (int)Math.Round((this.Usage?.OutputTokens ?? 0) * multiplier);
         }
     }

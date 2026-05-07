@@ -8,7 +8,7 @@ public class TokenStatisticsOutput
     /// <summary>
     /// 日期
     /// </summary>
-    public string Date { get; set; }
+    public string Date { get; set; } = null!;
 
     /// <summary>
     /// 模型统计列表

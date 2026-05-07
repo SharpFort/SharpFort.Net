@@ -23,7 +23,7 @@ public record ThorChatChoiceResponse
     /// 在当前模型中，无论流式还是非流式，Message 和 Delta存储相同的值
     /// </summary>
     [JsonPropertyName("message")]
-    public ThorChatMessage Message { get; set; }
+    public ThorChatMessage Message { get; set; } = null!;
 
     /// <summary>
     /// 选项列表中选项的索引。
@@ -60,7 +60,7 @@ public record ThorChatChoiceResponse
     /// </summary>
     public class FinishDetailsResponse
     {
-        [JsonPropertyName("type")] public string Type { get; set; }
-        [JsonPropertyName("stop")] public string Stop { get; set; }
+        [JsonPropertyName("type")] public string Type { get; set; } = null!;
+        [JsonPropertyName("stop")] public string Stop { get; set; } = null!;
     }
 }

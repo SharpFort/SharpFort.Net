@@ -12,7 +12,7 @@ public record ImageEditCreateRequest : SharedImageRequestBaseModel
     /// <summary>
     ///     Image file name
     /// </summary>
-    public string ImageName { get; set; }
+    public string ImageName { get; set; } = null!;
 
     /// <summary>
     ///     An additional image whose fully transparent areas (e.g. where alpha is zero) indicate where image should be edited.
@@ -26,13 +26,13 @@ public record ImageEditCreateRequest : SharedImageRequestBaseModel
     public string? MaskName { get; set; }
 
     [JsonPropertyName("quality")]
-    public string Quality { get; set; }
+    public string Quality { get; set; } = null!;
 
     /// <summary>
     ///     A text description of the desired image(s). The maximum length is 1000 characters.
     /// </summary>
     [JsonPropertyName("prompt")]
-    public string Prompt { get; set; }
+    public string Prompt { get; set; } = null!;
     
     [JsonPropertyName("background")]
     public string? Background { get; set; }

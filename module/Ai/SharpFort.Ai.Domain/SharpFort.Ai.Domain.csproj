@@ -24,4 +24,9 @@
     <Folder Include="Repositories\" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- CA1725: parameter name mismatches with interfaces are acceptable in ABP framework -->
+    <NoWarn>$(NoWarn);CA1725</NoWarn>
+  </PropertyGroup>
+
 </Project>

@@ -5,6 +5,6 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
     public class ThorToolChoiceFunctionTool
     {
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

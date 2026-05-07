@@ -5,9 +5,9 @@ namespace SharpFort.Ai.Application.Contracts.Dtos;
 
 public class SessionDto : FullAuditedEntityDto<Guid>
 {
-    public string SessionTitle { get; set; }
-    public string SessionContent { get; set; }
-    public string Remark { get; set; }
+    public string SessionTitle { get; set; } = null!;
+    public string SessionContent { get; set; } = null!;
+    public string Remark { get; set; } = null!;
 
     /// <summary>
     /// 会话类型

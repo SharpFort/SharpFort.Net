@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ namespace SharpFort.Ai.Domain.Mcp;
 [SfAgentTool]
 public class HttpRequestTool : ISingletonDependency
 {
+    private static readonly JsonSerializerOptions s_indentedOptions = new() { WriteIndented = true };
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<HttpRequestTool> _logger;
 
@@ -42,7 +44,7 @@ public class HttpRequestTool : ISingletonDependency
         try
         {
             var client = _httpClientFactory.CreateClient();
-            var request = new HttpRequestMessage(new HttpMethod(method.ToUpper()), url);
+            var request = new HttpRequestMessage(new HttpMethod(method.ToUpper(CultureInfo.InvariantCulture)), url);
 
             // 添加请求体
             if (!string.IsNullOrWhiteSpace(body))
@@ -61,7 +63,9 @@ public class HttpRequestTool : ISingletonDependency
         }
         catch (Exception ex)
         {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(ex, "HTTP {Method}请求失败: {Url}", method, url);
+#pragma warning restore CA1848
             return $"请求失败: {ex.Message}";
         }
     }
@@ -69,7 +73,7 @@ public class HttpRequestTool : ISingletonDependency
     /// <summary>
     /// 添加请求头
     /// </summary>
-    private void AddHeaders(HttpRequestMessage request, string headers)
+    private static void AddHeaders(HttpRequestMessage request, string headers)
     {
         var headerPairs = headers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         foreach (var pair in headerPairs)
@@ -85,11 +89,11 @@ public class HttpRequestTool : ISingletonDependency
     /// <summary>
     /// 格式化响应结果
     /// </summary>
-    private async Task<string> FormatResponse(HttpResponseMessage response)
+    private static async Task<string> FormatResponse(HttpResponseMessage response)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"状态码: {(int)response.StatusCode} {response.StatusCode}");
-        sb.AppendLine($"Content-Type: {response.Content.Headers.ContentType?.ToString() ?? "未知"}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"状态码: {(int)response.StatusCode} {response.StatusCode}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Content-Type: {response.Content.Headers.ContentType?.ToString() ?? "未知"}");
         sb.AppendLine();
 
         var content = await response.Content.ReadAsStringAsync();
@@ -106,10 +110,7 @@ public class HttpRequestTool : ISingletonDependency
                 {
                     var jsonDoc = JsonDocument.Parse(content);
                     sb.AppendLine("响应内容（JSON格式化）：");
-                    sb.AppendLine(JsonSerializer.Serialize(jsonDoc, new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    }));
+                    sb.AppendLine(JsonSerializer.Serialize(jsonDoc, s_indentedOptions));
                 }
                 catch
                 {
@@ -130,7 +131,7 @@ public class HttpRequestTool : ISingletonDependency
     /// <summary>
     /// 判断是否为JSON内容类型
     /// </summary>
-    private bool IsJsonContentType(string? contentType)
+    private static bool IsJsonContentType(string? contentType)
     {
         if (string.IsNullOrWhiteSpace(contentType))
         {

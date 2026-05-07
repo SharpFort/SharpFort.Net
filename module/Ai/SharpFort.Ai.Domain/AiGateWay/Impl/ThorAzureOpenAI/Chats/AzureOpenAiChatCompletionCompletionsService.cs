@@ -29,31 +29,34 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
         
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync();
-            
+            var error = await response.Content.ReadAsStringAsync(cancellationToken);
+
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Azure对话异常 , StatusCode: {StatusCode} 错误响应内容：{Content}", response.StatusCode,
                 error);
+#pragma warning restore CA1848
 
             throw new BusinessException(response.StatusCode.ToString(), "AzureOpenAI对话异常：" + error);
         }
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
-        var first = true;
-        while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
+        while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
         {
             line += Environment.NewLine;
 
             if (line.StartsWith('{'))
             {
+#pragma warning disable CA1848, CA1873 // Business guard protects this call
                 logger.LogInformation("AzureOpenAI对话异常 , StatusCode: {StatusCode} Response: {Response}",
                     response.StatusCode,
                     line);
+#pragma warning restore CA1848, CA1873
 
                 throw new BusinessException("500", "AzureOpenAI对话异常", line);
             }
 
-            if (line.StartsWith(OpenAIConstant.Data))
+            if (line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
                 line = line[OpenAIConstant.Data.Length..];
 
             line = line.Trim();
@@ -73,7 +76,7 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
             var result = JsonSerializer.Deserialize<ThorChatCompletionsResponse>(line,
                 ThorJsonSerializer.DefaultOptions);
 
-            yield return result;
+            yield return result!;
         }
     }
 
@@ -99,8 +102,10 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
 
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Azure对话异常 , StatusCode: {StatusCode} Response: {Response} Url:{Url}", response.StatusCode,
                 await response.Content.ReadAsStringAsync(cancellationToken), url);
+#pragma warning restore CA1848
         }
 
         var result = await response.Content
@@ -109,6 +114,6 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
             .ConfigureAwait(false);
 
 
-        return result;
+        return result!;
     }
 }

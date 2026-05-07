@@ -17,12 +17,12 @@ public class AiProvider : FullAuditedAggregateRoot<Guid>, IOrderNum
     /// <summary>
     /// 供应商名称 (e.g. OpenAI, DeepSeek)
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// API终结点
     /// </summary>
-    public string Endpoint { get; set; }
+    public string Endpoint { get; set; } = null!;
 
     /// <summary>
     /// 额外URL
@@ -32,7 +32,7 @@ public class AiProvider : FullAuditedAggregateRoot<Guid>, IOrderNum
     /// <summary>
     /// API Key
     /// </summary>
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 排序
@@ -43,5 +43,5 @@ public class AiProvider : FullAuditedAggregateRoot<Guid>, IOrderNum
     /// 关联的模型
     /// </summary>
     [Navigate(NavigateType.OneToMany, nameof(AiModel.AiProviderId))]
-    public List<AiModel> AiModels { get; set; }
+    public List<AiModel> AiModels { get; set; } = new List<AiModel>();
 }

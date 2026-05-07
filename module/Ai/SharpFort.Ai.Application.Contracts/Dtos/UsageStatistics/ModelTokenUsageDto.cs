@@ -8,13 +8,13 @@ public class ModelTokenUsageDto
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string Model { get; set; }
-    
+    public string Model { get; set; } = null!;
+
     /// <summary>
     /// 总消耗量
     /// </summary>
     public long Tokens { get; set; }
-    
+
     /// <summary>
     /// 占比（百分比）
     /// </summary>

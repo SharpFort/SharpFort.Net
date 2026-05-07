@@ -44,7 +44,7 @@ public static class HttpClientFactory
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    [Obsolete]
+    [Obsolete("Use IHttpClientFactory.CreateClient instead")]
     public static HttpClient GetHttpClient(string key)
     {
         return HttpClientPool.GetOrAdd(key, k => new Lazy<List<HttpClient>>(() =>

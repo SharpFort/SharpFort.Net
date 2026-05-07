@@ -4,8 +4,8 @@ namespace SharpFort.Ai.Application.Contracts.Dtos;
 
 public class SessionCreateAndUpdateInput
 {
-    public string SessionTitle { get; set; }
-    public string SessionContent { get; set; }
+    public string SessionTitle { get; set; } = null!;
+    public string SessionContent { get; set; } = null!;
     public string? Remark { get; set; }
 
     /// <summary>

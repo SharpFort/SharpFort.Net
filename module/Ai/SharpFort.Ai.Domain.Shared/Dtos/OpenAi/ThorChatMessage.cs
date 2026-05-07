@@ -20,7 +20,7 @@ public class ThorChatMessage
     /// 【必填】发出消息的角色，请使用<see cref="ThorChatMessageRoleConst.User"/>赋值,如：ThorChatMessageRoleConst.User
     /// </summary>
     [JsonPropertyName("role")]
-    public string Role { get; set; }
+    public string Role { get; set; } = null!;
 
     /// <summary>
     /// 发出的消息内容,如：你好
@@ -80,7 +80,7 @@ public class ThorChatMessage
                 }
                 else if (str.ValueKind == JsonValueKind.Array)
                 {
-                    Contents = JsonSerializer.Deserialize<IList<ThorChatMessageContent>>(value?.ToString());
+                    Contents = JsonSerializer.Deserialize<IList<ThorChatMessageContent>>(str.GetRawText());
                 }
             }
             else
@@ -185,7 +185,7 @@ public class ThorChatMessage
     /// <param name="toolCalls">工具调用参数列表</param>
     /// <returns></returns>
     public static ThorChatMessage CreateAssistantMessage(string content, string? name = null,
-        List<ThorToolCall> toolCalls = null)
+        List<ThorToolCall>? toolCalls = null)
     {
         return new()
         {
@@ -202,7 +202,7 @@ public class ThorChatMessage
     /// <param name="content">系统消息内容</param>
     /// <param name="toolCallId">工具调用 ID,此消息正在响应的工具调用。</param>
     /// <returns></returns>
-    public static ThorChatMessage CreateToolMessage(string content, string toolCallId = null)
+    public static ThorChatMessage CreateToolMessage(string content, string? toolCallId = null)
     {
         return new()
         {

@@ -8,6 +8,12 @@
   <ItemGroup>
     <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="10.3.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- CA1711: Type names following ABP/framework conventions -->
+    <NoWarn>$(NoWarn);CA1711</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Dtos\" />
     <Folder Include="IServices\" />

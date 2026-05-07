@@ -17,5 +17,5 @@ public class ThorResponseFormat
     public string? Type { get; set; }
 
     [JsonPropertyName("json_schema")]
-    public ThorResponseJsonSchema JsonSchema { get; set; }
+    public ThorResponseJsonSchema JsonSchema { get; set; } = null!;
 }

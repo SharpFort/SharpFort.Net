@@ -12,5 +12,5 @@ public class SfAgentToolAttribute:Attribute
         Name = name;
     }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 }

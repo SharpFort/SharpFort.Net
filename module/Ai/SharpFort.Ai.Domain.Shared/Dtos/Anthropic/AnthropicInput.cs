@@ -8,11 +8,11 @@ public sealed class AnthropicInput
 {
     [JsonPropertyName("stream")] public bool Stream { get; set; }
 
-    [JsonPropertyName("model")] public string Model { get; set; }
+    [JsonPropertyName("model")] public string Model { get; set; } = null!;
 
     [JsonPropertyName("max_tokens")] public int? MaxTokens { get; set; }
 
-    [JsonPropertyName("messages")] public IList<AnthropicMessageInput> Messages { get; set; }
+    [JsonPropertyName("messages")] public IList<AnthropicMessageInput> Messages { get; set; } = null!;
 
     [JsonPropertyName("tools")] public IList<AnthropicMessageTool>? Tools { get; set; }
 
@@ -48,7 +48,7 @@ public sealed class AnthropicInput
             }
             else
             {
-                ToolChoice = (AnthropicTooChoiceInput)value;
+                ToolChoice = (AnthropicTooChoiceInput)value!;
             }
         }
     }
@@ -88,7 +88,7 @@ public sealed class AnthropicInput
                 }
                 else if (str.ValueKind == JsonValueKind.Array)
                 {
-                    Systems = JsonSerializer.Deserialize<IList<AnthropicMessageContent>>(value?.ToString(),
+                    Systems = JsonSerializer.Deserialize<IList<AnthropicMessageContent>>(str.GetRawText(),
                         ThorJsonSerializer.DefaultOptions);
                 }
             }

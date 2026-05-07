@@ -10,12 +10,12 @@ public class AiProviderDto : FullAuditedEntityDto<Guid>
     /// <summary>
     /// 供应商名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// API终结点
     /// </summary>
-    public string Endpoint { get; set; }
+    public string Endpoint { get; set; } = null!;
 
     /// <summary>
     /// 额外URL
@@ -25,7 +25,7 @@ public class AiProviderDto : FullAuditedEntityDto<Guid>
     /// <summary>
     /// API Key
     /// </summary>
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 排序

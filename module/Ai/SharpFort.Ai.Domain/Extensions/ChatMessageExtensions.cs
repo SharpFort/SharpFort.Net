@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using OpenAI.Chat;
 
@@ -13,7 +14,7 @@ public static class ChatMessageExtensions
         if (propertyInfo != null)
         {
             var value = propertyInfo.GetValue(message) as ChatMessageRole?;
-            return value.ToString().ToLower();
+            return value?.ToString()?.ToLower(CultureInfo.InvariantCulture) ?? string.Empty;
         }
         
         return string.Empty;

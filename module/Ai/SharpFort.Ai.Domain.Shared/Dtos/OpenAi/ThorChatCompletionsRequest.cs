@@ -33,7 +33,7 @@ public class ThorChatCompletionsRequest
     /// 模型唯一编码值，如 gpt-4，gpt-3.5-turbo,moonshot-v1-8k，看底层具体平台定义
     /// </summary>
     [JsonPropertyName("model")]
-    public string Model { get; set; }
+    public string Model { get; set; } = null!;
 
     /// <summary>
     /// 温度采样的替代方法称为核采样，介于 0 和 1 之间，其中模型考虑具有 top_p 概率质量的标记的结果。
@@ -245,7 +245,7 @@ public class ThorChatCompletionsRequest
             }
             else
             {
-                ToolChoice = (ThorToolChoice)value;
+                ToolChoice = (ThorToolChoice)value!;
             }
         }
     }

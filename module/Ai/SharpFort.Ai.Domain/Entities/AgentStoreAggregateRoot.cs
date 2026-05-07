@@ -36,8 +36,8 @@ public class AgentStoreAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 设置存储
     /// </summary>
-    public void SetStore()
+    public void SetStore(string store)
     {
-        this.Store = Store;
+        this.Store = store;
     }
 }

@@ -8,7 +8,7 @@ public class ModelApiTypeOption
     /// <summary>
     /// 显示名称
     /// </summary>
-    public string Label { get; set; }
+    public string Label { get; set; } = null!;
 
     /// <summary>
     /// 枚举值

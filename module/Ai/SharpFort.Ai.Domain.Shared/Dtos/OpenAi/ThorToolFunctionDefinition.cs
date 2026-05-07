@@ -14,7 +14,7 @@ public class ThorToolFunctionDefinition
     /// 要调用的函数的名称。必须是 a-z、A-Z、0-9 或包含下划线和破折号，最大长度为 64。
     /// </summary>
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 函数功能的描述，模型使用它来选择何时以及如何调用函数。

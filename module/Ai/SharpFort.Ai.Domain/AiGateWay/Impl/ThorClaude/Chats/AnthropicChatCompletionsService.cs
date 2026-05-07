@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SharpFort.Ai.Domain.Shared.Dtos;
@@ -35,8 +36,8 @@ public class AnthropicChatCompletionsService(
         };
 
 
-        bool isThink = input.Model.EndsWith("-thinking");
-        input.Model = input.Model.Replace("-thinking", string.Empty);
+        bool isThink = input.Model.EndsWith("-thinking", StringComparison.Ordinal);
+        input.Model = input.Model.Replace("-thinking", string.Empty, StringComparison.Ordinal);
 
         if (input.MaxTokens is < 2048)
         {
@@ -82,21 +83,24 @@ public class AnthropicChatCompletionsService(
                 message += $", tip: 当前提示词过长，上下文已达到上限，如在 claudecode中使用，建议执行/compact压缩当前会话，或开启新会话后重试";
             }
 
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError(
-                $"Anthropic非流式对话异常 请求地址：{options.Endpoint},ErrorId：{errorId}, StatusCode: {response.StatusCode.GetHashCode()}, Response: {error}");
-            throw new Exception(message);
+                "Anthropic非流式对话异常 请求地址：{Endpoint},ErrorId：{ErrorId}, StatusCode: {StatusCode}, Response: {Response}",
+                options.Endpoint, errorId, response.StatusCode.GetHashCode(), error);
+#pragma warning restore CA1848
+            throw new InvalidOperationException(message);
         }
 
         var value =
             await response.Content.ReadFromJsonAsync<AnthropicChatCompletionDto>(ThorJsonSerializer.DefaultOptions,
                 cancellationToken: cancellationToken);
 
-        return value;
+        return value!;
     }
 
     public async IAsyncEnumerable<(string, AnthropicStreamDto?)> StreamChatCompletionsAsync(AiModelDescribe options,
         AnthropicInput input,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var openai =
             Activity.Current?.Source.StartActivity("Claudia 对话补全");
@@ -133,10 +137,13 @@ public class AnthropicChatCompletionsService(
                 message += $", tip: 当前提示词过长，上下文已达到上限，如在 claudecode中使用，建议执行/compact压缩当前会话，或开启新会话后重试";
             }
 
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError(
-                $"Anthropic流式对话异常 请求地址：{options.Endpoint},ErrorId：{errorId}, StatusCode: {response.StatusCode.GetHashCode()}, Response: {error}");
+                "Anthropic流式对话异常 请求地址：{Endpoint},ErrorId：{ErrorId}, StatusCode: {StatusCode}, Response: {Response}",
+                options.Endpoint, errorId, response.StatusCode.GetHashCode(), error);
+#pragma warning restore CA1848
 
-            throw new Exception(message);
+            throw new InvalidOperationException(message);
         }
 
         using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
@@ -153,10 +160,12 @@ public class AnthropicChatCompletionsService(
 
             if (line.StartsWith('{'))
             {
+#pragma warning disable CA1848, CA1873 // Business guard protects this call
                 logger.LogInformation("OpenAI对话异常 , StatusCode: {StatusCode} Response: {Response}", response.StatusCode,
                     line);
+#pragma warning restore CA1848, CA1873
 
-                throw new Exception("OpenAI对话异常" + line);
+                throw new InvalidOperationException("OpenAI对话异常" + line);
             }
 
             if (string.IsNullOrWhiteSpace(line))
@@ -164,13 +173,13 @@ public class AnthropicChatCompletionsService(
                 continue;
             }
 
-            if (line.StartsWith("event:"))
+            if (line.StartsWith("event:", StringComparison.Ordinal))
             {
                 eventType = line;
                 continue;
             }
 
-            if (!line.StartsWith(OpenAIConstant.Data)) continue;
+            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal)) continue;
 
             data = line[OpenAIConstant.Data.Length..].Trim();
 

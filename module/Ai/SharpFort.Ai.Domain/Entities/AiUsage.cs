@@ -33,7 +33,7 @@ public class AiUsage : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// Token密钥Id

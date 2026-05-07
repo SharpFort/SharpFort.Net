@@ -10,12 +10,12 @@ public class AiPromptDto : FullAuditedEntityDto<Guid>
     /// <summary>
     /// 提示词编码
     /// </summary>
-    public string Code { get; set; }
+    public string Code { get; set; } = null!;
 
     /// <summary>
     /// 提示词内容
     /// </summary>
-    public string Content { get; set; }
+    public string Content { get; set; } = null!;
 
     /// <summary>
     /// 描述

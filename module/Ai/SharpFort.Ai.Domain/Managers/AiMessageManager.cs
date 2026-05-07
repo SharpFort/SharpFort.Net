@@ -1,7 +1,6 @@
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Users;
 using SharpFort.Ai.Domain.Entities;
-using SharpFort.Ai.Domain.Entities;
 using SharpFort.Ai.Domain.Shared.Dtos;
 using SharpFort.SqlSugarCore.Abstractions;
 
@@ -27,7 +26,7 @@ public class AiMessageManager : DomainService
     public async Task<Guid> CreateSystemMessageAsync(Guid? userId, Guid? sessionId, MessageInputDto input, Guid? tokenId = null)
     {
         input.Role = "system";
-        var message = new ChatMessage(userId, sessionId, input.Content, input.Role, input.ModelId, input.TokenUsage, tokenId);
+        var message = new ChatMessage(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId);
         await _repository.InsertAsync(message);
         return message.Id;
     }
@@ -44,7 +43,7 @@ public class AiMessageManager : DomainService
     public async Task<Guid> CreateUserMessageAsync( Guid? userId, Guid? sessionId, MessageInputDto input, Guid? tokenId = null,DateTime? createTime=null)
     {
         input.Role = "user";
-        var message = new ChatMessage(userId, sessionId, input.Content, input.Role, input.ModelId, input.TokenUsage, tokenId)
+        var message = new ChatMessage(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId)
         {
             CreationTime = createTime??DateTime.Now
         };

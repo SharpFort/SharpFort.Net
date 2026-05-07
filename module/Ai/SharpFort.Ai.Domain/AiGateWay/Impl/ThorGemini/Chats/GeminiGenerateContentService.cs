@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SharpFort.Ai.Domain.AiGateWay.Exceptions;
@@ -15,10 +16,10 @@ public class GeminiGenerateContentService(
     IHttpClientFactory httpClientFactory) : IGeminiGenerateContentService
 {
     public async IAsyncEnumerable<JsonElement?> GenerateContentStreamAsync(AiModelDescribe options, JsonElement input,
-        CancellationToken cancellationToken)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var response = await httpClientFactory.CreateClient().PostJsonAsync(
-            options?.Endpoint.TrimEnd('/') + $"/v1beta/models/{options.ModelId}:streamGenerateContent?alt=sse",
+            options.Endpoint.TrimEnd('/') + $"/v1beta/models/{options.ModelId}:streamGenerateContent?alt=sse",
             input, null, new Dictionary<string, string>()
             {
                 { "x-goog-api-key", options.ApiKey }
@@ -29,11 +30,13 @@ public class GeminiGenerateContentService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Gemini生成异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
-            throw new Exception("Gemini生成异常" + response.StatusCode);
+            throw new InvalidOperationException("Gemini生成异常" + response.StatusCode);
         }
 
         using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
@@ -49,7 +52,7 @@ public class GeminiGenerateContentService(
                 continue;
             }
 
-            if (!line.StartsWith(OpenAIConstant.Data)) continue;
+            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal)) continue;
 
             var data = line[OpenAIConstant.Data.Length..].Trim();
 
@@ -64,7 +67,7 @@ public class GeminiGenerateContentService(
         CancellationToken cancellationToken)
     {
         var response = await httpClientFactory.CreateClient().PostJsonAsync(
-            options?.Endpoint.TrimEnd('/') + $"/v1beta/models/{options.ModelId}:generateContent",
+            options.Endpoint.TrimEnd('/') + $"/v1beta/models/{options.ModelId}:generateContent",
             input, null, new Dictionary<string, string>()
             {
                 { "x-goog-api-key", options.ApiKey }
@@ -85,9 +88,11 @@ public class GeminiGenerateContentService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Gemini 生成异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
             throw new BusinessException("Gemini 生成异常", response.StatusCode.ToString());
         }

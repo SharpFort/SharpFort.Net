@@ -15,17 +15,17 @@ public class AiModelDto
     /// <summary>
     /// 处理名
     /// </summary>
-    public string HandlerName { get; set; }
+    public string HandlerName { get; set; } = null!;
 
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 模型名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 模型描述

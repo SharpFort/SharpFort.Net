@@ -5,8 +5,8 @@ namespace SharpFort.Ai.Application.Contracts.Dtos.ChatSession;
 
 public class ChatSessionDto : FullAuditedEntityDto<Guid>
 {
-    public string SessionTitle { get; set; }
-    public string SessionContent { get; set; }
+    public string SessionTitle { get; set; } = null!;
+    public string SessionContent { get; set; } = null!;
     public string? Remark { get; set; }
 
     /// <summary>

@@ -7,7 +7,7 @@ public class OpenAiResponsesInput
 {
     [JsonPropertyName("stream")] public bool? Stream { get; set; }
 
-    [JsonPropertyName("model")] public string Model { get; set; }
+    [JsonPropertyName("model")] public string Model { get; set; } = null!;
     [JsonPropertyName("input")] public JsonElement Input { get; set; }
 
     [JsonPropertyName("max_output_tokens")]

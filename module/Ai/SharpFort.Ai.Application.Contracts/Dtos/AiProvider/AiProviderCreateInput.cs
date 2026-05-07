@@ -12,14 +12,14 @@ public class AiProviderCreateInput
     /// </summary>
     [Required(ErrorMessage = "供应商名称不能为空")]
     [StringLength(100, ErrorMessage = "供应商名称不能超过100个字符")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// API终结点
     /// </summary>
     [Required(ErrorMessage = "API终结点不能为空")]
     [StringLength(500, ErrorMessage = "API终结点不能超过500个字符")]
-    public string Endpoint { get; set; }
+    public string Endpoint { get; set; } = null!;
 
     /// <summary>
     /// 额外URL
@@ -32,7 +32,7 @@ public class AiProviderCreateInput
     /// </summary>
     [Required(ErrorMessage = "API Key不能为空")]
     [StringLength(500, ErrorMessage = "API Key不能超过500个字符")]
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 排序

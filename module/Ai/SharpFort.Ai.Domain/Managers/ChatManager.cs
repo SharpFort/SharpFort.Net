@@ -1,4 +1,5 @@
 using System.ClientModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -175,7 +176,7 @@ public class ChatManager : DomainService
                             new AgentResultOutput
                             {
                                 TypeEnum = AgentResultTypeEnum.ToolCalled,
-                                Content = functionResult.Result
+                                Content = functionResult.Result!
                             },
                             isDone: false, cancellationToken);
                         break;
@@ -199,8 +200,8 @@ public class ChatManager : DomainService
                         {
                             var usage = new ThorUsageResponse
                             {
-                                InputTokens = Convert.ToInt32(usageContent.Details.InputTokenCount ?? 0),
-                                OutputTokens = Convert.ToInt32(usageContent.Details.OutputTokenCount ?? 0),
+                                InputTokens = Convert.ToInt32(usageContent.Details.InputTokenCount ?? 0, CultureInfo.InvariantCulture),
+                                OutputTokens = Convert.ToInt32(usageContent.Details.OutputTokenCount ?? 0, CultureInfo.InvariantCulture),
                                 TotalTokens = usageContent.Details.TotalTokenCount ?? 0,
                             };
                             //设置倍率
@@ -219,7 +220,7 @@ public class ChatManager : DomainService
 
 
 
-                            await uow.CompleteAsync();
+                            await uow.CompleteAsync(cancellationToken);
 
                             await SendHttpStreamMessageAsync(httpContext,
                                 new AgentResultOutput
@@ -250,18 +251,18 @@ public class ChatManager : DomainService
         {
             //插入或者更新
             await _agentStoreRepository.InsertOrUpdateAsync(agentStore);
-            await uow.CompleteAsync();
+            await uow.CompleteAsync(cancellationToken);
         }
     }
 
 
-    public List<(string Code, string Name, AIFunction Tool)> GetTools()
+    public List<(string Code, string? Name, AIFunction Tool)> GetTools()
     {
         var toolClasses = typeof(ChatManager).Assembly.GetTypes()
             .Where(x => x.GetCustomAttribute<SfAgentToolAttribute>() is not null)
             .ToList();
 
-        List<(string Code, string Name, AIFunction Tool)> mcpTools = new();
+        List<(string Code, string? Name, AIFunction Tool)> mcpTools = new();
         foreach (var toolClass in toolClasses)
         {
             var instance = LazyServiceProvider.GetRequiredService(toolClass);
@@ -286,7 +287,7 @@ public class ChatManager : DomainService
     /// <param name="isDone"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task SendHttpStreamMessageAsync(HttpContext httpContext,
+    private static async Task SendHttpStreamMessageAsync(HttpContext httpContext,
         AgentResultOutput? content,
         bool isDone = false,
         CancellationToken cancellationToken = default)

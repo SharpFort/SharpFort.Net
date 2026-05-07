@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SharpFort.Ai.Domain.AiGateWay.Exceptions;
@@ -16,15 +17,15 @@ public sealed class OpenAiChatCompletionsService(
 {
     public async IAsyncEnumerable<ThorChatCompletionsResponse> CompleteChatStreamAsync(AiModelDescribe options,
         ThorChatCompletionsRequest chatCompletionCreate,
-        CancellationToken cancellationToken)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         using var openai =
             Activity.Current?.Source.StartActivity("OpenAI 对话流式补全");
 
-        var endpoint = options?.Endpoint.TrimEnd('/');
-        
+        var endpoint = options.Endpoint.TrimEnd('/');
+
         //兼容 v1结尾
-        if (endpoint != null && endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
+        if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
         }
@@ -52,9 +53,11 @@ public sealed class OpenAiChatCompletionsService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync();
+            var error = await response.Content.ReadAsStringAsync(cancellationToken);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 , StatusCode: {StatusCode} 错误响应内容：{Content}", response.StatusCode,
                 error);
+#pragma warning restore CA1848
 
             throw new BusinessException("OpenAI对话异常：" + error, response.StatusCode.ToString());
         }
@@ -65,19 +68,21 @@ public sealed class OpenAiChatCompletionsService(
         string? line = string.Empty;
         var first = true;
         var isThink = false;
-        while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
+        while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
         {
             line += Environment.NewLine;
 
             if (line.StartsWith('{'))
             {
+#pragma warning disable CA1848, CA1873 // Business guard protects this call
                 logger.LogInformation("OpenAI对话异常 , StatusCode: {StatusCode} Response: {Response}", response.StatusCode,
                     line);
+#pragma warning restore CA1848, CA1873
 
                 throw new BusinessException("OpenAI对话异常", line);
             }
 
-            if (line.StartsWith(OpenAIConstant.Data))
+            if (line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
                 line = line[OpenAIConstant.Data.Length..];
 
             line = line.Trim();
@@ -131,7 +136,7 @@ public sealed class OpenAiChatCompletionsService(
 
             first = false;
 
-            yield return result;
+            yield return result!;
         }
     }
 
@@ -142,10 +147,10 @@ public sealed class OpenAiChatCompletionsService(
         using var openai =
             Activity.Current?.Source.StartActivity("OpenAI 对话补全");
 
-        var endpoint = options?.Endpoint.TrimEnd('/');
-        
+        var endpoint = options.Endpoint.TrimEnd('/');
+
         //兼容 v1结尾
-        if (endpoint != null && endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
+        if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
         }
@@ -172,9 +177,11 @@ public sealed class OpenAiChatCompletionsService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
             throw new BusinessException("OpenAI对话异常", response.StatusCode.ToString());
         }
@@ -183,6 +190,6 @@ public sealed class OpenAiChatCompletionsService(
             await response.Content.ReadFromJsonAsync<ThorChatCompletionsResponse>(
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return result;
+        return result!;
     }
 }

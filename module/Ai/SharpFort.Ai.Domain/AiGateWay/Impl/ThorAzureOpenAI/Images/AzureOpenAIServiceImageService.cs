@@ -1,3 +1,4 @@
+using System.Globalization;
 using OpenAI.Images;
 using SharpFort.Ai.Domain.AiGateWay;
 using SharpFort.Ai.Domain.Shared.Dtos;
@@ -10,7 +11,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
     public async Task<ImageCreateResponse> CreateImage(ImageCreateRequest imageCreate, AiModelDescribe? options = null,
         CancellationToken cancellationToken = default(CancellationToken))
     {
-        var createClient = AzureOpenAIFactory.CreateClient(options);
+        var createClient = AzureOpenAIFactory.CreateClient(options!);
 
         var client = createClient.GetImageClient(imageCreate.Model);
         imageCreate.Size??="1024x1024";
@@ -25,7 +26,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
         var response = await client.GenerateImageAsync(imageCreate.Prompt, new ImageGenerationOptions()
         {
             Quality = imageCreate.Quality == "standard" ? GeneratedImageQuality.Standard : GeneratedImageQuality.High,
-            Size = new GeneratedImageSize(Convert.ToInt32(size[0]), Convert.ToInt32(size[1])),
+            Size = new GeneratedImageSize(Convert.ToInt32(size[0], CultureInfo.InvariantCulture), Convert.ToInt32(size[1], CultureInfo.InvariantCulture)),
             Style = imageCreate.Style == "vivid" ? GeneratedImageStyle.Vivid : GeneratedImageStyle.Natural,
             ResponseFormat =
                 imageCreate.ResponseFormat == "url" ? GeneratedImageFormat.Uri : GeneratedImageFormat.Bytes,
@@ -60,7 +61,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
         AiModelDescribe? options = null,
         CancellationToken cancellationToken = default(CancellationToken))
     {
-        var url = AzureOpenAIFactory.GetEditImageAddress(options, imageEditCreateRequest.Model);
+        var url = AzureOpenAIFactory.GetEditImageAddress(options!, imageEditCreateRequest.Model!);
         
         var multipartContent = new MultipartFormDataContent();
         if (imageEditCreateRequest.User != null)
@@ -80,7 +81,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
 
         if (imageEditCreateRequest.N != null)
         {
-            multipartContent.Add(new StringContent(imageEditCreateRequest.N.ToString()!), "n");
+            multipartContent.Add(new StringContent(imageEditCreateRequest.N.Value.ToString(CultureInfo.InvariantCulture)), "n");
         }
 
         if (imageEditCreateRequest.Model != null)
@@ -91,12 +92,12 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
         if (imageEditCreateRequest.Mask != null)
         {
             multipartContent.Add(new ByteArrayContent(imageEditCreateRequest.Mask), "mask",
-                imageEditCreateRequest.MaskName);
+                imageEditCreateRequest.MaskName!);
         }
 
         multipartContent.Add(new StringContent(imageEditCreateRequest.Prompt), "prompt");
-        multipartContent.Add(new ByteArrayContent(imageEditCreateRequest.Image), "image",
-            imageEditCreateRequest.ImageName);
+        multipartContent.Add(new ByteArrayContent(imageEditCreateRequest.Image!), "image",
+            imageEditCreateRequest.ImageName!);
 
         return await httpClientFactory.CreateClient().PostFileAndReadAsAsync<ImageCreateResponse>(
             url,

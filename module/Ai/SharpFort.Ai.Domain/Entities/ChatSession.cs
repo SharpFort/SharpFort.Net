@@ -16,10 +16,10 @@ public class ChatSession : FullAuditedAggregateRoot<Guid>
     }
 
     public Guid UserId { get; set; }
-    public string SessionTitle { get; set; }
+    public string SessionTitle { get; set; } = null!;
 
     [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString)]
-    public string SessionContent { get; set; }
+    public string SessionContent { get; set; } = null!;
     
     public string? Remark { get; set; }
 

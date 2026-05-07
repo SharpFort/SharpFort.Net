@@ -18,7 +18,7 @@ public class TokenUpdateInput
     /// </summary>
     [Required(ErrorMessage = "名称不能为空")]
     [StringLength(100, ErrorMessage = "名称长度不能超过100个字符")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 过期时间（空为永不过期）

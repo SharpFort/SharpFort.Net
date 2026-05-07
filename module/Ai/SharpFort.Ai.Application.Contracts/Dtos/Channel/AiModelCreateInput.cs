@@ -13,21 +13,21 @@ public class AiModelCreateInput
     /// </summary>
     [Required(ErrorMessage = "处理名不能为空")]
     [StringLength(100, ErrorMessage = "处理名不能超过100个字符")]
-    public string HandlerName { get; set; }
+    public string HandlerName { get; set; } = null!;
 
     /// <summary>
     /// 模型ID
     /// </summary>
     [Required(ErrorMessage = "模型ID不能为空")]
     [StringLength(200, ErrorMessage = "模型ID不能超过200个字符")]
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 模型名称
     /// </summary>
     [Required(ErrorMessage = "模型名称不能为空")]
     [StringLength(200, ErrorMessage = "模型名称不能超过200个字符")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 模型描述

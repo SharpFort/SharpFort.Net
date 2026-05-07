@@ -8,12 +8,12 @@ public class ModelTokenStatisticsDto
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 模型名称
     /// </summary>
-    public string ModelName { get; set; }
+    public string ModelName { get; set; } = null!;
 
     /// <summary>
     /// Token消耗量

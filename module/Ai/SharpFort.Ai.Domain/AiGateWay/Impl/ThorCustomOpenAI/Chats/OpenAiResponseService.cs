@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SharpFort.Ai.Domain.AiGateWay.Exceptions;
@@ -14,7 +15,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
 {
     
     public async IAsyncEnumerable<(string, JsonElement?)> ResponsesStreamAsync(AiModelDescribe options, OpenAiResponsesInput input,
-        CancellationToken cancellationToken)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
          using var openai =
             Activity.Current?.Source.StartActivity("OpenAi 响应");
@@ -22,15 +23,15 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
         
         var client = httpClientFactory.CreateClient();
         
-        var endpoint = options?.Endpoint.TrimEnd('/');
-        
+        var endpoint = options.Endpoint.TrimEnd('/');
+
         //兼容 v1结尾
-        if (endpoint != null && endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
+        if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
         }
         var requestUri = endpoint + "/v1/responses";
-        
+
         var response = await client.HttpRequestRaw(requestUri, input, options.ApiKey);
 
         openai?.SetTag("Model", input.Model);
@@ -40,11 +41,13 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI响应异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
-            throw new Exception("OpenAI响应异常" + response.StatusCode);
+            throw new InvalidOperationException("OpenAI响应异常" + response.StatusCode);
         }
 
         using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
@@ -61,10 +64,12 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
 
             if (line.StartsWith('{'))
             {
+#pragma warning disable CA1848, CA1873 // Business guard protects this call
                 logger.LogInformation("OpenAI响应异常 , StatusCode: {StatusCode} Response: {Response}", response.StatusCode,
                     line);
+#pragma warning restore CA1848, CA1873
 
-                throw new Exception("OpenAI响应异常" + line);
+                throw new InvalidOperationException("OpenAI响应异常" + line);
             }
 
             if (string.IsNullOrWhiteSpace(line))
@@ -72,13 +77,13 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
                 continue;
             }
 
-            if (line.StartsWith("event:"))
+            if (line.StartsWith("event:", StringComparison.Ordinal))
             {
                 eventType = line;
                 continue;
             }
 
-            if (!line.StartsWith(OpenAIConstant.Data)) continue;
+            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal)) continue;
 
             data = line[OpenAIConstant.Data.Length..].Trim();
 
@@ -95,15 +100,15 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
         using var openai =
             Activity.Current?.Source.StartActivity("OpenAI 响应");
 
-        var endpoint = options?.Endpoint.TrimEnd('/');
-        
+        var endpoint = options.Endpoint.TrimEnd('/');
+
         //兼容 v1结尾
-        if (endpoint != null && endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
+        if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
         }
         var requestUri = endpoint + "/v1/responses";
-        
+
         var response = await httpClientFactory.CreateClient().PostJsonAsync(
             requestUri,
             chatCompletionCreate, options.ApiKey).ConfigureAwait(false);
@@ -126,8 +131,10 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI 响应异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}", options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
             throw new BusinessException("OpenAI响应异常", response.StatusCode.ToString());
         }
@@ -136,6 +143,6 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpCl
             await response.Content.ReadFromJsonAsync<OpenAiResponsesOutput>(
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return result;
+        return result!;
     }
 }

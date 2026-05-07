@@ -18,17 +18,17 @@ public class AiModel : Entity<Guid>, IOrderNum, ISoftDelete
     /// <summary>
     /// 处理程序名称 (e.g. OpenAIHandler)
     /// </summary>
-    public string HandlerName { get; set; }
+    public string HandlerName { get; set; } = null!;
 
     /// <summary>
     /// 模型ID (e.g. gpt-4)
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 显示名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 描述

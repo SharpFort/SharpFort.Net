@@ -19,6 +19,6 @@ public sealed class SiliconFlowTextEmbeddingService(IHttpClientFactory httpClien
         var result =
             await response.Content.ReadFromJsonAsync<EmbeddingCreateResponse>(cancellationToken: cancellationToken);
 
-        return result;
+        return result!;
     }
 }

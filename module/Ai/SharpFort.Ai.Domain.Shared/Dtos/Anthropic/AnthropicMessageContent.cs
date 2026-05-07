@@ -8,7 +8,7 @@ public class AnthropicMessageContent
 {
     [JsonPropertyName("cache_control")] public AnthropicCacheControl? CacheControl { get; set; }
 
-    [JsonPropertyName("type")] public string Type { get; set; }
+    [JsonPropertyName("type")] public string Type { get; set; } = null!;
 
     [JsonPropertyName("text")] public string? Text { get; set; }
 
@@ -51,7 +51,7 @@ public class AnthropicMessageContent
                 }
                 else if (str.ValueKind == JsonValueKind.Array)
                 {
-                    _contents = JsonSerializer.Deserialize<List<AnthropicMessageContent>>(value?.ToString());
+                    _contents = JsonSerializer.Deserialize<List<AnthropicMessageContent>>(str.GetRawText());
                 }
             }
             else
@@ -67,7 +67,7 @@ public class AnthropicMessageContent
 
     public class AnthropicMessageContentSource
     {
-        [JsonPropertyName("type")] public string Type { get; set; }
+        [JsonPropertyName("type")] public string Type { get; set; } = null!;
 
         [JsonPropertyName("media_type")] public string? MediaType { get; set; }
 

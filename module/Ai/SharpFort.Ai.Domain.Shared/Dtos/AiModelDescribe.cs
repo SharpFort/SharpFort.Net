@@ -12,17 +12,17 @@ public class AiModelDescribe
     /// <summary>
     /// 应用名称
     /// </summary>
-    public string AppName { get; set; }
+    public string AppName { get; set; } = null!;
 
     /// <summary>
     /// 应用终结点
     /// </summary>
-    public string Endpoint { get; set; }
+    public string Endpoint { get; set; } = null!;
 
     /// <summary>
     /// 应用key
     /// </summary>
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 排序
@@ -32,17 +32,17 @@ public class AiModelDescribe
     /// <summary>
     /// 处理名
     /// </summary>
-    public string HandlerName { get; set; }
+    public string HandlerName { get; set; } = null!;
 
     /// <summary>
     /// 模型id
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 模型名称
     /// </summary>
-    public string ModelName { get; set; }
+    public string ModelName { get; set; } = null!;
 
     /// <summary>
     /// 模型描述

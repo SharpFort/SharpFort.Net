@@ -33,7 +33,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
         /// 错误信息
         /// </summary>
         [JsonIgnore]
-        public List<string?> Messages { get; private set; }
+        public List<string?> Messages { get; private set; } = [];
 
         /// <summary>
         /// 错误信息
@@ -63,7 +63,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
                     return Messages;
                 }
 
-                return Message;
+                return Message!;
             }
         }
     }

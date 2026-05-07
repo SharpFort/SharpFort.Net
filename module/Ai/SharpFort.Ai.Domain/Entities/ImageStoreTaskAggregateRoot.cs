@@ -11,19 +11,19 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// 提示词
     /// </summary>
     [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString)]
-    public string Prompt { get; set; }
+    public string Prompt { get; set; } = null!;
 
     /// <summary>
     /// 参考图PrefixBase64（带前缀，如 data:image/png;base64,xxx）
     /// </summary>
     [SugarColumn(IsJson = true, ColumnDataType = StaticConfig.CodeFirst_BigString)]
-    public List<string> ReferenceImagesPrefixBase64 { get; set; }
+    public List<string> ReferenceImagesPrefixBase64 { get; set; } = new List<string>();
 
     /// <summary>
     /// 参考图url
     /// </summary>
     [SugarColumn(IsJson = true)]
-    public List<string> ReferenceImagesUrl { get; set; }
+    public List<string> ReferenceImagesUrl { get; set; } = new List<string>();
 
 
     /// <summary>
@@ -49,7 +49,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 模型id
     /// </summary>
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// 错误信息
@@ -71,7 +71,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 是否匿名
     /// </summary>
-    public bool IsAnonymous { get; set; } = false;
+    public bool IsAnonymous { get; set; }
     
     /// <summary>
     /// 密钥id

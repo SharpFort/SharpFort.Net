@@ -1,3 +1,5 @@
+#pragma warning disable CA1707 // Identifiers should not contain underscores
+
 using System.ComponentModel;
 
 namespace SharpFort.Ai.Domain.Shared.Enums;

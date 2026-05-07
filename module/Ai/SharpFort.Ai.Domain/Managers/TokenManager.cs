@@ -26,12 +26,12 @@ public class TokenValidationResult
     /// <summary>
     /// token
     /// </summary>
-    public string Token { get; set; }
+    public string Token { get; set; } = null!;
 
     /// <summary>
     /// Token名称
     /// </summary>
-    public string TokenName { get; set; }
+    public string TokenName { get; set; } = null!;
 
     /// <summary>
     /// 是否启用请求日志记录
@@ -78,8 +78,8 @@ public class TokenManager : DomainService
         }
         else
         {
-            var tokenStr = tokenOrId.ToString();
-            if (!tokenStr.StartsWith("yi-"))
+            var tokenStr = tokenOrId.ToString() ?? string.Empty;
+            if (!tokenStr.StartsWith("yi-", StringComparison.Ordinal))
             {
                 throw new UserFriendlyException("当前请求token非法", "401");
             }
@@ -139,7 +139,7 @@ public class TokenManager : DomainService
     [Obsolete("请使用 ValidateTokenAsync 方法")]
     public async Task<Guid> GetUserIdAsync(string? token)
     {
-        var result = await ValidateTokenAsync(token);
+        var result = await ValidateTokenAsync(token!);
         return result.UserId;
     }
 }

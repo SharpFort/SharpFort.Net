@@ -13,12 +13,12 @@ public class AiAppShortcutAggregateRoot : FullAuditedAggregateRoot<Guid>, IOrder
     /// <summary>
     /// 应用名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 应用终结点
     /// </summary>
-    public string Endpoint { get; set; }
+    public string Endpoint { get; set; } = null!;
 
     /// <summary>
     /// 额外url
@@ -28,7 +28,7 @@ public class AiAppShortcutAggregateRoot : FullAuditedAggregateRoot<Guid>, IOrder
     /// <summary>
     /// 应用key
     /// </summary>
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 排序

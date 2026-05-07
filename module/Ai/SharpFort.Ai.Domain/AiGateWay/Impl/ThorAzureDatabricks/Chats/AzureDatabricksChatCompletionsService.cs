@@ -13,7 +13,7 @@ namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorAzureDatabricks.Chats;
 public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCompletionsService> logger,IHttpClientFactory httpClientFactory)
     : IChatCompletionService
 {
-    private string GetAddress(AiModelDescribe? options, string model)
+    private static string GetAddress(AiModelDescribe? options, string model)
     {
         // This method should return the appropriate URL for the Azure Databricks API
         // based on the provided options and model.
@@ -57,9 +57,11 @@ public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCo
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync();
+            var error = await response.Content.ReadAsStringAsync(cancellationToken);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 , StatusCode: {StatusCode} 错误响应内容：{Content}", response.StatusCode,
                 error);
+#pragma warning restore CA1848
 
             throw new BusinessException(response.StatusCode.ToString(), "OpenAI对话异常：" + error);
         }
@@ -68,21 +70,21 @@ public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCo
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
-        var first = true;
-        var isThink = false;
         while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
         {
             line += Environment.NewLine;
 
             if (line.StartsWith('{'))
             {
+#pragma warning disable CA1848, CA1873 // Business guard protects this call
                 logger.LogInformation("OpenAI对话异常 , StatusCode: {StatusCode} Response: {Response}", response.StatusCode,
                     line);
+#pragma warning restore CA1848, CA1873
 
                 throw new BusinessException("500", "OpenAI对话异常", line);
             }
 
-            if (line.StartsWith(OpenAIConstant.Data))
+            if (line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
                 line = line[OpenAIConstant.Data.Length..];
 
             line = line.Trim();
@@ -142,9 +144,11 @@ public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCo
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
             throw new BusinessException(response.StatusCode.ToString(), "OpenAI对话异常");
         }
@@ -153,6 +157,6 @@ public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCo
             await response.Content.ReadFromJsonAsync<ThorChatCompletionsResponse>(
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return result;
+        return result!;
     }
 }

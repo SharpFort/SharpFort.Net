@@ -1,3 +1,5 @@
+#pragma warning disable CA1720 // Identifier contains type name — 'Object' matches OpenAI API schema
+
 using System.Buffers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -6,7 +8,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Embeddings;
 
 public record EmbeddingCreateResponse : ThorBaseResponse
 {
-    [JsonPropertyName("model")] public string Model { get; set; }
+    [JsonPropertyName("model")] public string Model { get; set; } = null!;
 
     [JsonPropertyName("data")] public List<EmbeddingResponse> Data { get; set; } = [];
 
@@ -89,7 +91,7 @@ public record EmbeddingCreateResponse : ThorBaseResponse
         byte[] byteArray = ArrayPool<byte>.Shared.Rent(floatArray.Length * sizeof(float));
         try
         {
-            Buffer.BlockCopy(floatArray, 0, byteArray, 0, floatArray.Length);
+            Buffer.BlockCopy(floatArray, 0, byteArray, 0, floatArray.Length * sizeof(float));
 
             // 将 byte[] 转换成 base64 字符串
             return Convert.ToBase64String(byteArray);
@@ -109,5 +111,5 @@ public record EmbeddingResponse
 
     [JsonPropertyName("index")] public int? Index { get; set; }
 
-    [JsonPropertyName("embedding")] public object Embedding { get; set; }
+    [JsonPropertyName("embedding")] public object Embedding { get; set; } = null!;
 }

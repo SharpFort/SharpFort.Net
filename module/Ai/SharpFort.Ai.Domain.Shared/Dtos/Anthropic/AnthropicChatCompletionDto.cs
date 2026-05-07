@@ -1,3 +1,5 @@
+// 属性名来自 Anthropic API JSON 字段
+#pragma warning disable CA1707
 using System.Text.Json.Serialization;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
@@ -73,19 +75,19 @@ public class AnthropicChatCompletionDtoContentBlock
 
 public class AnthropicChatCompletionDto
 {
-    public string id { get; set; }
+    public string id { get; set; } = null!;
 
-    public string type { get; set; }
+    public string type { get; set; } = null!;
 
-    public string role { get; set; }
+    public string role { get; set; } = null!;
 
-    public AnthropicChatCompletionDtoContent[] content { get; set; }
+    public AnthropicChatCompletionDtoContent[] content { get; set; } = null!;
 
-    public string model { get; set; }
+    public string model { get; set; } = null!;
 
-    public string stop_reason { get; set; }
+    public string stop_reason { get; set; } = null!;
 
-    public object stop_sequence { get; set; }
+    public object stop_sequence { get; set; } = null!;
 
     public AnthropicCompletionDtoUsage? Usage { get; set; }
     
@@ -93,7 +95,7 @@ public class AnthropicChatCompletionDto
 
 public class AnthropicChatCompletionDtoContent
 {
-    public string type { get; set; }
+    public string type { get; set; } = null!;
 
     public string? text { get; set; }
 

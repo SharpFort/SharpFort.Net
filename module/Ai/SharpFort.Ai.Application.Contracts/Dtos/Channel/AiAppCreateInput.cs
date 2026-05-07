@@ -12,14 +12,14 @@ public class AiAppCreateInput
     /// </summary>
     [Required(ErrorMessage = "应用名称不能为空")]
     [StringLength(100, ErrorMessage = "应用名称不能超过100个字符")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 应用终结点
     /// </summary>
     [Required(ErrorMessage = "应用终结点不能为空")]
     [StringLength(500, ErrorMessage = "应用终结点不能超过500个字符")]
-    public string Endpoint { get; set; }
+    public string Endpoint { get; set; } = null!;
 
     /// <summary>
     /// 额外URL
@@ -32,7 +32,7 @@ public class AiAppCreateInput
     /// </summary>
     [Required(ErrorMessage = "应用Key不能为空")]
     [StringLength(500, ErrorMessage = "应用Key不能超过500个字符")]
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 排序

@@ -9,13 +9,13 @@ public class AiPromptCreateInput
     /// </summary>
     [Required]
     [StringLength(100)]
-    public string Code { get; set; }
+    public string Code { get; set; } = null!;
 
     /// <summary>
     /// 提示词内容
     /// </summary>
     [Required]
-    public string Content { get; set; }
+    public string Content { get; set; } = null!;
 
     /// <summary>
     /// 描述

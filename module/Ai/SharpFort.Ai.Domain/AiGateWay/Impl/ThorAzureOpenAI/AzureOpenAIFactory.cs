@@ -1,7 +1,10 @@
 using System.ClientModel;
 using System.Collections.Concurrent;
+using System.Globalization;
 using Azure.AI.OpenAI;
 using SharpFort.Ai.Domain.Shared.Dtos;
+
+#pragma warning disable CA1863 // One-off URI construction, not hot path
 
 namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorAzureOpenAI;
 
@@ -23,7 +26,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(AudioTranscriptions, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture,AudioTranscriptions, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static string GetAudioSpeechAddress(AiModelDescribe options, string model)
@@ -33,7 +36,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(AudioSpeechTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture,AudioSpeechTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static string GetAddress(AiModelDescribe options, string model)
@@ -43,7 +46,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(AddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture,AddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static string GetEditImageAddress(AiModelDescribe options, string model)
@@ -53,7 +56,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(EditImageAddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture,EditImageAddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static AzureOpenAIClient CreateClient(AiModelDescribe options)

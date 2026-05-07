@@ -9,7 +9,7 @@ namespace SharpFort.Ai.Domain.Mcp;
 public class DeepThinkTool:ISingletonDependency
 {
     [SfAgentTool("深度思考"),DisplayName("DeepThink"),Description("进行深度思考")]
-    public void DeepThink()
+    public static void DeepThink()
     {
         
     }

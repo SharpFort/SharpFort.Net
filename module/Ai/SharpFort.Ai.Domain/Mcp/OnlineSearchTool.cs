@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -88,6 +89,7 @@ public class OnlineSearchTool : ISingletonDependency
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
+#pragma warning disable CA1848 // Error handler — infrequent calls
                 _logger.LogError("百度搜索接口调用失败: {StatusCode}, {Error}", response.StatusCode, errorContent);
                 return $"搜索失败: {response.StatusCode}";
             }
@@ -106,21 +108,28 @@ public class OnlineSearchTool : ISingletonDependency
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "百度搜索网络请求异常");
+#pragma warning restore CA1848
             return "搜索服务暂时不可用，请稍后重试";
         }
         catch (TaskCanceledException ex)
         {
+#pragma warning disable CA1848 // Error handler — infrequent calls
             _logger.LogError(ex, "百度搜索请求超时");
+#pragma warning restore CA1848
             return "搜索请求超时，请稍后重试";
         }
         catch (JsonException ex)
         {
+#pragma warning disable CA1848 // Error handler — infrequent calls
             _logger.LogError(ex, "百度搜索结果解析失败");
+#pragma warning restore CA1848
             return "搜索结果解析失败";
         }
         catch (Exception ex)
         {
+#pragma warning disable CA1848 // Error handler — infrequent calls
             _logger.LogError(ex, "百度搜索发生未知异常");
+#pragma warning restore CA1848
             return "搜索发生异常，请稍后重试";
         }
     }
@@ -128,7 +137,7 @@ public class OnlineSearchTool : ISingletonDependency
     /// <summary>
     /// 格式化搜索结果
     /// </summary>
-    private string FormatSearchResults(List<BaiduSearchReference> references)
+    private static string FormatSearchResults(List<BaiduSearchReference> references)
     {
         var sb = new StringBuilder();
         sb.AppendLine("搜索结果：");
@@ -138,10 +147,10 @@ public class OnlineSearchTool : ISingletonDependency
         foreach (var item in references.Take(10)) // 最多返回10条
         {
             count++;
-            sb.AppendLine($"【{count}】{item.Title}");
-            sb.AppendLine($"来源：{item.Website} | 时间：{item.Date}");
-            sb.AppendLine($"摘要：{item.Snippet}");
-            sb.AppendLine($"链接：{item.Url}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"【{count}】{item.Title}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"来源：{item.Website} | 时间：{item.Date}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"摘要：{item.Snippet}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"链接：{item.Url}");
             sb.AppendLine();
         }
 
@@ -237,7 +246,7 @@ public class BaiduSearchReference
 [JsonSerializable(typeof(BaiduSearchRange))]
 [JsonSerializable(typeof(BaiduSearchPageTime))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
-internal partial class BaiduJsonContext : JsonSerializerContext
+internal sealed partial class BaiduJsonContext : JsonSerializerContext
 {
 }
 

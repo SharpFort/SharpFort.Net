@@ -188,8 +188,8 @@ public static class GeminiGenerateContentAcquirer
     private static bool LooksLikeBase64(string str)
     {
         // 常见图片 base64 开头: JPEG(/9j/), PNG(iVBOR), GIF(R0lGO), WebP(UklGR)
-        if (str.StartsWith("/9j/") || str.StartsWith("iVBOR") ||
-            str.StartsWith("R0lGO") || str.StartsWith("UklGR"))
+        if (str.StartsWith("/9j/", StringComparison.Ordinal) || str.StartsWith("iVBOR", StringComparison.Ordinal) ||
+            str.StartsWith("R0lGO", StringComparison.Ordinal) || str.StartsWith("UklGR", StringComparison.Ordinal))
         {
             return true;
         }

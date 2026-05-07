@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -10,13 +12,13 @@ namespace SharpFort.Ai.Domain.Mcp;
 [SfAgentTool]
 public class YxaiKnowledgeTool : ISingletonDependency
 {
+    private static readonly CompositeFormat ContentUrlFormat = CompositeFormat.Parse("https://ccnetcore.com/prod-api/article/{0}");
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<YxaiKnowledgeTool> _logger;
 
     private const string DirectoryUrl =
         "https://ccnetcore.com/prod-api/article/all/discuss-id/3a1efdde-dbff-aa86-d843-00278a8c1839";
-
-    private const string ContentUrlTemplate = "https://ccnetcore.com/prod-api/article/{0}";
 
     public YxaiKnowledgeTool(
         IHttpClientFactory httpClientFactory,
@@ -38,7 +40,9 @@ public class YxaiKnowledgeTool : ISingletonDependency
             var directoryResponse = await client.GetAsync(DirectoryUrl);
             if (!directoryResponse.IsSuccessStatusCode)
             {
+#pragma warning disable CA1848 // Business guard protects this call
                 _logger.LogError("意心知识库目录接口调用失败: {StatusCode}", directoryResponse.StatusCode);
+#pragma warning restore CA1848
                 return new List<YxaiKnowledgeItem>();
             }
 
@@ -57,7 +61,7 @@ public class YxaiKnowledgeTool : ISingletonDependency
             {
                 try
                 {
-                    var contentUrl = string.Format(ContentUrlTemplate, directory.Id);
+                    var contentUrl = string.Format(CultureInfo.InvariantCulture, ContentUrlFormat, directory.Id);
                     var contentResponse = await client.GetAsync(contentUrl);
 
                     if (contentResponse.IsSuccessStatusCode)
@@ -74,8 +78,10 @@ public class YxaiKnowledgeTool : ISingletonDependency
                     }
                     else
                     {
+#pragma warning disable CA1848 // Business guard protects this call
                         _logger.LogWarning("获取知识库内容失败: {StatusCode}, DirectoryId: {DirectoryId}",
                             contentResponse.StatusCode, directory.Id);
+#pragma warning restore CA1848
                         result.Add(new YxaiKnowledgeItem
                         {
                             Name = directory.Name,
@@ -85,7 +91,9 @@ public class YxaiKnowledgeTool : ISingletonDependency
                 }
                 catch (Exception ex)
                 {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
                     _logger.LogError(ex, "获取知识库内容发生异常, DirectoryId: {DirectoryId}", directory.Id);
+#pragma warning restore CA1848
                     result.Add(new YxaiKnowledgeItem
                     {
                         Name = directory.Name,
@@ -98,7 +106,9 @@ public class YxaiKnowledgeTool : ISingletonDependency
         }
         catch (Exception ex)
         {
+#pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(ex, "获取意心知识库发生异常");
+#pragma warning restore CA1848
             return new List<YxaiKnowledgeItem>();
         }
     }
@@ -140,7 +150,7 @@ public class YxaiKnowledgeItem
 
 [JsonSerializable(typeof(List<YxaiKnowledgeDirectoryItem>))]
 [JsonSerializable(typeof(YxaiKnowledgeContentResponse))]
-internal partial class YxaiKnowledgeJsonContext : JsonSerializerContext
+internal sealed partial class YxaiKnowledgeJsonContext : JsonSerializerContext
 {
 }
 

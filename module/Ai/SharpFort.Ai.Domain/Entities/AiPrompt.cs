@@ -18,13 +18,13 @@ public class AiPrompt : FullAuditedAggregateRoot<Guid>
     /// 提示词编码 (唯一标识)
     /// </summary>
     [SugarColumn(IsNullable = false, UniqueGroupNameList = new []{"uk_code"})]
-    public string Code { get; set; }
+    public string Code { get; set; } = null!;
 
     /// <summary>
     /// 提示词内容
     /// </summary>
     [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString)]
-    public string Content { get; set; }
+    public string Content { get; set; } = null!;
 
     /// <summary>
     /// 描述

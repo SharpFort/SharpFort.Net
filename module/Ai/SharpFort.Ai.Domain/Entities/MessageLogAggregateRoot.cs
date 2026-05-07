@@ -17,13 +17,13 @@ public class MessageLogAggregateRoot : Entity<Guid>
     /// 请求apikey
     /// </summary>
     [SugarColumn(Length = 255)]
-    public string ApiKey { get; set; }
+    public string ApiKey { get; set; } = null!;
 
     /// <summary>
     /// 请求apikey名称
     /// </summary>
     [SugarColumn(Length = 255)]
-    public string ApiKeyName { get; set; }
+    public string ApiKeyName { get; set; } = null!;
 
     /// <summary>
     /// 创建时间
@@ -34,7 +34,7 @@ public class MessageLogAggregateRoot : Entity<Guid>
     /// 模型id
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string ModelId { get; set; }
+    public string ModelId { get; set; } = null!;
 
     /// <summary>
     /// api类型
@@ -45,5 +45,5 @@ public class MessageLogAggregateRoot : Entity<Guid>
     /// api类型名称
     /// </summary>
     [SugarColumn(Length = 16)]
-    public string ApiTypeName { get; set; }
+    public string ApiTypeName { get; set; } = null!;
 }

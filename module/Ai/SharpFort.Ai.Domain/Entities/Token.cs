@@ -24,7 +24,7 @@ public class Token : FullAuditedAggregateRoot<Guid>
     /// Token密钥
     /// </summary>
     [SugarColumn(ColumnName = "Token")]
-    public string TokenKey { get; set; }
+    public string TokenKey { get; set; } = null!;
 
     /// <summary>
     /// 用户Id
@@ -35,7 +35,7 @@ public class Token : FullAuditedAggregateRoot<Guid>
     /// 名称
     /// </summary>
     [SugarColumn(Length = 100)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 过期时间（空为永不过期）
@@ -87,7 +87,7 @@ public class Token : FullAuditedAggregateRoot<Guid>
         IsDisabled = false;
     }
 
-    private string GenerateToken(int length = 36)
+    private static string GenerateToken(int length = 36)
     {
         // 定义可能的字符集：大写字母、小写字母和数字
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

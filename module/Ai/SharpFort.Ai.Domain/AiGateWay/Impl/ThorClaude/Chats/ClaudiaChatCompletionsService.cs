@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SharpFort.Ai.Domain.Shared.Dtos;
@@ -14,7 +15,7 @@ public sealed class ClaudiaChatCompletionsService(
     ILogger<ClaudiaChatCompletionsService> logger)
     : IChatCompletionService
 {
-    public List<ThorChatChoiceResponse> CreateResponse(AnthropicChatCompletionDto completionDto)
+    public static List<ThorChatChoiceResponse> CreateResponse(AnthropicChatCompletionDto completionDto)
     {
         var response = new ThorChatChoiceResponse();
         var chatMessage = new ThorChatMessage();
@@ -72,7 +73,7 @@ public sealed class ClaudiaChatCompletionsService(
         return new List<ThorChatChoiceResponse> { response };
     }
 
-    private object CreateMessage(List<ThorChatMessage> messages, AiModelDescribe options)
+    private static List<object> CreateMessage(List<ThorChatMessage> messages, AiModelDescribe options)
     {
         var list = new List<object>();
 
@@ -108,7 +109,7 @@ public sealed class ClaudiaChatCompletionsService(
                             };
                         }
 
-                        var isBase64 = x.ImageUrl?.Url.StartsWith("http") == true;
+                        var isBase64 = x.ImageUrl?.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true;
 
                         if ("true".Equals(options.ModelExtraInfo, StringComparison.OrdinalIgnoreCase))
                         {
@@ -232,7 +233,7 @@ public sealed class ClaudiaChatCompletionsService(
                                     id = toolCall.Id,
                                     name = toolCall.Function?.Name,
                                     input = JsonSerializer.Deserialize<Dictionary<string, object>>(
-                                        toolCall.Function?.Arguments, ThorJsonSerializer.DefaultOptions)
+                                        toolCall.Function?.Arguments ?? "{}", ThorJsonSerializer.DefaultOptions)
                                 });
                             }
 
@@ -276,7 +277,7 @@ public sealed class ClaudiaChatCompletionsService(
 
     public async IAsyncEnumerable<ThorChatCompletionsResponse> CompleteChatStreamAsync(AiModelDescribe options,
         ThorChatCompletionsRequest input,
-        CancellationToken cancellationToken)
+        [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         using var openai =
             Activity.Current?.Source.StartActivity("Claudia 对话补全");
@@ -294,7 +295,7 @@ public sealed class ClaudiaChatCompletionsService(
             { "anthropic-version", "2023-06-01" }
         };
 
-        var isThinking = input.Model.EndsWith("thinking");
+        var isThinking = input.Model.EndsWith("thinking", StringComparison.Ordinal);
         input.Model = input.Model.Replace("-thinking", string.Empty);
         var budgetTokens = 1024;
 
@@ -311,7 +312,7 @@ public sealed class ClaudiaChatCompletionsService(
         // budgetTokens最大4096
         budgetTokens = Math.Min(budgetTokens, 4096);
 
-        object tool_choice;
+        object? tool_choice;
         if (input.ToolChoice is not null && input.ToolChoice.Type == "auto")
         {
             tool_choice = new
@@ -348,8 +349,8 @@ public sealed class ClaudiaChatCompletionsService(
             max_tokens = input.MaxTokens ?? 64000,
             stream = true,
             tool_choice,
-            system = CreateMessage(input.Messages.Where(x => x.Role == "system").ToList(), options),
-            messages = CreateMessage(input.Messages.Where(x => x.Role != "system").ToList(), options),
+            system = CreateMessage((input.Messages ?? []).Where(x => x.Role == "system").ToList(), options),
+            messages = CreateMessage((input.Messages ?? []).Where(x => x.Role != "system").ToList(), options),
             top_p = isThinking ? null : input.TopP,
             thinking = isThinking
                 ? new
@@ -384,11 +385,13 @@ public sealed class ClaudiaChatCompletionsService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
-            throw new Exception("OpenAI对话异常" + response.StatusCode);
+            throw new InvalidOperationException("OpenAI对话异常" + response.StatusCode);
         }
 
         using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
@@ -406,13 +409,15 @@ public sealed class ClaudiaChatCompletionsService(
 
             if (line.StartsWith('{'))
             {
+#pragma warning disable CA1848, CA1873 // Business guard protects this call
                 logger.LogInformation("OpenAI对话异常 , StatusCode: {StatusCode} Response: {Response}", response.StatusCode,
                     line);
+#pragma warning restore CA1848, CA1873
 
-                throw new Exception("OpenAI对话异常" + line);
+                throw new InvalidOperationException("OpenAI对话异常" + line);
             }
 
-            if (line.StartsWith(OpenAIConstant.Data))
+            if (line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
                 line = line[OpenAIConstant.Data.Length..];
 
             line = line.Trim();
@@ -439,7 +444,7 @@ public sealed class ClaudiaChatCompletionsService(
 
             if (result?.Type == "content_block_delta")
             {
-                if (result.Delta.Type is "text" or "text_delta")
+                if (result!.Delta!.Type is "text" or "text_delta")
                 {
                     yield return new ThorChatCompletionsResponse()
                     {
@@ -455,7 +460,7 @@ public sealed class ClaudiaChatCompletionsService(
                             }
                         ],
                         Model = input.Model,
-                        Id = result?.Message?.id,
+                        Id = result?.Message?.id ?? string.Empty,
                         Usage = new ThorUsageResponse()
                         {
                             CompletionTokens = result?.Message?.Usage?.OutputTokens,
@@ -512,7 +517,7 @@ public sealed class ClaudiaChatCompletionsService(
                             }
                         },
                         Model = input.Model,
-                        Id = result?.Message?.id,
+                        Id = result?.Message?.id ?? string.Empty,
                         Usage = new ThorUsageResponse()
                         {
                             CompletionTokens = result?.Message?.Usage?.OutputTokens,
@@ -572,7 +577,7 @@ public sealed class ClaudiaChatCompletionsService(
                 };
             }
 
-            if (result.Type == "content_block_delta")
+            if (result?.Type == "content_block_delta")
             {
                 yield return new ThorChatCompletionsResponse()
                 {
@@ -601,7 +606,7 @@ public sealed class ClaudiaChatCompletionsService(
                 continue;
             }
 
-            if (result.Type == "message_start")
+            if (result?.Type == "message_start")
             {
                 yield return new ThorChatCompletionsResponse()
                 {
@@ -626,7 +631,7 @@ public sealed class ClaudiaChatCompletionsService(
                 continue;
             }
 
-            if (result.Type == "message_delta")
+            if (result?.Type == "message_delta")
             {
                 var deltaOutput = new ThorChatCompletionsResponse()
                 {
@@ -661,7 +666,7 @@ public sealed class ClaudiaChatCompletionsService(
                 continue;
             }
 
-            if (result.Message == null)
+            if (result?.Message == null)
             {
                 continue;
             }
@@ -675,14 +680,14 @@ public sealed class ClaudiaChatCompletionsService(
                 continue;
             }
 
-            if (first && content.Content == OpenAIConstant.ThinkStart)
+            if (first && content!.Content == OpenAIConstant.ThinkStart)
             {
                 isThink = true;
                 continue;
                 // 需要将content的内容转换到其他字段
             }
 
-            if (isThink && content.Content.Contains(OpenAIConstant.ThinkEnd))
+            if (isThink && content!.Content!.Contains(OpenAIConstant.ThinkEnd))
             {
                 isThink = false;
                 // 需要将content的内容转换到其他字段
@@ -692,7 +697,7 @@ public sealed class ClaudiaChatCompletionsService(
             if (isThink)
             {
                 // 需要将content的内容转换到其他字段
-                foreach (var choice in chat)
+                foreach (var choice in chat!)
                 {
                     choice.Delta.ReasoningContent = choice.Delta.Content;
                     choice.Delta.Content = string.Empty;
@@ -741,8 +746,8 @@ public sealed class ClaudiaChatCompletionsService(
             { "anthropic-version", "2023-06-01" }
         };
 
-        bool isThink = input.Model.EndsWith("-thinking");
-        input.Model = input.Model.Replace("-thinking", string.Empty);
+        bool isThink = input.Model.EndsWith("-thinking", StringComparison.Ordinal);
+        input.Model = input.Model.Replace("-thinking", string.Empty, StringComparison.Ordinal);
 
         var budgetTokens = 1024;
         if (input.MaxTokens is < 2048)
@@ -755,7 +760,7 @@ public sealed class ClaudiaChatCompletionsService(
             budgetTokens = input.MaxTokens.Value / (4 * 3);
         }
 
-        object tool_choice;
+        object? tool_choice;
         if (input.ToolChoice is not null && input.ToolChoice.Type == "auto")
         {
             tool_choice = new
@@ -793,8 +798,8 @@ public sealed class ClaudiaChatCompletionsService(
         {
             model = input.Model,
             max_tokens = input.MaxTokens ?? 2000,
-            system = CreateMessage(input.Messages.Where(x => x.Role == "system").ToList(), options),
-            messages = CreateMessage(input.Messages.Where(x => x.Role != "system").ToList(), options),
+            system = CreateMessage((input.Messages ?? []).Where(x => x.Role == "system").ToList(), options),
+            messages = CreateMessage((input.Messages ?? []).Where(x => x.Role != "system").ToList(), options),
             top_p = isThink ? null : input.TopP,
             tool_choice,
             thinking = isThink
@@ -830,11 +835,13 @@ public sealed class ClaudiaChatCompletionsService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+#pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
                 response.StatusCode, error);
+#pragma warning restore CA1848
 
-            throw new Exception("OpenAI对话异常" + response.StatusCode.ToString());
+            throw new InvalidOperationException("OpenAI对话异常" + response.StatusCode.ToString());
         }
 
         var value =
@@ -843,24 +850,24 @@ public sealed class ClaudiaChatCompletionsService(
 
         var thor = new ThorChatCompletionsResponse()
         {
-            Choices = CreateResponse(value),
+            Choices = CreateResponse(value!),
             Model = input.Model,
-            Id = value.id,
+            Id = value!.id,
             Usage = new ThorUsageResponse()
             {
-                CompletionTokens = value.Usage.OutputTokens,
-                PromptTokens = value.Usage.InputTokens
+                CompletionTokens = value.Usage!.OutputTokens,
+                PromptTokens = value.Usage!.InputTokens
             }
         };
 
-        if (value.Usage.CacheReadInputTokens != null)
+        if (value.Usage!.CacheReadInputTokens != null)
         {
             thor.Usage.PromptTokensDetails ??= new ThorUsageResponsePromptTokensDetails()
             {
                 CachedTokens = value.Usage.CacheReadInputTokens.Value,
             };
 
-            if (value.Usage.InputTokens > 0)
+            if (value.Usage!.InputTokens > 0)
             {
                 thor.Usage.InputTokens = value.Usage.InputTokens;
             }
