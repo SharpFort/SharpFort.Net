@@ -259,7 +259,7 @@ public class ChatManager : DomainService
             .Where(x => x.GetCustomAttribute<SfAgentToolAttribute>() is not null)
             .ToList();
 
-        List<(string Code, string? Name, AIFunction Tool)> mcpTools = new();
+        List<(string Code, string? Name, AIFunction Tool)> mcpTools = [];
         foreach (var toolClass in toolClasses)
         {
             var instance = LazyServiceProvider.GetRequiredService(toolClass);

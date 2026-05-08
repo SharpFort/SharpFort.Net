@@ -17,13 +17,13 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// 参考图PrefixBase64（带前缀，如 data:image/png;base64,xxx）
     /// </summary>
     [SugarColumn(IsJson = true, ColumnDataType = StaticConfig.CodeFirst_BigString)]
-    public List<string> ReferenceImagesPrefixBase64 { get; set; } = new List<string>();
+    public List<string> ReferenceImagesPrefixBase64 { get; set; } = [];
 
     /// <summary>
     /// 参考图url
     /// </summary>
     [SugarColumn(IsJson = true)]
-    public List<string> ReferenceImagesUrl { get; set; } = new List<string>();
+    public List<string> ReferenceImagesUrl { get; set; } = [];
 
 
     /// <summary>
@@ -66,7 +66,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// 分类标签
     /// </summary>
     [SugarColumn(IsJson = true)]
-    public List<string> Categories { get; set; } = new();
+    public List<string> Categories { get; set; } = [];
 
     /// <summary>
     /// 是否匿名

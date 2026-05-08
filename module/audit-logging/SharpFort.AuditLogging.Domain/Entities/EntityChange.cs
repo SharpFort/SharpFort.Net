@@ -14,7 +14,7 @@ namespace SharpFort.AuditLogging.Domain.Entities
     {
         public EntityChange()
         {
-            PropertyChanges = new List<EntityPropertyChange>();
+            PropertyChanges = [];
         }
 
         [SugarColumn(ColumnName = "Id", IsPrimaryKey = true)]
@@ -55,7 +55,7 @@ namespace SharpFort.AuditLogging.Domain.Entities
                                   .PropertyChanges?
                                   .Select(p => new EntityPropertyChange(guidGenerator, Id, p, tenantId))
                                   .ToList()
-                              ?? new List<EntityPropertyChange>();
+                              ?? [];
 
 
         }

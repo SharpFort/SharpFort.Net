@@ -4,11 +4,11 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Monitor
     {
         public CpuInfoDto Cpu { get; set; } = new();
         public MemoryInfoDto Memory { get; set; } = new();
-        public List<DiskInfoDto> Disks { get; set; } = new();
+        public List<DiskInfoDto> Disks { get; set; } = [];
         public SysInfoDto Sys { get; set; } = new();
         public AppInfoDto App { get; set; } = new();
-        public List<NetworkAdapterDto> Networks { get; set; } = new();
-        public List<AssemblyInfoDto> Assemblies { get; set; } = new();
+        public List<NetworkAdapterDto> Networks { get; set; } = [];
+        public List<AssemblyInfoDto> Assemblies { get; set; } = [];
     }
 
     public class CpuInfoDto

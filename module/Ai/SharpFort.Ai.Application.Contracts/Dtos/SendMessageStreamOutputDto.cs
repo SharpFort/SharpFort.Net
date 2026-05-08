@@ -27,7 +27,7 @@ public class SendMessageStreamOutputDto
     /// <summary>
     /// 选择项列表
     /// </summary>
-    public List<Choice> Choices { get; set; } = new List<Choice>();
+    public List<Choice> Choices { get; set; } = [];
 
     /// <summary>
     /// 系统指纹（可能为空）

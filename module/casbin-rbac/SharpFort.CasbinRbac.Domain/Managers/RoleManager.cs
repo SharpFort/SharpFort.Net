@@ -39,7 +39,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             foreach (var roleId in roleIds)
             {
                 // 添加新的关系
-                List<RoleMenu> roleMenus = new();
+                List<RoleMenu> roleMenus = [];
                 foreach (var menu in menuIds)
                 {
                     roleMenus.Add(new RoleMenu() { RoleId = roleId, MenuId = menu });

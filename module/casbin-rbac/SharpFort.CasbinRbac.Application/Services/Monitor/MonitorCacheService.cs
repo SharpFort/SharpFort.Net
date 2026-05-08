@@ -47,7 +47,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
 
         private static List<string> GroupedKeys(List<string> keys)
         {
-            HashSet<string> resultSet = new HashSet<string>();
+            HashSet<string> resultSet = [];
             foreach (string str in keys)
             {
                 string[] parts = str.Split(':');

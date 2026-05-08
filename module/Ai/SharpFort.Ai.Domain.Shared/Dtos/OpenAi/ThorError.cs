@@ -47,7 +47,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
                 {
                     case string s:
                         Message = s;
-                        Messages = new() { s };
+                        Messages = [s];
                         break;
                     case List<object> list when list.All(i => i is JsonElement):
                         Messages = list.Cast<JsonElement>().Select(e => e.GetString()).ToList();

@@ -21,7 +21,7 @@ public sealed class ClaudiaChatCompletionsService(
         var chatMessage = new ThorChatMessage();
         if (completionDto == null)
         {
-            return new List<ThorChatChoiceResponse>();
+            return [];
         }
 
         if (completionDto.content.Any(x => x.type.Equals("thinking", StringComparison.OrdinalIgnoreCase)))
@@ -70,7 +70,7 @@ public sealed class ClaudiaChatCompletionsService(
             ];
         }
 
-        return new List<ThorChatChoiceResponse> { response };
+        return [response];
     }
 
     private static List<object> CreateMessage(List<ThorChatMessage> messages, AiModelDescribe options)
@@ -505,8 +505,8 @@ public sealed class ClaudiaChatCompletionsService(
                 {
                     yield return new ThorChatCompletionsResponse()
                     {
-                        Choices = new List<ThorChatChoiceResponse>()
-                        {
+                        Choices =
+                        [
                             new()
                             {
                                 Message = new ThorChatMessage()
@@ -515,7 +515,7 @@ public sealed class ClaudiaChatCompletionsService(
                                     Role = "assistant",
                                 }
                             }
-                        },
+                        ],
                         Model = input.Model,
                         Id = result?.Message?.id ?? string.Empty,
                         Usage = new ThorUsageResponse()

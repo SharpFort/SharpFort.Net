@@ -68,7 +68,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 foreach (var userId in userIds)
                 {
                     // 添加新的关系
-                    List<UserRole> userRoleEntities = new();
+                    List<UserRole> userRoleEntities = [];
                     foreach (var roleId in roleIds)
                     {
                         userRoleEntities.Add(new UserRole() { UserId = userId, RoleId = roleId });
@@ -104,7 +104,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             {
                 foreach (var userId in userIds)
                 {
-                    List<UserPosition> userPostEntities = new();
+                    List<UserPosition> userPostEntities = [];
                     foreach (var post in postIds)
                     {
                         userPostEntities.Add(new UserPosition() { UserId = userId, PostId = post });
@@ -148,7 +148,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             if (role is not null)
             {
                 // 这会调用上面修改过的 GiveUserSetRoleAsync，从而自动同步 Casbin
-                await GiveUserSetRoleAsync(new List<Guid> { userId }, new List<Guid> { role.Id });
+                await GiveUserSetRoleAsync([userId], [role.Id]);
             }
         }
 
@@ -212,7 +212,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task<List<UserRoleMenuDto>> GetInfoListAsync(List<Guid> userIds)
         {
-            List<UserRoleMenuDto> output = new List<UserRoleMenuDto>();
+            List<UserRoleMenuDto> output = [];
             foreach (var userId in userIds)
             {
                 output.Add(await GetInfoByCacheAsync(userId));
@@ -257,11 +257,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     }
                 }
 
-                role.Menus = new List<Menu>();
+                role.Menus = [];
                 userRoleMenu.Roles.Add(role.Adapt<RoleDto>());
             }
 
-            user.Roles = new List<Role>();
+            user.Roles = [];
             userRoleMenu.User = user.Adapt<UserDto>();
             userRoleMenu.User.Password = string.Empty;
             userRoleMenu.Menus = userRoleMenu.Menus.OrderBy(x => x.OrderNum).ThenBy(x => x.CreationTime).ToList();

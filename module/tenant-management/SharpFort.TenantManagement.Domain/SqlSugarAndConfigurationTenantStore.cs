@@ -122,8 +122,10 @@ namespace SharpFort.TenantManagement.Domain
 
         private static ConnectionStrings? MaptoString(string tenantConnectionString)
         {
-            var connectionStrings = new ConnectionStrings();
-            connectionStrings[ConnectionStrings.DefaultConnectionStringName] = tenantConnectionString;
+            var connectionStrings = new ConnectionStrings
+            {
+                [ConnectionStrings.DefaultConnectionStringName] = tenantConnectionString
+            };
             return connectionStrings;
         }
 

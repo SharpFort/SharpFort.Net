@@ -111,7 +111,7 @@ public class ThorChatCompletionsRequest
 
             if (Stop is not null)
             {
-                return new List<string> { Stop };
+                return [Stop];
             }
 
             return StopAsList;

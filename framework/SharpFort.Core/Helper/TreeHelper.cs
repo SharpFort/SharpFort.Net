@@ -6,7 +6,7 @@
         {
             if (list is not null && list.Count > 0)
             {
-                List<T> result = new List<T>();
+                List<T> result = [];
                 Guid pid = list.Min(m => (m as ITreeModel<T>)!.ParentId);
                 List<T> t = list.Where(m => (m as ITreeModel<T>)!.ParentId == pid).ToList();
                 foreach (T model in t)
@@ -30,7 +30,7 @@
         private static void SetTreeChildren<T>(IList<T> list, IList<T> children, T model, Action<T> action = null!)
         {
             var mm = model as ITreeModel<T>;
-            mm!.Children = new List<T>();
+            mm!.Children = [];
             foreach (T item in children)
             {
                 if (action is not null)

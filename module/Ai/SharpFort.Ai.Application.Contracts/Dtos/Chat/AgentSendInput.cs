@@ -25,5 +25,5 @@ public class AgentSendInput
     /// <summary>
     /// 已选择工具
     /// </summary>
-    public List<string> Tools { get; set; } = new List<string>();
+    public List<string> Tools { get; set; } = [];
 }

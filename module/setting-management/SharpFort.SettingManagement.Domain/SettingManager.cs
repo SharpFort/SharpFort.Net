@@ -59,7 +59,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
         if (providerList.Count == 0)
         {
-            return new List<SettingValue>();
+            return [];
         }
 
         var settingValues = new Dictionary<string, SettingValue>();

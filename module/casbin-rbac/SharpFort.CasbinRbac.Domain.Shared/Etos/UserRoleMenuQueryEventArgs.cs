@@ -10,7 +10,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Etos
         {
             UserIds.AddRange(userIds.ToList());
         }
-        public List<Guid> UserIds { get; set; } = new List<Guid>();
+        public List<Guid> UserIds { get; set; } = [];
 
         public List<UserRoleMenuDto>? Result { get; set; }
     }

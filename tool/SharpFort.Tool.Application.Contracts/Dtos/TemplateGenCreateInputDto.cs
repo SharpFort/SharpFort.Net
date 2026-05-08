@@ -23,7 +23,7 @@ namespace SharpFort.Tool.Application.Contracts.Dtos
         /// <summary>
         /// 需要替换的字符串内容
         /// </summary>
-        public Dictionary<string, string> ReplaceStrData { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> ReplaceStrData { get; set; } = [];
 
         public void SetNameReplace()
         {

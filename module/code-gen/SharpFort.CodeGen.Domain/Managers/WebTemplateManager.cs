@@ -27,7 +27,7 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         public Task<List<Table>> BuildCodeToWebAsync()
         {
-            List<Type> entityTypes = new List<Type>();
+            List<Type> entityTypes = [];
             foreach (var module in _moduleContainer.Modules)
             {
                 entityTypes.AddRange(module.Assembly.GetTypes()
@@ -48,7 +48,7 @@ namespace SharpFort.CodeGen.Domain.Managers
         private static Table EntityTypeMapperToTable(Type entityType)
         {
             var table = new Table();
-            table.Fields = new List<Field>();
+            table.Fields = [];
             var sugarTable = entityType.GetCustomAttribute<SugarTable>();
 
             table.Name = sugarTable?.TableName ?? entityType.Name;

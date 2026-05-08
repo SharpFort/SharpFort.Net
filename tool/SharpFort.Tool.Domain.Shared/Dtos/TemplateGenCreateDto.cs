@@ -9,7 +9,7 @@ namespace SharpFort.Tool.Domain.Shared.Dtos
     {
         public TemplateGenCreateDto()
         {
-            ReplaceStrData = new Dictionary<string, string>();
+            ReplaceStrData = [];
         }
 
         public void SetTemplateGiteeRef(string moduleType)

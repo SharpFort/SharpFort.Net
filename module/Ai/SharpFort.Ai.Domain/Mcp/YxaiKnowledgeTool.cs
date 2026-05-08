@@ -43,7 +43,7 @@ public class YxaiKnowledgeTool : ISingletonDependency
 #pragma warning disable CA1848 // Business guard protects this call
                 _logger.LogError("意心知识库目录接口调用失败: {StatusCode}", directoryResponse.StatusCode);
 #pragma warning restore CA1848
-                return new List<YxaiKnowledgeItem>();
+                return [];
             }
 
             var directoryJson = await directoryResponse.Content.ReadAsStringAsync();
@@ -52,7 +52,7 @@ public class YxaiKnowledgeTool : ISingletonDependency
 
             if (directories == null || directories.Count == 0)
             {
-                return new List<YxaiKnowledgeItem>();
+                return [];
             }
 
             // 2. 循环调用内容接口获取每个目录的内容
@@ -109,7 +109,7 @@ public class YxaiKnowledgeTool : ISingletonDependency
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(ex, "获取意心知识库发生异常");
 #pragma warning restore CA1848
-            return new List<YxaiKnowledgeItem>();
+            return [];
         }
     }
 }

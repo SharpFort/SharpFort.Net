@@ -13,5 +13,5 @@ public class TokenStatisticsOutput
     /// <summary>
     /// 模型统计列表
     /// </summary>
-    public List<ModelTokenStatisticsDto> ModelStatistics { get; set; } = new();
+    public List<ModelTokenStatisticsDto> ModelStatistics { get; set; } = [];
 }

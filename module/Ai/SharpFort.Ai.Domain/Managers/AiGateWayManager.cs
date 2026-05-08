@@ -251,8 +251,8 @@ public class AiGateWayManager : DomainService
             var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             var model = new ThorChatCompletionsResponse()
             {
-                Choices = new List<ThorChatChoiceResponse>()
-                {
+                Choices =
+                [
                     new ThorChatChoiceResponse()
                     {
                         Delta = new ThorChatMessage()
@@ -260,7 +260,7 @@ public class AiGateWayManager : DomainService
                             Content = errorContent
                         }
                     }
-                }
+                ]
             };
             var message = JsonConvert.SerializeObject(model, new JsonSerializerSettings
             {
@@ -1229,8 +1229,8 @@ public class AiGateWayManager : DomainService
             systemContentBuilder.Append(errorContent);
             var model = new ThorChatCompletionsResponse()
             {
-                Choices = new List<ThorChatChoiceResponse>()
-                {
+                Choices =
+                [
                     new ThorChatChoiceResponse()
                     {
                         Delta = new ThorChatMessage()
@@ -1238,7 +1238,7 @@ public class AiGateWayManager : DomainService
                             Content = errorContent
                         }
                     }
-                }
+                ]
             };
             var errorMessage = JsonConvert.SerializeObject(model, new JsonSerializerSettings
             {

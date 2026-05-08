@@ -51,7 +51,7 @@ public class GiteeManager : ITransientDependency
         var result = await response.Content.ReadAsStringAsync();
         JArray jsonArray = JArray.Parse(result);
         // 创建一个列表来存储名字
-        List<string> names = new List<string>();
+        List<string> names = [];
 
         // 遍历每个对象，获取 name 字段
         foreach (JObject obj in jsonArray)

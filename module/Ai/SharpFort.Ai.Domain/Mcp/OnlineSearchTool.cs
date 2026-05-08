@@ -49,10 +49,10 @@ public class OnlineSearchTool : ISingletonDependency
             // 构建请求体
             var requestBody = new BaiduSearchRequest
             {
-                Messages = new List<BaiduSearchMessage>
-                {
+                Messages =
+                [
                     new() { Role = "user", Content = keyword }
-                }
+                ]
             };
 
             // 设置时间范围过滤
@@ -164,7 +164,7 @@ public class OnlineSearchTool : ISingletonDependency
 /// </summary>
 public class BaiduSearchRequest
 {
-    [JsonPropertyName("messages")] public List<BaiduSearchMessage> Messages { get; set; } = new();
+    [JsonPropertyName("messages")] public List<BaiduSearchMessage> Messages { get; set; } = [];
 
     [JsonPropertyName("search_filter")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

@@ -54,8 +54,8 @@ public class Table : FullAuditedAggregateRoot<Guid>
     /// </summary>
     public Table()
     {
-        Fields = new List<Field>();
-        ExtraProperties = new ExtraPropertyDictionary();
+        Fields = [];
+        ExtraProperties = [];
     }
 
     /// <summary>
@@ -66,8 +66,8 @@ public class Table : FullAuditedAggregateRoot<Guid>
         SetName(name);
         Description = Volo.Abp.Check.Length(description, nameof(description), 512);
 
-        Fields = new List<Field>();
-        ExtraProperties = new ExtraPropertyDictionary();
+        Fields = [];
+        ExtraProperties = [];
     }
 
     #region 领域行为

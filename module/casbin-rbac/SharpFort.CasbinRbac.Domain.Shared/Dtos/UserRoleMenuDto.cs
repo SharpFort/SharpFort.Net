@@ -5,11 +5,11 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
     public class UserRoleMenuDto
     {
         public UserDto User { get; set; } = new();
-        public HashSet<RoleDto> Roles { get; set; } = new();
-        public List<MenuDto> Menus { get; set; } = new();
+        public HashSet<RoleDto> Roles { get; set; } = [];
+        public List<MenuDto> Menus { get; set; } = [];
 
-        public HashSet<string> RoleCodes { get; set; } = new();
-        public HashSet<string> PermissionCodes { get; set; } = new();
+        public HashSet<string> RoleCodes { get; set; } = [];
+        public HashSet<string> PermissionCodes { get; set; } = [];
     }
 
     public class UserDto

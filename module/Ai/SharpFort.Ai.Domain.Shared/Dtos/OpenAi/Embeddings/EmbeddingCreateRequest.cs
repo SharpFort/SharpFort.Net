@@ -43,7 +43,7 @@ public record EmbeddingCreateRequest
 
             if (Input != null)
             {
-                return new List<string> { Input };
+                return [Input];
             }
 
             return InputAsList;

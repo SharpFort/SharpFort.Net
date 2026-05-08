@@ -99,7 +99,7 @@ public class UsageStatisticsService : ApplicationService, IUsageStatisticsServic
 
         if (!modelUsages.Any())
         {
-            return new List<ModelTokenUsageDto>();
+            return [];
         }
 
         // 计算总token数

@@ -26,9 +26,9 @@ public sealed class SfHangfireConventionalRegistrar : DefaultConventionalRegistr
     /// <returns>服务类型列表</returns>
     protected override List<Type> GetExposedServiceTypes(Type type)
     {
-        return new List<Type>
-        {
+        return
+        [
             typeof(IHangfireBackgroundWorker)
-        };
+        ];
     }
 }

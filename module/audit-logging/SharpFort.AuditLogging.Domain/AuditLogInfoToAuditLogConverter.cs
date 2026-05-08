@@ -42,13 +42,13 @@ public class AuditLogInfoToAuditLogConverter : IAuditLogInfoToAuditLogConverter,
                                 .EntityChanges?
                                 .Select(entityChangeInfo => new EntityChange(GuidGenerator, auditLogId, entityChangeInfo, tenantId: auditLogInfo.TenantId))
                                 .ToList()
-                            ?? new List<EntityChange>();
+                            ?? [];
 
         var actions = auditLogInfo
                           .Actions?
                           .Select(auditLogActionInfo => new AuditLogAction(GuidGenerator.Create(), auditLogId, auditLogActionInfo, tenantId: auditLogInfo.TenantId))
                           .ToList()
-                      ?? new List<AuditLogAction>();
+                      ?? [];
 
         var remoteServiceErrorInfos = auditLogInfo.Exceptions?.Select(exception => ExceptionToErrorInfoConverter.Convert(exception, options =>
                                           {

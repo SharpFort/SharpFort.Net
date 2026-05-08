@@ -54,7 +54,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (input.DataScope == DataScope.CUSTOM)
             {
                 await _roleDeptRepository.DeleteAsync(x => x.RoleId == input.RoleId);
-                var insertEntities = (input.DepartmentIds ?? new List<Guid>())
+                var insertEntities = (input.DepartmentIds ?? [])
                     .Select(x => new RoleDepartment { DepartmentId = x, RoleId = input.RoleId })
                     .ToList();
                 await _roleDeptRepository.InsertRangeAsync(insertEntities);
@@ -99,7 +99,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // await SyncCasbinRolePermissions(entity.Id, input.MenuIds, entity.RoleCode);
 
             // 修复之后使用 RoleManager 进行统一授权和Casbin分配
-            await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { entity.Id }, input.MenuIds ?? new List<Guid>());
+            await _roleManager.GiveRoleSetMenuAsync([entity.Id], input.MenuIds ?? []);
 
             var outputDto = await MapToGetOutputDtoAsync(entity);
 
@@ -134,7 +134,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             await _repository.UpdateAsync(entity);
 
-            await _roleManager.GiveRoleSetMenuAsync(new List<Guid> { id }, input.MenuIds ?? new List<Guid>());
+            await _roleManager.GiveRoleSetMenuAsync([id], input.MenuIds ?? []);
 
             // /* 原代码注释保留 */
             // // Casbin 同步：更新角色权限

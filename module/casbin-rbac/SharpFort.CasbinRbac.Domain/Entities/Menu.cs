@@ -251,7 +251,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                 .Where(m => m.MenuType != MenuType.Component)
                 .Where(m => m.MenuSource == MenuSource.Ruoyi)
                 .ToList();
-            List<Vue3RouterDto> routers = new();
+            List<Vue3RouterDto> routers = [];
             foreach (var m in menus)
             {
                 var r = new Vue3RouterDto();
@@ -330,7 +330,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                     {
                         showLink = m.IsShow,
                         FrameSrc = m.IsLink ? m.Router : null,
-                        Auths = m.PermissionCode is not null ? new List<string> { m.PermissionCode } : null, // CS8604
+                        Auths = m.PermissionCode is not null ? [m.PermissionCode] : null, // CS8604
                         Icon = m.MenuIcon ?? string.Empty, // CS8601: MenuIcon 是 string?
                         Title = m.MenuName,
                     },
@@ -346,7 +346,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             //根路由
             if (!routerDic.TryGetValue(Guid.Empty, out var rootRouters))
             {
-                return new List<Vue3PureRouterDto>();
+                return [];
             }
             Stack<Vue3PureRouterDto> stack = new Stack<Vue3PureRouterDto>(rootRouters);
             while (stack.Count > 0)

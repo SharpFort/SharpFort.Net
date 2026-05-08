@@ -124,7 +124,7 @@ namespace SharpFort.Core.Helper
         /// <returns></returns>
         public static List<DiskInfo> GetDiskInfos()
         {
-            List<DiskInfo> diskInfos = new();
+            List<DiskInfo> diskInfos = [];
 
             if (IsUnix())
             {

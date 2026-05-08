@@ -43,8 +43,8 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
             var userInfoMdoel = await SendHttpRequestAsync<QQAuthticationcationUserInfoResponse>(QQAuthenticationDefaults.UserInformationEndpoint, userInfoQueryKv);
 
 
-            List<Claim> claims = new List<Claim>()
-            {
+            List<Claim> claims =
+            [
 
                 new Claim(Claims.AvatarFullUrl, userInfoMdoel.figureurl_qq_2),
                 new Claim(Claims.AvatarUrl, userInfoMdoel.figureurl_qq_1),
@@ -56,7 +56,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
                 new Claim(AuthenticationConstants.Name, userInfoMdoel.nickname),
                 new Claim(AuthenticationConstants.AccessToken, tokenModel.access_token),
 
-            };
+            ];
             return claims;
 
         }

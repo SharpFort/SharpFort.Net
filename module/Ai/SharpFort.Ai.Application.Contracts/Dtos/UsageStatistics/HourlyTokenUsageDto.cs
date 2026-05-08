@@ -18,5 +18,5 @@ public class HourlyTokenUsageDto
     /// <summary>
     /// 各模型Token消耗明细
     /// </summary>
-    public List<ModelTokenBreakdownDto> ModelBreakdown { get; set; } = new();
+    public List<ModelTokenBreakdownDto> ModelBreakdown { get; set; } = [];
 }

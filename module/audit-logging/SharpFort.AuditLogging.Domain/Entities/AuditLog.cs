@@ -15,9 +15,9 @@ namespace SharpFort.AuditLogging.Domain.Entities
     {
         public AuditLog()
         {
-            EntityChanges = new List<EntityChange>();
-            Actions = new List<AuditLogAction>();
-            ExtraProperties = new ExtraPropertyDictionary();
+            EntityChanges = [];
+            Actions = [];
+            ExtraProperties = [];
         }
 
         public AuditLog(

@@ -19,7 +19,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Options
         /// 忽略的 URL 前缀列表 (小写)
         /// 这些 URL 将跳过 Casbin 检查
         /// </summary>
-        public List<string> IgnoreUrls { get; set; } = new List<string>();
+        public List<string> IgnoreUrls { get; set; } = [];
 
         /// <summary>
         /// 是否启用 CachedEnforcer（本地缓存，无需 Redis）

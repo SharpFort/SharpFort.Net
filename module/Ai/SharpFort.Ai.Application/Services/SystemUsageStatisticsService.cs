@@ -47,7 +47,7 @@ public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStat
             return new TokenStatisticsOutput
             {
                 Date = FormatDate(day),
-                ModelStatistics = new List<ModelTokenStatisticsDto>()
+                ModelStatistics = []
             };
         }
 

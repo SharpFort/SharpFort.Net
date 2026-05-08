@@ -9,8 +9,8 @@ namespace FluidSequence.Domain.Services
 
     public static class PlaceholderRegistry
     {
-        public static readonly List<PlaceholderMeta> Definitions = new List<PlaceholderMeta>
-        {
+        public static readonly List<PlaceholderMeta> Definitions =
+        [
             new PlaceholderMeta { Key = "{yyyy}", Label = "年份(4位)", Group = "时间" },
             new PlaceholderMeta { Key = "{yy}", Label = "年份(2位)", Group = "时间" },
             new PlaceholderMeta { Key = "{MM}", Label = "月份", Group = "时间" },
@@ -33,6 +33,6 @@ namespace FluidSequence.Domain.Services
             new PlaceholderMeta { Key = "{UserCode}", Label = "用户编码", Group = "上下文" },
             new PlaceholderMeta { Key = "{DeptCode}", Label = "部门编码", Group = "上下文" },
             new PlaceholderMeta { Key = "{TenantCode}", Label = "租户编码", Group = "上下文" },
-        };
+        ];
     }
 }

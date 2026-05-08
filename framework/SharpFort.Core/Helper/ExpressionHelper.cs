@@ -67,7 +67,7 @@ namespace SharpFort.Core.Helper
         /// <param name="map"></param>
         public LambdaParameteRebinder(Dictionary<ParameterExpression, ParameterExpression> map)
         {
-            this.map = map ?? new Dictionary<ParameterExpression, ParameterExpression>();
+            this.map = map ?? [];
         }
 
         /// <summary>

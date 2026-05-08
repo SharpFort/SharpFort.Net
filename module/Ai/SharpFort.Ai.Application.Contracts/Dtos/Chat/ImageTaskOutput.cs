@@ -40,7 +40,7 @@ public class ImageTaskOutput
     /// <summary>
     /// 分类标签
     /// </summary>
-    public List<string> Categories { get; set; } = new();
+    public List<string> Categories { get; set; } = [];
 
     /// <summary>
     /// 创建时间

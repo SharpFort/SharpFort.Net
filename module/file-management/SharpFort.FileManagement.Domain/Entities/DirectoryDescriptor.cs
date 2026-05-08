@@ -73,13 +73,13 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// 子目录集合
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(ParentId))]
-        public List<DirectoryDescriptor> Children { get; set; } = new();
+        public List<DirectoryDescriptor> Children { get; set; } = [];
 
         /// <summary>
         /// 目录下的文件集合
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(FileDescriptor.DirectoryId))]
-        public List<FileDescriptor> Files { get; set; } = new();
+        public List<FileDescriptor> Files { get; set; } = [];
 
         #endregion
 

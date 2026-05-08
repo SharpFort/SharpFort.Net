@@ -123,8 +123,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             entitiy.SetPassword(password);
 
             await _userManager.CreateAsync(entitiy);
-            await _userManager.GiveUserSetRoleAsync(new List<Guid> { entitiy.Id }, input.RoleIds ?? new List<Guid>());
-            await _userManager.GiveUserSetPostAsync(new List<Guid> { entitiy.Id }, input.PostIds ?? new List<Guid>());
+            await _userManager.GiveUserSetRoleAsync([entitiy.Id], input.RoleIds ?? []);
+            await _userManager.GiveUserSetPostAsync([entitiy.Id], input.PostIds ?? []);
 
             // 同步 Casbin 用户角色关系 (g)
             // 需要获取角色编码，这里假设 RoleIds 对应角色的 Code 需要查询
@@ -141,7 +141,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             // Casbin 同步逻辑放入 GiveUserSetRoleAsync 或者在这里显式调用
             // 建议：封装一个私有方法或领域服务处理 Casbin 同步
-            await SyncCasbinUserRoles(entitiy.Id, input.RoleIds ?? new List<Guid>());
+            await SyncCasbinUserRoles(entitiy.Id, input.RoleIds ?? []);
 
             var result = await MapToGetOutputDtoAsync(entitiy);
             return result;
@@ -219,14 +219,14 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await MapToEntityAsync(input, entity);
 
             var res1 = await _repository.UpdateAsync(entity);
-            await _userManager.GiveUserSetRoleAsync(new List<Guid> { id }, input.RoleIds ?? new List<Guid>());
-            await _userManager.GiveUserSetPostAsync(new List<Guid> { id }, input.PostIds ?? new List<Guid>());
+            await _userManager.GiveUserSetRoleAsync([id], input.RoleIds ?? []);
+            await _userManager.GiveUserSetPostAsync([id], input.PostIds ?? []);
 
             // Casbin 同步：更新用户角色
             // 先删除旧的
             await _enforcer.RemoveFilteredGroupingPolicyAsync(0, id.ToString());
             // 再添加新的
-            await SyncCasbinUserRoles(id, input.RoleIds ?? new List<Guid>());
+            await SyncCasbinUserRoles(id, input.RoleIds ?? []);
 
             return await MapToGetOutputDtoAsync(entity);
         }

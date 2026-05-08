@@ -138,7 +138,7 @@ namespace SharpFort.TenantManagement.Application
                 //尝试创建数据库
                 db.DbMaintenance.CreateDatabase();
 
-                List<Type> types = new List<Type>();
+                List<Type> types = [];
                 foreach (var module in moduleContainer.Modules)
                 {
                     types.AddRange(module.Assembly.GetTypes()

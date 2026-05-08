@@ -15,7 +15,7 @@ public class MessageDeleteInput
     /// 要删除的消息Id列表
     /// </summary>
     [Required]
-    public List<Guid> Ids { get; set; } = new();
+    public List<Guid> Ids { get; set; } = [];
 
     /// <summary>
     /// 是否同时隐藏后续消息（同一会话中时间大于当前消息的所有消息）

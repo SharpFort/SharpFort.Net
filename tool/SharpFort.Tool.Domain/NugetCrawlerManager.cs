@@ -48,7 +48,7 @@ namespace SharpFort.Tool.Domain
         /// <returns></returns>
         private List<string> GetVersionList()
         {
-            List<string> versions = new List<string>();
+            List<string> versions = [];
 
             var versionDoc = HtmlDoc.DocumentNode.SelectNodes("//*[@id=\"version-history\"]/table/tbody");
             var trDoc = versionDoc.First().ChildNodes.Where(x => x.Name == "tr").ToList();
@@ -94,7 +94,7 @@ namespace SharpFort.Tool.Domain
 
         public NugetResult()
         {
-            Versions = new List<string>();
+            Versions = [];
         }
     }
 }

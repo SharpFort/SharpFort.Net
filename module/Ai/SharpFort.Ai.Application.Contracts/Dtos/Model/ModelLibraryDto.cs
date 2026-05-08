@@ -36,7 +36,7 @@ public class ModelLibraryDto
     /// <summary>
     /// 模型支持的API类型
     /// </summary>
-    public List<ModelApiTypeOutput> ModelApiTypes { get; set; } = new List<ModelApiTypeOutput>();
+    public List<ModelApiTypeOutput> ModelApiTypes { get; set; } = [];
 
 
     /// <summary>

@@ -18,5 +18,5 @@ public class PublishImageInput
     /// <summary>
     /// 分类标签
     /// </summary>
-    public List<string> Categories { get; set; } = new();
+    public List<string> Categories { get; set; } = [];
 }

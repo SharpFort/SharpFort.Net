@@ -134,7 +134,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                [new OpenApiSecuritySchemeReference("JwtBearer", document)] = new List<string>()
+                [new OpenApiSecuritySchemeReference("JwtBearer", document)] = []
             });
         }
 
@@ -208,7 +208,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// </summary>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            operation.Parameters ??= new List<IOpenApiParameter>();
+            operation.Parameters ??= [];
 
             operation.Parameters.Add(new OpenApiParameter
             {

@@ -35,15 +35,15 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.Gitee
             };
             var userInfoMdoel = await SendHttpRequestAsync<GiteeAuthticationcationUserInfoResponse>(GiteeAuthenticationDefaults.UserInformationEndpoint, userInfoQueryKv);
 
-            List<Claim> claims = new List<Claim>()
-            {
+            List<Claim> claims =
+            [
                 new Claim(Claims.AvatarUrl, userInfoMdoel.avatar_url),
                 new Claim(Claims.Url, userInfoMdoel.url),
 
                 new Claim(AuthenticationConstants.OpenId,userInfoMdoel.id.ToString(CultureInfo.InvariantCulture)),
                 new Claim(AuthenticationConstants.Name, userInfoMdoel.name),
                 new Claim(AuthenticationConstants.AccessToken, tokenModel.access_token)
-            };
+            ];
             return claims;
         }
     }

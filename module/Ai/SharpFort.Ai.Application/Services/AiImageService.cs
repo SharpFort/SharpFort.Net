@@ -78,8 +78,8 @@ public class AiImageService : ApplicationService
         var task = new ImageStoreTaskAggregateRoot
         {
             Prompt = input.Prompt,
-            ReferenceImagesPrefixBase64 = input.ReferenceImagesPrefixBase64 ?? new List<string>(),
-            ReferenceImagesUrl = new List<string>(),
+            ReferenceImagesPrefixBase64 = input.ReferenceImagesPrefixBase64 ?? [],
+            ReferenceImagesUrl = [],
             TaskStatus = TaskStatusEnum.Processing,
             UserId = userId,
             UserName = CurrentUser.UserName,

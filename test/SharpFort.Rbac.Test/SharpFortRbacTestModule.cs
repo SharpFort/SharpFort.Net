@@ -45,7 +45,7 @@ namespace SharpFort.Rbac.Test
             var menuRep = services.GetRequiredService<ISqlSugarRepository<Menu>>();
             var defaultRoleEntity = await roleRep._DbQueryable.Where(x => x.RoleCode == UserConst.DefaultRoleCode).FirstAsync();
             var menuIds = await menuRep._DbQueryable.Where(x => x.PermissionCode!.Contains("user")).Select(x => x.Id).ToListAsync();
-            await roleManager.GiveRoleSetMenuAsync(new List<Guid> { defaultRoleEntity!.Id }, menuIds);
+            await roleManager.GiveRoleSetMenuAsync([defaultRoleEntity!.Id], menuIds);
             #endregion
         }
 

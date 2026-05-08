@@ -35,7 +35,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
 
         var ret = new ImageCreateResponse()
         {
-            Results = new List<ImageCreateResponse.ImageDataResult>()
+            Results = []
         };
 
         if (response.Value.ImageUri != null)
