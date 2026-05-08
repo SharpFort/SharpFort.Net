@@ -40,7 +40,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             Guid parentId,
             string? permissionCode = null,
             string? menuIcon = null,
-            string? component= null,
+            string? component = null,
             string? apiUrl = null,
             string? apiMethod = null,
             int orderNum = 0)
@@ -105,7 +105,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// </summary>
         [SugarColumn(Length = 255, IsNullable = true)]
         public string? Router { get; protected set; }
-        
+
         /// <summary>
         /// API 路径 (用于 Casbin 鉴权)
         /// 例如: /api/system/user
@@ -242,128 +242,128 @@ namespace SharpFort.CasbinRbac.Domain.Entities
     /// 实体扩展
     /// </summary>
     public static class MenuEntityExtensions
-{
-    /// <summary>
-    /// 构建vue3路由
-    /// </summary>
-    /// <param name="menus"></param>
-    /// <returns></returns>
-    public static List<Vue3RouterDto> Vue3RuoSfRouterBuild(this List<Menu> menus)
     {
-        menus = menus
-            .Where(m => m.State)
-            .Where(m => m.MenuType != MenuType.Component)
-            .Where(m => m.MenuSource == MenuSource.Ruoyi)
-            .ToList();
-        List<Vue3RouterDto> routers = new();
-        foreach (var m in menus)
+        /// <summary>
+        /// 构建vue3路由
+        /// </summary>
+        /// <param name="menus"></param>
+        /// <returns></returns>
+        public static List<Vue3RouterDto> Vue3RuoSfRouterBuild(this List<Menu> menus)
         {
-            var r = new Vue3RouterDto();
-            r.OrderNum = m.OrderNum;
-            var routerName = m.Router?.Split("/").LastOrDefault();
-            r.Id = m.Id;
-            r.ParentId = m.ParentId;
-
-            //开头大写
-            r.Name = string.Concat(routerName?.First().ToString().ToUpperInvariant(), routerName.AsSpan(1));
-            r.Path = m.Router!;
-            r.Hidden = !m.IsShow;
-
-
-            if (m.MenuType == MenuType.Catalogue)
+            menus = menus
+                .Where(m => m.State)
+                .Where(m => m.MenuType != MenuType.Component)
+                .Where(m => m.MenuSource == MenuSource.Ruoyi)
+                .ToList();
+            List<Vue3RouterDto> routers = new();
+            foreach (var m in menus)
             {
-                r.Redirect = "noRedirect";
-                r.AlwaysShow = true;
+                var r = new Vue3RouterDto();
+                r.OrderNum = m.OrderNum;
+                var routerName = m.Router?.Split("/").LastOrDefault();
+                r.Id = m.Id;
+                r.ParentId = m.ParentId;
 
-                //判断是否为最顶层的路由
-                if (Guid.Empty == m.ParentId)
+                //开头大写
+                r.Name = string.Concat(routerName?.First().ToString().ToUpperInvariant(), routerName.AsSpan(1));
+                r.Path = m.Router!;
+                r.Hidden = !m.IsShow;
+
+
+                if (m.MenuType == MenuType.Catalogue)
                 {
-                    r.Component = "Layout";
+                    r.Redirect = "noRedirect";
+                    r.AlwaysShow = true;
+
+                    //判断是否为最顶层的路由
+                    if (Guid.Empty == m.ParentId)
+                    {
+                        r.Component = "Layout";
+                    }
+                    else
+                    {
+                        r.Component = "ParentView";
+                    }
                 }
-                else
+
+                if (m.MenuType == MenuType.Menu)
                 {
-                    r.Component = "ParentView";
+                    r.Redirect = "noRedirect";
+                    r.AlwaysShow = true;
+                    r.Component = m.Component!;
+                    r.AlwaysShow = false;
+                }
+
+                r.Meta = new Meta
+                {
+                    Title = m.MenuName!,
+                    Icon = m.MenuIcon!,
+                    NoCache = !m.IsCache
+                };
+                if (m.IsLink)
+                {
+                    r.Meta.link = m.Router!;
+                    r.AlwaysShow = false;
+                }
+
+                routers.Add(r);
+            }
+
+            return MenuTreeHelper.SetTree(routers);
+        }
+
+
+        /// <summary>
+        /// 构建vue3  pure路由
+        /// </summary>
+        /// <param name="menus"></param>
+        /// <returns></returns>
+        public static List<Vue3PureRouterDto> Vue3PureRouterBuild(this List<Menu> menus)
+        {
+            //pure的菜单为树形
+            var allRouters = menus
+                .Where(m => m.State)
+                .Where(m => m.MenuType != MenuType.Component)
+                .Where(m => m.MenuSource == MenuSource.Pure)
+                .Select(m => new Vue3PureRouterDto
+                {
+                    Path = m.Router!.StartsWith('/') ? m.Router : "/" + m.Router,
+                    Name = m.IsLink ? "Link" : (m.RouterName ?? string.Empty), // CS8601: RouterName 是 string?
+                    component = m.Component,
+                    Meta = new MetaPureRouterDto()
+                    {
+                        showLink = m.IsShow,
+                        FrameSrc = m.IsLink ? m.Router : null,
+                        Auths = m.PermissionCode is not null ? new List<string> { m.PermissionCode } : null, // CS8604
+                        Icon = m.MenuIcon ?? string.Empty, // CS8601: MenuIcon 是 string?
+                        Title = m.MenuName,
+                    },
+                    OrderNum = m.OrderNum,
+                    Children = null,
+                    Id = m.Id,
+                    ParentId = m.ParentId
+                })
+                .ToList();
+
+
+            var routerDic = allRouters.GroupBy(x => x.ParentId).ToDictionary(x => x.Key, y => y.ToList());
+            //根路由
+            if (!routerDic.TryGetValue(Guid.Empty, out var rootRouters))
+            {
+                return new List<Vue3PureRouterDto>();
+            }
+            Stack<Vue3PureRouterDto> stack = new Stack<Vue3PureRouterDto>(rootRouters);
+            while (stack.Count > 0)
+            {
+                var currentRouter = stack.Pop();
+                if (routerDic.TryGetValue(currentRouter.Id, out var items))
+                {
+                    currentRouter.Children = items;
+                    items?.ForEach(x => stack.Push(x));
                 }
             }
 
-            if (m.MenuType == MenuType.Menu)
-            {
-                r.Redirect = "noRedirect";
-                r.AlwaysShow = true;
-                r.Component = m.Component!;
-                r.AlwaysShow = false;
-            }
-
-            r.Meta = new Meta
-            {
-                Title = m.MenuName!,
-                Icon = m.MenuIcon!,
-                NoCache = !m.IsCache
-            };
-            if (m.IsLink)
-            {
-                r.Meta.link = m.Router!;
-                r.AlwaysShow = false;
-            }
-
-            routers.Add(r);
+            return rootRouters.OrderBy(x => x.OrderNum).ThenBy(x => x.Id).ToList();
         }
-
-        return MenuTreeHelper.SetTree(routers);
     }
-
-
-    /// <summary>
-    /// 构建vue3  pure路由
-    /// </summary>
-    /// <param name="menus"></param>
-    /// <returns></returns>
-    public static List<Vue3PureRouterDto> Vue3PureRouterBuild(this List<Menu> menus)
-    {
-        //pure的菜单为树形
-        var allRouters = menus
-            .Where(m => m.State)
-            .Where(m => m.MenuType != MenuType.Component)
-            .Where(m => m.MenuSource == MenuSource.Pure)
-            .Select(m => new Vue3PureRouterDto
-            {
-                Path = m.Router!.StartsWith('/') ? m.Router : "/" + m.Router,
-                Name = m.IsLink ? "Link" : (m.RouterName ?? string.Empty), // CS8601: RouterName 是 string?
-                component = m.Component,
-                Meta = new MetaPureRouterDto()
-                {
-                    showLink = m.IsShow,
-                    FrameSrc = m.IsLink ? m.Router : null,
-                    Auths = m.PermissionCode is not null ? new List<string> { m.PermissionCode } : null, // CS8604
-                    Icon = m.MenuIcon ?? string.Empty, // CS8601: MenuIcon 是 string?
-                    Title = m.MenuName,
-                },
-                OrderNum = m.OrderNum,
-                Children = null,
-                Id = m.Id,
-                ParentId = m.ParentId
-            })
-            .ToList();
-
-
-        var routerDic = allRouters.GroupBy(x => x.ParentId).ToDictionary(x => x.Key, y => y.ToList());
-        //根路由
-        if (!routerDic.TryGetValue(Guid.Empty, out var rootRouters))
-        {
-            return new List<Vue3PureRouterDto>();
-        }
-        Stack<Vue3PureRouterDto> stack = new Stack<Vue3PureRouterDto>(rootRouters);
-        while (stack.Count > 0)
-        {
-            var currentRouter = stack.Pop();
-            if (routerDic.TryGetValue(currentRouter.Id, out var items))
-            {
-                currentRouter.Children = items;
-                items?.ForEach(x => stack.Push(x));
-            }
-        }
-
-        return rootRouters.OrderBy(x => x.OrderNum).ThenBy(x => x.Id).ToList();
-    }
-}
 }

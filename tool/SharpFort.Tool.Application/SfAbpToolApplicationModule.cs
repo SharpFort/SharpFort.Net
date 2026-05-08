@@ -5,7 +5,7 @@ namespace SharpFort.Tool.Application
 {
     [DependsOn(typeof(SfAbpToolApplicationContractsModule),
         typeof(SfAbpToolDomainModule))]
-    public class SfAbpToolApplicationModule:AbpModule
+    public class SfAbpToolApplicationModule : AbpModule
     {
 
     }

@@ -229,7 +229,7 @@ public class UsageStatisticsService : ApplicationService, IUsageStatisticsServic
             var modelIds = modelStats.Select(x => x.ModelId).ToList();
             var modelDic = await _modelManager._aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId))
                 .Distinct()
-                .Where(x=>x.IsEnabled)
+                .Where(x => x.IsEnabled)
                 .ToDictionaryAsync<string>(x => x.ModelId, y => y.IconUrl);
             modelStats.ForEach(x =>
             {

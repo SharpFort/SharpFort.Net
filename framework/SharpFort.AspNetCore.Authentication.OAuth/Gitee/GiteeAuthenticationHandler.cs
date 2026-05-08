@@ -26,7 +26,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.Gitee
                 new KeyValuePair<string, string?>("redirect_uri",Options.RedirectUri),
                 new KeyValuePair<string, string?>("code",code)
             };
-            var tokenModel = await SendHttpRequestAsync<GiteeAuthticationcationTokenResponse>(GiteeAuthenticationDefaults.TokenEndpoint, tokenQueryKv,HttpMethod.Post);
+            var tokenModel = await SendHttpRequestAsync<GiteeAuthticationcationTokenResponse>(GiteeAuthenticationDefaults.TokenEndpoint, tokenQueryKv, HttpMethod.Post);
 
             //获取 userInfo
             var userInfoQueryKv = new List<KeyValuePair<string, string?>>()

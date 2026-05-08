@@ -160,7 +160,7 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task<long> GetCountAsync(CancellationToken cancellationToken = default)
         {
-            return await this.CountAsync(_=>true);
+            return await this.CountAsync(_ => true);
         }
 
         public virtual async Task<List<TEntity>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, bool includeDetails = false, CancellationToken cancellationToken = default)
@@ -185,7 +185,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         {
             return (await GetDbSimpleClientAsync()).AsInsertable(insertObj);
         }
-        
+
         public virtual async Task<IInsertable<TEntity>> AsInsertable(TEntity[] insertObjs)
         {
             return (await GetDbSimpleClientAsync()).AsInsertable(insertObjs);
@@ -397,13 +397,13 @@ namespace SharpFort.SqlSugarCore.Repositories
             {
                 try
                 {
-                    int num =  await (await GetDbSimpleClientAsync())
+                    int num = await (await GetDbSimpleClientAsync())
                         .Context.Updateable(updateObj).ExecuteCommandWithOptLockAsync(true);
-                    return num>0;
+                    return num > 0;
                 }
                 catch (VersionExceptions ex)
                 {
- 
+
                     throw new AbpDbConcurrencyException($"{ex.Message}[更新失败：ConcurrencyStamp不是最新版本],entityInfo：{updateObj}", ex);
                 }
             }

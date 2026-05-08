@@ -56,7 +56,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         ///// 主键
         ///// </summary>
         //[SugarColumn(IsPrimaryKey = true)]
-        //public override Guid Id { get;  set; }
+        //public override Guid Id { get; set;}
 
         /// <summary>
         /// 配置名称

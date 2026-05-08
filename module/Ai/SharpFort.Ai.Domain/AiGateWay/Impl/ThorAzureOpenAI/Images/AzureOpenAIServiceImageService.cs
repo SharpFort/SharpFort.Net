@@ -14,7 +14,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
         var createClient = AzureOpenAIFactory.CreateClient(options!);
 
         var client = createClient.GetImageClient(imageCreate.Model);
-        imageCreate.Size??="1024x1024";
+        imageCreate.Size ??= "1024x1024";
         // 将size字符串拆分为宽度和高度
         var size = imageCreate.Size.Split('x');
         if (size.Length != 2)
@@ -62,7 +62,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
         CancellationToken cancellationToken = default(CancellationToken))
     {
         var url = AzureOpenAIFactory.GetEditImageAddress(options!, imageEditCreateRequest.Model!);
-        
+
         var multipartContent = new MultipartFormDataContent();
         if (imageEditCreateRequest.User != null)
         {

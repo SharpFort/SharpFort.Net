@@ -55,7 +55,7 @@ public class ChannelService : ApplicationService, IChannelService
     /// 根据ID获取AI应用
     /// </summary>
     [HttpGet("channel/app/{id}")]
-    public async Task<AiAppDto> GetAppByIdAsync([FromRoute]Guid id)
+    public async Task<AiAppDto> GetAppByIdAsync([FromRoute] Guid id)
     {
         var entity = await _appRepository.GetByIdAsync(id);
         return entity.Adapt<AiAppDto>();
@@ -100,7 +100,7 @@ public class ChannelService : ApplicationService, IChannelService
     /// 删除AI应用
     /// </summary>
     [HttpDelete("channel/app/{id}")]
-    public async Task DeleteAppAsync([FromRoute]Guid id)
+    public async Task DeleteAppAsync([FromRoute] Guid id)
     {
         // 检查是否有关联的模型
         var hasModels = await _modelRepository._DbQueryable
@@ -147,7 +147,7 @@ public class ChannelService : ApplicationService, IChannelService
     /// 根据ID获取AI模型
     /// </summary>
     [HttpGet("channel/model/{id}")]
-    public async Task<AiModelDto> GetModelByIdAsync([FromRoute]Guid id)
+    public async Task<AiModelDto> GetModelByIdAsync([FromRoute] Guid id)
     {
         var entity = await _modelRepository.GetByIdAsync(id);
         return entity.Adapt<AiModelDto>();

@@ -51,7 +51,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             Remark = remark;
             ListClass = listClass;
 
-        // 默认启用（IsDefault 和 IsDeleted 无需显式赋值为 false）
+            // 默认启用（IsDefault 和 IsDeleted 无需显式赋值为 false）
             State = true;
         }
 

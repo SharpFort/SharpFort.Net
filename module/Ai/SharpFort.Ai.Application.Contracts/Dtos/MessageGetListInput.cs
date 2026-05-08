@@ -3,7 +3,7 @@ using SharpFort.Ddd.Application.Contracts;
 
 namespace SharpFort.Ai.Application.Contracts.Dtos;
 
-public class MessageGetListInput:PagedAllResultRequestDto
+public class MessageGetListInput : PagedAllResultRequestDto
 {
     [Required]
     public Guid SessionId { get; set; }

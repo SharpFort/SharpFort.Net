@@ -134,15 +134,15 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 需要获取角色编码，这里假设 RoleIds 对应角色的 Code 需要查询
             // 或者暂时使用 RoleId 作为角色标识（推荐使用 ID 以保持一致性，但 Casbin 通常用 Code 更可读）
             // 方案书V1.2: sub 传递 UserId, g = 用户, 角色, 域
-            
+
             // 查询角色信息
             // 考虑事务一致性，这里应该在同一个 UOW 中
-            
+
             // 注意：RoleService/Manager 应该提供获取角色 Code 的方法
             // 这里为了演示，假设 RoleIds 对应的角色列表需要被查询出来
             // 暂时先跳过 Role Code 查询，直接用 RoleId，但最佳实践是 RoleCode
             // 修正：Casbin g策略通常是 g, user_id, role_code, domain_id
-            
+
             // Casbin 同步逻辑放入 GiveUserSetRoleAsync 或者在这里显式调用
             // 建议：封装一个私有方法或领域服务处理 Casbin 同步
             await SyncCasbinUserRoles(entitiy.Id, input.RoleIds ?? new List<Guid>());
@@ -163,7 +163,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             var roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
             var roleCodes = roles.Select(r => r.RoleCode).ToList();
 
-            var policies = roleCodes.Select(roleCode => new [] { userId.ToString(), roleCode, domain }).ToList();
+            var policies = roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain }).ToList();
 
             // 必须禁用 AutoSave 并手动 Save，因为在外层事务中
             // 已在 DI 中全局禁用 AutoSave

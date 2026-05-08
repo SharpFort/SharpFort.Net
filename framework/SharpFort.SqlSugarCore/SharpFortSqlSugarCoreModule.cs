@@ -50,9 +50,9 @@ namespace SharpFort.SqlSugarCore
             section.Bind(dbConnOptions);
 
             // 配置默认连接字符串
-            Configure<AbpDbConnectionOptions>(options => 
-            { 
-                options.ConnectionStrings.Default = dbConnOptions.Url; 
+            Configure<AbpDbConnectionOptions>(options =>
+            {
+                options.ConnectionStrings.Default = dbConnOptions.Url;
             });
 
             // 配置默认租户
@@ -86,16 +86,16 @@ namespace SharpFort.SqlSugarCore
 
         private void ConfigureDefaultTenant(IServiceCollection services, DbConnOptions dbConfig)
         {
-            Configure<AbpDefaultTenantStoreOptions>(options => 
+            Configure<AbpDefaultTenantStoreOptions>(options =>
             {
                 var tenants = options.Tenants.ToList();
-                
+
                 // 规范化租户名称
                 foreach (var tenant in tenants)
                 {
-                tenant.NormalizedName = tenant.Name.Contains('@')
-                        ? tenant.Name[..tenant.Name.LastIndexOf('@')]
-                        : tenant.Name;
+                    tenant.NormalizedName = tenant.Name.Contains('@')
+                            ? tenant.Name[..tenant.Name.LastIndexOf('@')]
+                            : tenant.Name;
                 }
 
                 // 添加默认租户
@@ -104,9 +104,9 @@ namespace SharpFort.SqlSugarCore
                     Id = Guid.Empty,
                     Name = ConnectionStrings.DefaultConnectionStringName,
                     NormalizedName = ConnectionStrings.DefaultConnectionStringName,
-                    ConnectionStrings = new ConnectionStrings 
-                    { 
-                        { ConnectionStrings.DefaultConnectionStringName, dbConfig.Url } 
+                    ConnectionStrings = new ConnectionStrings
+                    {
+                        { ConnectionStrings.DefaultConnectionStringName, dbConfig.Url }
                     },
                     IsActive = true
                 });
@@ -128,9 +128,9 @@ namespace SharpFort.SqlSugarCore
 
         public override async Task OnPreApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            var serviceProvider = context.ServiceProvider;
-            var options = serviceProvider.GetRequiredService<IOptions<DbConnOptions>>().Value;
-            var logger = serviceProvider.GetRequiredService<ILogger<SharpFortSqlSugarCoreModule>>();
+            IServiceProvider serviceProvider = context.ServiceProvider;
+            DbConnOptions options = serviceProvider.GetRequiredService<IOptions<DbConnOptions>>().Value;
+            ILogger<SharpFortSqlSugarCoreModule> logger = serviceProvider.GetRequiredService<ILogger<SharpFortSqlSugarCoreModule>>();
 
             // 记录配置信息
             LogConfiguration(logger, options);
@@ -168,8 +168,8 @@ namespace SharpFort.SqlSugarCore
 
         private static async Task InitializeDatabase(IServiceProvider serviceProvider)
         {
-            var moduleContainer = serviceProvider.GetRequiredService<IModuleContainer>();
-            var db = serviceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+            IModuleContainer moduleContainer = serviceProvider.GetRequiredService<IModuleContainer>();
+            ISqlSugarClient db = serviceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
 
             // 创建数据库
             db.DbMaintenance.CreateDatabase();

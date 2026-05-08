@@ -12,7 +12,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly ILogger<TencentCloudManager> _logger;
         public TencentCloudManager(ILogger<TencentCloudManager> logger)
         {
-            _logger= logger;
+            _logger = logger;
         }
 
         public async Task SendSmsAsync()

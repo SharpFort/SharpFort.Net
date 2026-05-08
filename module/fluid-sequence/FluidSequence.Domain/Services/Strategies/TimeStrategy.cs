@@ -9,8 +9,8 @@ namespace FluidSequence.Domain.Services.Strategies
     {
         public bool CanHandle(string placeholderKey)
         {
-            return placeholderKey == "yyyy" || placeholderKey == "yy" || placeholderKey == "MM" || placeholderKey == "dd" 
-                || placeholderKey == "HH" || placeholderKey == "mm" || placeholderKey == "ss" 
+            return placeholderKey == "yyyy" || placeholderKey == "yy" || placeholderKey == "MM" || placeholderKey == "dd"
+                || placeholderKey == "HH" || placeholderKey == "mm" || placeholderKey == "ss"
                 || placeholderKey == "ww" || placeholderKey == "QQ" || placeholderKey == "FY";
         }
 
@@ -26,20 +26,20 @@ namespace FluidSequence.Domain.Services.Strategies
                 case "HH": return now.ToString("HH", CultureInfo.InvariantCulture);
                 case "mm": return now.ToString("mm", CultureInfo.InvariantCulture);
                 case "ss": return now.ToString("ss", CultureInfo.InvariantCulture);
-                case "ww": 
+                case "ww":
                     return ISOWeek.GetWeekOfYear(now).ToString("D2", CultureInfo.InvariantCulture);
                 case "QQ":
                     int q = (now.Month - 1) / 3 + 1;
                     return $"Q{q}";
                 case "FY":
-                   int startMonth = 1;
-                   if (rule.ExtensionProps != null && rule.ExtensionProps.TryGetValue("FiscalYearStartMonth", out var startMonthObj))
-                   {
-                       startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
-                   }
-                   int fy = now.Year;
-                   if (now.Month < startMonth) fy--;
-                   return fy.ToString(CultureInfo.InvariantCulture);
+                    int startMonth = 1;
+                    if (rule.ExtensionProps != null && rule.ExtensionProps.TryGetValue("FiscalYearStartMonth", out var startMonthObj))
+                    {
+                        startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
+                    }
+                    int fy = now.Year;
+                    if (now.Month < startMonth) fy--;
+                    return fy.ToString(CultureInfo.InvariantCulture);
             }
             return placeholderKey;
         }

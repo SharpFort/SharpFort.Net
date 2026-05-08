@@ -15,12 +15,12 @@ using FluidSequence.Domain.Repositories;
 namespace FluidSequence.Application.Services
 {
     [Authorize]
-    public class SequenceRuleAppService : SfCrudAppService< 
-        SysSequenceRule, 
-        SequenceRuleDto, 
-        Guid, 
-        SequenceRuleGetListInput, 
-        CreateSequenceRuleInput, 
+    public class SequenceRuleAppService : SfCrudAppService<
+        SysSequenceRule,
+        SequenceRuleDto,
+        Guid,
+        SequenceRuleGetListInput,
+        CreateSequenceRuleInput,
         UpdateSequenceRuleInput>,
         ISequenceRuleAppService
     {
@@ -28,8 +28,8 @@ namespace FluidSequence.Application.Services
         private readonly ISequenceRuleRepository _repository;
 
         public SequenceRuleAppService(
-            ISequenceRuleRepository repository, 
-            SequenceDomainService domainService) 
+            ISequenceRuleRepository repository,
+            SequenceDomainService domainService)
             : base(repository)
         {
             _repository = repository;
@@ -38,10 +38,10 @@ namespace FluidSequence.Application.Services
 
         public async Task<string> TestGenerateAsync(string ruleCode, Dictionary<string, string> context)
         {
-             var rule = await _repository.GetAsync(r => r.RuleCode == ruleCode);
-             if (rule == null) throw new Volo.Abp.UserFriendlyException($"Rule {ruleCode} not found");
+            var rule = await _repository.GetAsync(r => r.RuleCode == ruleCode);
+            if (rule == null) throw new Volo.Abp.UserFriendlyException($"Rule {ruleCode} not found");
 
-             return _domainService.TestGenerate(rule, context);
+            return _domainService.TestGenerate(rule, context);
         }
 
         public Task<List<PlaceholderMetaDto>> GetPlaceholdersAsync()
@@ -62,7 +62,7 @@ namespace FluidSequence.Application.Services
         public override async Task<PagedResultDto<SequenceRuleDto>> GetListAsync(SequenceRuleGetListInput input)
         {
             RefAsync<int> total = 0;
-            
+
             var entities = await _repository._DbQueryable
                 .WhereIF(!string.IsNullOrWhiteSpace(input.RuleName), x => x.RuleName.Contains(input.RuleName!))
                 .WhereIF(!string.IsNullOrWhiteSpace(input.RuleCode), x => x.RuleCode.Contains(input.RuleCode!))

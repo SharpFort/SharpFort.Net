@@ -43,7 +43,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 
             var roleInfo = CurrentUser.GetRoleInfo();
             var expUser = Expressionable.Create<User>();
-            
+
             // 如果无角色信息，默认只能看自己
             if (roleInfo == null || roleInfo.Count == 0)
             {
@@ -55,7 +55,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             // 检查是否有 "全部数据权限" (只要有一个角色拥有 ALL 权限，就跳过所有过滤)
             if (roleInfo.Any(r => r.DataScope == DataScope.ALL))
             {
-                return; 
+                return;
             }
 
             // 拼接 OR 条件 (取并集)
@@ -98,7 +98,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             }
 
             sqlSugarClient.QueryFilter.AddTableFilter(expUser.ToExpression());
-            
+
             // 针对 Role 表的过滤 (只能看自己拥有的角色)
             var expRole = Expressionable.Create<Role>();
             var roleIds = roleInfo.Select(x => x.Id).ToList();

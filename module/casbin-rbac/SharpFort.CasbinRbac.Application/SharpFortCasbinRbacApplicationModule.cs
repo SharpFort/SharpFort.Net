@@ -23,7 +23,7 @@ namespace SharpFort.CasbinRbac.Application
             {
                 options.CaptchaType = CaptchaType.ARITHMETIC;
             });
-            
+
             // 注册字段级权限控制器
             context.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
             {
@@ -33,20 +33,20 @@ namespace SharpFort.CasbinRbac.Application
                 // 但 System.Text.Json 的 Converters 是 List<JsonConverter>。
                 // 既然 Converter 依赖 Service，我们不能直接在这里 Add(new factory)。
                 // 这是一个常见痛点。
-                
+
                 // 解决方案：不要在这里注册。
                 // 而是实现 IConfigureOptions<JsonOptions> 并在那里注入 IHttpContextAccessor。
                 // 或者，FieldSecurityJsonConverterFactory 不依赖 Constructor Argument，而是依赖 ServiceProvider (在 CreateConverter 传入 options? 不行)
                 // 我们的 Factory 依赖 IHttpContextAccessor。
-                
+
                 // 回退一步：Factory 不应该依赖 Accessor。Factory 取 Accessor 应该在 CreateConverter 里面吗？
                 // CreateConverter 只有 Type 和 Options。
                 // 实际上，Converter 实例是新建的。Converter 自身可以持有 Accessor。
                 // 只要 Factory 能拿到 Accessor。
-                
+
                 // 最佳实践：在 ApplicationInitialization 或 Web 层注册？
                 // 或者，让 Factory 只有无参构造函数，然后使用 `new HttpContextAccessor()`? 不行。
-                
+
                 // 既然我们在 Abp 框架下，我们可以使用 `IConfigureOptions`.
             });
 

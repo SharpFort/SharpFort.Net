@@ -25,7 +25,7 @@ public partial class SfModuleManager : ModuleManager, IModuleManager, ISingleton
         IModuleContainer moduleContainer,
         ILogger<SfModuleManager> logger,
         IOptions<AbpModuleLifecycleOptions> options,
-        IServiceProvider serviceProvider) 
+        IServiceProvider serviceProvider)
         : base(moduleContainer, logger, options, serviceProvider)
     {
         _moduleContainer = moduleContainer;

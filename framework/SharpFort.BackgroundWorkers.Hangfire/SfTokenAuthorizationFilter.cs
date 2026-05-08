@@ -14,7 +14,7 @@ public sealed class SfTokenAuthorizationFilter : IDashboardAsyncAuthorizationFil
     private const string BearerPrefix = "Bearer ";
     private const string TokenCookieKey = "Token";
     private const string HtmlContentType = "text/html";
-    
+
     private readonly IServiceProvider _serviceProvider;
     private string _requiredUsername = "cc";
     private TimeSpan _tokenExpiration = TimeSpan.FromMinutes(10);
@@ -86,7 +86,7 @@ public sealed class SfTokenAuthorizationFilter : IDashboardAsyncAuthorizationFil
     {
         httpContext.Response.StatusCode = 401;
         httpContext.Response.ContentType = HtmlContentType;
-        
+
         var html = @"
             <html>
             <head>

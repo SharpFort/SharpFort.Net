@@ -20,7 +20,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         private ISqlSugarRepository<Dictionary, Guid> _repository;
         public DictionaryDataService(ISqlSugarRepository<Dictionary, Guid> repository) : base(repository)
         {
-            _repository= repository;
+            _repository = repository;
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             return base.PostImportExcelAsync(input);
         }
-        
+
         /// <summary>
         /// 获取实体动态下拉框列表
         /// </summary>

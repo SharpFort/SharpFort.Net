@@ -12,16 +12,16 @@ public record ThorUsageResponse
     /// </summary>
     [JsonPropertyName("prompt_tokens")]
     public int? PromptTokens { get; set; }
-    
+
     [JsonPropertyName("input_tokens")]
     public int? InputTokens { get; set; }
-    
+
     [JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }
-    
+
     [JsonPropertyName("input_tokens_details")]
     public ThorUsageResponseInputTokensDetails? InputTokensDetails { get; set; }
-    
+
     /// <summary>
     /// 生成的完成中的令牌数。
     /// </summary>
@@ -51,7 +51,7 @@ public class ThorUsageResponseInputTokensDetails
 {
     [JsonPropertyName("image_tokens")]
     public int? ImageTokens { get; set; }
-    
+
     [JsonPropertyName("text_tokens")]
     public int? TextTokens { get; set; }
 }
@@ -63,7 +63,7 @@ public record ThorUsageResponsePromptTokensDetails
     /// </summary>
     [JsonPropertyName("cached_tokens")]
     public int? CachedTokens { get; set; }
-    
+
     /// <summary>
     /// audio_tokens
     /// </summary>

@@ -110,12 +110,12 @@ namespace Sf.Abp.Web
             //本地开发环境，禁用作业执行
             if (host.IsDevelopment())
             {
-                Configure<AbpBackgroundWorkerOptions> (options =>
+                Configure<AbpBackgroundWorkerOptions>(options =>
                 {
-                    options.IsEnabled = false; 
+                    options.IsEnabled = false;
                 });
             }
-            
+
             //请求日志
             Configure<AbpAuditingOptions>(options =>
             {
@@ -202,17 +202,17 @@ namespace Sf.Abp.Web
 
             //配置Hangfire定时任务存储，开启redis后，优先使用redis
             var redisConfiguration = configuration["Redis:Configuration"];
-            context.Services.AddHangfire(config=>
+            context.Services.AddHangfire(config =>
             {
-                var redisEnabled=configuration.GetSection("Redis").GetValue<bool>("IsEnabled");
+                var redisEnabled = configuration.GetSection("Redis").GetValue<bool>("IsEnabled");
                 if (redisEnabled)
                 {
-                    var jobDb=configuration.GetSection("Redis").GetValue<int>("JobDb");
+                    var jobDb = configuration.GetSection("Redis").GetValue<int>("JobDb");
                     config.UseRedisStorage(
                         ConnectionMultiplexer.Connect(redisConfiguration),
                         new RedisStorageOptions()
                         {
-                            Db =jobDb,
+                            Db = jobDb,
                             InvisibilityTimeout = TimeSpan.FromHours(1), //JOB允许执行1小时
                             Prefix = "Sf:HangfireJob:"
                         }).WithJobExpirationTimeout(TimeSpan.FromHours(1));
@@ -364,7 +364,7 @@ namespace Sf.Abp.Web
 
             //鉴权
             app.UseAuthentication();
-            
+
             //Casbin鉴权中间件
             app.UseMiddleware<CasbinAuthorizationMiddleware>();
 

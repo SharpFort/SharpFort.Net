@@ -11,9 +11,9 @@ namespace SharpFort.Tool.Commands
 {
     public class CloneCommand : ICommand
     {
-        private const string CloneAddress= "https://gitee.com/ccnetcore/Sf";
+        private const string CloneAddress = "https://gitee.com/ccnetcore/Sf";
 
-        
+
         public string Command => "clone";
         public string? Description => "克隆最新SharpFort源代码，需依赖git";
 
@@ -26,8 +26,8 @@ namespace SharpFort.Tool.Commands
                 return 0;
             });
         }
-        
-        
+
+
         /// <summary>
         /// 执行cmd命令
         /// </summary>
@@ -53,7 +53,7 @@ namespace SharpFort.Tool.Commands
                 psi.FileName = "/bin/bash";
                 psi.Arguments = $"-c \"{string.Join("; ", cmdCommands)}\"";
             }
-            
+
             Process proc = new Process
             {
                 StartInfo = psi

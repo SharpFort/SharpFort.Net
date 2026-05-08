@@ -5,11 +5,11 @@ using FluidSequence.Application.Contracts.Dtos;
 
 namespace FluidSequence.Application.Contracts.IServices
 {
-    public interface ISequenceRuleAppService : ICrudAppService< 
-        SequenceRuleDto, 
-        Guid, 
-        SequenceRuleGetListInput, 
-        CreateSequenceRuleInput, 
+    public interface ISequenceRuleAppService : ICrudAppService<
+        SequenceRuleDto,
+        Guid,
+        SequenceRuleGetListInput,
+        CreateSequenceRuleInput,
         UpdateSequenceRuleInput>
     {
         Task<string> TestGenerateAsync(string ruleCode, Dictionary<string, string> context);

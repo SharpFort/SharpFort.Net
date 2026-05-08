@@ -10,7 +10,7 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorAzureOpenAI.Chats;
 
-public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChatCompletionCompletionsService> logger,IHttpClientFactory httpClientFactory)
+public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChatCompletionCompletionsService> logger, IHttpClientFactory httpClientFactory)
     : IChatCompletionService
 {
     public async IAsyncEnumerable<ThorChatCompletionsResponse> CompleteChatStreamAsync(AiModelDescribe options,
@@ -26,7 +26,7 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
 
         openai?.SetTag("Model", chatCompletionCreate.Model);
         openai?.SetTag("Response", response.StatusCode.ToString());
-        
+
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             var error = await response.Content.ReadAsStringAsync(cancellationToken);

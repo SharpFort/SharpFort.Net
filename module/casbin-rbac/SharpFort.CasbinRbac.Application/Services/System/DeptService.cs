@@ -63,7 +63,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             await CheckCreateInputDtoAsync(input);
             var entity = await MapToEntityAsync(input);
-            
+
             // 处理 Ancestors
             string ancestors = Guid.Empty.ToString();
             Guid parentId = input.ParentId ?? Guid.Empty;
@@ -73,12 +73,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 var parent = await _repository.GetByIdAsync(parentId);
                 if (parent != null)
                 {
-                    ancestors = string.IsNullOrEmpty(parent.Ancestors) 
-                        ? parent.Id.ToString() 
+                    ancestors = string.IsNullOrEmpty(parent.Ancestors)
+                        ? parent.Id.ToString()
                         : $"{parent.Ancestors},{parent.Id}";
                 }
             }
-            
+
             // 使用 InitPath 设置受保护的属性
             entity.InitPath(parentId, ancestors);
 

@@ -63,18 +63,18 @@ public class TokenManager : DomainService
     /// <returns>Token验证结果</returns>
     public async Task<TokenValidationResult> ValidateTokenAsync(object tokenOrId)
     {
-        
+
         if (tokenOrId is null)
         {
             throw new UserFriendlyException("当前请求未包含token", "401");
         }
-        
+
         Token entity;
         if (tokenOrId is Guid tokenId)
         {
-             entity = await _tokenRepository._DbQueryable
-                .Where(x => x.Id == tokenId)
-                .FirstAsync();
+            entity = await _tokenRepository._DbQueryable
+               .Where(x => x.Id == tokenId)
+               .FirstAsync();
         }
         else
         {
@@ -87,7 +87,7 @@ public class TokenManager : DomainService
                 .Where(x => x.TokenKey == tokenStr)
                 .FirstAsync();
         }
-        
+
         if (entity is null)
         {
             throw new UserFriendlyException("当前请求token无效", "401");

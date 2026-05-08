@@ -9,7 +9,7 @@ public class ModelsListDto
     [JsonPropertyName("object")] public string @object { get; set; } = null!;
 
     [JsonPropertyName("data")] public List<ModelsDataDto> Data { get; set; }
-    
+
     public ModelsListDto()
     {
         Data = new();

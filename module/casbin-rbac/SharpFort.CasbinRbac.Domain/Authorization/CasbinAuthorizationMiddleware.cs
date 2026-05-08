@@ -21,8 +21,8 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
         private readonly IEnforcer _enforcer;
 
         public CasbinAuthorizationMiddleware(
-            ICurrentUser currentUser, 
-            ICurrentTenant currentTenant, 
+            ICurrentUser currentUser,
+            ICurrentTenant currentTenant,
             IEnforcer enforcer,
             IOptions<CasbinOptions> options)
         {
@@ -65,7 +65,7 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             }
 
             var sub = _currentUser.Id?.ToString();
-            
+
             // 3. Domain (dom)
             var dom = _currentTenant.Id?.ToString() ?? "default";
 

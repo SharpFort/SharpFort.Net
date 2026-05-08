@@ -94,7 +94,7 @@ namespace SharpFort.CodeGen.Application.Services
             {
                 throw new UserFriendlyException("当前操作系统不支持打开目录");
             }
-            
+
             await Task.CompletedTask;
         }
     }

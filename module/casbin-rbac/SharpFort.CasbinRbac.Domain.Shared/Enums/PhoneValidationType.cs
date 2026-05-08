@@ -5,7 +5,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Enums;
 /// <summary>
 /// 手机号验证场景类型
 /// </summary>
-public enum  PhoneValidationType
+public enum PhoneValidationType
 {
     /// <summary>
     /// 未知/默认

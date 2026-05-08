@@ -27,13 +27,13 @@ public class MessageService : ApplicationService
     /// <param name="input"></param>
     /// <returns></returns>
     [Authorize]
-    public async Task<PagedResultDto<MessageDto>> GetListAsync([FromQuery]MessageGetListInput input)
+    public async Task<PagedResultDto<MessageDto>> GetListAsync([FromQuery] MessageGetListInput input)
     {
         RefAsync<int> total = 0;
         var userId = CurrentUser.GetId();
         var entities = await _repository._DbQueryable
             .Where(x => x.SessionId == input.SessionId)
-            .Where(x=>x.UserId == userId)
+            .Where(x => x.UserId == userId)
             .Where(x => !x.IsHidden)
             .OrderBy(x => x.Id)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);

@@ -2,7 +2,7 @@ using SharpFort.CasbinRbac.Domain.Shared.Enums;
 
 namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu
 {
-    public class MenuUpdateInputVo 
+    public class MenuUpdateInputVo
     {
         public Guid Id { get; set; }
         public Guid? CreatorId { get; set; }

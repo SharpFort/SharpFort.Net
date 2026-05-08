@@ -279,7 +279,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // Casbin 同步：添加用户角色关联 (g) (使用 CasbinPolicyManager 双写同步机制)
             var role = await _repository.GetByIdAsync(input.RoleId);
             if (role == null) throw new UserFriendlyException("角色不存在");
-            
+
             var users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
             foreach (var user in users)
             {
@@ -309,7 +309,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await _userRoleRepository._Db.Deleteable<UserRole>().Where(x => x.RoleId == input.RoleId)
                 .Where(x => input.UserIds.Contains(x.UserId))
                 .ExecuteCommandAsync();
-            
+
             // Casbin 同步：移除用户角色关联 (使用 CasbinPolicyManager 双写同步机制)
             var role = await _repository.GetByIdAsync(input.RoleId);
             if (role == null) throw new UserFriendlyException("角色不存在");

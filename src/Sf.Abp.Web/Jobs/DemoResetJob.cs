@@ -5,7 +5,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace Sf.Abp.Web.Jobs
 {
-    public class DemoResetJob  : HangfireBackgroundWorkerBase
+    public class DemoResetJob : HangfireBackgroundWorkerBase
     {
         private ISqlSugarDbContext _dbContext;
         private ILogger<DemoResetJob> _logger => LoggerFactory.CreateLogger<DemoResetJob>();
@@ -17,11 +17,11 @@ namespace Sf.Abp.Web.Jobs
             RecurringJobId = "重置demo环境";
             //每天1点和13点进行重置demo环境
             CronExpression = "0 0 1,13 * * ?";
-           
+
             _dataSeeder = dataSeeder;
             _configuration = configuration;
         }
-        
+
         public override async Task DoWorkAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             //开启演示环境重置功能

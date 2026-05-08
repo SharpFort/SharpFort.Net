@@ -55,7 +55,7 @@ public class Role : FullAuditedAggregateRoot<Guid>, IOrderNum, IState, IMultiTen
     /// </summary>
     [SugarColumn(IsPrimaryKey = true)]
     public override Guid Id { get; protected set; }
-    
+
     /// <summary>
     /// 租户ID
     /// </summary>

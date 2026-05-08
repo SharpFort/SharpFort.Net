@@ -49,7 +49,7 @@ public sealed class UnitOfWorkHangfireFilter : IServerFilter, ISingletonDependen
     /// <param name="context">执行上下文</param>
     private async Task OnPerformedAsync(PerformedContext context)
     {
-        if (!context.Items.TryGetValue(UnitOfWorkItemKey, out var obj) || 
+        if (!context.Items.TryGetValue(UnitOfWorkItemKey, out var obj) ||
             obj is not IUnitOfWork uow)
         {
             return;

@@ -6,7 +6,7 @@ using SharpFort.TenantManagement.Domain;
 
 namespace SharpFort.TenantManagement.SqlSugarCore
 {
-    public class SqlSugarTenantRepository : SqlSugarRepository<Tenant, Guid>, ISqlSugarTenantRepository,ITransientDependency
+    public class SqlSugarTenantRepository : SqlSugarRepository<Tenant, Guid>, ISqlSugarTenantRepository, ITransientDependency
     {
         public SqlSugarTenantRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
         {
@@ -19,7 +19,7 @@ namespace SharpFort.TenantManagement.SqlSugarCore
 
         public async Task<long> GetCountAsync(string filter = null)
         {
-            return await _DbQueryable.WhereIF(!string.IsNullOrEmpty(filter),x=>x.Name.Contains(filter)) .CountAsync();
+            return await _DbQueryable.WhereIF(!string.IsNullOrEmpty(filter), x => x.Name.Contains(filter)).CountAsync();
         }
 
         public async Task<List<Tenant>> GetListAsync(string sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, string filter = null, bool includeDetails = false)

@@ -48,24 +48,24 @@ public class AiModelDescribe
     /// 模型描述
     /// </summary>
     public string? Description { get; set; }
-    
+
     /// <summary>
     /// 额外url
     /// </summary>
     public string? AppExtraUrl { get; set; }
-    
+
     /// <summary>
     /// 模型额外信息
     /// </summary>
     public string? ModelExtraInfo { get; set; }
-    
+
     /// <summary>
     /// 模型倍率
     /// </summary>
     public decimal Multiplier { get; set; }
-    
 
-    
+
+
     /// <summary>
     /// 模型类型(聊天/图片等)
     /// </summary>

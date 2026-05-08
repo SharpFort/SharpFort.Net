@@ -38,7 +38,7 @@ public sealed class SharpFortBackgroundWorkersHangfireModule : AbpModule
 
         // 获取配置
         var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
-        
+
         // 检查是否启用 Redis
         var isRedisEnabled = configuration.GetValue<bool>("Redis:IsEnabled");
 
@@ -56,11 +56,11 @@ public sealed class SharpFortBackgroundWorkersHangfireModule : AbpModule
             {
                 // 内存模式：直接使用 Hangfire
                 var unProxyWorker = ProxyHelper.UnProxy(worker);
-                
+
                 // 添加或更新循环任务
                 RecurringJob.AddOrUpdate(
                     worker.RecurringJobId,
-                    (Expression<Func<Task>>)(() => 
+                    (Expression<Func<Task>>)(() =>
                         ((IHangfireBackgroundWorker)unProxyWorker).DoWorkAsync(default)),
                     worker.CronExpression,
                     new RecurringJobOptions

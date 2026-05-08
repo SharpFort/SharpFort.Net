@@ -10,7 +10,7 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorDeepSeek.Chats;
 
-public sealed class DeepSeekChatCompletionsService(ILogger<DeepSeekChatCompletionsService> logger,IHttpClientFactory httpClientFactory)
+public sealed class DeepSeekChatCompletionsService(ILogger<DeepSeekChatCompletionsService> logger, IHttpClientFactory httpClientFactory)
     : IChatCompletionService
 {
     public async IAsyncEnumerable<ThorChatCompletionsResponse> CompleteChatStreamAsync(AiModelDescribe options,
@@ -24,7 +24,7 @@ public sealed class DeepSeekChatCompletionsService(ILogger<DeepSeekChatCompletio
 
         using var openai =
             Activity.Current?.Source.StartActivity("OpenAI 对话流式补全");
-        
+
         var endpoint = options.Endpoint.TrimEnd('/');
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))

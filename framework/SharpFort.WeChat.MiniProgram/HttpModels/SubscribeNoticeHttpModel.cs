@@ -13,7 +13,7 @@ public class SubscribeNoticeRequest
     /// 小程序模板id
     /// </summary>
     public string template_id { get; set; }
-    
+
     /// <summary>
     /// 跳转页面
     /// </summary>

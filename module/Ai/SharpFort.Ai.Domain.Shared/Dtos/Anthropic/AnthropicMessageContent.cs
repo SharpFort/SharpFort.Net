@@ -19,9 +19,9 @@ public class AnthropicMessageContent
     [JsonPropertyName("id")] public string? Id { get; set; }
 
     [JsonPropertyName("thinking")] public string? Thinking { get; set; }
-    
+
     [JsonPropertyName("signature")] public string? Signature { get; set; }
-    
+
     [JsonPropertyName("input")] public object? Input { get; set; }
 
     [JsonPropertyName("content")]

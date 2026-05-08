@@ -7,7 +7,7 @@ namespace SharpFort.FluidSequence.Application
     [DependsOn(
         typeof(FluidSequenceApplicationContractsModule),
         typeof(FluidSequenceDomainModule),
-        
+
         typeof(SharpFortDddApplicationModule)
 
     )]

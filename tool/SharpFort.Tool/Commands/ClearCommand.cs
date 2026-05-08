@@ -10,7 +10,7 @@ namespace SharpFort.Tool.Commands
     public class ClearCommand : ICommand
     {
         public static List<string> CommandStrs => ["clear"];
-      
+
 
         public string Command => "clear";
         public string? Description => "清除当前目录及子目录下的obj、bin文件夹` yi-abp clear `";
@@ -19,7 +19,7 @@ namespace SharpFort.Tool.Commands
         {
             application.HelpOption("-h|--help");
             List<string> delDirBlacklist = ["obj", "bin"];
-            var pathOption=  application.Option("-path", "路径",CommandOptionType.SingleValue);
+            var pathOption = application.Option("-path", "路径", CommandOptionType.SingleValue);
 
 
             application.OnExecute(() =>
@@ -33,15 +33,15 @@ namespace SharpFort.Tool.Commands
                 return 0;
             });
         }
-        
-        
+
+
         private static void DeleteObjBinFolders(string directory, List<string> delDirBlacklist)
         {
             try
             {
                 foreach (string subDir in Directory.GetDirectories(directory))
                 {
-                    if (delDirBlacklist.Contains(Path.GetFileName( subDir)))
+                    if (delDirBlacklist.Contains(Path.GetFileName(subDir)))
                     {
                         Directory.Delete(subDir, true);
                         Console.WriteLine($"已删除文件夹：{subDir}");

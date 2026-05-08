@@ -12,7 +12,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
-public class SessionService : CrudAppService<ChatSession, SessionDto, Guid,SessionGetListInput,SessionCreateAndUpdateInput>
+public class SessionService : CrudAppService<ChatSession, SessionDto, Guid, SessionGetListInput, SessionCreateAndUpdateInput>
 {
     private readonly ISqlSugarRepository<ChatSession, Guid> _repository;
     public readonly ISqlSugarRepository<ChatMessage, Guid> _messageRepository;

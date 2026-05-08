@@ -3,7 +3,7 @@
 namespace SharpFort.Tool.Application.Contracts
 {
     [DependsOn(typeof(SfAbpToolDomainSharedModule))]
-    public class SfAbpToolApplicationContractsModule:AbpModule
+    public class SfAbpToolApplicationContractsModule : AbpModule
     {
 
     }

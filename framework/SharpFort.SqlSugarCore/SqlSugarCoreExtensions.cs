@@ -23,7 +23,7 @@ public static class SqlSugarCoreExtensions
     /// <returns>服务集合</returns>
     public static IServiceCollection AddSfDbContext<TDbContext>(
         this IServiceCollection services,
-        ServiceLifetime serviceLifetime = ServiceLifetime.Transient) 
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         where TDbContext : class, ISqlSugarDbContextDependencies
     {
         services.Add(new ServiceDescriptor(

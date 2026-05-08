@@ -48,17 +48,17 @@ public class RoleMenu : CreationAuditedEntity<Guid>
     /// 主键
     /// </summary>
     //[SugarColumn(IsPrimaryKey = true)]
-    //public override Guid Id { get;  set; }
+    //public override Guid Id { get; set;}
 
     /// <summary>
     /// 角色ID
     /// </summary>
-    public Guid RoleId { get;  set; }
+    public Guid RoleId { get; set; }
 
     /// <summary>
     /// 菜单ID
     /// </summary>
-    public Guid MenuId { get;  set; }
+    public Guid MenuId { get; set; }
 
     #endregion
 

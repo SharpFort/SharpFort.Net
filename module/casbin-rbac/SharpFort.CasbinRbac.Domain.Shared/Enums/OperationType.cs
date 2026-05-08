@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SharpFort.CasbinRbac.Domain.Shared.Enums
 {
-    public enum OperationType 
+    public enum OperationType
     {
         [Description("其他")]
         Other = 0,

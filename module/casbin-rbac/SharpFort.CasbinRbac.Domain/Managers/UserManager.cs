@@ -32,13 +32,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly ICasbinPolicyManager _casbinPolicyManager; // 新增
 
         public UserManager(
-            ISqlSugarRepository<User> repository, 
-            ISqlSugarRepository<UserRole> repositoryUserRole, 
-            ISqlSugarRepository<UserPosition> repositoryUserPost, 
-            IGuidGenerator guidGenerator, 
-            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache, 
-            IUserRepository userRepository, 
-            ILocalEventBus localEventBus, 
+            ISqlSugarRepository<User> repository,
+            ISqlSugarRepository<UserRole> repositoryUserRole,
+            ISqlSugarRepository<UserPosition> repositoryUserPost,
+            IGuidGenerator guidGenerator,
+            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache,
+            IUserRepository userRepository,
+            ILocalEventBus localEventBus,
             ISqlSugarRepository<Role> roleRepository,
             ICasbinPolicyManager casbinPolicyManager) // 注入
         {

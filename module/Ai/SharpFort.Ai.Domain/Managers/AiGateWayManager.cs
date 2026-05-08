@@ -512,12 +512,12 @@ public class AiGateWayManager : DomainService
         var currentUsage = data.Usage;
         ThorUsageResponse tokenUsage = new ThorUsageResponse
         {
-            InputTokens = (currentUsage?.InputTokens??0) + (currentUsage?.CacheCreationInputTokens??0)+ (currentUsage?.CacheReadInputTokens??0),
-            OutputTokens = (currentUsage?.OutputTokens??0),
-            TotalTokens = (currentUsage?.InputTokens??0) + (currentUsage?.CacheCreationInputTokens??0)+ (currentUsage?.CacheReadInputTokens??0)+(currentUsage?.OutputTokens??0)
+            InputTokens = (currentUsage?.InputTokens ?? 0) + (currentUsage?.CacheCreationInputTokens ?? 0) + (currentUsage?.CacheReadInputTokens ?? 0),
+            OutputTokens = (currentUsage?.OutputTokens ?? 0),
+            TotalTokens = (currentUsage?.InputTokens ?? 0) + (currentUsage?.CacheCreationInputTokens ?? 0) + (currentUsage?.CacheReadInputTokens ?? 0) + (currentUsage?.OutputTokens ?? 0)
         };
-        
-        
+
+
         tokenUsage.SetSupplementalMultiplier(modelDescribe.Multiplier);
 
         if (userId is not null)
@@ -625,8 +625,8 @@ public class AiGateWayManager : DomainService
                         tokenUsage.OutputTokens = currentTokenUsage.OutputTokens;
                     }
                 }
-                
-               
+
+
                 await WriteAsEventStreamDataAsync(httpContext, responseResult.Item1, responseResult.Item2,
                     cancellationToken);
             }
@@ -812,7 +812,7 @@ public class AiGateWayManager : DomainService
 
         await _usageStatisticsManager.SetUsageAsync(userId, sourceModelId, tokenUsage, tokenId);
 
-      
+
     }
 
 
@@ -1102,7 +1102,7 @@ public class AiGateWayManager : DomainService
                 }
             }
         }, cancellationToken);
-        
+
         StreamProcessResult? processResult = null;
 
         switch (apiType)
@@ -1122,8 +1122,8 @@ public class AiGateWayManager : DomainService
             default:
                 throw new UserFriendlyException($"不支持的API类型: {apiType}");
         }
-        
-        
+
+
         // 统一的统计处理
         var userMessageId = await _aiMessageManager.CreateUserMessageAsync(userId, sessionId,
             new MessageInputDto
@@ -1131,7 +1131,7 @@ public class AiGateWayManager : DomainService
                 Content = sessionId is null ? "不予存储" : processResult?.UserContent ?? string.Empty,
                 ModelId = sourceModelId,
                 TokenUsage = processResult?.TokenUsage,
-            }, tokenId,createTime:startTime);
+            }, tokenId, createTime: startTime);
 
         var systemMessageId = await _aiMessageManager.CreateSystemMessageAsync(userId, sessionId,
             new MessageInputDto
@@ -1163,7 +1163,7 @@ public class AiGateWayManager : DomainService
         messageQueue.Enqueue("data: [DONE]\n\n");
         isComplete = true;
         await outputTask;
-        
+
         await _usageStatisticsManager.SetUsageAsync(userId, sourceModelId, processResult?.TokenUsage, tokenId);
 
     }
@@ -1251,7 +1251,7 @@ public class AiGateWayManager : DomainService
             });
             messageQueue.Enqueue($"data: {errorMessage}\n\n");
         }
-        
+
         return new StreamProcessResult
         {
             UserContent = userContent,

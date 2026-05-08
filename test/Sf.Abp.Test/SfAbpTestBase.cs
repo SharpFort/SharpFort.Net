@@ -7,7 +7,7 @@ using Volo.Abp;
 
 namespace Sf.Abp.Test
 {
-    public class SfAbpTestBase :AbpTestBaseWithServiceProvider
+    public class SfAbpTestBase : AbpTestBaseWithServiceProvider
     {
         public ILogger Logger { get; private set; }
         protected IServiceScope TestServiceScope { get; }
@@ -34,13 +34,13 @@ namespace Sf.Abp.Test
 
 
         public virtual void ConfigureServices(HostBuilderContext host, IServiceCollection service)
-        { 
+        {
         }
         protected virtual void ConfigureAppConfiguration(IConfigurationBuilder configurationBuilder)
         {
             configurationBuilder.AddJsonFile("appsettings.json");
             configurationBuilder.AddJsonFile("appsettings.Development.json");
-            
+
         }
     }
 }

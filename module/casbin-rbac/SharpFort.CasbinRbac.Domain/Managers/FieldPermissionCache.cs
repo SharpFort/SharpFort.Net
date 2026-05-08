@@ -10,14 +10,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
     public class FieldPermissionCache : IFieldPermissionCache, ISingletonDependency
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        
+
         // Key: RoleId
         // Value: Map<ResourceName, Set<FieldName>>
-        private ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>> _cache 
+        private ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>> _cache
             = new ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>>();
-            
+
         // Key: RoleCode (Case-insensitive), Value: RoleId
-        private ConcurrentDictionary<string, Guid> _roleCodeMap 
+        private ConcurrentDictionary<string, Guid> _roleCodeMap
             = new ConcurrentDictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
 
         public FieldPermissionCache(IServiceScopeFactory scopeFactory)
@@ -31,7 +31,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             using var scope = _scopeFactory.CreateScope();
             var repo = scope.ServiceProvider.GetRequiredService<ISqlSugarRepository<RoleField>>();
             var roleRepo = scope.ServiceProvider.GetRequiredService<ISqlSugarRepository<Role>>();
-            
+
             // 1. Load Rules
             var allRules = await repo.GetListAsync();
             var newCache = new ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>>();
@@ -81,7 +81,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             return denyList;
         }
-        
+
         /// <summary>
         /// 根据角色代码获取禁止字段 (给 CurrentUser 使用)
         /// </summary>
@@ -89,7 +89,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         {
             var denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (roleCodes == null || !roleCodes.Any()) return denyList;
-            
+
             foreach (var code in roleCodes)
             {
                 if (_roleCodeMap.TryGetValue(code, out var roleId))
@@ -102,7 +102,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private void MergeDenyFields(HashSet<string> denyList, Guid roleId, string resourceName)
         {
-             if (_cache.TryGetValue(roleId, out var resourceMap))
+            if (_cache.TryGetValue(roleId, out var resourceMap))
             {
                 if (resourceMap.TryGetValue(resourceName, out var fields))
                 {

@@ -5,7 +5,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace Sf.Abp.Web.Jobs.rbac
 {
-    public class BackupDataBaseJob: HangfireBackgroundWorkerBase
+    public class BackupDataBaseJob : HangfireBackgroundWorkerBase
     {
         private ISqlSugarDbContext _dbContext;
         private IOptions<RbacOptions> _options;
@@ -14,7 +14,7 @@ namespace Sf.Abp.Web.Jobs.rbac
 
             _options = options;
             _dbContext = dbContext;
-            
+
             RecurringJobId = "数据库备份";
             //每天00点与24点进行备份
             CronExpression = "0 0 0,12 * * ? ";

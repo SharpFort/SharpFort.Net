@@ -98,7 +98,7 @@ public sealed class AnthropicInput
             }
         }
     }
-    
+
     [JsonPropertyName("thinking")] public AnthropicThinkingInput? Thinking { get; set; }
 
     [JsonPropertyName("temperature")] public double? Temperature { get; set; }
@@ -110,13 +110,13 @@ public class AnthropicThinkingInput
 {
     [JsonPropertyName("type")] public string? Type { get; set; }
     [JsonPropertyName("budget_tokens")] public int? BudgetTokens { get; set; }
-    
+
     [JsonPropertyName("signature")] public string? Signature { get; set; }
- 
+
     [JsonPropertyName("thinking")] public string? Thinking { get; set; }
-    
+
     [JsonPropertyName("data")] public string? Data { get; set; }
-    
+
     [JsonPropertyName("text")] public string? Text { get; set; }
 }
 

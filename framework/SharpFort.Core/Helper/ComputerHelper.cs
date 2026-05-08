@@ -30,7 +30,7 @@ namespace SharpFort.Core.Helper
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private static DateTime ParseToDateTime( string str)
+        private static DateTime ParseToDateTime(string str)
         {
             try
             {
@@ -87,9 +87,9 @@ namespace SharpFort.Core.Helper
         public static CPUMetrics GetCPUMetrics()
         {
             CPUMetrics cpuMetrics = new CPUMetrics();
-           var cpudetail =  GetCPUDetails();
+            var cpudetail = GetCPUDetails();
             cpuMetrics.CoreTotal = cpudetail.Cores;
-            cpuMetrics.LogicalProcessors =cpudetail.LogicalProcessors;
+            cpuMetrics.LogicalProcessors = cpudetail.LogicalProcessors;
             cpuMetrics.CPURate = Math.Ceiling(ParseToDouble(GetCPURate()));
             cpuMetrics.FreeRate = 1 - cpuMetrics.CPURate;
             return cpuMetrics;
@@ -108,7 +108,7 @@ namespace SharpFort.Core.Helper
                 memoryMetrics.UsedRam = Math.Round(memoryMetrics.Used / 1024, 2) + "GB";
                 memoryMetrics.TotalRAM = Math.Round(memoryMetrics.Total / 1024, 2) + "GB";
                 memoryMetrics.RAMRate = Math.Ceiling(100 * memoryMetrics.Used / memoryMetrics.Total).ToString(CultureInfo.InvariantCulture) + "%";
-  
+
                 return memoryMetrics;
             }
             catch (Exception ex)
@@ -188,7 +188,7 @@ namespace SharpFort.Core.Helper
             var isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             return isUnix;
         }
-        
+
         public static string GetCPURate()
         {
             string cpuRate;
@@ -225,7 +225,7 @@ namespace SharpFort.Core.Helper
                     string[] outputArr = output.Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
                     if (outputArr.Length == 2)
                     {
-                        runTime = DateTimeHelper.FormatTime(ParseToLong((DateTime.Now - ParseToDateTime( outputArr[1].Split('.')[0])).TotalMilliseconds.ToString(CultureInfo.InvariantCulture).Split('.')[0]));
+                        runTime = DateTimeHelper.FormatTime(ParseToLong((DateTime.Now - ParseToDateTime(outputArr[1].Split('.')[0])).TotalMilliseconds.ToString(CultureInfo.InvariantCulture).Split('.')[0]));
                     }
                 }
             }
@@ -235,7 +235,7 @@ namespace SharpFort.Core.Helper
             }
             return runTime;
         }
-        
+
 
 
         public static CPUInfo GetCPUDetails()
@@ -260,9 +260,9 @@ namespace SharpFort.Core.Helper
                 if (lines.Length > 1)
                 {
                     var values = lines[1].Split(',');
-                  
-                    cores =  int.Parse(values[1].Trim(), CultureInfo.InvariantCulture);
-                    logicalProcessors =int.Parse(values[2].Trim(), CultureInfo.InvariantCulture);
+
+                    cores = int.Parse(values[1].Trim(), CultureInfo.InvariantCulture);
+                    logicalProcessors = int.Parse(values[2].Trim(), CultureInfo.InvariantCulture);
                 }
             }
 
@@ -297,7 +297,7 @@ namespace SharpFort.Core.Helper
         /// </summary>
         public double FreeRate { get; set; }
     }
-    
+
     /// <summary>
     /// 内存信息
     /// </summary>
@@ -387,16 +387,16 @@ free_mem=$(cat /proc/meminfo | grep -i ""MemFree"" | awk '{print $2}')
 echo $total_mem $used_mem $free_mem
  ");
             var metrics = new MemoryMetrics();
- 
+
             if (!string.IsNullOrWhiteSpace(output))
             {
                 var memory = output.Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
                 if (memory.Length >= 2)
                 {
-                    metrics.Total =  Math.Round(double.Parse(memory[0], CultureInfo.InvariantCulture) / 1024, 0);
+                    metrics.Total = Math.Round(double.Parse(memory[0], CultureInfo.InvariantCulture) / 1024, 0);
 
-                    metrics.Free = Math.Round(double.Parse(memory[1], CultureInfo.InvariantCulture)/ 1024, 0);//m
-                    metrics.Used =   metrics.Total   - metrics.Free;
+                    metrics.Free = Math.Round(double.Parse(memory[1], CultureInfo.InvariantCulture) / 1024, 0);//m
+                    metrics.Used = metrics.Total - metrics.Free;
                 }
             }
             return metrics;

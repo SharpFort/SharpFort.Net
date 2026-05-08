@@ -13,7 +13,7 @@ public interface ISqlSugarDbContextDependencies
     /// 获取执行顺序
     /// </summary>
     int ExecutionOrder { get; }
-    
+
     /// <summary>
     /// SqlSugar客户端配置时触发
     /// </summary>
@@ -47,7 +47,7 @@ public interface ISqlSugarDbContextDependencies
     /// <param name="sql">SQL语句</param>
     /// <param name="parameters">SQL参数</param>
     void OnLogExecuted(string sql, SugarParameter[] parameters);
-    
+
     /// <summary>
     /// 实体服务配置
     /// </summary>

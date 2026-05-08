@@ -24,10 +24,10 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Consts
 
         public const string Permission = nameof(Permission);
 
-        public const string RoleInfo=nameof(RoleInfo);
+        public const string RoleInfo = nameof(RoleInfo);
 
-        public const string Refresh=nameof(Refresh);
+        public const string Refresh = nameof(Refresh);
 
-      
+
     }
 }

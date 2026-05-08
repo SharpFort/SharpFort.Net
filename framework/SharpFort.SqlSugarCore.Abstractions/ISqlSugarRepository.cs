@@ -10,7 +10,7 @@ namespace SharpFort.SqlSugarCore.Abstractions
     /// SqlSugar仓储接口
     /// </summary>
     /// <typeparam name="TEntity">实体类型</typeparam>
-    public interface ISqlSugarRepository<TEntity> : IRepository<TEntity>, IUnitOfWorkEnabled 
+    public interface ISqlSugarRepository<TEntity> : IRepository<TEntity>, IUnitOfWorkEnabled
         where TEntity : class, IEntity, new()
     {
         #region 数据库访问器
@@ -240,9 +240,9 @@ namespace SharpFort.SqlSugarCore.Abstractions
     /// </summary>
     /// <typeparam name="TEntity">实体类型</typeparam>
     /// <typeparam name="TKey">主键类型</typeparam>
-    public interface ISqlSugarRepository<TEntity, TKey> : 
+    public interface ISqlSugarRepository<TEntity, TKey> :
         ISqlSugarRepository<TEntity>,
-        IRepository<TEntity, TKey> 
+        IRepository<TEntity, TKey>
         where TEntity : class, IEntity<TKey>, new()
     {
     }

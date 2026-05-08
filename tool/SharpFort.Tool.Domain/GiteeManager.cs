@@ -48,25 +48,25 @@ public class GiteeManager : ITransientDependency
             await client.GetAsync(
                 $"{GiteeHost}/repos/{Owner}/{Repo}/branches?access_token={_accessToken}&sort=name&direction=asc&page=1&per_page=100");
         response.EnsureSuccessStatusCode();
-       var result= await response.Content.ReadAsStringAsync();
-       JArray jsonArray=  JArray.Parse(result);
-       // 创建一个列表来存储名字
-       List<string> names = new List<string>();
+        var result = await response.Content.ReadAsStringAsync();
+        JArray jsonArray = JArray.Parse(result);
+        // 创建一个列表来存储名字
+        List<string> names = new List<string>();
 
-       // 遍历每个对象，获取 name 字段
-       foreach (JObject obj in jsonArray)
-       {
-           // 获取 name 字段的值
-           string? name = obj["name"]?.ToString();
-           if (name != null)
-           {
-               names.Add(name);
-           }
-       }
+        // 遍历每个对象，获取 name 字段
+        foreach (JObject obj in jsonArray)
+        {
+            // 获取 name 字段的值
+            string? name = obj["name"]?.ToString();
+            if (name != null)
+            {
+                names.Add(name);
+            }
+        }
         return names;
     }
-    
-    
+
+
     /// <summary>
     /// 下载仓库分支代码
     /// </summary>
@@ -79,7 +79,7 @@ public class GiteeManager : ITransientDependency
             await client.GetAsync(
                 $"{GiteeHost}/repos/{Owner}/{Repo}/zipball?access_token={_accessToken}&ref={branch}");
         response.EnsureSuccessStatusCode();
-       return await response.Content.ReadAsStreamAsync();
-       
+        return await response.Content.ReadAsStreamAsync();
+
     }
 }

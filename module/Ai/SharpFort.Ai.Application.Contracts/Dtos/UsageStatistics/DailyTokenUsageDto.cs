@@ -9,7 +9,7 @@ public class DailyTokenUsageDto
     /// 日期
     /// </summary>
     public DateTime Date { get; set; }
-    
+
     /// <summary>
     /// Token消耗量
     /// </summary>

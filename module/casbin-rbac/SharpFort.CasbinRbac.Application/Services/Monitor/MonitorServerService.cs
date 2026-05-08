@@ -38,7 +38,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
             return await Task.Run(() =>
             {
                 var dto = new MonitorServerInfoDto();
-                
+
                 // PERFORMANCE FIX: Never call RefreshAll() in a request loop! It queries BIOS, Motherboard, Batteries, etc., and blocks the thread.
                 // Create a scoped instance and ONLY refresh what we specifically need (Memory and CPU are fast).
                 HardwareInfo hardwareInfo = new HardwareInfo();  // CA1859: use concrete type
@@ -63,7 +63,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 var programStartTime = currentProcess.StartTime;
                 string programRunTime = DateTimeHelper.FormatTime((long)(DateTime.Now - programStartTime).TotalMilliseconds);
                 string appRAM = ((double)currentProcess.WorkingSet64 / 1048576).ToString("N2", global::System.Globalization.CultureInfo.InvariantCulture) + " MB";
-                
+
                 dto.App = new AppInfoDto
                 {
                     Name = _hostEnvironment.EnvironmentName,
@@ -109,7 +109,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                         long freeSpaceGb = drive.AvailableFreeSpace / 1024 / 1024 / 1024;
                         long usedSpaceGb = totalSizeGb - freeSpaceGb;
                         decimal availablePercent = totalSizeGb > 0 ? decimal.Ceiling(usedSpaceGb / (decimal)totalSizeGb * 100) : 0;
-                        
+
                         dto.Disks.Add(new DiskInfoDto
                         {
                             DiskName = drive.Name,

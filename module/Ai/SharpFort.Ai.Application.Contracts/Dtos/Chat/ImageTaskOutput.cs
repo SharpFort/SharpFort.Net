@@ -20,7 +20,7 @@ public class ImageTaskOutput
     /// <summary>
     /// 是否匿名
     /// </summary>
-    public bool IsAnonymous { get; set; } 
+    public bool IsAnonymous { get; set; }
 
     /// <summary>
     /// 生成图片URL
@@ -51,15 +51,15 @@ public class ImageTaskOutput
     /// 错误信息
     /// </summary>
     public string? ErrorInfo { get; set; }
-    
+
     /// <summary>
     /// 用户名称
     /// </summary>
     public string? UserName { get; set; }
-    
+
     /// <summary>
     /// 用户名称Id
     /// </summary>
     public Guid? UserId { get; set; }
-    
+
 }

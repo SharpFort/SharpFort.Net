@@ -8,7 +8,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpFort.Tool
 {
-    public interface ICommand:ISingletonDependency
+    public interface ICommand : ISingletonDependency
     {
         public string Command { get; }
 

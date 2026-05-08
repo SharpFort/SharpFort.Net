@@ -29,7 +29,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <summary>
         /// 创建新部门
         /// </summary>
-        public Department(Guid id, string deptName, string deptCode, Guid parentId, string? ancestors = null, string? leader = null, string? remark = null, int orderNum = 0, bool isDeleted=false)
+        public Department(Guid id, string deptName, string deptCode, Guid parentId, string? ancestors = null, string? leader = null, string? remark = null, int orderNum = 0, bool isDeleted = false)
             : base(id)
         {
             Volo.Abp.Check.NotNullOrWhiteSpace(deptName, nameof(deptName));

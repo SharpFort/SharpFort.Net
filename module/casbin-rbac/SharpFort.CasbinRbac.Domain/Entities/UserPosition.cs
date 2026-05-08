@@ -9,7 +9,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities;
 /// </summary>
 [SugarTable("casbin_sys_user_position")]
 // 核心约束：防止重复分配同一岗位，建立联合唯一索引
-[SugarIndex("index_user_position_unique", nameof(UserId),OrderByType.Asc, nameof(PostId), OrderByType.Asc, IsUnique = true)]
+[SugarIndex("index_user_position_unique", nameof(UserId), OrderByType.Asc, nameof(PostId), OrderByType.Asc, IsUnique = true)]
 public class UserPosition : CreationAuditedEntity<Guid>
 {
     #region 构造函�?
@@ -52,12 +52,12 @@ public class UserPosition : CreationAuditedEntity<Guid>
     /// <summary>
     /// 用户ID
     /// </summary>
-    public Guid UserId { get;  set; }
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// 岗位ID
     /// </summary>
-    public Guid PostId { get;  set; }
+    public Guid PostId { get; set; }
 
     #endregion
 

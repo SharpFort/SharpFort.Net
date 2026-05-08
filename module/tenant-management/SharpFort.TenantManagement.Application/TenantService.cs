@@ -125,7 +125,7 @@ namespace SharpFort.TenantManagement.Application
             using (CurrentTenant.Change(id))
             {
                 await CodeFirst(this.LazyServiceProvider);
-                 await _dataSeeder.SeedAsync(id);
+                await _dataSeeder.SeedAsync(id);
             }
         }
 

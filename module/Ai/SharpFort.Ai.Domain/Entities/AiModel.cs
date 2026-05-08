@@ -69,7 +69,7 @@ public class AiModel : Entity<Guid>, IOrderNum, ISoftDelete
     /// 成本倍率
     /// </summary>
     public decimal Multiplier { get; set; } = 1;
-    
+
     /// <summary>
     /// 显示倍率
     /// </summary>

@@ -81,7 +81,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
     /// <summary>
     /// 构造函数
     /// </summary>
-    public DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvider) 
+    public DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvider)
         : base(lazyServiceProvider)
     {
     }
@@ -260,7 +260,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
     protected virtual EntityEventReport? CreateEventReport(object entity)
     {
         var eventReport = new EntityEventReport();
-        
+
         //判断是否为领域事件-聚合根
         var generatesDomainEventsEntity = entity as IGeneratesDomainEvents;
         if (generatesDomainEventsEntity == null)
@@ -296,10 +296,10 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
             );
             generatesDomainEventsEntity.ClearDistributedEvents();
         }
-        
+
         return eventReport;
     }
-    
+
     /// <summary>
     /// 发布领域事件
     /// </summary>

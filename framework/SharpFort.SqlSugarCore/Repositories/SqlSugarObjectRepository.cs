@@ -144,7 +144,7 @@ namespace SharpFort.SqlSugarCore.Repositories
     }
 
 #pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配（继承自基类）
-    public class SqlSugarObjectRepository<TEntity, TKey> : SqlSugarObjectRepository<TEntity>,  IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
+    public class SqlSugarObjectRepository<TEntity, TKey> : SqlSugarObjectRepository<TEntity>, IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>
     {
         public Task DeleteAsync(TKey id, bool autoSave = false, CancellationToken cancellationToken = default)
         {

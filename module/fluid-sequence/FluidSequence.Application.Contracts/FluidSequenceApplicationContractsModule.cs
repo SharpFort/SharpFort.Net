@@ -10,7 +10,7 @@ namespace FluidSequence.Application.Contracts
         typeof(AbpSettingManagementApplicationContractsModule),
 
         typeof(SharpFortDddApplicationContractsModule))]
-    public class FluidSequenceApplicationContractsModule:AbpModule
+    public class FluidSequenceApplicationContractsModule : AbpModule
     {
 
     }

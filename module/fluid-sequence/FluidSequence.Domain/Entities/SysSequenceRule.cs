@@ -97,7 +97,7 @@ namespace FluidSequence.Domain.Entities
         /// </summary>
         [SugarColumn(ColumnDescription = "租户ID", IsNullable = true)]
         public Guid? TenantId { get; set; }
-        
+
         /// <summary>
         /// 备注
         /// </summary>
@@ -113,7 +113,7 @@ namespace FluidSequence.Domain.Entities
         public bool TryReset(DateTime now)
         {
             if (ResetType == SequenceResetType.None) return false;
-            
+
             bool shouldReset = false;
             // Handle first time initialization
             if (LastResetTime == null)
@@ -122,7 +122,7 @@ namespace FluidSequence.Domain.Entities
                 // If current value is default/initial, we don't necessarily 'reset', 
                 // but we mark the time. If it was used, it should be at least MinValue.
                 // Assuming TryReset is called before NextValue.
-                return false; 
+                return false;
             }
 
             var last = LastResetTime.Value;
@@ -138,12 +138,12 @@ namespace FluidSequence.Domain.Entities
                     shouldReset = last.Year != now.Year;
                     break;
                 case SequenceResetType.Weekly:
-                     var cal = CultureInfo.CurrentCulture.Calendar;
-                     var rule = CalendarWeekRule.FirstFourDayWeek; // Customize if needed
-                     var dow = DayOfWeek.Monday; // Customize if needed
-                     int lastWeek = cal.GetWeekOfYear(last, rule, dow);
-                     int currentWeek = cal.GetWeekOfYear(now, rule, dow);
-                     shouldReset = last.Year != now.Year || lastWeek != currentWeek;
+                    var cal = CultureInfo.CurrentCulture.Calendar;
+                    var rule = CalendarWeekRule.FirstFourDayWeek; // Customize if needed
+                    var dow = DayOfWeek.Monday; // Customize if needed
+                    int lastWeek = cal.GetWeekOfYear(last, rule, dow);
+                    int currentWeek = cal.GetWeekOfYear(now, rule, dow);
+                    shouldReset = last.Year != now.Year || lastWeek != currentWeek;
                     break;
                 case SequenceResetType.Quarterly:
                     int lastQ = (last.Month - 1) / 3 + 1;
@@ -151,17 +151,17 @@ namespace FluidSequence.Domain.Entities
                     shouldReset = last.Year != now.Year || lastQ != currentQ;
                     break;
                 case SequenceResetType.FiscalYearly:
-                     // Needs ExtensionProps configuration
-                     int startMonth = 1;
-                     if (ExtensionProps != null && ExtensionProps.TryGetValue("FiscalYearStartMonth", out object? startMonthObj))
-                     {
-                         startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
-                     }
-                     int lastFy = last.Year;
-                     if (last.Month < startMonth) lastFy--;
-                     int currentFy = now.Year;
-                     if (now.Month < startMonth) currentFy--;
-                     shouldReset = lastFy != currentFy;
+                    // Needs ExtensionProps configuration
+                    int startMonth = 1;
+                    if (ExtensionProps != null && ExtensionProps.TryGetValue("FiscalYearStartMonth", out object? startMonthObj))
+                    {
+                        startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
+                    }
+                    int lastFy = last.Year;
+                    if (last.Month < startMonth) lastFy--;
+                    int currentFy = now.Year;
+                    if (now.Month < startMonth) currentFy--;
+                    shouldReset = lastFy != currentFy;
                     break;
             }
 

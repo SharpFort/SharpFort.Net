@@ -1,7 +1,7 @@
 namespace SharpFort.Ai.Domain.Shared.Attributes;
 
-[AttributeUsage(AttributeTargets.Class|AttributeTargets.Method)]
-public class SfAgentToolAttribute:Attribute
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public class SfAgentToolAttribute : Attribute
 {
     public SfAgentToolAttribute()
     {

@@ -13,7 +13,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <param name="resourceName">资源名 (TableName)</param>
         /// <returns>禁止访问的字段集合 (Case-insensitive)</returns>
         HashSet<string> GetDenyFields(IEnumerable<Guid> roleIds, string resourceName);
-        
+
         /// <summary>
         /// 根据角色代码获取禁止字段 (给 CurrentUser 使用)
         /// </summary>

@@ -7,7 +7,7 @@ namespace SharpFort.Ai.Application
     [DependsOn(
         typeof(SharpFortAiApplicationContractsModule),
         typeof(SharpFortAiDomainModule),
-        
+
         typeof(SharpFortDddApplicationModule)
 
     )]

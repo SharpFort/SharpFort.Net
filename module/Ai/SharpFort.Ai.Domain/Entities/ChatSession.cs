@@ -20,7 +20,7 @@ public class ChatSession : FullAuditedAggregateRoot<Guid>
 
     [SugarColumn(ColumnDataType = StaticConfig.CodeFirst_BigString)]
     public string SessionContent { get; set; } = null!;
-    
+
     public string? Remark { get; set; }
 
     /// <summary>

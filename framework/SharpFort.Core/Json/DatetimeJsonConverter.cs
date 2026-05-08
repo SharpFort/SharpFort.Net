@@ -30,8 +30,8 @@ public class DatetimeJsonConverter : JsonConverter<DateTime>
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            return DateTime.TryParse(reader.GetString(), out DateTime dateTime) 
-                ? dateTime 
+            return DateTime.TryParse(reader.GetString(), out DateTime dateTime)
+                ? dateTime
                 : reader.GetDateTime();
         }
         return reader.GetDateTime();

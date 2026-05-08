@@ -36,7 +36,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <param name="phone">电话</param>
         /// <param name="nick">昵称</param>
         public User(string userName, string password, long? phone = null, string? nick = null)
-           
+
         {
             Volo.Abp.Check.NotNullOrWhiteSpace(userName, nameof(userName));
             Volo.Abp.Check.NotNullOrWhiteSpace(password, nameof(password));
@@ -64,7 +64,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// </summary>
         [SugarColumn(IsPrimaryKey = true)]
         public override Guid Id { get; protected set; }
-        
+
         /// <summary>
         /// 租户ID
         /// </summary>
@@ -112,7 +112,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 头像地址
         /// </summary>
         [SugarColumn(IsNullable = true)]
-        public string? Icon { get;  set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// 性别
@@ -156,12 +156,12 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <summary>
         /// 排序号 (IOrderNum 实现)
         /// </summary>
-        public int OrderNum { get;  set; }
+        public int OrderNum { get; set; }
 
         /// <summary>
         /// 启用状态 (IState 实现)
         /// </summary>
-        public bool State { get;  set; }
+        public bool State { get; set; }
 
         #endregion
 
@@ -178,21 +178,21 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// [Navigate] 仅用于查询（Read Model），写操作请通过 DepartmentId 处理
         /// </summary>
         [Navigate(NavigateType.OneToOne, nameof(DepartmentId))]
-        public Department? Dept { get;  set; }
+        public Department? Dept { get; set; }
 
         /// <summary>
         /// 角色集合
         /// 跨聚合关系，通过中间表 UserRole 连接
         /// </summary>
         [Navigate(typeof(UserRole), nameof(UserRole.UserId), nameof(UserRole.RoleId))]
-        public List<Role> Roles { get;  set; } = null!;
+        public List<Role> Roles { get; set; } = null!;
 
         /// <summary>
         /// 岗位集合
         /// 跨聚合关系，通过中间表 UserPosition 连接
         /// </summary>
         [Navigate(typeof(UserPosition), nameof(UserPosition.UserId), nameof(UserPosition.PostId))]
-        public List<Position> Posts { get;  set; } = null!;
+        public List<Position> Posts { get; set; } = null!;
 
         #endregion
 

@@ -37,7 +37,10 @@
       "Bash(Select-Object FullName)",
       "Bash(Get-ChildItem -Path \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\Ai\" -Recurse -Filter \"*.cs\" -File)",
       "Bash(Measure-Object)",
-      "Bash(Select-Object Count)"
+      "Bash(Select-Object Count)",
+      "Bash(Select-String -Pattern \"Ai\")",
+      "PowerShell(dotnet format *)",
+      "PowerShell(dotnet restore *)"
     ],
     "deny": [],
     "ask": []

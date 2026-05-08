@@ -55,7 +55,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
                 new Claim(AuthenticationConstants.OpenId, tokenModel.openid),
                 new Claim(AuthenticationConstants.Name, userInfoMdoel.nickname),
                 new Claim(AuthenticationConstants.AccessToken, tokenModel.access_token),
-               
+
             };
             return claims;
 

@@ -48,7 +48,7 @@ namespace FluidSequence.SqlSugarCore.Repositories
 
             var dt = await db.Ado.GetDataTableAsync(sql, new
             {
-                count    = count,
+                count = count,
                 ruleCode = ruleCode
             });
 
@@ -56,7 +56,7 @@ namespace FluidSequence.SqlSugarCore.Repositories
                 throw new UserFriendlyException($"流水号规则 [{ruleCode}] 不存在，无法执行号段预取。");
 
             var rangeStart = Convert.ToInt32(dt.Rows[0]["range_start"]);
-            var rangeEnd   = Convert.ToInt32(dt.Rows[0]["range_end"]);
+            var rangeEnd = Convert.ToInt32(dt.Rows[0]["range_end"]);
 
             return (rangeStart, rangeEnd);
         }

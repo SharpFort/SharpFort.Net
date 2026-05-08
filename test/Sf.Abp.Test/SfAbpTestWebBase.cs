@@ -6,10 +6,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace Sf.Abp.Test;
 
-public class SfAbpTestWebBase:SfAbpTestBase
+public class SfAbpTestWebBase : SfAbpTestBase
 {
     public HttpContext HttpContext { get; private set; }
-    public SfAbpTestWebBase():base()
+    public SfAbpTestWebBase() : base()
     {
         HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext;
         this.ConfigureHttpContext(httpContext);
@@ -27,7 +27,7 @@ public class SfAbpTestWebBase:SfAbpTestBase
 
     protected virtual void ConfigureHttpContext(HttpContext httpContext)
     {
-        httpContext.Request.Path= "/test";
+        httpContext.Request.Path = "/test";
     }
 }
 

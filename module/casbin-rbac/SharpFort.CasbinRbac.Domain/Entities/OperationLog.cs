@@ -41,16 +41,16 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <param name="requestParam">请求参数</param>
         /// <param name="requestResult">返回结果</param>
         public OperationLog(
-            Guid id, 
-            string title, 
-            OperationType operType, 
-            string method, 
-            string requestMethod, 
-            string operUser, 
-            string operIp, 
-            string? operLocation = null, 
-            string? requestParam = null, 
-            string? requestResult = null) 
+            Guid id,
+            string title,
+            OperationType operType,
+            string method,
+            string requestMethod,
+            string operUser,
+            string operIp,
+            string? operLocation = null,
+            string? requestParam = null,
+            string? requestResult = null)
             : base(id)
         {
             Title = title;
@@ -74,7 +74,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 操作模块 / 标题
         /// 如：用户管理、角色管�?
         /// </summary>
-        [SugarColumn(ColumnName = "Title" ,Length = 64, IsNullable = true)]
+        [SugarColumn(ColumnName = "Title", Length = 64, IsNullable = true)]
         public string? Title { get; protected set; }
 
         /// <summary>
@@ -87,47 +87,47 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 请求方式
         /// GET, POST, PUT, DELETE
         /// </summary>
-        [SugarColumn(ColumnName = "RequestMethod",Length = 20, IsNullable = true)]
+        [SugarColumn(ColumnName = "RequestMethod", Length = 20, IsNullable = true)]
         public string? RequestMethod { get; protected set; }
 
         /// <summary>
         /// 方法名称
         /// 通常记录 Controller.Action �?Class.Method
         /// </summary>
-        [SugarColumn(ColumnName = "Method",Length = 255, IsNullable = true)]
+        [SugarColumn(ColumnName = "Method", Length = 255, IsNullable = true)]
         public string? Method { get; protected set; }
 
         /// <summary>
         /// 操作人员账号
         /// (CreatorId 记录的是 Guid，这里记录可读的账号�?
         /// </summary>
-        [SugarColumn(ColumnName = "OperUser",Length = 64, IsNullable = true)]
+        [SugarColumn(ColumnName = "OperUser", Length = 64, IsNullable = true)]
         public string? OperUser { get; protected set; }
 
         /// <summary>
         /// 操作Ip 
         ///</summary>
-        [SugarColumn(ColumnName = "OperIp",Length = 50, IsNullable = true)]
+        [SugarColumn(ColumnName = "OperIp", Length = 50, IsNullable = true)]
         public string? OperIp { get; protected set; }
 
         /// <summary>
         /// 操作地点 
         ///</summary>
-        [SugarColumn(ColumnName = "OperLocation",Length = 128, IsNullable = true)]
+        [SugarColumn(ColumnName = "OperLocation", Length = 128, IsNullable = true)]
         public string? OperLocation { get; protected set; }
 
         /// <summary>
         /// 请求参数
         /// 记录 JSON 数据，可能很�?
         /// </summary>
-        [SugarColumn(ColumnName = "RequestParam",ColumnDataType = "text")]
+        [SugarColumn(ColumnName = "RequestParam", ColumnDataType = "text")]
         public string? RequestParam { get; protected set; }
 
         /// <summary>
         /// 请求结果
         /// 记录 JSON 数据，可能很�?
         /// </summary>
-        [SugarColumn(ColumnName = "RequestResult",ColumnDataType = "text")]
+        [SugarColumn(ColumnName = "RequestResult", ColumnDataType = "text")]
         public string? RequestResult { get; protected set; }
 
         #endregion

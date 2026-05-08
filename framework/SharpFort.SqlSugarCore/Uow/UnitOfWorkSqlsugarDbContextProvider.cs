@@ -38,7 +38,7 @@ namespace SharpFort.SqlSugarCore.Uow
             IUnitOfWorkManager unitOfWorkManager,
             IConnectionStringResolver connectionStringResolver,
             ICancellationTokenProvider cancellationTokenProvider,
-            ICurrentTenant currentTenant, 
+            ICurrentTenant currentTenant,
             TenantConfigurationWrapper tenantConfigurationWrapper)
         {
             _unitOfWorkManager = unitOfWorkManager;
@@ -88,8 +88,8 @@ namespace SharpFort.SqlSugarCore.Uow
         /// 创建数据库上下文
         /// </summary>
         protected virtual async Task<TDbContext> CreateDbContextAsync(
-            IUnitOfWork unitOfWork, 
-            string connectionStringName, 
+            IUnitOfWork unitOfWork,
+            string connectionStringName,
             string connectionString)
         {
             var creationContext = new SqlSugarDbContextCreationContext(connectionStringName, connectionString);

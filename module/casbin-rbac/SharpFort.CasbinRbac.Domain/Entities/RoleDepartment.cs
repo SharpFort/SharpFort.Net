@@ -10,7 +10,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities;
 /// </summary>
 [SugarTable("casbin_sys_role_Department")] // 建议缩写表名，保持简�?
 // 核心约束：同一个角色不能重复绑定同一个部门，设置联合唯一索引
-[SugarIndex("index_role_Department_unique", nameof(RoleId),OrderByType.Asc, nameof(DepartmentId),OrderByType.Asc, IsUnique = true)]
+[SugarIndex("index_role_Department_unique", nameof(RoleId), OrderByType.Asc, nameof(DepartmentId), OrderByType.Asc, IsUnique = true)]
 public class RoleDepartment : CreationAuditedEntity<Guid>
 {
     #region 构造函�?
@@ -53,12 +53,12 @@ public class RoleDepartment : CreationAuditedEntity<Guid>
     /// <summary>
     /// 角色ID
     /// </summary>
-    public Guid RoleId { get;  set; }
+    public Guid RoleId { get; set; }
 
     /// <summary>
     /// 部门ID
     /// </summary>
-    public Guid DepartmentId { get;  set; }
+    public Guid DepartmentId { get; set; }
 
     #endregion
 

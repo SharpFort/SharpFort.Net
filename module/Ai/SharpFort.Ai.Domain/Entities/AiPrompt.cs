@@ -17,7 +17,7 @@ public class AiPrompt : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 提示词编码 (唯一标识)
     /// </summary>
-    [SugarColumn(IsNullable = false, UniqueGroupNameList = new []{"uk_code"})]
+    [SugarColumn(IsNullable = false, UniqueGroupNameList = new[] { "uk_code" })]
     public string Code { get; set; } = null!;
 
     /// <summary>

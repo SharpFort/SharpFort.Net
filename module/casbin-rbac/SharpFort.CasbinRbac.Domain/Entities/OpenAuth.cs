@@ -13,7 +13,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
     /// </summary>
     [SugarTable("casbin_sys_open_auth")]
     // 核心约束：同一个平台下的 OpenId 必须唯一，不能被多个用户绑定
-    [SugarIndex($"index_unique_{nameof(AuthType)}_{nameof(OpenId)}", nameof(AuthType),OrderByType.Asc, nameof(OpenId),OrderByType.Asc, IsUnique = true)]
+    [SugarIndex($"index_unique_{nameof(AuthType)}_{nameof(OpenId)}", nameof(AuthType), OrderByType.Asc, nameof(OpenId), OrderByType.Asc, IsUnique = true)]
     // 常用查询：查询某个用户绑定了哪些平台
     [SugarIndex($"index_{nameof(UserId)}", nameof(UserId), OrderByType.Asc)]
     public class OpenAuth : FullAuditedAggregateRoot<Guid>
@@ -43,7 +43,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
 
             UserId = userId;
             // 建议：统一转小写存储，避免 "Gitee" 和 "gitee" 造成数据混乱
-            AuthType = authType.ToLowerInvariant(); 
+            AuthType = authType.ToLowerInvariant();
             OpenId = openId;
             NickName = nickName;
             Avatar = avatar;

@@ -8,19 +8,19 @@ sealed class Program
     {
 
 #if DEBUG
-        
+
         //帮助
         //args = ["-h"];
-        
+
         //版本
         // args = ["-v"];
-        
+
         //清理
         // args = ["clear"];
-        
+
         //创建模块
         //args = ["new","oooo", "-t","module","-p","D:\\temp","-csf"];
-        
+
         //查看模板列表
         //args = ["new","list"];
         //查看子命令帮组

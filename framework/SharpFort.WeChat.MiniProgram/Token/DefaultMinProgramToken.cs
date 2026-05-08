@@ -5,7 +5,7 @@ using SharpFort.WeChat.MiniProgram.HttpModels;
 
 namespace SharpFort.WeChat.MiniProgram.Token;
 
-internal class DefaultMinProgramToken:IMiniProgramToken
+internal class DefaultMinProgramToken : IMiniProgramToken
 {
     private const string Url = "https://api.weixin.qq.com/cgi-bin/token";
     private WeChatMiniProgramOptions _options;

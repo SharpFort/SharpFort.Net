@@ -10,7 +10,7 @@ public class ModelConst
         "yi-",
         "ma-"
     ];
-    
+
     /// <summary>
     /// 获取模型ID的前缀（如果存在）
     /// </summary>

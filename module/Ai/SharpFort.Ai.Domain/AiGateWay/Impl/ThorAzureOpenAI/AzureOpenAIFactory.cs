@@ -26,7 +26,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(CultureInfo.InvariantCulture,AudioTranscriptions, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture, AudioTranscriptions, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static string GetAudioSpeechAddress(AiModelDescribe options, string model)
@@ -36,7 +36,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(CultureInfo.InvariantCulture,AudioSpeechTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture, AudioSpeechTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static string GetAddress(AiModelDescribe options, string model)
@@ -46,7 +46,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(CultureInfo.InvariantCulture,AddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture, AddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static string GetEditImageAddress(AiModelDescribe options, string model)
@@ -56,7 +56,7 @@ public static class AzureOpenAIFactory
             options.AppExtraUrl = "2025-03-01-preview";
         }
 
-        return string.Format(CultureInfo.InvariantCulture,EditImageAddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
+        return string.Format(CultureInfo.InvariantCulture, EditImageAddressTemplate, options.Endpoint.TrimEnd('/'), model, options.AppExtraUrl);
     }
 
     public static AzureOpenAIClient CreateClient(AiModelDescribe options)

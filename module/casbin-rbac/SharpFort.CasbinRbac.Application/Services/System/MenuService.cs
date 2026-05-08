@@ -83,7 +83,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // // TODO: 如果菜单的 ApiUrl/ApiMethod 变更，需要同步更新 Casbin 策略
             // // 这涉及到复杂的策略查找与替换，建议后续完善
             // // 现阶段，如果是修改，建议先手动在界面删除再添加，或开发专门的策略同步功能
-            
+
             var result = await base.UpdateAsync(id, input);
 
             // 如果 API 路由发生了变化，找到所有拥有此菜单的角色，并刷新其 Casbin 权限
@@ -116,7 +116,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             RefAsync<int> total = 0;
             var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName.Contains(input.MenuName!))
                         .WhereIF(input.State is not null, x => x.State == input.State)
-                        .Where(x=>x.MenuSource==input.MenuSource)
+                        .Where(x => x.MenuSource == input.MenuSource)
                         .OrderBy(x => x.OrderNum)
                         .OrderBy(x => x.CreationTime)
                         .ToListAsync();

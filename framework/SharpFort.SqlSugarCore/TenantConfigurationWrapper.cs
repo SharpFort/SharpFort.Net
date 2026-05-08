@@ -12,14 +12,14 @@ namespace SharpFort.SqlSugarCore;
 public class TenantConfigurationWrapper : ITransientDependency
 {
     private readonly IAbpLazyServiceProvider _serviceProvider;
-    
-    private ICurrentTenant CurrentTenantService => 
+
+    private ICurrentTenant CurrentTenantService =>
         _serviceProvider.LazyGetRequiredService<ICurrentTenant>();
-    
-    private ITenantStore TenantStoreService => 
+
+    private ITenantStore TenantStoreService =>
         _serviceProvider.LazyGetRequiredService<ITenantStore>();
-    
-    private DbConnOptions DbConnectionOptions => 
+
+    private DbConnOptions DbConnectionOptions =>
         _serviceProvider.LazyGetRequiredService<IOptions<DbConnOptions>>().Value;
 
     /// <summary>
@@ -77,7 +77,7 @@ public class TenantConfigurationWrapper : ITransientDependency
     /// <returns></returns>
     public async Task<string> GetCurrentConnectionStringAsync()
     {
-        return  (await GetAsync())!.ConnectionStrings!.Default!;
+        return (await GetAsync())!.ConnectionStrings!.Default!;
     }
     /// <summary>
     /// 获取当前连接名
@@ -85,7 +85,7 @@ public class TenantConfigurationWrapper : ITransientDependency
     /// <returns></returns>
     public async Task<string> GetCurrentConnectionNameAsync()
     {
-        return  (await GetAsync())!.Name;
+        return (await GetAsync())!.Name;
     }
 }
 
@@ -97,16 +97,16 @@ public static class TenantConfigurationExtensions
     /// <returns></returns>
     public static string GetCurrentConnectionString(this TenantConfiguration tenantConfiguration)
     {
-        return  tenantConfiguration.ConnectionStrings!.Default!;
+        return tenantConfiguration.ConnectionStrings!.Default!;
     }
-    
+
     /// <summary>
     /// 获取当前连接名
     /// </summary>
     /// <returns></returns>
     public static string GetCurrentConnectionName(this TenantConfiguration tenantConfiguration)
     {
-        return  tenantConfiguration.Name;
+        return tenantConfiguration.Name;
     }
 }
 

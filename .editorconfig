@@ -1,0 +1,35 @@
+# .NET Code Style Configuration
+# Copy this file to <solution-root>/.editorconfig
+# Category-level rules automatically cover new rules Microsoft adds to each category.
+
+root = true
+
+[*.cs]
+
+# ── Safe Auto-Fix (build-visible, dotnet format can fix) ──────────────────
+# Category-wide: all Style rules are safe (see exceptions below)
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+
+# Category-wide: all UnnecessaryCode rules are safe
+dotnet_analyzer_diagnostic.category-UnnecessaryCode.severity = warning
+
+# ── Manual Review (editor-visible only, not during build) ─────────────────
+# Category-wide: all Naming rules require human judgment
+dotnet_analyzer_diagnostic.category-Naming.severity = suggestion
+
+# Category-wide: all Accessibility rules require human judgment
+dotnet_analyzer_diagnostic.category-Accessibility.severity = suggestion
+
+# ── Exceptions (safe categories but these specific rules need review) ─────
+# IDE0063: using statement → using declaration changes Dispose scope
+dotnet_diagnostic.IDE0063.severity = suggestion
+# IDE0071: string interpolation simplification may affect culture formatting
+dotnet_diagnostic.IDE0071.severity = suggestion
+
+# ── Naming Conventions (Microsoft defaults) ───────────────────────────────
+# Public members: PascalCase
+# Private fields: _camelCase
+# Interfaces: IPrefix
+# Types: PascalCase
+# Parameters: camelCase
+# Using .NET built-in defaults — no explicit rules needed unless customizing.

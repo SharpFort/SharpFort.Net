@@ -121,11 +121,11 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
             return (await GetListAsync(input)).Items;
         }
 
-        public async Task<AuthOutputDto?> TryGetAuthInfoAsync(string? openId, string authType,Guid? userId=null)
+        public async Task<AuthOutputDto?> TryGetAuthInfoAsync(string? openId, string authType, Guid? userId = null)
         {
             var entity = await _repository._DbQueryable
                 .WhereIF(openId is not null, x => x.OpenId == openId)
-                .WhereIF(userId is not null,x => x.UserId == userId)
+                .WhereIF(userId is not null, x => x.UserId == userId)
                 .Where(x => x.AuthType == authType)
                 .FirstAsync();
             var output = await MapToGetOutputDtoAsync(entity);
@@ -162,7 +162,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         {
             return base.DeleteAsync(ids);
         }
-        
+
         [RemoteService(IsEnabled = false)]
         public override async Task<AuthOutputDto> CreateAsync(AuthCreateOrUpdateInputDto input)
         {

@@ -5,7 +5,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Embeddings;
 
 //TODO add model validation
 //TODO check what is string or array for prompt,..
-public record EmbeddingCreateRequest 
+public record EmbeddingCreateRequest
 {
     /// <summary>
     ///     Input text to get embeddings for, encoded as a string or array of tokens. To get embeddings for multiple inputs

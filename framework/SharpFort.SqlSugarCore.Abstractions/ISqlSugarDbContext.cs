@@ -17,7 +17,7 @@ namespace SharpFort.SqlSugarCore.Abstractions
         /// 获取SqlSugar客户端实例
         /// </summary>
         ISqlSugarClient SqlSugarClient { get; }
-        
+
         /// <summary>
         /// 执行数据库备份
         /// </summary>

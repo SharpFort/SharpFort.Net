@@ -40,12 +40,12 @@ public class AiMessageManager : DomainService
     /// <param name="tokenId">Token Id（Web端传Guid.Empty）</param>
     /// <param name="createTime"></param>
     /// <returns></returns>
-    public async Task<Guid> CreateUserMessageAsync( Guid? userId, Guid? sessionId, MessageInputDto input, Guid? tokenId = null,DateTime? createTime=null)
+    public async Task<Guid> CreateUserMessageAsync(Guid? userId, Guid? sessionId, MessageInputDto input, Guid? tokenId = null, DateTime? createTime = null)
     {
         input.Role = "user";
         var message = new ChatMessage(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId)
         {
-            CreationTime = createTime??DateTime.Now
+            CreationTime = createTime ?? DateTime.Now
         };
         await _repository.InsertAsync(message);
         return message.Id;

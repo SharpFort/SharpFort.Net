@@ -32,7 +32,7 @@ namespace SharpFort.Ddd.Application
         {
             // 设置默认每页显示记录数
             LimitedResultRequestDto.DefaultMaxResultCount = 10;
-            
+
             // 设置最大允许的每页记录数
             LimitedResultRequestDto.MaxMaxResultCount = 10000;
         }

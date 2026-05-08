@@ -6,11 +6,11 @@ using SharpFort.Ai.Domain.Shared.Attributes;
 namespace SharpFort.Ai.Domain.Mcp;
 
 [SfAgentTool]
-public class DeepThinkTool:ISingletonDependency
+public class DeepThinkTool : ISingletonDependency
 {
-    [SfAgentTool("深度思考"),DisplayName("DeepThink"),Description("进行深度思考")]
+    [SfAgentTool("深度思考"), DisplayName("DeepThink"), Description("进行深度思考")]
     public static void DeepThink()
     {
-        
+
     }
 }

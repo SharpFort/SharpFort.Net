@@ -12,9 +12,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
     public interface IAccountManager : IDomainService
     {
         string CreateRefreshToken(Guid userId);
-        Task<string> GetTokenByUserIdAsync(Guid userId,Action<UserRoleMenuDto>? getUserInfo=null);
+        Task<string> GetTokenByUserIdAsync(Guid userId, Action<UserRoleMenuDto>? getUserInfo = null);
         Task LoginValidationAsync(string userName, string password, Action<User>? userAction = null);
-        Task RegisterAsync(string userName, string password, long? phone,string? nick);
+        Task RegisterAsync(string userName, string password, long? phone, string? nick);
         Task<bool> RestPasswordAsync(Guid userId, string password);
         Task UpdatePasswordAsync(Guid userId, string newPassword, string oldPassword);
     }

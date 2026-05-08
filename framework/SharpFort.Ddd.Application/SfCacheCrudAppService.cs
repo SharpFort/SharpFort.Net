@@ -12,12 +12,12 @@ namespace SharpFort.Ddd.Application
     /// <typeparam name="TEntity">实体类型</typeparam>
     /// <typeparam name="TEntityDto">实体DTO类型</typeparam>
     /// <typeparam name="TKey">主键类型</typeparam>
-    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey> 
+    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey>
         : SfCrudAppService<TEntity, TEntityDto, TKey, PagedAndSortedResultRequestDto>
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository) 
+        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository)
             : base(repository)
         {
         }
@@ -67,16 +67,16 @@ namespace SharpFort.Ddd.Application
         /// <summary>
         /// 分布式缓存访问器
         /// </summary>
-        private IDistributedCache<TEntity> EntityCache => 
+        private IDistributedCache<TEntity> EntityCache =>
             LazyServiceProvider.LazyGetRequiredService<IDistributedCache<TEntity>>();
 
         /// <summary>
         /// 获取缓存键
         /// </summary>
-        protected virtual string GenerateCacheKey(TKey id) => 
+        protected virtual string GenerateCacheKey(TKey id) =>
             $"{typeof(TEntity).Name}:{CurrentTenant.Id ?? Guid.Empty}:{id}";
 
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository) 
+        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository)
             : base(repository)
         {
         }
@@ -117,7 +117,7 @@ namespace SharpFort.Ddd.Application
         protected virtual Task<PagedResultDto<TGetListOutputDto>> GetListFromCacheAsync(
             TGetListInput input)
         {
-            throw new NotImplementedException(); 
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -136,9 +136,9 @@ namespace SharpFort.Ddd.Application
         public override async Task DeleteAsync(IEnumerable<TKey> ids)
         {
             await base.DeleteAsync(ids);
-            
+
             // 批量清除缓存
-            var tasks = ids.Select(id => 
+            var tasks = ids.Select(id =>
                 EntityCache.RemoveAsync(GenerateCacheKey(id)));
             await Task.WhenAll(tasks);
         }

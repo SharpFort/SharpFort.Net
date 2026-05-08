@@ -13,9 +13,9 @@ namespace FluidSequence.Domain.Services.Strategies
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
-             if (placeholderKey == "SEQ") return rule.CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(rule.SeqLength, '0');
-             if (placeholderKey == "SEQ36") return ConvertToBase36(rule.CurrentValue); 
-             return placeholderKey;
+            if (placeholderKey == "SEQ") return rule.CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(rule.SeqLength, '0');
+            if (placeholderKey == "SEQ36") return ConvertToBase36(rule.CurrentValue);
+            return placeholderKey;
         }
 
         private static string ConvertToBase36(long value)

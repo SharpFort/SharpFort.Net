@@ -6,7 +6,7 @@ public class WeChatMiniProgramOptions
     /// AppId
     /// </summary>
     public string AppID { get; set; }
-    
+
     /// <summary>
     /// App密钥
     /// </summary>

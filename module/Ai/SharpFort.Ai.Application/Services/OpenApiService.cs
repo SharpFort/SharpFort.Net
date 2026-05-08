@@ -73,7 +73,7 @@ public class OpenApiService : ApplicationService
         if (input.Stream == true)
         {
             await _aiGateWayManager.CompleteChatStreamForStatisticsAsync(_httpContextAccessor.HttpContext, input,
-                userId, null, tokenId,CancellationToken.None);
+                userId, null, tokenId, CancellationToken.None);
         }
         else
         {
@@ -290,7 +290,7 @@ public class OpenApiService : ApplicationService
         {
             return apiKeyHeader.Trim();
         }
-        
+
         // 再从 谷歌 获取
         string googApiKeyHeader = httpContext.Request.Headers["x-goog-api-key"];
         if (!string.IsNullOrWhiteSpace(googApiKeyHeader))

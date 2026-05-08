@@ -15,29 +15,29 @@ namespace SharpFort.Tool.Commands
         public void CommandLineApplication(CommandLineApplication application)
         {
             application.HelpOption("-h|--help");
-            var modulePathOption=  application.Option("-p|--modulePath", "模块路径",CommandOptionType.SingleValue);
-            var solutionOption=  application.Option("-s|--solution", "解决方案路径",CommandOptionType.SingleValue);
+            var modulePathOption = application.Option("-p|--modulePath", "模块路径", CommandOptionType.SingleValue);
+            var solutionOption = application.Option("-s|--solution", "解决方案路径", CommandOptionType.SingleValue);
             var moduleNameArgument = application.Argument("moduleName", "模块名", (_) => { });
             application.OnExecute(() =>
             {
                 var moduleName = moduleNameArgument.Value;
-  
+
                 //模块路径默认按小写规则，默认在模块路径下一层
-                var modulePath =moduleName.ToLower(CultureInfo.InvariantCulture).Replace(".", "-");
+                var modulePath = moduleName.ToLower(CultureInfo.InvariantCulture).Replace(".", "-");
                 if (modulePathOption.HasValue())
                 {
                     modulePath = modulePathOption.Value();
                 }
-                
-                
+
+
                 //解决方案默认在模块文件夹上一级，也可以通过s进行指定
                 var slnPath = "../";
-                
+
                 if (solutionOption.HasValue())
                 {
                     slnPath = solutionOption.Value();
                 }
-                
+
                 CheckFirstSlnPath(slnPath);
                 var dotnetSlnCommandPart = new List<string>() { "Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore" };
                 var paths = dotnetSlnCommandPart.Select(x => Path.Combine(modulePath, $"{moduleName}.{x}")).ToArray();
@@ -45,13 +45,13 @@ namespace SharpFort.Tool.Commands
 
                 var cmdCommands = dotnetSlnCommandPart.Select(x => $"dotnet sln \"{slnPath}\" add \"{Path.Combine(modulePath, $"{moduleName}.{x}")}\"").ToArray();
                 StartCmd(cmdCommands);
-                
+
                 Console.WriteLine("恭喜~模块添加成功！");
                 return 0;
             });
-            
+
         }
-        
+
         /// <summary>
         /// 获取一个sln解决方案，多个将报错
         /// </summary>
@@ -97,7 +97,7 @@ namespace SharpFort.Tool.Commands
                 psi.FileName = "/bin/bash";
                 psi.Arguments = $"-c \"{string.Join("; ", cmdCommands)}\"";
             }
-            
+
             Process proc = new Process
             {
                 StartInfo = psi

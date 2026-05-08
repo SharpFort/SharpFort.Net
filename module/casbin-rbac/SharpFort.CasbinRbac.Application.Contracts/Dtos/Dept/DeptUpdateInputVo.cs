@@ -6,7 +6,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Dept
         public string DeptName { get; set; } = string.Empty;
         public string DeptCode { get; set; } = string.Empty;
         public string? Leader { get; set; }
-        public Guid? ParentId { get; set; }=Guid.Empty;
+        public Guid? ParentId { get; set; } = Guid.Empty;
         public string? Remark { get; set; }
     }
 }

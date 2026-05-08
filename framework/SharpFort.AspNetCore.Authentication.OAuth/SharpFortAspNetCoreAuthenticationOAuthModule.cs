@@ -9,7 +9,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
     /// 本模块轮子来自 AspNet.Security.OAuth.QQ;
     /// </summary>
     [DependsOn(typeof(SharpFortAspNetCoreModule))]
-    public class SharpFortAspNetCoreAuthenticationOAuthModule:AbpModule
+    public class SharpFortAspNetCoreAuthenticationOAuthModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {

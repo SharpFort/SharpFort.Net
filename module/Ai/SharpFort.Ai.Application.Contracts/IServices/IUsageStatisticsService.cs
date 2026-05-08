@@ -12,7 +12,7 @@ public interface IUsageStatisticsService
     /// </summary>
     /// <returns>每日Token使用量列表</returns>
     Task<List<DailyTokenUsageDto>> GetLast7DaysTokenUsageAsync(UsageStatisticsGetInput input);
-    
+
     /// <summary>
     /// 获取当前用户各个模型的Token消耗量及占比
     /// </summary>

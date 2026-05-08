@@ -28,7 +28,7 @@ public class ThorChatCompletionsRequest
     /// </summary>
     [JsonPropertyName("messages")]
     public List<ThorChatMessage>? Messages { get; set; }
-    
+
     /// <summary>
     /// 模型唯一编码值，如 gpt-4，gpt-3.5-turbo,moonshot-v1-8k，看底层具体平台定义
     /// </summary>

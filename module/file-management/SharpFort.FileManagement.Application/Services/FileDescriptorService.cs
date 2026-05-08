@@ -230,14 +230,14 @@ namespace SharpFort.FileManagement.Application.Services
                 .OrderByDescending(x => x.CreationTime)
                 .FirstAsync();
 
-            if (existingFile == null) 
+            if (existingFile == null)
             {
                 throw new UserFriendlyException("文件不存在，无法秒传");
             }
 
             // 创建新记录，指向现有物理文件
             var newFile = FileDescriptor.CreateForQuickUpload(
-                GuidGenerator.Create(), 
+                GuidGenerator.Create(),
                 existingFile,
                 input.FileName,
                 input.DirectoryId,
@@ -245,7 +245,7 @@ namespace SharpFort.FileManagement.Application.Services
             );
 
             await _repository.InsertAsync(newFile);
-            
+
             var dto = newFile.Adapt<FileDescriptorGetOutputDto>();
             dto.SizeInfo = newFile.GetSizeInfo();
             return dto;

@@ -10,17 +10,17 @@ public static class OpenAIConstant
     /// </summary>
     /// <returns></returns>
     public const string Done = "[DONE]";
-    
+
     /// <summary>
     /// Data: 协议头
     /// </summary>
     public const string Data = "data:";
-    
+
     /// <summary>
     /// think: 协议头
     /// </summary>
     public const string ThinkStart = "<think>";
-    
+
     /// <summary>
     /// think: 协议尾
     /// </summary>

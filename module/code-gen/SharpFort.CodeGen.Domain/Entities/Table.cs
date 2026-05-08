@@ -21,20 +21,20 @@ public class Table : FullAuditedAggregateRoot<Guid>
     /// 主键
     /// </summary>
     [SugarColumn(ColumnName = "id", IsPrimaryKey = true)]
-    public override Guid Id { get; protected set;  }
+    public override Guid Id { get; protected set; }
 
     /// <summary>
     /// 表名称 (如: SystemUser)
     /// 规则：必填，唯一，建议 PascalCase
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
-    public string Name { get;  set; } = null!;
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 表描述/备注
     /// </summary>
     [SugarColumn(ColumnName = "description", Length = 512, IsNullable = true)]
-    public string? Description { get;  set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// 扩展属性 (ABP Feature)
@@ -42,21 +42,21 @@ public class Table : FullAuditedAggregateRoot<Guid>
     /// 映射：Postgres JSONB
     /// </summary>
     [SugarColumn(ColumnName = "extra_properties", IsJson = true)]
-    public override ExtraPropertyDictionary ExtraProperties { get; protected set;  }
+    public override ExtraPropertyDictionary ExtraProperties { get; protected set; }
 
     /// <summary>
     /// 包含的字段列表 (聚合子项)
     /// 关系：1对多
     /// </summary>
     [Navigate(NavigateType.OneToMany, nameof(Field.TableId))]
-    public List<Field> Fields { get;  set; }
+    public List<Field> Fields { get; set; }
 
     // IsDeleted, CreationTime, CreatorId 由基类自动实现
 
     /// <summary>
     /// ORM 专用
     /// </summary>
-    public  Table()
+    public Table()
     {
         Fields = new List<Field>();
         ExtraProperties = new ExtraPropertyDictionary();

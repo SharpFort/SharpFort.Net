@@ -34,25 +34,25 @@ namespace SharpFort.SqlSugarCore
         /// <summary>
         /// 租户配置包装器
         /// </summary>
-        private TenantConfigurationWrapper TenantConfigurationWrapper => 
+        private TenantConfigurationWrapper TenantConfigurationWrapper =>
             LazyServiceProvider.LazyGetRequiredService<TenantConfigurationWrapper>();
 
         /// <summary>
         /// 当前租户信息
         /// </summary>
-        private ICurrentTenant CurrentTenant => 
+        private ICurrentTenant CurrentTenant =>
             LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
 
         /// <summary>
         /// 数据库连接配置选项
         /// </summary>
-        private DbConnOptions DbConnectionOptions => 
+        private DbConnOptions DbConnectionOptions =>
             LazyServiceProvider.LazyGetRequiredService<IOptions<DbConnOptions>>().Value;
 
         /// <summary>
         /// 序列化服务
         /// </summary>
-        private ISerializeService SerializeService => 
+        private ISerializeService SerializeService =>
             LazyServiceProvider.LazyGetRequiredService<ISerializeService>();
 
         /// <summary>
@@ -78,11 +78,11 @@ namespace SharpFort.SqlSugarCore
 
             // 异步获取租户配置
             var tenantConfiguration = AsyncHelper.RunSync(async () => await TenantConfigurationWrapper.GetAsync());
-           
+
             // 构建数据库连接配置
             var connectionConfig = BuildConnectionConfig(options =>
             {
-            options.ConnectionString = tenantConfiguration!.GetCurrentConnectionString();
+                options.ConnectionString = tenantConfiguration!.GetCurrentConnectionString();
                 options.DbType = GetCurrentDbType(tenantConfiguration!.GetCurrentConnectionName());
             });
 
@@ -187,7 +187,7 @@ namespace SharpFort.SqlSugarCore
                     throw new ArgumentException("启用读写分离但未配置读库连接字符串");
                 }
 
-                slaveConfigs.AddRange(dbConnOptions.ReadUrl.Select(url => 
+                slaveConfigs.AddRange(dbConnOptions.ReadUrl.Select(url =>
                     new SlaveConnectionConfig { ConnectionString = url }));
             }
 
@@ -227,14 +227,14 @@ namespace SharpFort.SqlSugarCore
                 EntityService = (propertyInfo, columnInfo) =>
                 {
                     // 配置空值处理
-                    if (new NullabilityInfoContext().Create(propertyInfo).WriteState 
+                    if (new NullabilityInfoContext().Create(propertyInfo).WriteState
                         is NullabilityState.Nullable)
                     {
                         columnInfo.IsNullable = true;
                     }
 
                     // 处理下划线命名
-                    if (dbConnOptions.EnableUnderLine && !columnInfo.IsIgnore 
+                    if (dbConnOptions.EnableUnderLine && !columnInfo.IsIgnore
                         && !columnInfo.DbColumnName.Contains('_'))
                     {
                         columnInfo.DbColumnName = UtilMethods.ToUnderLine(columnInfo.DbColumnName);
@@ -259,9 +259,9 @@ namespace SharpFort.SqlSugarCore
         /// <returns>数据库类型</returns>
         protected virtual DbType GetCurrentDbType(string tenantName)
         {
-            return tenantName == ConnectionStrings.DefaultConnectionStringName 
-                ? DbConnectionOptions.DbType!.Value 
-                : GetDbTypeFromTenantName(tenantName) 
+            return tenantName == ConnectionStrings.DefaultConnectionStringName
+                ? DbConnectionOptions.DbType!.Value
+                : GetDbTypeFromTenantName(tenantName)
                   ?? throw new ArgumentException($"无法从租户名称{tenantName}中解析数据库类型");
         }
 
@@ -283,8 +283,8 @@ namespace SharpFort.SqlSugarCore
             }
 
             var dbTypeString = name[(atIndex + 1)..];
-            return Enum.TryParse<DbType>(dbTypeString, out var dbType) 
-                ? dbType 
+            return Enum.TryParse<DbType>(dbTypeString, out var dbType)
+                ? dbType
                 : throw new ArgumentException($"不支持的数据库类型: {dbTypeString}");
         }
 
@@ -295,7 +295,7 @@ namespace SharpFort.SqlSugarCore
         {
             const string backupDirectory = "database_backup";
             var fileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{SqlSugarClient.Ado.Connection.Database}";
-            
+
             Directory.CreateDirectory(backupDirectory);
 
             switch (DbConnectionOptions.DbType)
@@ -308,7 +308,7 @@ namespace SharpFort.SqlSugarCore
 
                 case DbType.Sqlite:
                     SqlSugarClient.DbMaintenance.BackupDataBase(
-                        null, 
+                        null,
                         $"{fileName}.db");
                     break;
 

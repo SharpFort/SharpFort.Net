@@ -10,7 +10,7 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorAzureDatabricks.Chats;
 
-public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCompletionsService> logger,IHttpClientFactory httpClientFactory)
+public class AzureDatabricksChatCompletionsService(ILogger<AzureDatabricksChatCompletionsService> logger, IHttpClientFactory httpClientFactory)
     : IChatCompletionService
 {
     private static string GetAddress(AiModelDescribe? options, string model)

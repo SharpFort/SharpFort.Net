@@ -82,7 +82,7 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
     public string ModelId { get; set; } = null!;
     public string? Remark { get; set; }
 
-    [SugarColumn(IsOwnsOne = true)] 
+    [SugarColumn(IsOwnsOne = true)]
     public TokenUsageValueObject TokenUsage { get; set; } = new TokenUsageValueObject();
 
     public MessageType MessageType { get; set; }

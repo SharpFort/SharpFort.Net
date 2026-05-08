@@ -11,12 +11,12 @@ namespace SharpFort.Tool
 
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
-           // var configuration = context.Services.GetConfiguration();
+            // var configuration = context.Services.GetConfiguration();
             Configure<AbpRemoteServiceOptions>(options =>
             {
                 options.RemoteServices.Default =
                      new RemoteServiceConfiguration("https://ccnetcore.com:19009");
-                   // new RemoteServiceConfiguration("http://localhost:19002");
+                // new RemoteServiceConfiguration("http://localhost:19002");
             });
         }
     }

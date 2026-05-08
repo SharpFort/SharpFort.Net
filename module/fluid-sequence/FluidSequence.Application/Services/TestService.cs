@@ -7,6 +7,6 @@ namespace FluidSequence.Application.Services
     /// </summary>
     public class TestService : ApplicationService
     {
-     
+
     }
 }

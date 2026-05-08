@@ -9,10 +9,10 @@ public enum ModelApiType
 
     [Description("Claude Messages")]
     Messages,
-    
+
     [Description("OpenAi Responses")]
     Responses,
-    
+
     [Description("Gemini GenerateContent")]
     GenerateContent
 }

@@ -41,9 +41,9 @@
         /// <param name="code">响应代码</param>
         /// <param name="data">响应数据</param>
         public RemoteServiceSuccessInfo(
-            string message, 
-            string? details = null, 
-            string? code = null, 
+            string message,
+            string? details = null,
+            string? code = null,
             object? data = null)
         {
             Message = message;

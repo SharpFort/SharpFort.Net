@@ -39,16 +39,16 @@ public record ImageCreateRequest : SharedImageRequestBaseModel
     /// </summary>
     [JsonPropertyName("style")]
     public string? Style { get; set; }
-    
+
     [JsonPropertyName("background")]
     public string? Background { get; set; }
-    
+
     [JsonPropertyName("moderation")]
     public string? Moderation { get; set; }
-    
+
     [JsonPropertyName("output_compression")]
     public string? OutputCompression { get; set; }
-    
+
     [JsonPropertyName("output_format")]
     public string? OutputFormat { get; set; }
 }

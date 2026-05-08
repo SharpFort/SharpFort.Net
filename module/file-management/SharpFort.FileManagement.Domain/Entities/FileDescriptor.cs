@@ -19,11 +19,11 @@ namespace SharpFort.FileManagement.Domain.Entities
     [SugarIndex($"index_ProviderName", nameof(ProviderName), OrderByType.Asc)]
     // 2. 复合唯一索引：实现“同一租户、同一文件夹下，未删除的文件不允许重名”
     // 这里的 true 表示 Unique 约束
-    [SugarIndex($"index_Unique_FileName", 
-        nameof(TenantId), OrderByType.Asc, 
-        nameof(DirectoryId), OrderByType.Asc, 
+    [SugarIndex($"index_Unique_FileName",
+        nameof(TenantId), OrderByType.Asc,
+        nameof(DirectoryId), OrderByType.Asc,
         // nameof(Name), OrderByType.Asc, 
-        nameof(IsDeleted), OrderByType.Asc, 
+        nameof(IsDeleted), OrderByType.Asc,
         true)]
     public class FileDescriptor : FullAuditedAggregateRoot<Guid>, IMultiTenant
     {
@@ -280,10 +280,10 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// 静态工厂方法：用于秒传创建新记录
         /// </summary>
         public static FileDescriptor CreateForQuickUpload(
-            Guid id, 
-            FileDescriptor existingFile, 
-            string name, 
-            Guid? directoryId, 
+            Guid id,
+            FileDescriptor existingFile,
+            string name,
+            Guid? directoryId,
             Guid? tenantId)
         {
             return new FileDescriptor
@@ -291,9 +291,9 @@ namespace SharpFort.FileManagement.Domain.Entities
                 Id = id,
                 TenantId = tenantId,
                 DirectoryId = directoryId,
-                Name = name, 
+                Name = name,
                 // 以下全部复用 existingFile 的物理信息
-                BlobName = existingFile.BlobName, 
+                BlobName = existingFile.BlobName,
                 MimeType = existingFile.MimeType,
                 Size = existingFile.Size,
                 Hash = existingFile.Hash,

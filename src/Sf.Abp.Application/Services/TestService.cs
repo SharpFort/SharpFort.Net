@@ -147,7 +147,7 @@ namespace Sf.Abp.Application.Services
             return result ?? string.Empty;
         }
 
-        
+
         /// <summary>
         /// 分布式送abp版本：abp套了一层娃。但是纯粹鸡肋，不建议使用这个
         /// </summary>
@@ -177,13 +177,13 @@ namespace Sf.Abp.Application.Services
             var number2 = 0;
             await Parallel.ForAsync(0, 100, async (i, cancellationToken) =>
             {
-                    //执行1秒
-                    number2 += 1;
+                //执行1秒
+                number2 += 1;
             });
             return $"加锁结果：{number},不加锁结果：{number2}";
         }
 
         public ICurrentTenant CurrentTenant { get; set; }
-       
+
     }
 }

@@ -9,9 +9,9 @@ namespace SharpFort.AuditLogging.Domain.Entities
 {
     [DisableAuditing]
     [SugarTable("Sf-AuditLog")]
-    [SugarIndex($"index_{nameof(ExecutionTime)}", nameof(TenantId), OrderByType.Asc,nameof(ExecutionTime), OrderByType.Asc)]
-    [SugarIndex($"index_{nameof(ExecutionTime)}_{nameof(UserId)}",nameof(TenantId), OrderByType.Asc, nameof(UserId), OrderByType.Asc, nameof(ExecutionTime), OrderByType.Asc)]
-    public class AuditLog: AggregateRoot<Guid>, IMultiTenant
+    [SugarIndex($"index_{nameof(ExecutionTime)}", nameof(TenantId), OrderByType.Asc, nameof(ExecutionTime), OrderByType.Asc)]
+    [SugarIndex($"index_{nameof(ExecutionTime)}_{nameof(UserId)}", nameof(TenantId), OrderByType.Asc, nameof(UserId), OrderByType.Asc, nameof(ExecutionTime), OrderByType.Asc)]
+    public class AuditLog : AggregateRoot<Guid>, IMultiTenant
     {
         public AuditLog()
         {
@@ -123,11 +123,11 @@ namespace SharpFort.AuditLogging.Domain.Entities
 
         //导航属性
         [Navigate(NavigateType.OneToMany, nameof(EntityChange.AuditLogId))]
-        public virtual  List<EntityChange> EntityChanges { get; protected set; }
+        public virtual List<EntityChange> EntityChanges { get; protected set; }
 
         //导航属性
         [Navigate(NavigateType.OneToMany, nameof(AuditLogAction.AuditLogId))]
-        public  virtual List<AuditLogAction> Actions { get; protected set; }
+        public virtual List<AuditLogAction> Actions { get; protected set; }
 
         [SugarColumn(IsIgnore = true)]
         public override ExtraPropertyDictionary ExtraProperties { get; protected set; }

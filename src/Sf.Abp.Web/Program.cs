@@ -5,7 +5,7 @@ using Sf.Abp.Web;
 //创建日志,可使用{SourceContext}记录
 Log.Logger = new LoggerConfiguration()
     //由于后端处理请求中，前端请求已经结束，此类日志可不记录
-    .Filter.ByExcluding(log =>log.Exception?.GetType() == typeof(TaskCanceledException)||log.MessageTemplate.Text.Contains("\"message\": \"A task was canceled.\""))
+    .Filter.ByExcluding(log => log.Exception?.GetType() == typeof(TaskCanceledException) || log.MessageTemplate.Text.Contains("\"message\": \"A task was canceled.\""))
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Error)

@@ -26,7 +26,7 @@ namespace SharpFort.Rbac.Test
             // {
             //     options.IsAutoRegisterEnabled = false;
             // });
-            Configure<AbpBackgroundWorkerOptions> (options =>
+            Configure<AbpBackgroundWorkerOptions>(options =>
             {
                 options.IsEnabled = false; //禁用作业执行
             });

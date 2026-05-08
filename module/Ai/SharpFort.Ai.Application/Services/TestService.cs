@@ -7,6 +7,6 @@ namespace SharpFort.Ai.Application.Services
     /// </summary>
     public class TestService : ApplicationService
     {
-     
+
     }
 }

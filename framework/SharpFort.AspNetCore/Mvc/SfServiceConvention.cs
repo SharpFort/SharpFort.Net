@@ -27,7 +27,7 @@ namespace SharpFort.AspNetCore.Mvc
         /// <param name="conventionalRouteBuilder">约定路由构建器</param>
         public SfServiceConvention(
             IOptions<AbpAspNetCoreMvcOptions> options,
-            IConventionalRouteBuilder conventionalRouteBuilder) 
+            IConventionalRouteBuilder conventionalRouteBuilder)
             : base(options, conventionalRouteBuilder)
         {
         }

@@ -20,7 +20,7 @@ namespace SharpFort.AspNetCore.Mvc
         /// 构造函数
         /// </summary>
         /// <param name="options">ABP约定控制器配置选项</param>
-        public SfConventionalRouteBuilder(IOptions<AbpConventionalControllerOptions> options) 
+        public SfConventionalRouteBuilder(IOptions<AbpConventionalControllerOptions> options)
             : base(options)
         {
         }
@@ -43,13 +43,13 @@ namespace SharpFort.AspNetCore.Mvc
         {
             // 获取API路由前缀
             var apiRoutePrefix = GetApiRoutePrefix(action, configuration);
-            
+
             // 规范化控制器名称
             var normalizedControllerName = NormalizeUrlControllerName(
-                rootPath, 
-                controllerName, 
-                action, 
-                httpMethod, 
+                rootPath,
+                controllerName,
+                action,
+                httpMethod,
                 configuration);
 
             // 构建基础URL
@@ -68,8 +68,8 @@ namespace SharpFort.AspNetCore.Mvc
         /// 构建ID参数路由部分
         /// </summary>
         private string BuildIdParameterRoute(
-            string baseUrl, 
-            ActionModel action, 
+            string baseUrl,
+            ActionModel action,
             ConventionalControllerSetting configuration)
         {
             var idParameter = action.Parameters.FirstOrDefault(p => p.ParameterName == "id");
@@ -108,10 +108,10 @@ namespace SharpFort.AspNetCore.Mvc
             ConventionalControllerSetting configuration)
         {
             var actionNameInUrl = NormalizeUrlActionName(
-                rootPath, 
-                controllerName, 
-                action, 
-                httpMethod, 
+                rootPath,
+                controllerName,
+                action,
+                httpMethod,
                 configuration);
 
             if (actionNameInUrl.IsNullOrEmpty())

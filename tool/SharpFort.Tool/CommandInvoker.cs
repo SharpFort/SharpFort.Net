@@ -29,7 +29,7 @@ namespace SharpFort.Tool
                 {
                     Name = command.Command,
                     Parent = Application,
-                    Description =command.Description
+                    Description = command.Description
                 };
                 Application.Commands.Add(childrenCommandLineApplication);
                 command.CommandLineApplication(childrenCommandLineApplication);

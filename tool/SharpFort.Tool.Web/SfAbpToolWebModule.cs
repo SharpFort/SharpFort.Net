@@ -60,7 +60,7 @@ namespace SharpFort.Tool.Web
             {
                 options.AutoValidate = false;
             });
-            
+
             //Swagger
             context.Services.AddSfSwaggerGen<SfAbpToolWebModule>(options =>
             {
@@ -125,7 +125,7 @@ namespace SharpFort.Tool.Web
             });
 
 
-         
+
             return Task.CompletedTask;
         }
 

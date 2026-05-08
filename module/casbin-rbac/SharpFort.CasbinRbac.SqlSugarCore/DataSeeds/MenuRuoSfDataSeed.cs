@@ -182,7 +182,7 @@
 //                IsDeleted = false
 //            };
 //            entities.Add(server);
-            
+
 
 //            //定时任务
 //            Menu task = new Menu(_guidGenerator.Create(), monitoring.Id)
@@ -225,7 +225,7 @@
 //                IsDeleted = false,
 //            };
 //            entities.Add(swagger);
-            
+
 //            //表单构建
 //            Menu builder = new Menu(_guidGenerator.Create(), tool.Id)
 //            {

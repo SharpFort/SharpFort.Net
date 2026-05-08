@@ -10,7 +10,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities;
 /// </summary>
 [SugarTable("casbin_sys_user_role")]
 // 核心约束：防止重复授权，建立联合唯一索引
-[SugarIndex("index_user_role_unique", nameof(UserId),OrderByType.Asc, nameof(RoleId), OrderByType.Asc, IsUnique = true)]
+[SugarIndex("index_user_role_unique", nameof(UserId), OrderByType.Asc, nameof(RoleId), OrderByType.Asc, IsUnique = true)]
 public class UserRole : CreationAuditedEntity<Guid>
 {
     #region 构造函�?
@@ -53,12 +53,12 @@ public class UserRole : CreationAuditedEntity<Guid>
     /// <summary>
     /// 用户ID
     /// </summary>
-    public Guid UserId { get;  set; }
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// 角色ID
     /// </summary>
-    public Guid RoleId { get;  set; }
+    public Guid RoleId { get; set; }
 
     #endregion
 

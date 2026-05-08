@@ -4,7 +4,7 @@ using Volo.Abp.MultiTenancy.Localization;
 
 namespace Volo.Abp.MultiTenancy;
 
-[Dependency(ReplaceServices =true)]
+[Dependency(ReplaceServices = true)]
 public class SfTenantConfigurationProvider : ITenantConfigurationProvider, ITransientDependency
 {
     protected virtual ITenantResolver TenantResolver { get; }

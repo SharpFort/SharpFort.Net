@@ -62,7 +62,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <param name="getUserInfo"></param>
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
-        public async Task<string> GetTokenByUserIdAsync(Guid userId,Action<UserRoleMenuDto>? getUserInfo=null)
+        public async Task<string> GetTokenByUserIdAsync(Guid userId, Action<UserRoleMenuDto>? getUserInfo = null)
         {
             //获取用户信息
             var userInfo = await _userManager.GetInfoAsync(userId);
@@ -87,7 +87,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             {
                 getUserInfo(userInfo);
             }
-            
+
             var accessToken = CreateToken(UserInfoToClaim(userInfo));
             //将用户信息添加到缓存中，需要考虑的是更改了用户、角色、菜单等整个体系都需要将缓存进行刷新，看具体业务进行选择
             return accessToken;
@@ -187,9 +187,6 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             return false;
         }
-        
-        
-
         /// <summary>
         /// 令牌转换
         /// </summary>
@@ -293,9 +290,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// - 默认角色需要在 RbacOptions 中配置
         /// - 密码使用 BCrypt 加密（workFactor=12）
         /// </remarks>
-        public async Task RegisterAsync( string userName, string password, long? phone,string? nick)
+        public async Task RegisterAsync(string userName, string password, long? phone, string? nick)
         {
-            var user = new User(userName, password, phone,nick);
+            var user = new User(userName, password, phone, nick);
             await _userManager.CreateAsync(user);
             await _userManager.SetDefautRoleAsync(user.Id);
         }

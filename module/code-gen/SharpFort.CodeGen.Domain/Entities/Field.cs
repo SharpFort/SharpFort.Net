@@ -29,63 +29,63 @@ public class Field : FullAuditedEntity<Guid>
     /// 规则：必填，不可变
     /// </summary>
     [SugarColumn(ColumnName = "table_id", IsNullable = false)]
-    public Guid TableId { get; set;  }
+    public Guid TableId { get; set; }
 
     /// <summary>
     /// 字段名称 (列名)
     /// 规则：必填，长度 64，同一表下唯一
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
-    public string Name { get; set;  } = null!;
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 字段描述/注释
     /// </summary>
     [SugarColumn(ColumnName = "description", Length = 512, IsNullable = true)]
-    public string? Description { get; set;  }
+    public string? Description { get; set; }
 
     /// <summary>
     /// 字段类型 (如 String, Int, Guid)
     /// </summary>
     [SugarColumn(ColumnName = "field_type")]
-    public FieldType FieldType { get; set;  }
+    public FieldType FieldType { get; set; }
 
     /// <summary>
     /// 数据长度 (如 varchar(64) 中的 64)
     /// </summary>
     [SugarColumn(ColumnName = "length")]
-    public int Length { get; set;  }
+    public int Length { get; set; }
 
     /// <summary>
     /// 排序权重
     /// </summary>
     [SugarColumn(ColumnName = "order_num")]
-    public int OrderNum { get; set;  }
+    public int OrderNum { get; set; }
 
     /// <summary>
     /// 是否必填 (Nullable = false)
     /// </summary>
     [SugarColumn(ColumnName = "is_required")]
-    public bool IsRequired { get; set;  }
+    public bool IsRequired { get; set; }
 
     /// <summary>
     /// 是否主键
     /// </summary>
     [SugarColumn(ColumnName = "is_key")]
-    public bool IsKey { get; set;  }
+    public bool IsKey { get; set; }
 
     /// <summary>
     /// 是否自增
     /// </summary>
     [SugarColumn(ColumnName = "is_auto_add")]
-    public bool IsAutoAdd { get; set;  }
+    public bool IsAutoAdd { get; set; }
 
     /// <summary>
     /// 是否公共字段 (如 CreationTime, IsDeleted)
     /// 场景：生成 DTO 时通常会忽略公共字段
     /// </summary>
     [SugarColumn(ColumnName = "is_public")]
-    public bool IsPublic { get; set;  }
+    public bool IsPublic { get; set; }
 
     // IsDeleted, CreationTime 等由 FullAuditedAggregateRootEntity 自动实现
 

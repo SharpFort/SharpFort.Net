@@ -19,7 +19,7 @@ namespace SharpFort.AspNetCore.UnifyResult;
 /// <summary>
 /// 规范化配置选项
 /// </summary>
-public sealed class UnifyResultSettingsOptions 
+public sealed class UnifyResultSettingsOptions
 {
     /// <summary>
     /// 设置返回 200 状态码列表

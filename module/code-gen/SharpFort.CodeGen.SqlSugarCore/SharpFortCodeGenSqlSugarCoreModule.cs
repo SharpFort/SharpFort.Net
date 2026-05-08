@@ -3,7 +3,7 @@
 namespace SharpFort.CodeGen.SqlSugarCore
 {
     [DependsOn(typeof(SharpFortSqlSugarCoreModule))]
-    public class SharpFortCodeGenSqlSugarCoreModule:AbpModule
+    public class SharpFortCodeGenSqlSugarCoreModule : AbpModule
     {
 
     }

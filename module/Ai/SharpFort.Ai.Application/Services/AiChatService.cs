@@ -69,7 +69,7 @@ public class AiChatService : ApplicationService, IAiChatService
             .ToListAsync();
 
         var output = entities.Adapt<List<AiModelDto>>();
-        
+
         // Custom logic for free model if needed, adapted from original
         output.ForEach(x =>
         {

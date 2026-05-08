@@ -29,42 +29,42 @@ public record EmbeddingCreateResponse : ThorBaseResponse
                 return;
             // 否则转换成float[]
             case null or "float":
-            {
-                foreach (var embeddingResponse in Data)
                 {
-                    if (embeddingResponse.Embedding is string base64)
+                    foreach (var embeddingResponse in Data)
                     {
-                        embeddingResponse.Embedding = Convert.FromBase64String(base64);
+                        if (embeddingResponse.Embedding is string base64)
+                        {
+                            embeddingResponse.Embedding = Convert.FromBase64String(base64);
+                        }
                     }
-                }
 
-                return;
-            }
+                    return;
+                }
             // 判断第一个是否是string，如果是则不转换
             case "base64" when Data[0].Embedding is string:
                 return;
             // 否则转换成base64
             case "base64":
-            {
-                foreach (var embeddingResponse in Data)
                 {
-                    if (embeddingResponse.Embedding is JsonElement str)
+                    foreach (var embeddingResponse in Data)
                     {
-                        if (str.ValueKind == JsonValueKind.Array)
+                        if (embeddingResponse.Embedding is JsonElement str)
                         {
-                            var floats = str.EnumerateArray().Select(element => element.GetSingle()).ToArray();
+                            if (str.ValueKind == JsonValueKind.Array)
+                            {
+                                var floats = str.EnumerateArray().Select(element => element.GetSingle()).ToArray();
 
-                            embeddingResponse.Embedding = ConvertFloatArrayToBase64(floats);
+                                embeddingResponse.Embedding = ConvertFloatArrayToBase64(floats);
+                            }
+                        }
+                        else if (embeddingResponse.Embedding is IList<double> doubles)
+                        {
+                            embeddingResponse.Embedding = ConvertFloatArrayToBase64(doubles.ToArray());
                         }
                     }
-                    else if (embeddingResponse.Embedding is IList<double> doubles)
-                    {
-                        embeddingResponse.Embedding = ConvertFloatArrayToBase64(doubles.ToArray());
-                    }
-                }
 
-                break;
-            }
+                    break;
+                }
         }
     }
 

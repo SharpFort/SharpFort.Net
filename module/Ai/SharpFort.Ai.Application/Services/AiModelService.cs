@@ -42,7 +42,7 @@ public class AiModelService : ApplicationService, IAiModelService
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x =>
                 x.Name.Contains(input.SearchKey) || x.ModelId.Contains(input.SearchKey))
             .WhereIF(input.AiProviderId.HasValue, x => x.AiProviderId == input.AiProviderId.Value);
-            // .WhereIF(input.IsPremiumOnly == true, x => x.IsPremium); // Assuming IsPremiumOnly is not in DTO or not needed yet
+        // .WhereIF(input.IsPremiumOnly == true, x => x.IsPremium); // Assuming IsPremiumOnly is not in DTO or not needed yet
 
         var entities = await query
             .OrderBy(x => x.OrderNum)
@@ -94,7 +94,7 @@ public class AiModelService : ApplicationService, IAiModelService
             MultiplierShow = input.MultiplierShow,
             ProviderName = input.ProviderName,
             IconUrl = input.IconUrl,
- 
+
             IsEnabled = input.IsEnabled,
             IsDeleted = false
         };

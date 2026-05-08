@@ -41,7 +41,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
             }
 
             return Task.FromResult(new PagedResultDto<OnlineUserModel>()
-                { TotalCount = data.Count, Items = dataWhere.ToList() });
+            { TotalCount = data.Count, Items = dataWhere.ToList() });
         }
 
 

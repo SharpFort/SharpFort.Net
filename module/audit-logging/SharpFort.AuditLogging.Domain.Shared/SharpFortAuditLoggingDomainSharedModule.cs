@@ -4,7 +4,7 @@ using Volo.Abp.Modularity;
 namespace SharpFort.AuditLogging.Domain.Shared
 {
     [DependsOn(typeof(AbpDddDomainSharedModule))]
-    public class SharpFortAuditLoggingDomainSharedModule:AbpModule
+    public class SharpFortAuditLoggingDomainSharedModule : AbpModule
     {
 
     }

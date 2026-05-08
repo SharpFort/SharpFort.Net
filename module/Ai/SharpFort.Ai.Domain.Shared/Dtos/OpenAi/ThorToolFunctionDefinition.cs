@@ -9,7 +9,7 @@ public class ThorToolFunctionDefinition
 {
     [JsonPropertyName("type")]
     public string? Type { get; set; }
-    
+
     /// <summary>
     /// 要调用的函数的名称。必须是 a-z、A-Z、0-9 或包含下划线和破折号，最大长度为 64。
     /// </summary>

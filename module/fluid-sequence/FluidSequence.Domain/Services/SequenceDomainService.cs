@@ -37,9 +37,9 @@ namespace FluidSequence.Domain.Services
             IEnumerable<IPlaceholderStrategy> strategies,
             SequenceHiLoBufferService hiLoBuffer)
         {
-            _repository  = repository;
-            _strategies  = strategies;
-            _hiLoBuffer  = hiLoBuffer;
+            _repository = repository;
+            _strategies = strategies;
+            _hiLoBuffer = hiLoBuffer;
         }
 
         /// <summary>

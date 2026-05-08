@@ -25,7 +25,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.IServices
         /// <param name="userName"></param>
         /// <param name="phone"></param>
         /// <returns></returns>
-        Task<UserRoleMenuDto?> GetAsync(string? userName,long? phone);
+        Task<UserRoleMenuDto?> GetAsync(string? userName, long? phone);
 
         /// <summary>
         /// 校验电话验证码，需要与电话号码绑定

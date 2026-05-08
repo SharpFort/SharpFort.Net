@@ -76,7 +76,7 @@ public class AiImageService : ApplicationService
         }
 
 
-        
+
 
         // 创建任务实体
         var task = new ImageStoreTaskAggregateRoot

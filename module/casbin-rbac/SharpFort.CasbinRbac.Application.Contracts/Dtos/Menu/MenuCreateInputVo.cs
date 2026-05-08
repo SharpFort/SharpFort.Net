@@ -5,7 +5,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu
     /// <summary>
     /// Menu输入创建对象
     /// </summary>
-    public class MenuCreateInputVo 
+    public class MenuCreateInputVo
     {
         public Guid? Id { get; set; }
 
@@ -30,7 +30,7 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu
         public int OrderNum { get; set; }
         public MenuSource MenuSource { get; set; } = MenuSource.Ruoyi;
         public string? RouterName { get; set; }
-        
+
         /// <summary>
         /// API URL (用于 Casbin 鉴权，例如 /api/user)
         /// </summary>

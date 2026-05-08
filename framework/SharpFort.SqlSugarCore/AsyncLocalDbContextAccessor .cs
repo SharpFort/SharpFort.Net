@@ -32,4 +32,4 @@ namespace SharpFort.SqlSugarCore
             _currentScope = new AsyncLocal<ISqlSugarDbContext?>();
         }
     }
-} 
+}

@@ -51,7 +51,7 @@ namespace SharpFort.FileManagement.Application.Contracts.IServices
         /// </summary>
         Task RenameAsync(Guid id, string newName);
 
-        
+
         /// <summary>
         /// 校验文件哈希（判断是否可以秒传）
         /// </summary>

@@ -24,7 +24,7 @@ public class GeminiGenerateContentService(
             {
                 { "x-goog-api-key", options.ApiKey }
             }).ConfigureAwait(false);
-        
+
 
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)

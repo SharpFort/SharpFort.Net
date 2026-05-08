@@ -15,7 +15,9 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Caches
 
     public class CaptchaPhoneCacheKey
     {
-        public CaptchaPhoneCacheKey(PhoneValidationType validationPhoneType,string phone) { Phone = phone;
+        public CaptchaPhoneCacheKey(PhoneValidationType validationPhoneType, string phone)
+        {
+            Phone = phone;
             PhoneValidationType = validationPhoneType;
         }
         public PhoneValidationType PhoneValidationType { get; set; }

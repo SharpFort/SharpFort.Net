@@ -81,8 +81,8 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <summary>
         /// 校验图片登录验证码,无需和账号绑定
         /// </summary>
-        [RemoteService(isEnabled:false)]
-        public void ValidationImageCaptcha(string? uuid,string? code )
+        [RemoteService(isEnabled: false)]
+        public void ValidationImageCaptcha(string? uuid, string? code)
         {
             if (_rbacOptions.EnableCaptcha)
             {
@@ -109,7 +109,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             }
 
             //校验验证码
-            ValidationImageCaptcha(input.Uuid,input.Code);
+            ValidationImageCaptcha(input.Uuid, input.Code);
 
             User user = new();
             //校验
@@ -224,7 +224,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             return await PostCaptchaPhoneAsync(PhoneValidationType.RetrievePassword, input);
         }
-        
+
         /// <summary>
         /// 手机验证码-绑定
         /// </summary>
@@ -236,20 +236,20 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             return await PostCaptchaPhoneAsync(PhoneValidationType.Bind, input);
         }
-        
+
         /// <summary>
         /// 手机验证码-需通过图形验证码
         /// </summary>
         /// <returns></returns>
-        [RemoteService(isEnabled:false)]
+        [RemoteService(isEnabled: false)]
         private async Task<object> PostCaptchaPhoneAsync(PhoneValidationType validationPhoneType,
             PhoneCaptchaImageDto input)
         {
             //验证uuid 和 验证码
-            ValidationImageCaptcha(input.Uuid,input.Code);
-            
+            ValidationImageCaptcha(input.Uuid, input.Code);
+
             await ValidationPhone(input.Phone);
-            
+
             if (validationPhoneType == PhoneValidationType.Register &&
                 await _userRepository.IsAnyAsync(x => x.Phone!.Value.ToString(CultureInfo.InvariantCulture) == input.Phone))
             {
@@ -343,7 +343,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             {
                 throw new UserFriendlyException("注册账号不能以ls_字符开头");
             }
-            
+
             if (_rbacOptions.EnableCaptcha)
             {
                 //校验验证码，根据电话号码获取 value，比对验证码已经uuid
@@ -359,7 +359,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// 不需要验证，为了给第三方使用，例如微信小程序，后续可通过绑定操作，进行账号合并
         /// </summary>
         /// <param name="input"></param>
-        [RemoteService(isEnabled:false)]
+        [RemoteService(isEnabled: false)]
         public async Task PostTempRegisterAsync(RegisterDto input)
         {
             //注册领域逻辑
@@ -440,13 +440,13 @@ namespace SharpFort.CasbinRbac.Application.Services
             {
                 //将后端菜单转换成前端路由，组件级别需要过滤
                 output =
-                    ObjectMapper.Map<List<MenuDto>, List<Menu>>(menus.Where(x=>x.MenuSource==MenuSource.Ruoyi).ToList()).Vue3RuoSfRouterBuild();
+                    ObjectMapper.Map<List<MenuDto>, List<Menu>>(menus.Where(x => x.MenuSource == MenuSource.Ruoyi).ToList()).Vue3RuoSfRouterBuild();
             }
             else if (routerType == "pure")
             {
                 //将后端菜单转换成前端路由，组件级别需要过滤
                 output =
-                    ObjectMapper.Map<List<MenuDto>, List<Menu>>(menus.Where(x=>x.MenuSource==MenuSource.Pure).ToList()).Vue3PureRouterBuild();
+                    ObjectMapper.Map<List<MenuDto>, List<Menu>>(menus.Where(x => x.MenuSource == MenuSource.Pure).ToList()).Vue3PureRouterBuild();
             }
 
             return output;

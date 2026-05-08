@@ -4,7 +4,7 @@ namespace SharpFort.Ai.Domain.AiGateWay;
 
 public static class SupplementalMultiplierHelper
 {
-    public static void SetSupplementalMultiplier(this ThorUsageResponse? usage,decimal multiplier)
+    public static void SetSupplementalMultiplier(this ThorUsageResponse? usage, decimal multiplier)
     {
         if (usage is not null)
         {

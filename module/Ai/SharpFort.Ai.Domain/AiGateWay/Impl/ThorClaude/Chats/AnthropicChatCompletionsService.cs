@@ -78,7 +78,7 @@ public class AnthropicChatCompletionsService(
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             var message = $"恭喜你运气爆棚遇到了错误，对话异常：StatusCode【{response.StatusCode.GetHashCode()}】，ErrorId【{errorId}】";
-            if (error.Contains("prompt is too long") || error.Contains("提示词太长")||error.Contains("input tokens exceeds the model's maximum context length"))
+            if (error.Contains("prompt is too long") || error.Contains("提示词太长") || error.Contains("input tokens exceeds the model's maximum context length"))
             {
                 message += $", tip: 当前提示词过长，上下文已达到上限，如在 claudecode中使用，建议执行/compact压缩当前会话，或开启新会话后重试";
             }
@@ -132,7 +132,7 @@ public class AnthropicChatCompletionsService(
             var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             var message = $"恭喜你运气爆棚遇到了错误，对话异常：StatusCode【{response.StatusCode.GetHashCode()}】，ErrorId【{errorId}】";
-            if (error.Contains("prompt is too long") || error.Contains("提示词太长")||error.Contains("input tokens exceeds the model's maximum context length"))
+            if (error.Contains("prompt is too long") || error.Contains("提示词太长") || error.Contains("input tokens exceeds the model's maximum context length"))
             {
                 message += $", tip: 当前提示词过长，上下文已达到上限，如在 claudecode中使用，建议执行/compact压缩当前会话，或开启新会话后重试";
             }

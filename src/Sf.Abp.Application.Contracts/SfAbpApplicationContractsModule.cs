@@ -15,7 +15,7 @@ namespace Sf.Abp.Application.Contracts
         typeof(SharpFortCasbinRbacApplicationContractsModule),
         typeof(SharpFortAiApplicationContractsModule)
         )]
-    public class SfAbpApplicationContractsModule:AbpModule
+    public class SfAbpApplicationContractsModule : AbpModule
     {
 
     }

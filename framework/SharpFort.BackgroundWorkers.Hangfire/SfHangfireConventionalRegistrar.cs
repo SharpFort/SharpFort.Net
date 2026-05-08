@@ -15,7 +15,7 @@ public sealed class SfHangfireConventionalRegistrar : DefaultConventionalRegistr
     /// <returns>如果类型不是 IHangfireBackgroundWorker 或已被禁用则返回 true</returns>
     protected override bool IsConventionalRegistrationDisabled(Type type)
     {
-        return !typeof(IHangfireBackgroundWorker).IsAssignableFrom(type) || 
+        return !typeof(IHangfireBackgroundWorker).IsAssignableFrom(type) ||
                base.IsConventionalRegistrationDisabled(type);
     }
 

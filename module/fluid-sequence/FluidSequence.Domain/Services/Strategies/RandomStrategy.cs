@@ -10,7 +10,7 @@ namespace FluidSequence.Domain.Services.Strategies
         private static readonly Random _random = new Random();
         private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         // Safe chars excluding I, O, Z, 0, 1, 2
-        private const string SafeChars = "ABCDEFGHJKLMNPQRSTUVWXY3456789"; 
+        private const string SafeChars = "ABCDEFGHJKLMNPQRSTUVWXY3456789";
         private const string MixChars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
 
         public bool CanHandle(string placeholderKey)
@@ -39,7 +39,7 @@ namespace FluidSequence.Domain.Services.Strategies
                 default: return placeholderKey;
             }
 
-            lock(_random)
+            lock (_random)
             {
                 for (int i = 0; i < len; i++)
                 {

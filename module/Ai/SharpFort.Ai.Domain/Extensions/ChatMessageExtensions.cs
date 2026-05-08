@@ -10,13 +10,13 @@ public static class ChatMessageExtensions
     {
         var type = message.GetType();
         var propertyInfo = type.GetProperty("Role", BindingFlags.NonPublic | BindingFlags.Instance);
-        
+
         if (propertyInfo != null)
         {
             var value = propertyInfo.GetValue(message) as ChatMessageRole?;
             return value?.ToString()?.ToLower(CultureInfo.InvariantCulture) ?? string.Empty;
         }
-        
+
         return string.Empty;
     }
 }

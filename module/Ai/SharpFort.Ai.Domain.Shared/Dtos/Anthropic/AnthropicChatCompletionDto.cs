@@ -20,7 +20,7 @@ public class AnthropicStreamDto
     [JsonPropertyName("usage")] public AnthropicCompletionDtoUsage? Usage { get; set; }
 
     [JsonPropertyName("error")] public AnthropicStreamErrorDto? Error { get; set; }
-    
+
 }
 
 public class AnthropicStreamErrorDto
@@ -41,11 +41,11 @@ public class AnthropicChatCompletionDtoDelta
     [JsonPropertyName("partial_json")] public string? PartialJson { get; set; }
 
     [JsonPropertyName("stop_reason")] public string? StopReason { get; set; }
-    
+
     [JsonPropertyName("signature")] public string? Signature { get; set; }
-    
+
     [JsonPropertyName("stop_sequence")] public string? StopSequence { get; set; }
-    
+
 }
 
 public class AnthropicChatCompletionDtoContentBlock
@@ -69,7 +69,7 @@ public class AnthropicChatCompletionDtoContentBlock
     [JsonPropertyName("tool_use_id")] public string? ToolUseId { get; set; }
 
     [JsonPropertyName("content")] public object? Content { get; set; }
-    
+
     [JsonPropertyName("text")] public string? Text { get; set; }
 }
 
@@ -90,7 +90,7 @@ public class AnthropicChatCompletionDto
     public object stop_sequence { get; set; } = null!;
 
     public AnthropicCompletionDtoUsage? Usage { get; set; }
-    
+
 }
 
 public class AnthropicChatCompletionDtoContent
@@ -110,7 +110,7 @@ public class AnthropicChatCompletionDtoContent
     [JsonPropertyName("partial_json")] public string? PartialJson { get; set; }
 
     public string? signature { get; set; }
-    
+
 }
 
 public class AnthropicCompletionDtoUsage
@@ -126,7 +126,7 @@ public class AnthropicCompletionDtoUsage
     [JsonPropertyName("output_tokens")] public int? OutputTokens { get; set; }
 
     [JsonPropertyName("server_tool_use")] public AnthropicServerToolUse? ServerToolUse { get; set; }
-    
+
     [JsonPropertyName("cache_creation")] public object? CacheCreation { get; set; }
 
     [JsonPropertyName("service_tier")] public string? ServiceTier { get; set; }

@@ -12,7 +12,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private ICasbinPolicyManager _casbinPolicyManager;
 
         public RoleManager(
-            ISqlSugarRepository<Role> repository, 
+            ISqlSugarRepository<Role> repository,
             ISqlSugarRepository<RoleMenu> roleMenuRepository,
             ISqlSugarRepository<Menu> menuRepository,
             ICasbinPolicyManager casbinPolicyManager)
@@ -34,7 +34,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 1. 业务数据持久化
             // 这个是需要事务的，在service中进行工作单元
             await _roleMenuRepository.DeleteAsync(u => roleIds.Contains(u.RoleId));
-            
+
             // 遍历角色
             foreach (var roleId in roleIds)
             {

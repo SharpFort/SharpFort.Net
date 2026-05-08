@@ -49,7 +49,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                     // 组合完整路径 (简单处理，实际可能需要更复杂的路由解析)
                     // Abp 自动路由规则比较复杂，这里仅处理显示声明 Route 的
                     // 假设 Controller Route 包含 [controller], [action] 等占位符
-                    
+
                     var fullPath = CombinePaths(controllerPath, methodPath);
                     fullPath = ReplacePlaceholders(fullPath, controller.Name, method.Name);
 
@@ -99,7 +99,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
         {
             // ControllerName usually ends with "Controller"
             var cName = controllerName.EndsWith("Controller", StringComparison.Ordinal) ? controllerName.Substring(0, controllerName.Length - 10) : controllerName;
-            
+
             path = path.Replace("[controller]", cName, StringComparison.OrdinalIgnoreCase);
             path = path.Replace("[action]", actionName, StringComparison.OrdinalIgnoreCase);
             return path;

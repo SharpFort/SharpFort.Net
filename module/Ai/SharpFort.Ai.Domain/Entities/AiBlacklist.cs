@@ -13,12 +13,12 @@ public class AiBlacklist : FullAuditedAggregateRoot<Guid>
     /// 用户
     /// </summary>
     public Guid UserId { get; set; }
-    
+
     /// <summary>
     /// 有效开始时间
     /// </summary>
     public DateTime StartTime { get; set; }
-    
+
     /// <summary>
     /// 有效结束时间
     /// </summary>

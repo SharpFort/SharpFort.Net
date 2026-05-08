@@ -6,7 +6,7 @@ namespace SharpFort.TenantManagement.Application.Contracts
 {
     [DependsOn(typeof(AbpTenantManagementDomainSharedModule),
         typeof(SharpFortDddApplicationContractsModule))]
-    public class SharpFortTenantManagementApplicationContractsModule:AbpModule
+    public class SharpFortTenantManagementApplicationContractsModule : AbpModule
     {
 
     }

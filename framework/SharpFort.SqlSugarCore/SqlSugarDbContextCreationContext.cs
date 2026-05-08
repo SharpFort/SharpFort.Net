@@ -9,7 +9,7 @@ namespace SharpFort.SqlSugarCore;
 /// </summary>
 public class SqlSugarDbContextCreationContext
 {
-    private static readonly AsyncLocal<SqlSugarDbContextCreationContext> CurrentContextHolder = 
+    private static readonly AsyncLocal<SqlSugarDbContextCreationContext> CurrentContextHolder =
         new AsyncLocal<SqlSugarDbContextCreationContext>();
 
     /// <summary>

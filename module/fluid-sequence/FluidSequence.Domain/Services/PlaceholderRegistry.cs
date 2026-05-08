@@ -23,10 +23,10 @@ namespace FluidSequence.Domain.Services
             new PlaceholderMeta { Key = "{ww}", Label = "周数", Group = "时间" },
             new PlaceholderMeta { Key = "{QQ}", Label = "季度", Group = "时间" },
             new PlaceholderMeta { Key = "{FY}", Label = "财年", Group = "时间" },
-            
+
             new PlaceholderMeta { Key = "{SEQ}", Label = "序列号", Group = "核心" },
             new PlaceholderMeta { Key = "{SEQ36}", Label = "36进制序列号", Group = "核心" },
-            
+
             new PlaceholderMeta { Key = "{RAND:NUM:4}", Label = "4位随机数字", Group = "随机" },
             new PlaceholderMeta { Key = "{RAND:CHAR:4}", Label = "4位随机字母", Group = "随机" },
             new PlaceholderMeta { Key = "{RAND:SAFE:4}", Label = "4位安全随机码", Group = "随机" },

@@ -72,7 +72,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// 是否匿名
     /// </summary>
     public bool IsAnonymous { get; set; }
-    
+
     /// <summary>
     /// 密钥id
     /// </summary>
@@ -93,7 +93,7 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     /// </summary>
     /// <param name="isAnonymous"></param>
     /// <param name="categories"></param>
-    public void SetPublish(bool isAnonymous,List<string> categories)
+    public void SetPublish(bool isAnonymous, List<string> categories)
     {
         this.PublishStatus = PublishStatus.Published;
         this.IsAnonymous = isAnonymous;

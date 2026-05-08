@@ -15,7 +15,7 @@ namespace SharpFort.AuditLogging.Domain.Entities
     [SugarTable("SfEntityPropertyChange")]
 
     [SugarIndex($"index_{nameof(EntityChangeId)}", nameof(EntityChangeId), OrderByType.Asc)]
-    public class EntityPropertyChange:Entity<Guid>, IMultiTenant
+    public class EntityPropertyChange : Entity<Guid>, IMultiTenant
     {
         public EntityPropertyChange()
         {

@@ -12,7 +12,7 @@ public class AgentStoreAggregateRoot : FullAuditedAggregateRoot<Guid>
     public AgentStoreAggregateRoot()
     {
     }
-    
+
     /// <summary>
     /// 构建
     /// </summary>

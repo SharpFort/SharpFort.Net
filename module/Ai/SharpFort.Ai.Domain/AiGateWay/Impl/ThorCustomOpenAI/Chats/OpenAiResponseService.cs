@@ -11,18 +11,18 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Responses;
 
 namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorCustomOpenAI.Chats;
 
-public class OpenAiResponseService(ILogger<OpenAiResponseService> logger,IHttpClientFactory httpClientFactory):IOpenAiResponseService
+public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpClientFactory httpClientFactory) : IOpenAiResponseService
 {
-    
+
     public async IAsyncEnumerable<(string, JsonElement?)> ResponsesStreamAsync(AiModelDescribe options, OpenAiResponsesInput input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-         using var openai =
-            Activity.Current?.Source.StartActivity("OpenAi 响应");
+        using var openai =
+           Activity.Current?.Source.StartActivity("OpenAi 响应");
 
-        
+
         var client = httpClientFactory.CreateClient();
-        
+
         var endpoint = options.Endpoint.TrimEnd('/');
 
         //兼容 v1结尾

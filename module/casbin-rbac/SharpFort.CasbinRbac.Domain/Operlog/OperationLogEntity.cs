@@ -51,12 +51,12 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
         /// <summary>
         /// 请求参数 
         ///</summary>
-        [SugarColumn(ColumnName = "RequestParam",ColumnDataType = StaticConfig.CodeFirst_BigString)]
+        [SugarColumn(ColumnName = "RequestParam", ColumnDataType = StaticConfig.CodeFirst_BigString)]
         public string? RequestParam { get; set; }
         /// <summary>
         /// 请求结果 
         ///</summary>
-        [SugarColumn(ColumnName = "RequestResult",ColumnDataType = StaticConfig.CodeFirst_BigString)]
+        [SugarColumn(ColumnName = "RequestResult", ColumnDataType = StaticConfig.CodeFirst_BigString)]
         public string? RequestResult { get; set; }
 
         public DateTime CreationTime { get; set; }

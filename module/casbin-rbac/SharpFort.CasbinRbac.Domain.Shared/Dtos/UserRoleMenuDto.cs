@@ -18,7 +18,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
         /// <summary>
         /// 主键
         /// </summary>
-        public Guid Id { get;  set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// 逻辑删除
@@ -129,7 +129,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
     }
     public class RoleDto
     {
-        public Guid Id { get;  set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// 逻辑删除
@@ -189,11 +189,11 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Dtos
     }
     public class MenuDto
     {
-        public Guid Id { get;  set; }
+        public Guid Id { get; set; }
         /// <summary>
         /// 菜单来源
         /// </summary>
-        public MenuSource MenuSource { get; set; } 
+        public MenuSource MenuSource { get; set; }
         public string? RouterName { get; set; }
 
         /// <summary>

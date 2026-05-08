@@ -82,9 +82,9 @@ namespace SharpFort.TenantManagement.Domain
                 using (CurrentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
                 {
                     Tenant? tenant = null;
-                    using (var uow=_unitOfWorkManager.Begin(isTransactional:false))
+                    using (var uow = _unitOfWorkManager.Begin(isTransactional: false))
                     {
-                         tenant = await TenantRepository.FindAsync(id.Value);
+                        tenant = await TenantRepository.FindAsync(id.Value);
                         await uow.CompleteAsync();
                     }
 

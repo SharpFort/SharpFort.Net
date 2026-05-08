@@ -7,7 +7,7 @@ namespace SharpFort.WeChat.MiniProgram;
 
 [DependsOn(typeof(SharpFortCoreModule),
     typeof(AbpCachingModule))]
-public class SharpFortWeChatMiniProgramModule: AbpModule
+public class SharpFortWeChatMiniProgramModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {

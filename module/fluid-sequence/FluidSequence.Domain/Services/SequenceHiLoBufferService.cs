@@ -52,7 +52,7 @@ namespace FluidSequence.Domain.Services
         public async Task<int> NextAsync(string ruleCode, int bufferCount)
         {
             var queue = _buffers.GetOrAdd(ruleCode, _ => new ConcurrentQueue<int>());
-            var sem   = _locks.GetOrAdd(ruleCode, _ => new SemaphoreSlim(1, 1));
+            var sem = _locks.GetOrAdd(ruleCode, _ => new SemaphoreSlim(1, 1));
 
             // 快路径：队列非空，直接出队，无需加锁，零竞争
             if (queue.TryDequeue(out var value))

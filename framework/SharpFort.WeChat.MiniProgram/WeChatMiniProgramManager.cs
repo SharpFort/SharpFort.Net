@@ -47,7 +47,7 @@ public class WeChatMiniProgramManager : IWeChatMiniProgramManager, ISingletonDep
     }
 
 
-    
+
     /// <summary>
     /// 发送模板订阅消息
     /// </summary>
@@ -62,13 +62,13 @@ public class WeChatMiniProgramManager : IWeChatMiniProgramManager, ISingletonDep
             template_id = input.template_id,
             page = input.page,
             data = input.data,
-            miniprogram_state = _options.Notice?.State??"formal"
+            miniprogram_state = _options.Notice?.State ?? "formal"
         };
-        req.template_id=req.template_id?? _options.Notice?.TemplateId;
- 
+        req.template_id = req.template_id ?? _options.Notice?.TemplateId;
+
         using (HttpClient httpClient = new HttpClient())
         {
-            var body =new StringContent(JsonConvert.SerializeObject(req));
+            var body = new StringContent(JsonConvert.SerializeObject(req));
             HttpResponseMessage response = await httpClient.PostAsync(url, body);
             var responseBody = await response.Content.ReadFromJsonAsync<SubscribeNoticeResponse>();
             responseBody.ValidateSuccess();

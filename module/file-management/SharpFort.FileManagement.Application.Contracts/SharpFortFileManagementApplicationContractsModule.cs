@@ -10,7 +10,7 @@ namespace SharpFort.FileManagement.Application.Contracts
         typeof(AbpSettingManagementApplicationContractsModule),
 
         typeof(SharpFortDddApplicationContractsModule))]
-    public class SharpFortFileManagementApplicationContractsModule:AbpModule
+    public class SharpFortFileManagementApplicationContractsModule : AbpModule
     {
 
     }

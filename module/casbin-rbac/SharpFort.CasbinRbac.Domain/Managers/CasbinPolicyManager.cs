@@ -5,7 +5,7 @@ using Volo.Abp.MultiTenancy;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
 using Casbin.Adapter.SqlSugar.Entities;
- 
+
 
 
 namespace SharpFort.CasbinRbac.Domain.Managers
@@ -72,7 +72,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             var sub = GetUserSubject(user.Id);
             var roleSub = GetRoleSubject(role.RoleCode);
             var domain = GetTenantDomain(user.TenantId);
-            
+
             // 1. 持久化
             // g rule: V0=sub(User), V1=role(Role), V2=domain
             var rule = new CasbinRule
@@ -86,7 +86,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 2. 内存更新
             await _enforcer.AddGroupingPolicyAsync(sub, roleSub, domain);
-            
+
             TriggerMemorySync();
         }
 
@@ -113,7 +113,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 1. 持久化
             // 先物理删除该用户在该租户下的所有角色关联 (g, sub, ?, domain)
             await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain).ExecuteCommandAsync();
-            
+
             // 批量插入新关联
             if (roles.Count > 0)
             {
@@ -138,10 +138,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 插入新数据
             if (roles.Count > 0)
             {
-                var policies = roles.Select(r => new[] { 
-                    sub, 
-                    GetRoleSubject(r.RoleCode), 
-                    domain 
+                var policies = roles.Select(r => new[] {
+                    sub,
+                    GetRoleSubject(r.RoleCode),
+                    domain
                 }).ToList();
 
                 await _enforcer.AddGroupingPoliciesAsync(policies);
@@ -170,11 +170,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 var methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
 
                 // 内存对象
-                newPolicies.Add(new[] { 
-                    roleSub, 
-                    domain, 
-                    menu.ApiUrl, 
-                    methods 
+                newPolicies.Add(new[] {
+                    roleSub,
+                    domain,
+                    menu.ApiUrl,
+                    methods
                 });
 
                 // 数据库对象
@@ -216,7 +216,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 1. 持久化
             // 清理
             await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain).ExecuteCommandAsync();
-            
+
             // 插入无敌规则
             await _roleRepository._Db.Insertable(new CasbinRule
             {

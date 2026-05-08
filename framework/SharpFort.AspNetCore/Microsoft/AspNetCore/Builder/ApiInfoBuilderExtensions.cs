@@ -19,7 +19,7 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
         {
             // 添加API信息处理中间件到请求管道
             builder.UseMiddleware<ApiInfoMiddleware>();
-            
+
             return builder;
         }
     }

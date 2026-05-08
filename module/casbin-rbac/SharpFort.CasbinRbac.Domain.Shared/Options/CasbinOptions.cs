@@ -14,7 +14,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Options
         /// 启用后支持 X-Casbin-Debug 头
         /// </summary>
         public bool EnableDebugMode { get; set; }
-        
+
         /// <summary>
         /// 忽略的 URL 前缀列表 (小写)
         /// 这些 URL 将跳过 Casbin 检查

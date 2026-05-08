@@ -1,6 +1,6 @@
 ﻿namespace SharpFort.WeChat.MiniProgram;
 
-public class WeChatMiniProgramException: Exception
+public class WeChatMiniProgramException : Exception
 {
     public override string Message
     {

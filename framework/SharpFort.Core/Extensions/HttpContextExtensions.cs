@@ -58,9 +58,9 @@ namespace SharpFort.Core.Extensions
         {
             const string defaultLanguage = "zh-CN";
             var acceptLanguage = httpContext.Request.Headers["Accept-Language"].FirstOrDefault();
-            
-            return string.IsNullOrEmpty(acceptLanguage) 
-                ? defaultLanguage 
+
+            return string.IsNullOrEmpty(acceptLanguage)
+                ? defaultLanguage
                 : acceptLanguage.Split(',')[0];
         }
 
@@ -72,7 +72,7 @@ namespace SharpFort.Core.Extensions
         public static bool IsAjaxRequest(this HttpRequest request)
         {
             const string ajaxHeader = "XMLHttpRequest";
-            return ajaxHeader.Equals(request.Headers["X-Requested-With"], 
+            return ajaxHeader.Equals(request.Headers["X-Requested-With"],
                 StringComparison.OrdinalIgnoreCase);
         }
 
@@ -88,7 +88,7 @@ namespace SharpFort.Core.Extensions
 
             // 尝试获取X-Forwarded-For头
             var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            
+
             // 如果没有代理头,则获取远程IP
             if (string.IsNullOrEmpty(ip))
             {
@@ -103,12 +103,12 @@ namespace SharpFort.Core.Extensions
 
             // 清理IPv6格式
             ip = ip.Replace("::ffff:", localhost);
-            
+
             // 移除端口号
             ip = Regex.Replace(ip, @":\d{1,5}$", "");
 
             // 验证IP格式
-            var isValidIp = Regex.IsMatch(ip, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") || 
+            var isValidIp = Regex.IsMatch(ip, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") ||
                            Regex.IsMatch(ip, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?):\d{1,5}$");
 
             return isValidIp ? ip : localhost;
@@ -137,7 +137,7 @@ namespace SharpFort.Core.Extensions
                 .Select(x => x.Value)
                 .ToArray();
         }
-        
+
         /// <summary>
         /// 判断是否为WebSocket请求
         /// </summary>
@@ -145,7 +145,7 @@ namespace SharpFort.Core.Extensions
         /// <returns>是否为WebSocket请求</returns>
         public static bool IsWebSocketRequest(this HttpContext context)
         {
-            return context.WebSockets.IsWebSocketRequest || 
+            return context.WebSockets.IsWebSocketRequest ||
                    context.Request.Path == "/ws";
         }
     }

@@ -34,7 +34,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         {
             // 获取MVC配置选项
             var mvcOptions = services.GetPreConfigureActions<AbpAspNetCoreMvcOptions>().Configure();
-            
+
             // 获取并去重远程服务名称
             var remoteServiceSettings = mvcOptions.ConventionalControllers
                 .ConventionalControllerSettings
@@ -73,17 +73,17 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// 配置API分组
         /// </summary>
         private static void ConfigureApiGroups(
-            SwaggerGenOptions options, 
+            SwaggerGenOptions options,
             IEnumerable<ConventionalControllerSetting> settings)
         {
             foreach (var setting in settings.OrderBy(x => x.RemoteServiceName))
             {
                 if (!options.SwaggerGeneratorOptions.SwaggerDocs.ContainsKey(setting.RemoteServiceName))
                 {
-                    options.SwaggerDoc(setting.RemoteServiceName, new OpenApiInfo 
-                    { 
-                        Title = setting.RemoteServiceName, 
-                        Version = "v1" 
+                    options.SwaggerDoc(setting.RemoteServiceName, new OpenApiInfo
+                    {
+                        Title = setting.RemoteServiceName,
+                        Version = "v1"
                     });
                 }
             }
@@ -214,7 +214,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             operation.Parameters ??= new List<IOpenApiParameter>();
-            
+
             operation.Parameters.Add(new OpenApiParameter
             {
                 Name = TenantHeaderKey,

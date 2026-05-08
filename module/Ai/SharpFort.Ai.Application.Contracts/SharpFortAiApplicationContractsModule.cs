@@ -10,7 +10,7 @@ namespace SharpFort.Ai.Application.Contracts
         typeof(AbpSettingManagementApplicationContractsModule),
 
         typeof(SharpFortDddApplicationContractsModule))]
-    public class SharpFortAiApplicationContractsModule:AbpModule
+    public class SharpFortAiApplicationContractsModule : AbpModule
     {
 
     }

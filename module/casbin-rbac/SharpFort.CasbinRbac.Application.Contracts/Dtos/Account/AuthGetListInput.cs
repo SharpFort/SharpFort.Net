@@ -2,7 +2,7 @@
 
 namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Account
 {
-    public class AuthGetListInput:PagedAllResultRequestDto
+    public class AuthGetListInput : PagedAllResultRequestDto
     {
         public Guid? UserId { get; set; }
 

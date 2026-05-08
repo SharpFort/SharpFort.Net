@@ -24,7 +24,7 @@ namespace SharpFort.AspNetCore.UnifyResult.Providers;
 /// </summary>
 [Dependency(TryRegister = true)]
 [ExposeServices(typeof(IUnifyResultProvider))]
-public class RESTfulResultProvider : IUnifyResultProvider,ITransientDependency
+public class RESTfulResultProvider : IUnifyResultProvider, ITransientDependency
 {
     /// <summary>
     /// 设置响应状态码
@@ -53,7 +53,7 @@ public class RESTfulResultProvider : IUnifyResultProvider,ITransientDependency
         else if (unifyResultSettings.Return200StatusCodes.Contains(statusCode)) context.Response.StatusCode = 200;
         else { }
     }
-    
+
     /// <summary>
     /// 异常返回值
     /// </summary>

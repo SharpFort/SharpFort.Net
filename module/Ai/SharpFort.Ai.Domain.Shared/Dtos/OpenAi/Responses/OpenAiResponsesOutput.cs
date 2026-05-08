@@ -54,7 +54,7 @@ public class OpenAiResponsesOutput
     public dynamic? User { get; set; }
     [JsonPropertyName("metadata")]
     public dynamic? Metadata { get; set; }
-    
+
     public void SupplementalMultiplier(decimal multiplier)
     {
         if (this.Usage is not null)

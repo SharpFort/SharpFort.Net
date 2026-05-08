@@ -90,11 +90,11 @@ public class ThorChatMessage
         }
     }
 
-    
+
     /// <summary>
     /// 用于数据存储
     /// </summary>
-    [JsonIgnore] 
+    [JsonIgnore]
     public string MessagesStore
     {
         get
@@ -111,7 +111,7 @@ public class ThorChatMessage
             return string.Empty;
         }
     }
-    
+
     /// <summary>
     /// 【可选】参与者的可选名称。提供模型信息以区分相同角色的参与者。
     /// </summary>
