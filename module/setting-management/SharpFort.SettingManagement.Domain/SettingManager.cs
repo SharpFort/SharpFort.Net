@@ -26,10 +26,9 @@ public class SettingManager : ISettingManager, ISingletonDependency
         //TODO: Instead, use IServiceScopeFactory and create a scope..?
 
         _lazyProviders = new Lazy<List<ISettingManagementProvider>>(
-            () => Options
+            () => [.. Options
                 .Providers
-                .Select(c => (serviceProvider.GetRequiredService(c) as ISettingManagementProvider)!)
-                .ToList(),
+                .Select(c => (serviceProvider.GetRequiredService(c) as ISettingManagementProvider)!)],
             true
         );
     }
@@ -101,7 +100,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
             }
         }
 
-        return settingValues.Values.ToList();
+        return [.. settingValues.Values];
     }
 
     public virtual async Task SetAsync(string name, string? value, string providerName, string? providerKey, bool forceToSet = false)
@@ -136,9 +135,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
             }
         }
 
-        providers = providers
-            .TakeWhile(p => p.Name == providerName)
-            .ToList(); //Getting list for case of there are more than one provider with same providerName
+        providers = [.. providers.TakeWhile(p => p.Name == providerName)]; //Getting list for case of there are more than one provider with same providerName
 
         if (value == null)
         {

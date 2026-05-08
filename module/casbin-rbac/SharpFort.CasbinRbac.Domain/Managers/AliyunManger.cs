@@ -18,7 +18,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private Client CreateClient()
         {
-            AlibabaCloud.OpenApiClient.Models.Config config = new AlibabaCloud.OpenApiClient.Models.Config
+            AlibabaCloud.OpenApiClient.Models.Config config = new()
             {
                 // 必填，您的 AccessKey ID
                 AccessKeyId = Options.AccessKeyId,
@@ -43,7 +43,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             try
             {
                 var _aliyunClient = CreateClient();
-                AlibabaCloud.SDK.Dysmsapi20170525.Models.SendSmsRequest sendSmsRequest = new AlibabaCloud.SDK.Dysmsapi20170525.Models.SendSmsRequest
+                AlibabaCloud.SDK.Dysmsapi20170525.Models.SendSmsRequest sendSmsRequest = new()
                 {
                     PhoneNumbers = phoneNumbers,
                     SignName = Options.Sms.SignName,

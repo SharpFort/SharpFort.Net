@@ -86,7 +86,7 @@ namespace SharpFort.Core.Helper
         /// <returns></returns>
         public static CPUMetrics GetCPUMetrics()
         {
-            CPUMetrics cpuMetrics = new CPUMetrics();
+            CPUMetrics cpuMetrics = new();
             var cpudetail = GetCPUDetails();
             cpuMetrics.CoreTotal = cpudetail.Cores;
             cpuMetrics.LogicalProcessors = cpudetail.LogicalProcessors;
@@ -132,7 +132,10 @@ namespace SharpFort.Core.Helper
                 {
                     string output = ShellHelper.Bash("df -m / | awk '{print $2,$3,$4,$5,$6}'");
                     var arr = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                    if (arr.Length == 0) return diskInfos;
+                    if (arr.Length == 0)
+                    {
+                        return diskInfos;
+                    }
 
                     var rootDisk = arr[1].Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
                     if (rootDisk == null || rootDisk.Length == 0)
@@ -360,7 +363,10 @@ namespace SharpFort.Core.Helper
             var metrics = new MemoryMetrics();
             var lines = output.Trim().Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
 
-            if (lines.Length <= 0) return metrics;
+            if (lines.Length <= 0)
+            {
+                return metrics;
+            }
 
             var freeMemoryParts = lines[0].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
             var totalMemoryParts = lines[1].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);

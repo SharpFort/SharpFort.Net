@@ -20,13 +20,13 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
             //获取 accessToken
             var tokenQueryKv = new List<KeyValuePair<string, string?>>()
             {
-                new KeyValuePair<string, string?>("grant_type","authorization_code"),
-                new KeyValuePair<string, string?>("client_id",Options.ClientId),
-                new KeyValuePair<string, string?>("client_secret",Options.ClientSecret),
-                new KeyValuePair<string, string?>("redirect_uri",Options.RedirectUri),
-                new KeyValuePair<string, string?>("fmt","json"),
-                new KeyValuePair<string, string?>("need_openid","1"),
-                new KeyValuePair<string, string?>("code",code)
+                new("grant_type","authorization_code"),
+                new("client_id",Options.ClientId),
+                new("client_secret",Options.ClientSecret),
+                new("redirect_uri",Options.RedirectUri),
+                new("fmt","json"),
+                new("need_openid","1"),
+                new("code",code)
             };
             var tokenModel = await SendHttpRequestAsync<QQAuthticationcationTokenResponse>(QQAuthenticationDefaults.TokenEndpoint, tokenQueryKv);
 
@@ -35,9 +35,9 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
             //获取 userInfo
             var userInfoQueryKv = new List<KeyValuePair<string, string?>>()
             {
-                new KeyValuePair<string, string?>("access_token",tokenModel.access_token),
-                new KeyValuePair<string, string?>("oauth_consumer_key",Options.ClientId),
-                new KeyValuePair<string, string?>("openid",tokenModel.openid),
+                new("access_token",tokenModel.access_token),
+                new("oauth_consumer_key",Options.ClientId),
+                new("openid",tokenModel.openid),
             };
 
             var userInfoMdoel = await SendHttpRequestAsync<QQAuthticationcationUserInfoResponse>(QQAuthenticationDefaults.UserInformationEndpoint, userInfoQueryKv);

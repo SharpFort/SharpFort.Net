@@ -64,7 +64,7 @@ namespace SharpFort.TenantManagement.Application
         public async Task<List<TenantSelectOutputDto>> GetSelectAsync()
         {
             var entites = await _repository._DbQueryable.ToListAsync();
-            return entites.Select(x => new TenantSelectOutputDto { Id = x.Id, Name = x.Name }).ToList();
+            return [.. entites.Select(x => new TenantSelectOutputDto { Id = x.Id, Name = x.Name })];
         }
 
 

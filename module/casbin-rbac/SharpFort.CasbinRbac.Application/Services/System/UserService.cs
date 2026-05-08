@@ -149,7 +149,10 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         private async Task SyncCasbinUserRoles(Guid userId, List<Guid> roleIds)
         {
-            if (roleIds.Count == 0) return;
+            if (roleIds.Count == 0)
+            {
+                return;
+            }
 
             // 获取当前用户的域 (假设单域，或者从 User.DepartmentId 推导，或者默认 "default")
             // 方案 V1.2: g = _, _, _ (user, role, domain)

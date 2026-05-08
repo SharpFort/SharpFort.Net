@@ -8,7 +8,7 @@ public class Code2SessionResponse : IErrorObjct
     public string openid { get; set; }
     public string session_key { get; set; }
     public string unionid { get; set; }
-    public int errcode { get; set; }
+    public int Errcode { get; set; }
     public string errmsg { get; set; }
 }
 

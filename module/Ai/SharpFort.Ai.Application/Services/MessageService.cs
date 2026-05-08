@@ -80,7 +80,7 @@ public class MessageService : ApplicationService
                 idsToHide.AddRange(subsequentIds);
             }
 
-            idsToHide = idsToHide.Distinct().ToList();
+            idsToHide = [.. idsToHide.Distinct()];
         }
 
         // 批量更新为隐藏状态

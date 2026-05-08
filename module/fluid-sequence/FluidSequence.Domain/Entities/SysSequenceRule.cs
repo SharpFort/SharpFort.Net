@@ -110,7 +110,10 @@ namespace FluidSequence.Domain.Entities
 
         public bool TryReset(DateTime now)
         {
-            if (ResetType == SequenceResetType.None) return false;
+            if (ResetType == SequenceResetType.None)
+            {
+                return false;
+            }
 
             bool shouldReset = false;
             // Handle first time initialization
@@ -156,9 +159,17 @@ namespace FluidSequence.Domain.Entities
                         startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
                     }
                     int lastFy = last.Year;
-                    if (last.Month < startMonth) lastFy--;
+                    if (last.Month < startMonth)
+                    {
+                        lastFy--;
+                    }
+
                     int currentFy = now.Year;
-                    if (now.Month < startMonth) currentFy--;
+                    if (now.Month < startMonth)
+                    {
+                        currentFy--;
+                    }
+
                     shouldReset = lastFy != currentFy;
                     break;
             }

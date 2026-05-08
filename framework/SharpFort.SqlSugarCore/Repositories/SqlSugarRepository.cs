@@ -124,7 +124,7 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task InsertManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await InsertRangeAsync(entities.ToList());
+            await InsertRangeAsync([.. entities]);
         }
 
         public virtual async Task<TEntity> UpdateAsync(TEntity entity, bool autoSave = false, CancellationToken cancellationToken = default)
@@ -135,7 +135,7 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task UpdateManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await UpdateRangeAsync(entities.ToList());
+            await UpdateRangeAsync([.. entities]);
         }
 
         public virtual async Task DeleteAsync(TEntity entity, bool autoSave = false, CancellationToken cancellationToken = default)
@@ -145,7 +145,7 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task DeleteManyAsync(IEnumerable<TEntity> entities, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await DeleteAsync(entities.ToList());
+            await DeleteAsync([.. entities]);
         }
 
         public virtual async Task<List<TEntity>> GetListAsync(bool includeDetails = false, CancellationToken cancellationToken = default)

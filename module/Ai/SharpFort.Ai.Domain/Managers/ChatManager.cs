@@ -142,9 +142,9 @@ public class ChatManager : DomainService
         var toolContents = GetTools();
         var chatOptions = new ChatOptions()
         {
-            Tools = toolContents
+            Tools = [.. toolContents
                 .Where(x => tools.Contains(x.Code))
-                .Select(x => (AITool)x.Tool).ToList(),
+                .Select(x => (AITool)x.Tool)],
             ToolMode = ChatToolMode.Auto
         };
 

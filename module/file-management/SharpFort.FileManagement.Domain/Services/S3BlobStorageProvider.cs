@@ -79,7 +79,9 @@ namespace SharpFort.FileManagement.Domain.Services
         public Task<string?> GetUrlAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
         {
             if (config == null)
+            {
                 return Task.FromResult<string?>(null);
+            }
 
             // 如果配置了自定义域名，使用自定义域名
             if (!string.IsNullOrEmpty(config.CustomDomain))

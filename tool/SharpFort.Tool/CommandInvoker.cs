@@ -22,7 +22,7 @@ namespace SharpFort.Tool
             Application.VersionOption("-v|--versions", Assembly.GetExecutingAssembly().GetName().Version!.ToString());
             foreach (var command in _commands)
             {
-                CommandLineApplication childrenCommandLineApplication = new CommandLineApplication(true)
+                CommandLineApplication childrenCommandLineApplication = new(true)
                 {
                     Name = command.Command,
                     Parent = Application,

@@ -11,7 +11,7 @@ namespace SharpFort.Core.Helper
             {
                 List<T> result = [];
                 Guid pid = list.Min(m => (m as ITreeModel<T>)!.ParentId);
-                IList<T> t = list.Where(m => (m as ITreeModel<T>)!.ParentId == pid).ToList();
+                IList<T> t = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == pid)];
                 foreach (T model in t)
                 {
                     if (action is not null)
@@ -20,14 +20,14 @@ namespace SharpFort.Core.Helper
                     }
                     result.Add(model);
                     var item = model as ITreeModel<T>;
-                    List<T> children = list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id).ToList();
+                    List<T> children = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id)];
                     if (children.Count > 0)
                     {
                         SetTreeChildren(list, children, model, action!);
                     }
                 }
                 // 改为升序排序，并增加稳定排序键 Id
-                return result.OrderBy(m => (m as ITreeModel<T>)!.OrderNum).ThenBy(m => (m as ITreeModel<T>)!.Id).ToList();
+                return [.. result.OrderBy(m => (m as ITreeModel<T>)!.OrderNum).ThenBy(m => (m as ITreeModel<T>)!.Id)];
             }
             return null!;
         }
@@ -44,14 +44,14 @@ namespace SharpFort.Core.Helper
                 }
                 mm.Children.Add(item);
                 var _item = item as ITreeModel<T>;
-                List<T> _children = list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id).ToList();
+                List<T> _children = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id)];
                 if (_children.Count > 0)
                 {
                     SetTreeChildren(list, _children, item, action!);
                 }
             }
             // 改为升序排序，并增加稳定排序键 Id
-            mm.Children = mm.Children.OrderBy(m => (m as ITreeModel<T>)!.OrderNum).ThenBy(m => (m as ITreeModel<T>)!.Id).ToList();
+            mm.Children = [.. mm.Children.OrderBy(m => (m as ITreeModel<T>)!.OrderNum).ThenBy(m => (m as ITreeModel<T>)!.Id)];
         }
 
         public interface ITreeModel<T>

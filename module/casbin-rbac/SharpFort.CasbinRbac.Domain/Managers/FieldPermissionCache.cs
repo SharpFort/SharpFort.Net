@@ -14,11 +14,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         // Key: RoleId
         // Value: Map<ResourceName, Set<FieldName>>
         private ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>> _cache
-            = new ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>>();
+            = new();
 
         // Key: RoleCode (Case-insensitive), Value: RoleId
         private ConcurrentDictionary<string, Guid> _roleCodeMap
-            = new ConcurrentDictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+            = new(StringComparer.OrdinalIgnoreCase);
 
         public FieldPermissionCache(IServiceScopeFactory scopeFactory)
         {
@@ -73,7 +73,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public HashSet<string> GetDenyFields(IEnumerable<Guid> roleIds, string resourceName)
         {
             var denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (roleIds == null || !roleIds.Any()) return denyList;
+            if (roleIds == null || !roleIds.Any())
+            {
+                return denyList;
+            }
 
             foreach (var roleId in roleIds)
             {
@@ -88,7 +91,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public HashSet<string> GetDenyFieldsByCodes(IEnumerable<string> roleCodes, string resourceName)
         {
             var denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (roleCodes == null || !roleCodes.Any()) return denyList;
+            if (roleCodes == null || !roleCodes.Any())
+            {
+                return denyList;
+            }
 
             foreach (var code in roleCodes)
             {

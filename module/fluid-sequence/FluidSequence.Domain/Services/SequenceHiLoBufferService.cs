@@ -28,11 +28,11 @@ namespace FluidSequence.Domain.Services
     {
         // 每个 ruleCode → 待使用的号码队列
         private readonly ConcurrentDictionary<string, ConcurrentQueue<int>> _buffers
-            = new ConcurrentDictionary<string, ConcurrentQueue<int>>();
+            = new();
 
         // 每个 ruleCode → 用于控制"只有一个线程去 DB 预取"的信号量
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks
-            = new ConcurrentDictionary<string, SemaphoreSlim>();
+            = new();
 
         private readonly ISequenceRuleRepository _repository;
 
@@ -54,7 +54,9 @@ namespace FluidSequence.Domain.Services
 
             // 快路径：队列非空，直接出队，无需加锁，零竞争
             if (queue.TryDequeue(out var value))
+            {
                 return value;
+            }
 
             // 慢路径：队列已耗尽，加锁去 DB 预取
             await sem.WaitAsync();
@@ -62,7 +64,9 @@ namespace FluidSequence.Domain.Services
             {
                 // 二次检查：有可能另一个线程刚刚填充好了队列
                 if (queue.TryDequeue(out value))
+                {
                     return value;
+                }
 
                 // 原子推进：将 DB 中 current_value 向上推进 bufferCount 步
                 // rangeStart 是本批次的第一个号，rangeEnd 是最后一个号（均含）
@@ -72,7 +76,9 @@ namespace FluidSequence.Domain.Services
                 // 注意：AtomicAdvance 返回的 rangeStart = 推进前的 current_value
                 //       即数据库原本已记录到 rangeStart，[rangeStart+1, rangeEnd] 是新增的号段
                 for (var i = rangeStart + 1; i <= rangeEnd; i++)
+                {
                     queue.Enqueue(i);
+                }
 
                 // 返回号段的第一个号
                 return rangeStart + 1;

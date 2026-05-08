@@ -2,5 +2,5 @@
 
 public interface IHasErrcode
 {
-    public int errcode { get; set; }
+    public int Errcode { get; set; }
 }

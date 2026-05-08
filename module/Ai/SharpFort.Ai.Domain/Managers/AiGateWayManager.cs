@@ -196,7 +196,7 @@ public class AiGateWayManager : DomainService
         // 创建一个队列来缓存消息
         var messageQueue = new ConcurrentQueue<string>();
 
-        StringBuilder backupSystemContent = new StringBuilder();
+        StringBuilder backupSystemContent = new();
         // 设置输出速率（例如每50毫秒输出一次）
         var outputInterval = TimeSpan.FromMilliseconds(75);
         // 标记是否完成接收
@@ -316,7 +316,10 @@ public class AiGateWayManager : DomainService
         try
         {
             var model = request.Model;
-            if (string.IsNullOrEmpty(model)) model = "dall-e-2";
+            if (string.IsNullOrEmpty(model))
+            {
+                model = "dall-e-2";
+            }
 
             var modelDescribe = await GetModelAsync(ModelApiType.Completions, model);
 
@@ -376,7 +379,10 @@ public class AiGateWayManager : DomainService
     {
         try
         {
-            if (input == null) throw new ArgumentNullException(nameof(input), "模型校验异常");
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input), "模型校验异常");
+            }
 
             using var embedding =
                 Activity.Current?.Source.StartActivity("向量模型调用");
@@ -403,7 +409,7 @@ public class AiGateWayManager : DomainService
                 else if (str.ValueKind == JsonValueKind.Array)
                 {
                     var inputString = str.EnumerateArray().Select(x => x.ToString()).ToArray();
-                    embeddingCreateRequest.InputAsList = inputString.ToList();
+                    embeddingCreateRequest.InputAsList = [.. inputString];
                 }
                 else
                 {
@@ -505,7 +511,7 @@ public class AiGateWayManager : DomainService
         var data = await chatService.ChatCompletionsAsync(modelDescribe, request, cancellationToken);
 
         var currentUsage = data.Usage;
-        ThorUsageResponse tokenUsage = new ThorUsageResponse
+        ThorUsageResponse tokenUsage = new()
         {
             InputTokens = (currentUsage?.InputTokens ?? 0) + (currentUsage?.CacheCreationInputTokens ?? 0) + (currentUsage?.CacheReadInputTokens ?? 0),
             OutputTokens = (currentUsage?.OutputTokens ?? 0),
@@ -572,7 +578,7 @@ public class AiGateWayManager : DomainService
         request.Model = ModelConst.ProcessModelId(request.Model);
 
         var completeChatResponse = chatService.StreamChatCompletionsAsync(modelDescribe, request, cancellationToken);
-        ThorUsageResponse? tokenUsage = new ThorUsageResponse();
+        ThorUsageResponse? tokenUsage = new();
         bool isFirst = true;
         try
         {
@@ -1571,7 +1577,10 @@ public class AiGateWayManager : DomainService
     private static async ValueTask WriteUtf8StringAsync(Stream stream, string value, CancellationToken token)
     {
         if (string.IsNullOrEmpty(value))
+        {
             return;
+        }
+
         var buffer = Encoding.UTF8.GetBytes(value);
         await stream.WriteAsync(buffer, token).ConfigureAwait(false);
     }

@@ -26,9 +26,9 @@ namespace SharpFort.Tool.Domain
 
         private NugetResult InitData()
         {
-            NugetResult nugetResult = new NugetResult();
+            NugetResult nugetResult = new();
 
-            HtmlWeb web = new HtmlWeb();
+            HtmlWeb web = new();
             this.HtmlDoc = web.Load(NugetVersionUrl);
             nugetResult.Versions = GetVersionList();
             nugetResult.DownloadNumber = GetDownloadNumber();

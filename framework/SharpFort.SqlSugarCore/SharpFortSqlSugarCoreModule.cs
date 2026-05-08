@@ -111,7 +111,7 @@ namespace SharpFort.SqlSugarCore
                     IsActive = true
                 });
 
-                options.Tenants = tenants.ToArray();
+                options.Tenants = [.. tenants];
             });
         }
 

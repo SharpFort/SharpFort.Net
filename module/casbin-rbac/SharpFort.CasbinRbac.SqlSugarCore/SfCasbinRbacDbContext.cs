@@ -36,10 +36,16 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
         /// </summary>
         protected void DataPermissionFilter(ISqlSugarClient sqlSugarClient)
         {
-            if (CurrentUser.Id == null) return;
+            if (CurrentUser.Id == null)
+            {
+                return;
+            }
 
             // 管理员跳过过滤
-            if (CurrentUser.UserName == UserConst.Admin || CurrentUser.Roles.Contains(UserConst.AdminRolesCode)) return;
+            if (CurrentUser.UserName == UserConst.Admin || CurrentUser.Roles.Contains(UserConst.AdminRolesCode))
+            {
+                return;
+            }
 
             var roleInfo = CurrentUser.GetRoleInfo();
             var expUser = Expressionable.Create<User>();

@@ -34,7 +34,10 @@ public class RESTfulResultProvider : IUnifyResultProvider, ITransientDependency
     /// <param name="unifyResultSettings"></param>
     public static void SetResponseStatusCodes(HttpContext context, int statusCode, UnifyResultSettingsOptions? unifyResultSettings)
     {
-        if (unifyResultSettings == null) return;
+        if (unifyResultSettings == null)
+        {
+            return;
+        }
 
         // 篡改响应状态码
         if (unifyResultSettings.AdaptStatusCodes != null && unifyResultSettings.AdaptStatusCodes.Length > 0)
@@ -48,9 +51,15 @@ public class RESTfulResultProvider : IUnifyResultProvider, ITransientDependency
         }
 
         // 如果为 null，则所有请求错误的状态码设置为 200
-        if (unifyResultSettings.Return200StatusCodes == null) context.Response.StatusCode = 200;
+        if (unifyResultSettings.Return200StatusCodes == null)
+        {
+            context.Response.StatusCode = 200;
+        }
         // 否则只有里面的才设置为 200
-        else if (unifyResultSettings.Return200StatusCodes.Contains(statusCode)) context.Response.StatusCode = 200;
+        else if (unifyResultSettings.Return200StatusCodes.Contains(statusCode))
+        {
+            context.Response.StatusCode = 200;
+        }
         else { }
     }
 

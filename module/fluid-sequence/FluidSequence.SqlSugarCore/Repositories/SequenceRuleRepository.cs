@@ -49,7 +49,9 @@ namespace FluidSequence.SqlSugarCore.Repositories
             });
 
             if (dt.Rows.Count == 0)
+            {
                 throw new UserFriendlyException($"流水号规则 [{ruleCode}] 不存在，无法执行号段预取。");
+            }
 
             var rangeStart = Convert.ToInt32(dt.Rows[0]["range_start"]);
             var rangeEnd = Convert.ToInt32(dt.Rows[0]["range_end"]);

@@ -349,8 +349,8 @@ public sealed class ClaudiaChatCompletionsService(
             max_tokens = input.MaxTokens ?? 64000,
             stream = true,
             tool_choice,
-            system = CreateMessage((input.Messages ?? []).Where(x => x.Role == "system").ToList(), options),
-            messages = CreateMessage((input.Messages ?? []).Where(x => x.Role != "system").ToList(), options),
+            system = CreateMessage([.. (input.Messages ?? []).Where(x => x.Role == "system")], options),
+            messages = CreateMessage([.. (input.Messages ?? []).Where(x => x.Role != "system")], options),
             top_p = isThinking ? null : input.TopP,
             thinking = isThinking
                 ? new
@@ -418,11 +418,16 @@ public sealed class ClaudiaChatCompletionsService(
             }
 
             if (line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
+            {
                 line = line[OpenAIConstant.Data.Length..];
+            }
 
             line = line.Trim();
 
-            if (string.IsNullOrWhiteSpace(line)) continue;
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
 
             if (line == OpenAIConstant.Done)
             {
@@ -798,8 +803,8 @@ public sealed class ClaudiaChatCompletionsService(
         {
             model = input.Model,
             max_tokens = input.MaxTokens ?? 2000,
-            system = CreateMessage((input.Messages ?? []).Where(x => x.Role == "system").ToList(), options),
-            messages = CreateMessage((input.Messages ?? []).Where(x => x.Role != "system").ToList(), options),
+            system = CreateMessage([.. (input.Messages ?? []).Where(x => x.Role == "system")], options),
+            messages = CreateMessage([.. (input.Messages ?? []).Where(x => x.Role != "system")], options),
             top_p = isThink ? null : input.TopP,
             tool_choice,
             thinking = isThink

@@ -327,7 +327,7 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
     {
         if (DbOptions.EnabledSqlLog)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine();
             sb.AppendLine("==========Sf-SQL执行:==========");
             sb.AppendLine(UtilMethods.GetSqlString(DbType.SqlServer, sql, parameters));

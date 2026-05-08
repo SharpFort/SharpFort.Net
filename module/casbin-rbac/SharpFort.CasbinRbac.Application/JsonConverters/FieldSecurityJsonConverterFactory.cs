@@ -115,7 +115,10 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
             foreach (var prop in _properties)
             {
                 // 过滤 WriteOnly
-                if (!prop.CanRead) continue;
+                if (!prop.CanRead)
+                {
+                    continue;
+                }
 
                 // 字段过滤核心逻辑
                 if (denyFields != null && denyFields.Contains(prop.Name))

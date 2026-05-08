@@ -40,7 +40,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         {
             VerifyRedisCacheEnable();
             var keys = RedisClient.Keys(CacheKeyPrefix + "*");
-            var result = GroupedKeys(keys.ToList());
+            var result = GroupedKeys([.. keys]);
             var output = result.Select(x => new MonitorCacheNameGetListOutputDto { CacheName = x }).ToList();
             return output;
         }
@@ -64,7 +64,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                     resultSet.Add(str);
                 }
             }
-            return resultSet.ToList();
+            return [.. resultSet];
 
         }
 
@@ -84,7 +84,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         {
             VerifyRedisCacheEnable();
             var output = RedisClient.Keys($"{cacaheName}:*").Select(x => x.RemovePreFix(cacaheName + ":"));
-            return output.ToList();
+            return [.. output];
         }
 
         //全部不为空

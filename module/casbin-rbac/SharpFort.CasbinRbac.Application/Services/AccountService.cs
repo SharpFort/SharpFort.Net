@@ -436,13 +436,13 @@ namespace SharpFort.CasbinRbac.Application.Services
             {
                 //将后端菜单转换成前端路由，组件级别需要过滤
                 output =
-                    ObjectMapper.Map<List<MenuDto>, List<Menu>>(menus.Where(x => x.MenuSource == MenuSource.Ruoyi).ToList()).Vue3RuoSfRouterBuild();
+                    ObjectMapper.Map<List<MenuDto>, List<Menu>>([.. menus.Where(x => x.MenuSource == MenuSource.Ruoyi)]).Vue3RuoSfRouterBuild();
             }
             else if (routerType == "pure")
             {
                 //将后端菜单转换成前端路由，组件级别需要过滤
                 output =
-                    ObjectMapper.Map<List<MenuDto>, List<Menu>>(menus.Where(x => x.MenuSource == MenuSource.Pure).ToList()).Vue3PureRouterBuild();
+                    ObjectMapper.Map<List<MenuDto>, List<Menu>>([.. menus.Where(x => x.MenuSource == MenuSource.Pure)]).Vue3PureRouterBuild();
             }
 
             return output;

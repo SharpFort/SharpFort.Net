@@ -93,10 +93,10 @@ public class Token : FullAuditedAggregateRoot<Guid>
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
         // 创建随机数生成器
-        Random random = new Random();
+        Random random = new();
 
         // 使用StringBuilder高效构建字符串
-        StringBuilder sb = new StringBuilder(length);
+        StringBuilder sb = new(length);
 
         // 生成指定长度的随机字符串
         for (int i = 0; i < length; i++)

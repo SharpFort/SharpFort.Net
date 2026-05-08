@@ -14,7 +14,7 @@ namespace SharpFort.CasbinRbac.Domain.Extensions
         /// <returns></returns>
         public static List<string> GetPermissions(this ICurrentUser currentUser)
         {
-            return currentUser.FindClaims(TokenTypeConst.Permission).Select(x => x.Value).ToList();
+            return [.. currentUser.FindClaims(TokenTypeConst.Permission).Select(x => x.Value)];
 
         }
 

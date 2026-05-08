@@ -61,7 +61,7 @@ public class SubscribeNoticeInput
 
 public class SubscribeNoticeResponse : IErrorObjct
 {
-    public int errcode { get; set; }
+    public int Errcode { get; set; }
     public string errmsg { get; set; }
 }
 

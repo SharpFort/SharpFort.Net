@@ -72,10 +72,9 @@ namespace SharpFort.Tool.Web
                 {
                     builder
                         .WithOrigins(
-                            configuration["App:CorsOrigins"]!
+                            [.. configuration["App:CorsOrigins"]!
                                 .Split(";", StringSplitOptions.RemoveEmptyEntries)
-                                .Select(o => o.RemovePostFix("/"))
-                                .ToArray()
+                                .Select(o => o.RemovePostFix("/"))]
                         )
                         .WithAbpExposedHeaders()
                         .SetIsOriginAllowedToAllowWildcardSubdomains()

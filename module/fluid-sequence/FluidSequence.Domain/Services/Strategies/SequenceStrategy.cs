@@ -12,15 +12,27 @@ namespace FluidSequence.Domain.Services.Strategies
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
-            if (placeholderKey == "SEQ") return rule.CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(rule.SeqLength, '0');
-            if (placeholderKey == "SEQ36") return ConvertToBase36(rule.CurrentValue);
+            if (placeholderKey == "SEQ")
+            {
+                return rule.CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(rule.SeqLength, '0');
+            }
+
+            if (placeholderKey == "SEQ36")
+            {
+                return ConvertToBase36(rule.CurrentValue);
+            }
+
             return placeholderKey;
         }
 
         private static string ConvertToBase36(long value)
         {
             const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            if (value == 0) return "0";
+            if (value == 0)
+            {
+                return "0";
+            }
+
             string result = "";
             while (value > 0)
             {

@@ -58,7 +58,9 @@ namespace FluidSequence.Domain.Services
                 // Hi-Lo 模式：从内存队列取号，队列空时原子批量预取
                 int bufferCount = 50; // 默认单次预取 50 个
                 if (rule.ExtensionProps!.TryGetValue("BufferCount", out var bc))
+                {
                     bufferCount = Math.Max(1, Convert.ToInt32(bc, System.Globalization.CultureInfo.InvariantCulture));
+                }
 
                 // 从缓冲队列取到的是最新的 CurrentValue，直接用于模板渲染
                 // 注意：此时 rule.CurrentValue 是旧值，需要临时覆盖以便 ParseTemplate 正确使用
@@ -153,12 +155,16 @@ namespace FluidSequence.Domain.Services
                 foreach (var strategy in _strategies)
                 {
                     if (strategy.CanHandle(key))
+                    {
                         return strategy.Handle(key, rule, context);
+                    }
                 }
 
                 // 策略链未命中时，尝试从上下文字典直接读取
                 if (context != null && context.TryGetValue(key, out var ctxVal))
+                {
                     return ctxVal;
+                }
 
                 // 无法解析的占位符原样保留，方便调试
                 return match.Value;

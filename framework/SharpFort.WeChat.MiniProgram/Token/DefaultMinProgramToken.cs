@@ -23,7 +23,7 @@ internal class DefaultMinProgramToken : IMiniProgramToken
         req.appid = _options.AppID;
         req.secret = _options.AppSecret;
         req.grant_type = "client_credential";
-        using (HttpClient httpClient = new HttpClient())
+        using (HttpClient httpClient = new())
         {
             string queryString = req.ToQueryString();
             var builder = new UriBuilder(Url);

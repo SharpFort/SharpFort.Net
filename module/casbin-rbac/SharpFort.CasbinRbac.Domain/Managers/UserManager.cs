@@ -264,7 +264,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             user.Roles = [];
             userRoleMenu.User = user.Adapt<UserDto>();
             userRoleMenu.User.Password = string.Empty;
-            userRoleMenu.Menus = userRoleMenu.Menus.OrderBy(x => x.OrderNum).ThenBy(x => x.CreationTime).ToList();
+            userRoleMenu.Menus = [.. userRoleMenu.Menus.OrderBy(x => x.OrderNum).ThenBy(x => x.CreationTime)];
             return userRoleMenu;
         }
     }

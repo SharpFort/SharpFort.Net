@@ -84,7 +84,10 @@ namespace SharpFort.Core.Extensions
         public static string GetClientIp(this HttpContext context)
         {
             const string localhost = "127.0.0.1";
-            if (context == null) return string.Empty;
+            if (context == null)
+            {
+                return string.Empty;
+            }
 
             // 尝试获取X-Forwarded-For头
             var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
@@ -132,10 +135,9 @@ namespace SharpFort.Core.Extensions
         /// <returns>权限值数组</returns>
         public static string[]? GetUserPermissions(this HttpContext context, string permissionsName)
         {
-            return context.User.Claims
+            return [.. context.User.Claims
                 .Where(x => x.Type == permissionsName)
-                .Select(x => x.Value)
-                .ToArray();
+                .Select(x => x.Value)];
         }
 
         /// <summary>

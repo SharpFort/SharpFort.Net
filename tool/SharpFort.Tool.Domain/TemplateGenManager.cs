@@ -47,7 +47,7 @@ namespace SharpFort.Tool.Domain
 
             var downloadFilePath = Path.Combine(downloadPath, $"{id}.zip");
             var gitSteam = await _giteeManager.DownLoadFileAsync(input.GiteeRef);
-            using (FileStream fileStream = new FileStream(downloadFilePath, FileMode.Create, FileAccess.Write))
+            using (FileStream fileStream = new(downloadFilePath, FileMode.Create, FileAccess.Write))
             {
                 await gitSteam.CopyToAsync(fileStream);
             }

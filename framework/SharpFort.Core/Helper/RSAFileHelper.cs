@@ -18,7 +18,10 @@ namespace SharpFort.Core.Helper
             string rootPath = Directory.GetCurrentDirectory();
             string filePath = Path.Combine(rootPath, fileName);
             if (!File.Exists(filePath))
+            {
                 throw new FileNotFoundException("文件不存在", filePath);
+            }
+
             string key = File.ReadAllText(filePath);
             var rsa = RSA.Create();
             rsa.ImportFromPem(key.AsSpan());

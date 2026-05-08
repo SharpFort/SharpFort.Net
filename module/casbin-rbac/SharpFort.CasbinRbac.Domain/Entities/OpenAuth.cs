@@ -114,9 +114,20 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// </summary>
         public void UpdateToken(string token, string? nickName, string? avatar)
         {
-            if (!string.IsNullOrWhiteSpace(token)) Token = token;
-            if (!string.IsNullOrWhiteSpace(nickName)) NickName = nickName;
-            if (!string.IsNullOrWhiteSpace(avatar)) Avatar = avatar;
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                Token = token;
+            }
+
+            if (!string.IsNullOrWhiteSpace(nickName))
+            {
+                NickName = nickName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(avatar))
+            {
+                Avatar = avatar;
+            }
         }
 
         #endregion

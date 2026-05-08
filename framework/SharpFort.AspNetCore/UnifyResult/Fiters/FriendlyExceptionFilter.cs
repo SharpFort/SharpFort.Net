@@ -43,10 +43,16 @@ public sealed partial class FriendlyExceptionFilter : IAsyncExceptionFilter
     {
 
         // 排除 WebSocket 请求处理
-        if (context.HttpContext.IsWebSocketRequest()) return;
+        if (context.HttpContext.IsWebSocketRequest())
+        {
+            return;
+        }
 
         // 如果异常在其他地方被标记了处理，那么这里不再处理
-        if (context.ExceptionHandled) return;
+        if (context.ExceptionHandled)
+        {
+            return;
+        }
 
         // 解析异常信息
         var exceptionMetadata = GetExceptionMetadata(context);

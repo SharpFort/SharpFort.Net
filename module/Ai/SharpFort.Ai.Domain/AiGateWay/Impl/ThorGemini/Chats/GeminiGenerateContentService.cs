@@ -50,7 +50,10 @@ public class GeminiGenerateContentService(
                 continue;
             }
 
-            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal)) continue;
+            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
+            {
+                continue;
+            }
 
             var data = line[OpenAIConstant.Data.Length..].Trim();
 

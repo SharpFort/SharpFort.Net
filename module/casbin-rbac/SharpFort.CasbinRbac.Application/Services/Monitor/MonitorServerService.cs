@@ -25,7 +25,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         private static List<NetworkAdapterDto> _cachedNetworks = null!;
         private static List<AssemblyInfoDto> _cachedAssemblies = null!;
         private static DateTime _lastStaticCacheTime = DateTime.MinValue;
-        private static readonly object _staticCacheLock = new object();
+        private static readonly object _staticCacheLock = new();
 
         [HttpGet("monitor-server/info")]
         public async Task<MonitorServerInfoDto> GetServerInfoAsync()
@@ -36,7 +36,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
 
                 // PERFORMANCE FIX: Never call RefreshAll() in a request loop! It queries BIOS, Motherboard, Batteries, etc., and blocks the thread.
                 // Create a scoped instance and ONLY refresh what we specifically need (Memory and CPU are fast).
-                HardwareInfo hardwareInfo = new HardwareInfo();  // CA1859: use concrete type
+                HardwareInfo hardwareInfo = new();  // CA1859: use concrete type
                 hardwareInfo.RefreshMemoryStatus();
                 hardwareInfo.RefreshCPUList();
 
@@ -127,22 +127,21 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                     if ((DateTime.Now - _lastStaticCacheTime).TotalHours > 1 || _cachedNetworks == null || _cachedAssemblies == null)
                     {
                         hardwareInfo.RefreshNetworkAdapterList();
-                        _cachedNetworks = hardwareInfo.NetworkAdapterList.Select(net => new NetworkAdapterDto
+                        _cachedNetworks = [.. hardwareInfo.NetworkAdapterList.Select(net => new NetworkAdapterDto
                         {
                             Name = net.Name,
                             MacAddress = net.MACAddress,
                             IPv4 = net.IPAddressList != null ? string.Join(", ", net.IPAddressList.Select(ip => ip.ToString())) : "N/A"
-                        }).ToList();
+                        })];
 
-                        _cachedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                        _cachedAssemblies = [.. AppDomain.CurrentDomain.GetAssemblies()
                             .Where(a => !a.IsDynamic)
                             .Select(a => new AssemblyInfoDto
                             {
                                 Name = a.GetName().Name ?? "Unknown",
                                 Version = a.GetName().Version?.ToString() ?? string.Empty
                             })
-                            .OrderBy(a => a.Name)
-                            .ToList();
+                            .OrderBy(a => a.Name)];
 
                         _lastStaticCacheTime = DateTime.Now;
                     }

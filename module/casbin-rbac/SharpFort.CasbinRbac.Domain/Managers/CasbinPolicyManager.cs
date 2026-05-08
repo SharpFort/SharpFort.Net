@@ -165,7 +165,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             foreach (var menu in menus)
             {
-                if (string.IsNullOrWhiteSpace(menu.ApiUrl)) continue;
+                if (string.IsNullOrWhiteSpace(menu.ApiUrl))
+                {
+                    continue;
+                }
 
                 var methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
 

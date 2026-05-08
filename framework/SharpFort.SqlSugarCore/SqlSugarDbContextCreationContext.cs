@@ -8,7 +8,7 @@ namespace SharpFort.SqlSugarCore;
 public class SqlSugarDbContextCreationContext
 {
     private static readonly AsyncLocal<SqlSugarDbContextCreationContext> CurrentContextHolder =
-        new AsyncLocal<SqlSugarDbContextCreationContext>();
+        new();
 
     /// <summary>
     /// 获取当前上下文

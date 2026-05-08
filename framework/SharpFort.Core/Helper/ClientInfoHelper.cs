@@ -19,7 +19,10 @@ namespace SharpFort.Core.Helper
 
         public static ClientResult GetClientInfo(HttpContext context)
         {
-            if (context == null) return new ClientResult();
+            if (context == null)
+            {
+                return new ClientResult();
+            }
 
             // 1. 解析 UserAgent (浏览器和OS)
             var uaStr = context.GetUserAgent(); // 假设这是你的扩展方法

@@ -12,7 +12,10 @@ namespace FluidSequence.Domain.Services.Strategies
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
-            if (context == null) return "";
+            if (context == null)
+            {
+                return "";
+            }
 
             if (placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal))
             {

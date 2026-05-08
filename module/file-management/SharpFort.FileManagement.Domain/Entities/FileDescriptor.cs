@@ -245,7 +245,9 @@ namespace SharpFort.FileManagement.Domain.Entities
         private static FileType InferFileType(string? extension)
         {
             if (string.IsNullOrEmpty(extension))
+            {
                 return FileType.File;
+            }
 
             return extension.ToLowerInvariant() switch
             {

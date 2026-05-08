@@ -51,7 +51,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         var actionExecutedContext = await next();
 
         // 排除 WebSocket 请求处理
-        if (actionExecutedContext.HttpContext.IsWebSocketRequest()) return;
+        if (actionExecutedContext.HttpContext.IsWebSocketRequest())
+        {
+            return;
+        }
 
         // 处理已经含有状态码结果的 Result
         if (actionExecutedContext.Result is IStatusCodeActionResult statusCodeResult &&
@@ -75,7 +78,11 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
                     }
 
                     // 如果 Response 已经完成输出，则禁止写入
-                    if (httpContext.Response.HasStarted) return;
+                    if (httpContext.Response.HasStarted)
+                    {
+                        return;
+                    }
+
                     await unifyRes.OnResponseStatusCodes(httpContext, statusCode,
                         httpContext.RequestServices.GetService<IOptions<UnifyResultSettingsOptions>>()!.Value);
                 }
@@ -85,7 +92,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         }
 
         // 如果出现异常，则不会进入该过滤器
-        if (actionExecutedContext.Exception != null) return;
+        if (actionExecutedContext.Exception != null)
+        {
+            return;
+        }
 
         // 获取控制器信息
         var actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
@@ -107,7 +117,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             var validationMetadata = GetValidationMetadata(badRequestObjectResult.Value!);
 
             var result = unifyResult.OnValidateFailed(context, validationMetadata);
-            if (result != null) actionExecutedContext.Result = result;
+            if (result != null)
+            {
+                actionExecutedContext.Result = result;
+            }
         }
         else
         {
@@ -120,7 +133,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             }
 
             // 如果是不能规范化的结果类型，则跳过
-            if (result == null) return;
+            if (result == null)
+            {
+                return;
+            }
 
             actionExecutedContext.Result = result;
         }
@@ -216,7 +232,9 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         };
 
         // 目前支持返回值 ActionResult
-        if (isDataResult) data = result switch
+        if (isDataResult)
+        {
+            data = result switch
         {
             // 处理内容结果
             ContentResult content => content.Content!,
@@ -226,6 +244,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             JsonResult json => json.Value!,
             _ => null!,
         };
+        }
 
         return isDataResult;
     }
@@ -241,7 +260,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
     {
         // 获取终点路由特性
         var endpointFeature = context.Features.Get<IEndpointFeature>();
-        if (endpointFeature == null) return (unifyResult = null!) == null;
+        if (endpointFeature == null)
+        {
+            return (unifyResult = null!) == null;
+        }
 
         // 判断是否跳过规范化处理
         var isSkip = context.GetEndpoint()?.Metadata?.GetMetadata<NonUnifyAttribute>() != null
@@ -249,7 +271,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
                      || context.Request.Headers["accept"].ToString().Contains("odata.metadata=", StringComparison.OrdinalIgnoreCase)
                      || context.Request.Headers["accept"].ToString().Contains("odata.streaming=", StringComparison.OrdinalIgnoreCase);
 
-        if (isSkip == true) unifyResult = null!;
+        if (isSkip == true)
+        {
+            unifyResult = null!;
+        }
         else
         {
             unifyResult = context.RequestServices.GetRequiredService<IUnifyResultProvider>();

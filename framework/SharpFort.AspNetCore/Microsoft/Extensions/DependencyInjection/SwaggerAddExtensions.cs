@@ -160,9 +160,15 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// <param name="context">架构过滤器上下文</param>
         public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
-            if (!context.Type.IsEnum) return;
+            if (!context.Type.IsEnum)
+            {
+                return;
+            }
 
-            if (schema is not OpenApiSchema openApiSchema) return;
+            if (schema is not OpenApiSchema openApiSchema)
+            {
+                return;
+            }
 
             openApiSchema.Enum!.Clear();
             openApiSchema.Type = JsonSchemaType.String;

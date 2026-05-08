@@ -23,13 +23,19 @@ public static class JsonElementExtensions
                 case string propertyName:
                     if (current.ValueKind != JsonValueKind.Object ||
                         !current.TryGetProperty(propertyName, out current))
+                    {
                         return null;
+                    }
+
                     break;
 
                 case int index:
                     if (current.ValueKind != JsonValueKind.Array ||
                         index < 0 || index >= current.GetArrayLength())
+                    {
                         return null;
+                    }
+
                     current = current[index];
                     break;
 
@@ -48,7 +54,10 @@ public static class JsonElementExtensions
     {
         if (element.ValueKind == JsonValueKind.Object &&
             element.TryGetProperty(propertyName, out var value))
+        {
             return value;
+        }
+
         return null;
     }
 
@@ -59,7 +68,10 @@ public static class JsonElementExtensions
     {
         if (element.ValueKind == JsonValueKind.Array &&
             index >= 0 && index < element.GetArrayLength())
+        {
             return element[index];
+        }
+
         return null;
     }
 
@@ -152,7 +164,9 @@ public static class JsonElementExtensions
         if (element?.ValueKind == JsonValueKind.Array)
         {
             foreach (var item in element.Value.EnumerateArray())
+            {
                 yield return item;
+            }
         }
     }
 
@@ -166,13 +180,12 @@ public static class JsonElementExtensions
     /// 数组转 List
     /// </summary>
     public static List<string?> ToStringList(this JsonElement? element)
-        => element.GetArray().Select(e => e.GetString()).ToList();
+        => [.. element.GetArray().Select(e => e.GetString())];
 
     public static List<int> ToIntList(this JsonElement? element)
-        => element.GetArray()
+        => [.. element.GetArray()
             .Where(e => e.ValueKind == JsonValueKind.Number)
-            .Select(e => e.GetInt32())
-            .ToList();
+            .Select(e => e.GetInt32())];
 
     #endregion
 
@@ -186,7 +199,9 @@ public static class JsonElementExtensions
         if (element?.ValueKind == JsonValueKind.Object)
         {
             foreach (var prop in element.Value.EnumerateObject())
+            {
                 yield return prop;
+            }
         }
     }
 
@@ -257,11 +272,16 @@ public static class JsonElementExtensions
     public static Dictionary<string, JsonElement>? ToDictionary(this JsonElement? element)
     {
         if (element?.ValueKind != JsonValueKind.Object)
+        {
             return null;
+        }
 
         var dict = new Dictionary<string, JsonElement>();
         foreach (var prop in element.Value.EnumerateObject())
+        {
             dict[prop.Name] = prop.Value;
+        }
+
         return dict;
     }
 

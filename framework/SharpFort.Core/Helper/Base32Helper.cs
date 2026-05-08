@@ -13,7 +13,7 @@ namespace SharpFort.Core.Helper
         /// </summary>
         public static string ToString(byte[] bytes)
         {
-            StringBuilder sb = new StringBuilder();         // holds the base32 chars
+            StringBuilder sb = new();         // holds the base32 chars
             byte index;
             int hi = 5;
             int currentByte = 0;

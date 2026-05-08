@@ -36,7 +36,11 @@ namespace FluidSequence.Domain.Services.Strategies
                         startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
                     }
                     int fy = now.Year;
-                    if (now.Month < startMonth) fy--;
+                    if (now.Month < startMonth)
+                    {
+                        fy--;
+                    }
+
                     return fy.ToString(CultureInfo.InvariantCulture);
             }
             return placeholderKey;

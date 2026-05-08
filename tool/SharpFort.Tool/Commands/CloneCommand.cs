@@ -29,7 +29,7 @@ namespace SharpFort.Tool.Commands
         /// <param name="cmdCommands"></param>
         private static void StartCmd(params string[] cmdCommands)
         {
-            ProcessStartInfo psi = new ProcessStartInfo
+            ProcessStartInfo psi = new()
             {
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
@@ -49,7 +49,7 @@ namespace SharpFort.Tool.Commands
                 psi.Arguments = $"-c \"{string.Join("; ", cmdCommands)}\"";
             }
 
-            Process proc = new Process
+            Process proc = new()
             {
                 StartInfo = psi
             };

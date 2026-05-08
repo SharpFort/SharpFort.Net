@@ -5,7 +5,7 @@ namespace FluidSequence.Domain.Services.Strategies
 {
     public class RandomStrategy : IPlaceholderStrategy, ISingletonDependency
     {
-        private static readonly Random _random = new Random();
+        private static readonly Random _random = new();
         private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         // Safe chars excluding I, O, Z, 0, 1, 2
         private const string SafeChars = "ABCDEFGHJKLMNPQRSTUVWXY3456789";
@@ -20,10 +20,16 @@ namespace FluidSequence.Domain.Services.Strategies
         {
             // RAND:NUM:4
             var parts = placeholderKey.Split(':');
-            if (parts.Length < 3) return placeholderKey;
+            if (parts.Length < 3)
+            {
+                return placeholderKey;
+            }
 
             string type = parts[1];
-            if (!int.TryParse(parts[2], out int len)) return placeholderKey;
+            if (!int.TryParse(parts[2], out int len))
+            {
+                return placeholderKey;
+            }
 
             char[] buffer = new char[len];
             string source = "";

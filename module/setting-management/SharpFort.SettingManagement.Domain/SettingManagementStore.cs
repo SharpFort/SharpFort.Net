@@ -52,7 +52,7 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
     public virtual async Task<List<SettingValue>> GetListAsync(string providerName, string providerKey)
     {
         var settings = await SettingRepository.GetListAsync(providerName, providerKey);
-        return settings.Select(s => new SettingValue(s.Name, s.Value)).ToList();
+        return [.. settings.Select(s => new SettingValue(s.Name, s.Value))];
     }
 
     [UnitOfWork]
@@ -146,7 +146,7 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
 
         if (cacheItems.All(x => x.Value != null))
         {
-            return cacheItems.Select(kvp => new KeyValuePair<string, SettingCacheItem>(kvp.Key, kvp.Value!)).ToList();
+            return [.. cacheItems.Select(kvp => new KeyValuePair<string, SettingCacheItem>(kvp.Key, kvp.Value!))];
         }
 
         var notCacheKeys = cacheItems.Where(x => x.Value == null).Select(x => x.Key).ToList();
@@ -177,7 +177,7 @@ public class SettingManagementStore : ISettingManagementStore, ITransientDepende
     {
         var settingDefinitions = (await SettingDefinitionManager.GetAllAsync()).Where(x => notCacheKeys.Any(k => GetSettingNameFormCacheKeyOrNull(k) == x.Name));
 
-        var settingsDictionary = (await SettingRepository.GetListAsync(notCacheKeys.Select(GetSettingNameFormCacheKeyOrNull).ToArray(), providerName, providerKey))
+        var settingsDictionary = (await SettingRepository.GetListAsync([.. notCacheKeys.Select(GetSettingNameFormCacheKeyOrNull)], providerName, providerKey))
             .ToDictionary(s => s.Name, s => s.Value);
 
         var cacheItems = new List<KeyValuePair<string, SettingCacheItem>>();

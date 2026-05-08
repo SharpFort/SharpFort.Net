@@ -76,12 +76,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     WHERE is_deleted = false";
 
                 var roleRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleQuery);
-                roleData = roleRows.Select(r => (
+                roleData = [.. roleRows.Select(r => (
                     Id: (Guid)r.id,
                     RoleCode: (string)r.role_code,
                     RoleName: (string)r.role_name,
                     State: (bool)r.state
-                )).ToList();
+                ))];
 
                 LogTableReadComplete("Role", roleData.Count, stepSw.ElapsedMilliseconds);
 
@@ -95,13 +95,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     WHERE is_deleted = false";
 
                 var menuRows = await readClient.Ado.SqlQueryAsync<dynamic>(menuQuery);
-                menuData = menuRows.Select(m => (
+                menuData = [.. menuRows.Select(m => (
                     Id: (Guid)m.id,
                     MenuName: (string)m.menu_name,
                     ApiUrl: m.api_url != null ? (string)m.api_url : "",
                     ApiMethod: m.api_method != null ? (string)m.api_method : "",
                     State: (bool)m.state
-                )).ToList();
+                ))];
 
                 LogTableReadComplete("Menu", menuData.Count, stepSw.ElapsedMilliseconds);
 
@@ -114,10 +114,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     FROM casbin_sys_role_menu";
 
                 var roleMenuRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleMenuQuery);
-                roleMenuData = roleMenuRows.Select(rm => (
+                roleMenuData = [.. roleMenuRows.Select(rm => (
                     RoleId: (Guid)rm.role_id,
                     MenuId: (Guid)rm.menu_id
-                )).ToList();
+                ))];
 
                 LogTableReadComplete("RoleMenu", roleMenuData.Count, stepSw.ElapsedMilliseconds);
 
@@ -130,10 +130,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     FROM casbin_sys_user_role";
 
                 var userRoleRows = await readClient.Ado.SqlQueryAsync<dynamic>(userRoleQuery);
-                userRoleData = userRoleRows.Select(ur => (
+                userRoleData = [.. userRoleRows.Select(ur => (
                     UserId: (Guid)ur.user_id,
                     RoleId: (Guid)ur.role_id
-                )).ToList();
+                ))];
 
                 LogTableReadComplete("UserRole", userRoleData.Count, stepSw.ElapsedMilliseconds);
             }
@@ -215,8 +215,15 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             int pRuleCount = rulesToInsert.Count;
             LogPRulesBuilt(pRuleCount);
-            if (skippedRoles > 0) LogSkippedRoleMenuRoleNotFound(skippedRoles);
-            if (skippedMenus > 0) LogSkippedRoleMenuMenuNotFound(skippedMenus);
+            if (skippedRoles > 0)
+            {
+                LogSkippedRoleMenuRoleNotFound(skippedRoles);
+            }
+
+            if (skippedMenus > 0)
+            {
+                LogSkippedRoleMenuMenuNotFound(skippedMenus);
+            }
 
             // Build g rules (user-role)
             LogBuildingGRules();
@@ -241,7 +248,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             int gRuleCount = rulesToInsert.Count - pRuleCount;
             LogGRulesBuilt(gRuleCount);
-            if (skippedUserRoles > 0) LogSkippedUserRoleNotFound(skippedUserRoles);
+            if (skippedUserRoles > 0)
+            {
+                LogSkippedUserRoleNotFound(skippedUserRoles);
+            }
 
             LogProcessPhaseComplete(rulesToInsert.Count, phaseSw.ElapsedMilliseconds);
 
@@ -349,7 +359,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private static string ToSnakeCase(string input)
         {
             if (string.IsNullOrEmpty(input))
+            {
                 return input;
+            }
 
             var result = new System.Text.StringBuilder();
             result.Append(char.ToLowerInvariant(input[0]));

@@ -38,7 +38,10 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                 {
                     // 提取 Http Method 和 Template
                     var httpMethodAttr = method.GetCustomAttributes().OfType<HttpMethodAttribute>().FirstOrDefault();
-                    if (httpMethodAttr == null) continue;
+                    if (httpMethodAttr == null)
+                    {
+                        continue;
+                    }
 
                     var methodPath = httpMethodAttr.Template ?? "";
                     var httpMethod = httpMethodAttr.HttpMethods.FirstOrDefault() ?? "GET";
@@ -51,7 +54,10 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                     fullPath = ReplacePlaceholders(fullPath, controller.Name, method.Name);
 
                     // 规范化路径
-                    if (!fullPath.StartsWith('/')) fullPath = "/" + fullPath;
+                    if (!fullPath.StartsWith('/'))
+                    {
+                        fullPath = "/" + fullPath;
+                    }
 
                     // 检查是否已存在
                     var exists = await _menuRepo.IsAnyAsync(m => m.ApiUrl == fullPath && m.ApiMethod == httpMethod);
@@ -87,8 +93,16 @@ namespace SharpFort.CasbinRbac.Domain.Utils
 
         private static string CombinePaths(string p1, string p2)
         {
-            if (string.IsNullOrEmpty(p1)) return p2;
-            if (string.IsNullOrEmpty(p2)) return p1;
+            if (string.IsNullOrEmpty(p1))
+            {
+                return p2;
+            }
+
+            if (string.IsNullOrEmpty(p2))
+            {
+                return p1;
+            }
+
             return $"{p1.TrimEnd('/')}/{p2.TrimStart('/')}";
         }
 

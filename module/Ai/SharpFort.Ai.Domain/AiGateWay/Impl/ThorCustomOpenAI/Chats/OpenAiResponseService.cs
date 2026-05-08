@@ -83,7 +83,10 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
                 continue;
             }
 
-            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal)) continue;
+            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
+            {
+                continue;
+            }
 
             data = line[OpenAIConstant.Data.Length..].Trim();
 

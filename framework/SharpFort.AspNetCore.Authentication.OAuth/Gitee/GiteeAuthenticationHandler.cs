@@ -20,18 +20,18 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.Gitee
             //获取 accessToken
             var tokenQueryKv = new List<KeyValuePair<string, string?>>()
             {
-                new KeyValuePair<string, string?>("grant_type","authorization_code"),
-                new KeyValuePair<string, string?>("client_id",Options.ClientId),
-                new KeyValuePair<string, string?>("client_secret",Options.ClientSecret),
-                new KeyValuePair<string, string?>("redirect_uri",Options.RedirectUri),
-                new KeyValuePair<string, string?>("code",code)
+                new("grant_type","authorization_code"),
+                new("client_id",Options.ClientId),
+                new("client_secret",Options.ClientSecret),
+                new("redirect_uri",Options.RedirectUri),
+                new("code",code)
             };
             var tokenModel = await SendHttpRequestAsync<GiteeAuthticationcationTokenResponse>(GiteeAuthenticationDefaults.TokenEndpoint, tokenQueryKv, HttpMethod.Post);
 
             //获取 userInfo
             var userInfoQueryKv = new List<KeyValuePair<string, string?>>()
             {
-                new KeyValuePair<string, string?>("access_token",tokenModel.access_token),
+                new("access_token",tokenModel.access_token),
             };
             var userInfoMdoel = await SendHttpRequestAsync<GiteeAuthticationcationUserInfoResponse>(GiteeAuthenticationDefaults.UserInformationEndpoint, userInfoQueryKv);
 

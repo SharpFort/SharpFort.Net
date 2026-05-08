@@ -8,7 +8,7 @@
             {
                 List<T> result = [];
                 Guid pid = list.Min(m => (m as ITreeModel<T>)!.ParentId);
-                List<T> t = list.Where(m => (m as ITreeModel<T>)!.ParentId == pid).ToList();
+                List<T> t = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == pid)];
                 foreach (T model in t)
                 {
                     if (action is not null)
@@ -17,13 +17,13 @@
                     }
                     result.Add(model);
                     var item = model as ITreeModel<T>;
-                    List<T> children = list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id).ToList();
+                    List<T> children = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id)];
                     if (children.Count > 0)
                     {
                         SetTreeChildren(list, children, model, action!);
                     }
                 }
-                return result.OrderByDescending(m => (m as ITreeModel<T>)!.OrderNum).ToList();
+                return [.. result.OrderByDescending(m => (m as ITreeModel<T>)!.OrderNum)];
             }
             return null!;
         }
@@ -39,13 +39,13 @@
                 }
                 mm.Children.Add(item);
                 var _item = item as ITreeModel<T>;
-                List<T> _children = list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id).ToList();
+                List<T> _children = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id)];
                 if (_children.Count > 0)
                 {
                     SetTreeChildren(list, _children, item, action!);
                 }
             }
-            mm.Children = mm.Children.OrderByDescending(m => (m as ITreeModel<T>)!.OrderNum).ToList();
+            mm.Children = [.. mm.Children.OrderByDescending(m => (m as ITreeModel<T>)!.OrderNum)];
         }
 
 

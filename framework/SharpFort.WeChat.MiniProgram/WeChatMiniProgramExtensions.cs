@@ -14,7 +14,7 @@ public static class WeChatMiniProgramExtensions
     internal static void ValidateSuccess(this IErrorObjct response)
     {
 
-        if (response.errcode != 0)
+        if (response.Errcode != 0)
         {
             throw new WeChatMiniProgramException(response.errmsg);
         }

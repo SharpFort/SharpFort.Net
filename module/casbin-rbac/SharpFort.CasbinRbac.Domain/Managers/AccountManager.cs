@@ -114,8 +114,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             //添加用户id，及刷新token的标识
             var claims = new List<Claim> {
-                new Claim(AbpClaimTypes.UserId,userId.ToString()),
-                new Claim(TokenTypeConst.Refresh, "true")
+                new(AbpClaimTypes.UserId,userId.ToString()),
+                new(TokenTypeConst.Refresh, "true")
             };
             var token = new JwtSecurityToken(
                issuer: _refreshJwtOptions.Issuer,

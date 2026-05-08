@@ -73,7 +73,7 @@ public class UsageStatisticsService : ApplicationService, IUsageStatisticsServic
             });
         }
 
-        return result.OrderBy(x => x.Date).ToList();
+        return [.. result.OrderBy(x => x.Date)];
     }
 
     /// <summary>

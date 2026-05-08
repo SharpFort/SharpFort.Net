@@ -246,11 +246,10 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// <returns></returns>
         public static List<Vue3RouterDto> Vue3RuoSfRouterBuild(this List<Menu> menus)
         {
-            menus = menus
+            menus = [.. menus
                 .Where(m => m.State)
                 .Where(m => m.MenuType != MenuType.Component)
-                .Where(m => m.MenuSource == MenuSource.Ruoyi)
-                .ToList();
+                .Where(m => m.MenuSource == MenuSource.Ruoyi)];
             List<Vue3RouterDto> routers = [];
             foreach (var m in menus)
             {
@@ -348,7 +347,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             {
                 return [];
             }
-            Stack<Vue3PureRouterDto> stack = new Stack<Vue3PureRouterDto>(rootRouters);
+            Stack<Vue3PureRouterDto> stack = new(rootRouters);
             while (stack.Count > 0)
             {
                 var currentRouter = stack.Pop();
@@ -359,7 +358,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                 }
             }
 
-            return rootRouters.OrderBy(x => x.OrderNum).ThenBy(x => x.Id).ToList();
+            return [.. rootRouters.OrderBy(x => x.OrderNum).ThenBy(x => x.Id)];
         }
     }
 }

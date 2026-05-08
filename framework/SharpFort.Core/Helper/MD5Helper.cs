@@ -27,7 +27,9 @@ namespace SharpFort.Core.Helper
         public static string SHA2Encode(string pass, string salt, int passwordFormat = 1)
         {
             if (passwordFormat == 0) // MembershipPasswordFormat.Clear
+            {
                 return pass;
+            }
 
             byte[] bIn = Encoding.Unicode.GetBytes(pass);
             byte[] bSalt = Convert.FromBase64String(salt);

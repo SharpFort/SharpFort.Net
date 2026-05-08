@@ -31,7 +31,7 @@ public class WeChatMiniProgramManager : IWeChatMiniProgramManager, ISingletonDep
         req.secret = _options.AppSecret;
         req.appid = _options.AppID;
 
-        using (HttpClient httpClient = new HttpClient())
+        using (HttpClient httpClient = new())
         {
             string queryString = req.ToQueryString();
             var builder = new UriBuilder(url);
@@ -65,7 +65,7 @@ public class WeChatMiniProgramManager : IWeChatMiniProgramManager, ISingletonDep
         };
         req.template_id = req.template_id ?? _options.Notice?.TemplateId;
 
-        using (HttpClient httpClient = new HttpClient())
+        using (HttpClient httpClient = new())
         {
             var body = new StringContent(JsonConvert.SerializeObject(req));
             HttpResponseMessage response = await httpClient.PostAsync(url, body);

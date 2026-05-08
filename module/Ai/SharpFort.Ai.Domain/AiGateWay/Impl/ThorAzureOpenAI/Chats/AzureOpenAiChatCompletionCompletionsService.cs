@@ -57,11 +57,16 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
             }
 
             if (line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
+            {
                 line = line[OpenAIConstant.Data.Length..];
+            }
 
             line = line.Trim();
 
-            if (string.IsNullOrWhiteSpace(line)) continue;
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
 
             if (line == OpenAIConstant.Done)
             {

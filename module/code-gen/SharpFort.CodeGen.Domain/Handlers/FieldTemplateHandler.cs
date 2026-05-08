@@ -24,7 +24,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
         /// <returns></returns>
         public string BuildFields()
         {
-            StringBuilder fieldStrs = new StringBuilder();
+            StringBuilder fieldStrs = new();
 
 
             foreach (var field in Table.Fields)

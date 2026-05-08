@@ -145,9 +145,9 @@ namespace SharpFort.Core.Helper
             }
             var bufferSize = _privateKeyRsaProvider.KeySize / 8;
             byte[] buffer = new byte[bufferSize];//待解密块  
-            using (MemoryStream msInput = new MemoryStream(Convert.FromBase64String(cipherText)))
+            using (MemoryStream msInput = new(Convert.FromBase64String(cipherText)))
             {
-                using (MemoryStream msOutput = new MemoryStream())
+                using (MemoryStream msOutput = new())
                 {
                     int readLen; while ((readLen = msInput.Read(buffer, 0, bufferSize)) > 0)
                     {
@@ -204,9 +204,9 @@ namespace SharpFort.Core.Helper
             var bufferSize = _publicKeyRsaProvider.KeySize / 8 - 11;
             byte[] buffer = new byte[bufferSize];//待加密块
 
-            using (MemoryStream msInput = new MemoryStream(_encoding.GetBytes(text)))
+            using (MemoryStream msInput = new(_encoding.GetBytes(text)))
             {
-                using (MemoryStream msOutput = new MemoryStream())
+                using (MemoryStream msOutput = new())
                 {
                     int readLen; while ((readLen = msInput.Read(buffer, 0, bufferSize)) > 0)
                     {
@@ -235,25 +235,35 @@ namespace SharpFort.Core.Helper
             var rsa = RSA.Create();
             var rsaParameters = new RSAParameters();
 
-            using (BinaryReader binr = new BinaryReader(new MemoryStream(privateKeyBits)))
+            using (BinaryReader binr = new(new MemoryStream(privateKeyBits)))
             {
                 byte bt = 0;
                 ushort twobytes = 0;
                 twobytes = binr.ReadUInt16();
                 if (twobytes == 0x8130)
+                {
                     binr.ReadByte();
+                }
                 else if (twobytes == 0x8230)
+                {
                     binr.ReadInt16();
+                }
                 else
+                {
                     throw new InvalidOperationException("Unexpected value read binr.ReadUInt16()");
+                }
 
                 twobytes = binr.ReadUInt16();
                 if (twobytes != 0x0102)
+                {
                     throw new InvalidOperationException("Unexpected version");
+                }
 
                 bt = binr.ReadByte();
                 if (bt != 0x00)
+                {
                     throw new InvalidOperationException("Unexpected value read binr.ReadByte()");
+                }
 
                 rsaParameters.Modulus = binr.ReadBytes(GetIntegerSize(binr));
                 rsaParameters.Exponent = binr.ReadBytes(GetIntegerSize(binr));
@@ -286,58 +296,85 @@ namespace SharpFort.Core.Helper
             var x509Key = Convert.FromBase64String(publicKeyString);
 
             // ---------  Set up stream to read the asn.1 encoded SubjectPublicKeyInfo blob  ------
-            using (MemoryStream mem = new MemoryStream(x509Key))
+            using (MemoryStream mem = new(x509Key))
             {
-                using (BinaryReader binr = new BinaryReader(mem))  //wrap Memory Stream with BinaryReader for easy reading
+                using (BinaryReader binr = new(mem))  //wrap Memory Stream with BinaryReader for easy reading
                 {
                     byte bt = 0;
                     ushort twobytes = 0;
 
                     twobytes = binr.ReadUInt16();
                     if (twobytes == 0x8130) //data read as little endian order (actual data order for Sequence is 30 81)
+                    {
                         binr.ReadByte();    //advance 1 byte
+                    }
                     else if (twobytes == 0x8230)
+                    {
                         binr.ReadInt16();   //advance 2 bytes
+                    }
                     else
+                    {
                         return null;
+                    }
 
                     seq = binr.ReadBytes(15);       //read the Sequence OID
                     if (!CompareBytearrays(seq, seqOid))    //make sure Sequence for OID is correct
+                    {
                         return null;
+                    }
 
                     twobytes = binr.ReadUInt16();
                     if (twobytes == 0x8103) //data read as little endian order (actual data order for Bit String is 03 81)
+                    {
                         binr.ReadByte();    //advance 1 byte
+                    }
                     else if (twobytes == 0x8203)
+                    {
                         binr.ReadInt16();   //advance 2 bytes
+                    }
                     else
+                    {
                         return null;
+                    }
 
                     bt = binr.ReadByte();
                     if (bt != 0x00)     //expect null byte next
+                    {
                         return null;
+                    }
 
                     twobytes = binr.ReadUInt16();
                     if (twobytes == 0x8130) //data read as little endian order (actual data order for Sequence is 30 81)
+                    {
                         binr.ReadByte();    //advance 1 byte
+                    }
                     else if (twobytes == 0x8230)
+                    {
                         binr.ReadInt16();   //advance 2 bytes
+                    }
                     else
+                    {
                         return null;
+                    }
 
                     twobytes = binr.ReadUInt16();
                     byte lowbyte = 0x00;
                     byte highbyte = 0x00;
 
                     if (twobytes == 0x8102) //data read as little endian order (actual data order for Integer is 02 81)
+                    {
                         lowbyte = binr.ReadByte();  // read next bytes which is bytes in modulus
+                    }
                     else if (twobytes == 0x8202)
                     {
                         highbyte = binr.ReadByte(); //advance 2 bytes
                         lowbyte = binr.ReadByte();
                     }
                     else
+                    {
                         return null;
+                    }
+
                     byte[] modint = { lowbyte, highbyte, 0x00, 0x00 };   //reverse byte order since asn.1 key uses big endian order
                     int modsize = BitConverter.ToInt32(modint, 0);
 
@@ -351,13 +388,16 @@ namespace SharpFort.Core.Helper
                     byte[] modulus = binr.ReadBytes(modsize);   //read the modulus bytes
 
                     if (binr.ReadByte() != 0x02)            //expect an Integer for the exponent data
+                    {
                         return null;
+                    }
+
                     int expbytes = binr.ReadByte();        // should only need one byte for actual exponent data (for all useful values)
                     byte[] exponent = binr.ReadBytes(expbytes);
 
                     // ------- create RSACryptoServiceProvider instance and initialize with public key -----
                     var rsa = RSA.Create();
-                    RSAParameters rsaKeyInfo = new RSAParameters
+                    RSAParameters rsaKeyInfo = new()
                     {
                         Modulus = modulus,
                         Exponent = exponent
@@ -380,11 +420,16 @@ namespace SharpFort.Core.Helper
             int count = 0;
             bt = binr.ReadByte();
             if (bt != 0x02)
+            {
                 return 0;
+            }
+
             bt = binr.ReadByte();
 
             if (bt == 0x81)
+            {
                 count = binr.ReadByte();
+            }
             else
                 if (bt == 0x82)
                 {
@@ -409,12 +454,18 @@ namespace SharpFort.Core.Helper
         private static bool CompareBytearrays(byte[] a, byte[] b)
         {
             if (a.Length != b.Length)
+            {
                 return false;
+            }
+
             int i = 0;
             foreach (byte c in a)
             {
                 if (c != b[i])
+                {
                     return false;
+                }
+
                 i++;
             }
             return true;

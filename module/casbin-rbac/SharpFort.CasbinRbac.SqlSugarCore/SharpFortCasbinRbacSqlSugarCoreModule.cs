@@ -55,11 +55,17 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 
                 if (casbinOptions.EnableCachedEnforcer)
                 {
-                    if (logger is not null) LogCachedEnforcerEnabled(logger);
+                    if (logger is not null)
+                    {
+                        LogCachedEnforcerEnabled(logger);
+                    }
                 }
                 else
                 {
-                    if (logger is not null) LogStandardEnforcerEnabled(logger);
+                    if (logger is not null)
+                    {
+                        LogStandardEnforcerEnabled(logger);
+                    }
                 }
 
                 // Disable AutoSave for Transaction safety
@@ -87,25 +93,41 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                                 {
                                     // Reload policies from database when other instances update
                                     enforcer.LoadPolicy();
-                                    if (logger is not null) LogPoliciesReloaded(logger);
+                                    if (logger is not null)
+                                    {
+                                        LogPoliciesReloaded(logger);
+                                    }
+
                                     return Task.CompletedTask;
                                 });
 
-                                if (logger is not null) LogRedisWatcherEnabled(logger);
+                                if (logger is not null)
+                                {
+                                    LogRedisWatcherEnabled(logger);
+                                }
                             }
                             else
                             {
-                                if (logger is not null) LogRedisConfigEmpty(logger);
+                                if (logger is not null)
+                                {
+                                    LogRedisConfigEmpty(logger);
+                                }
                             }
                         }
                         else
                         {
-                            if (logger is not null) LogRedisDisabled(logger);
+                            if (logger is not null)
+                            {
+                                LogRedisDisabled(logger);
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
-                        if (logger is not null) LogRedisWatcherFailed(logger, ex);
+                        if (logger is not null)
+                        {
+                            LogRedisWatcherFailed(logger, ex);
+                        }
                     }
                 }
 

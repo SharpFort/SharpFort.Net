@@ -179,7 +179,10 @@ public class AnthropicChatCompletionsService(
                 continue;
             }
 
-            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal)) continue;
+            if (!line.StartsWith(OpenAIConstant.Data, StringComparison.Ordinal))
+            {
+                continue;
+            }
 
             data = line[OpenAIConstant.Data.Length..].Trim();
 
