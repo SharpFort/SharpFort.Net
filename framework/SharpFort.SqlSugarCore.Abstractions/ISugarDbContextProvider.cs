@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.SqlSugarCore.Abstractions
+﻿namespace SharpFort.SqlSugarCore.Abstractions
 {
     /// <summary>
     /// SqlSugar数据库上下文提供者接口

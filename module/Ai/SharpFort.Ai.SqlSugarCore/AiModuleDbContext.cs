@@ -1,9 +1,6 @@
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using SharpFort.SqlSugarCore;
-using SharpFort.Ai.Domain.Entities;
-using SharpFort.SqlSugarCore.Abstractions;
-using SqlSugar;
 
 namespace SharpFort.Ai.SqlSugarCore
 {

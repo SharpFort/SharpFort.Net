@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace FluidSequence.Domain.Services
 {
     public class PlaceholderMeta

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.Core.Helper
+﻿namespace SharpFort.Core.Helper
 {
     public static class TreeHelper
     {

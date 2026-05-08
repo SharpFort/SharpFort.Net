@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.SqlSugarCore.Abstractions;
+﻿namespace SharpFort.SqlSugarCore.Abstractions;
 
 /// <summary>
 /// 默认租户表特性

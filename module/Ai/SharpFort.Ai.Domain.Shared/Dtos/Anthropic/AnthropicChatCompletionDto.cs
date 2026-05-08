@@ -1,7 +1,6 @@
 // 属性名来自 Anthropic API JSON 字段
 #pragma warning disable CA1707
 using System.Text.Json.Serialization;
-using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Domain.Shared.Dtos.Anthropic;
 

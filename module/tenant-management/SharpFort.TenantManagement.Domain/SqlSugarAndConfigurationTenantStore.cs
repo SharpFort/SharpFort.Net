@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
-using Volo.Abp;
 using Volo.Abp.Caching;
 using Volo.Abp.Data;
 using Volo.Abp.MultiTenancy;

@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpFort.CasbinRbac.Domain.Entities;

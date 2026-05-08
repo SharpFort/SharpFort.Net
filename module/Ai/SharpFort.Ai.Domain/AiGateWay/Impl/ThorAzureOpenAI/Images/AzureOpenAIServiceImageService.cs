@@ -1,6 +1,5 @@
 using System.Globalization;
 using OpenAI.Images;
-using SharpFort.Ai.Domain.AiGateWay;
 using SharpFort.Ai.Domain.Shared.Dtos;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Images;
 

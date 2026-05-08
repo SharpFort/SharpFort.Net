@@ -1,5 +1,4 @@
-﻿using Volo.Abp.Application.Dtos;
-using SharpFort.CasbinRbac.Application.Contracts.Dtos.Account;
+﻿using SharpFort.CasbinRbac.Application.Contracts.Dtos.Account;
 
 namespace SharpFort.CasbinRbac.Application.Contracts.IServices;
 

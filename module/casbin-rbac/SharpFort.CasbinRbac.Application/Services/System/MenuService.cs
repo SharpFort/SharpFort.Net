@@ -6,7 +6,6 @@ using SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
-using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Application.Services.System

@@ -1,8 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using TencentCloud.Ame.V20190916.Models;
-using TencentCloud.Tiw.V20190919.Models;
-using Volo.Abp.Domain.Repositories;
 using Xunit;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.User;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;

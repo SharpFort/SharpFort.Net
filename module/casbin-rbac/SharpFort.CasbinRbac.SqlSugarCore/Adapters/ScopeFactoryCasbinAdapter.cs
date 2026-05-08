@@ -2,7 +2,6 @@ using Casbin.Adapter.SqlSugar;
 using Casbin.Model;
 using Casbin.Persist;
 using Microsoft.Extensions.DependencyInjection;
-using SqlSugar;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.SqlSugarCore.Adapters

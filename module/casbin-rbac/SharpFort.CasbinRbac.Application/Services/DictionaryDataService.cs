@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Domain.Repositories;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Dictionary;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;

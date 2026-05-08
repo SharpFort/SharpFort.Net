@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.Core.Data
+﻿namespace SharpFort.Core.Data
 {
     /// <summary>
     /// 状态接口

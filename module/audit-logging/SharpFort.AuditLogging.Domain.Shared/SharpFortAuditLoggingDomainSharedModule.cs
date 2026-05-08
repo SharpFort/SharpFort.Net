@@ -1,5 +1,4 @@
 ﻿using Volo.Abp.Domain;
-using Volo.Abp.Modularity;
 
 namespace SharpFort.AuditLogging.Domain.Shared
 {

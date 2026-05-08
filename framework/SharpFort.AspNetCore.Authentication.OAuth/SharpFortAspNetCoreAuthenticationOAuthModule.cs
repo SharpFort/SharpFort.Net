@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Modularity;
-using SharpFort.Core;
 
 
 namespace SharpFort.AspNetCore.Authentication.OAuth

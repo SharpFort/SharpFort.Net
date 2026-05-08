@@ -1,5 +1,4 @@
-﻿using Volo.Abp.SettingManagement;
-using Sf.Abp.Application.Contracts;
+﻿using Sf.Abp.Application.Contracts;
 using Sf.Abp.Domain;
 using SharpFort.CodeGen.Application;
 using SharpFort.Ddd.Application;

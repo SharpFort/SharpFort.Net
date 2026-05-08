@@ -1,11 +1,8 @@
 ﻿#nullable disable
-using Mapster;
 using SqlSugar;
 using Volo.Abp.DependencyInjection;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Repositories;
-using SharpFort.CasbinRbac.Domain.Shared.Consts;
-using SharpFort.CasbinRbac.Domain.Shared.Dtos;
 using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.SqlSugarCore.Repositories;
 

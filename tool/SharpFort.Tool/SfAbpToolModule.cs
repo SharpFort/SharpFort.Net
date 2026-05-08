@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Http.Client;
+﻿using Volo.Abp.Http.Client;
 using SharpFort.Tool.HttpApi.Client;
 
 namespace SharpFort.Tool

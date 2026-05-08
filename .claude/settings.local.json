@@ -40,7 +40,10 @@
       "Bash(Select-Object Count)",
       "Bash(Select-String -Pattern \"Ai\")",
       "PowerShell(dotnet format *)",
-      "PowerShell(dotnet restore *)"
+      "PowerShell(dotnet restore *)",
+      "Bash(Select-String -Pattern \"Warning|Error\")",
+      "Bash(Get-Content build_baseline.txt)",
+      "PowerShell($content = Get-Content build_baseline.txt; $allLines = $content.Count; $ideWarnings = \\($content | Select-String \"warning IDE\"\\).Count; $errors = \\($content | Select-String \"Error\" | Where-Object { $_ -match \"error \" }\\).Count; $nuWarnings = \\($content | Select-String \"warning NU\"\\).Count; Write-Output \"Total lines: $allLines\"; Write-Output \"IDE Warnings: $ideWarnings\"; Write-Output \"Build Errors: $errors\"; Write-Output \"NU Warnings: $nuWarnings\")"
     ],
     "deny": [],
     "ask": []

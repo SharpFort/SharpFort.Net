@@ -1,4 +1,3 @@
-using SharpFort.Ai.Application.Contracts.Dtos;
 using SharpFort.Ai.Application.Contracts.Dtos.Ranking;
 
 namespace SharpFort.Ai.Application.Contracts.IServices;

@@ -1,6 +1,4 @@
 using System.Data.Common;
-using Volo.Abp;
-using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.SqlSugarCore;
 

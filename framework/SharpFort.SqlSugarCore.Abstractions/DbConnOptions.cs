@@ -1,5 +1,4 @@
 ﻿using SqlSugar;
-using ArgumentException = System.ArgumentException;
 
 namespace SharpFort.SqlSugarCore.Abstractions
 {

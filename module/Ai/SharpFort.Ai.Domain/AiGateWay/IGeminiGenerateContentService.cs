@@ -1,6 +1,5 @@
 using System.Text.Json;
 using SharpFort.Ai.Domain.Shared.Dtos;
-using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Domain.AiGateWay;
 

@@ -6,7 +6,6 @@
 
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SharpFort.AspNetCore.Authentication.OAuth.QQ;
 

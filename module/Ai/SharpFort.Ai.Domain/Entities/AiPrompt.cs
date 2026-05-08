@@ -1,6 +1,5 @@
 using SqlSugar;
 using Volo.Abp.Domain.Entities.Auditing;
-using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Entities;
 

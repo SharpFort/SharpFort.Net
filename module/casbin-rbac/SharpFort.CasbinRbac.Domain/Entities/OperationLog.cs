@@ -1,9 +1,6 @@
 ﻿using SqlSugar;
-using Volo.Abp.Auditing;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
-using SharpFort.CasbinRbac.Domain.Shared.OperLog;
 
 namespace SharpFort.CasbinRbac.Domain.Entities
 {

@@ -1,5 +1,4 @@
 ﻿using Volo.Abp.Application;
-using Volo.Abp.Modularity;
 
 namespace SharpFort.Ddd.Application.Contracts
 {

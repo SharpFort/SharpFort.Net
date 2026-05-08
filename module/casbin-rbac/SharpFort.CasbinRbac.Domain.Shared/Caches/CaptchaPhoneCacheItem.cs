@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpFort.CasbinRbac.Domain.Shared.Enums;
+﻿using SharpFort.CasbinRbac.Domain.Shared.Enums;
 
 namespace SharpFort.CasbinRbac.Domain.Shared.Caches
 {

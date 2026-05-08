@@ -1,9 +1,5 @@
 using SqlSugar;
 using Volo.Abp.Data;
-using Volo.Abp.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace SharpFort.CodeGen.Domain.Entities;

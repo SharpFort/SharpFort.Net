@@ -1,9 +1,6 @@
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
 using SharpFort.Ai.Application.Contracts.IServices;
-using SharpFort.Ai.Domain.Managers;
 
 namespace SharpFort.Ai.Application.Services;
 

@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Auditing;
+﻿using Volo.Abp.Auditing;
 using Volo.Abp.Domain;
-using Volo.Abp.Modularity;
 using SharpFort.AuditLogging.Domain.Shared;
 
 namespace SharpFort.AuditLogging.Domain

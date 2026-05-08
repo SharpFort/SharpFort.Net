@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 // 属性名来自 QQ OAuth API 返回的 JSON 字段，不可重命名
 #pragma warning disable CA1707
 

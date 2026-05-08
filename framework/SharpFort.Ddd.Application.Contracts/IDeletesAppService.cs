@@ -1,5 +1,4 @@
-﻿using Volo.Abp;
-using Volo.Abp.Application.Services;
+﻿using Volo.Abp.Application.Services;
 
 namespace SharpFort.Ddd.Application.Contracts
 {

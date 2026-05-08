@@ -4,7 +4,6 @@ using SqlSugar;
 using SharpFort.SqlSugarCore;
 using SharpFort.SqlSugarCore.Abstractions;
 using FluidSequence.Domain.Shared.Consts;
-using FluidSequence.Domain.Entities;
 
 namespace FluidSequence.SqlSugarCore
 {

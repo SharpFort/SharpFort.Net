@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SqlSugar;
-using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Check = Volo.Abp.Check;
 

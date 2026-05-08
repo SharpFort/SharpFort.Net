@@ -5,18 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Uow;
-using Volo.Abp.Users;
 using SharpFort.Ai.Domain.Entities;
 using SharpFort.Ai.Domain.Extensions;
 using SharpFort.Ai.Domain.Managers;
-using SharpFort.Ai.Domain.Shared.Consts;
 using SharpFort.Ai.Domain.Shared.Dtos.Anthropic;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Embeddings;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Images;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Responses;
 using SharpFort.Ai.Domain.Shared.Enums;
-using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;

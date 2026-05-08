@@ -25,6 +25,8 @@ dotnet_analyzer_diagnostic.category-Accessibility.severity = suggestion
 dotnet_diagnostic.IDE0063.severity = suggestion
 # IDE0071: string interpolation simplification may affect culture formatting
 dotnet_diagnostic.IDE0071.severity = suggestion
+# IDE0160: file-scoped → block-scoped namespace is a style preference; file-scoped is modern C# convention
+dotnet_diagnostic.IDE0160.severity = suggestion
 
 # ── Naming Conventions (Microsoft defaults) ───────────────────────────────
 # Public members: PascalCase

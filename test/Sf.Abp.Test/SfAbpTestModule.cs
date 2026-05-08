@@ -1,12 +1,4 @@
-﻿using Hangfire;
-using Hangfire.MemoryStorage;
-using StackExchange.Redis;
-using Volo.Abp.Auditing;
-using Volo.Abp.Autofac;
-using Volo.Abp.BackgroundJobs.Hangfire;
-using Volo.Abp.BackgroundWorkers;
-using SharpFort.Application;
-using SharpFort.SqlsugarCore;
+﻿using Volo.Abp.Autofac;
 
 namespace Sf.Abp.Test
 {

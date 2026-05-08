@@ -1,7 +1,5 @@
-﻿using System;
-using SqlSugar;
+﻿using SqlSugar;
 using Volo.Abp.Auditing;
-using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.MultiTenancy;
 using SharpFort.AuditLogging.Domain.Shared.Consts;

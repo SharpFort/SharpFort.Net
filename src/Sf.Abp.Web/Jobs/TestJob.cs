@@ -1,8 +1,6 @@
 ﻿using Hangfire;
 using Volo.Abp.BackgroundWorkers.Hangfire;
 
-using SharpFort.SqlSugarCore.Abstractions;
-
 namespace Sf.Abp.Web.Jobs
 {
     /// <summary>

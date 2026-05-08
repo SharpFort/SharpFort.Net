@@ -1,6 +1,5 @@
 ﻿using Volo.Abp.Caching;
 using Volo.Abp.Domain;
-using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.Settings;
 

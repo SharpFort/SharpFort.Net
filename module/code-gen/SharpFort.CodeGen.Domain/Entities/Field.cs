@@ -1,5 +1,4 @@
 using SqlSugar;
-using Volo.Abp.Domain.Entities;
 using SharpFort.CodeGen.Domain.Shared.Enums;
 using Volo.Abp.Domain.Entities.Auditing;
 

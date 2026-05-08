@@ -1,6 +1,5 @@
 ﻿using IPTools.Core;
 using Microsoft.AspNetCore.Http;
-using System;
 using UAParser;
 using SharpFort.Core.Extensions;
 

@@ -2,7 +2,6 @@
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.MultiTenancy;
 
 namespace SharpFort.Ddd.Application
 {

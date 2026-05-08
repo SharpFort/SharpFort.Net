@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace SharpFort.TenantManagement.Application.Contracts.Dtos
+﻿namespace SharpFort.TenantManagement.Application.Contracts.Dtos
 {
     public class TenantUpdateInput
     {

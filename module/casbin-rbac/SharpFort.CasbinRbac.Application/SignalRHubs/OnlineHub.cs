@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Net.Http;
 using Volo.Abp.AspNetCore.SignalR;
 using SharpFort.Core.Helper;
-using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Shared.Model;
 
 namespace SharpFort.CasbinRbac.Application.SignalRHubs

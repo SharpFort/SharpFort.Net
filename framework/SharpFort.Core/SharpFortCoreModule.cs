@@ -1,6 +1,4 @@
-﻿using Volo.Abp.Modularity;
-
-namespace SharpFort.Core
+﻿namespace SharpFort.Core
 {
     /// <summary>
     /// Sf框架核心模块

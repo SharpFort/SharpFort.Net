@@ -9,7 +9,6 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
 using Volo.Abp.Users;
 using SharpFort.Core.Extensions;
-using SharpFort.Core.Helper;
 using SharpFort.CasbinRbac.Domain.Shared.OperLog;
 
 namespace SharpFort.CasbinRbac.Domain.Operlog

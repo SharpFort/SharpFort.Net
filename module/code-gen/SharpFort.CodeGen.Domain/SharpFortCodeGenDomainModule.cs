@@ -1,5 +1,4 @@
 ﻿using Volo.Abp.Domain;
-using Volo.Abp.Modularity;
 using SharpFort.CodeGen.Domain.Shared;
 using SharpFort.SqlSugarCore.Abstractions;
 

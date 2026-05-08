@@ -1,6 +1,4 @@
-﻿using Volo.Abp.Domain.Repositories;
-using SharpFort.CasbinRbac.Domain.Entities;
-using SharpFort.CasbinRbac.Domain.Shared.Dtos;
+﻿using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Domain.Repositories

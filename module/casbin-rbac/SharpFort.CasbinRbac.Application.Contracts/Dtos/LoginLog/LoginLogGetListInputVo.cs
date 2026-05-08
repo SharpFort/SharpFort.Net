@@ -1,5 +1,4 @@
-﻿using SharpFort.Ddd;
-using SharpFort.Ddd.Application.Contracts;
+﻿using SharpFort.Ddd.Application.Contracts;
 
 namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.LoginLog
 {

@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
-using SharpFort.Core.Extensions;
 using SharpFort.WeChat.MiniProgram.HttpModels;
 
 namespace SharpFort.WeChat.MiniProgram.Token;

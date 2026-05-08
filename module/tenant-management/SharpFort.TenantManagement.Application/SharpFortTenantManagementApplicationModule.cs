@@ -1,6 +1,4 @@
-﻿using Volo.Abp.Modularity;
-using SharpFort.Ddd.Application;
-using SharpFort.TenantManagement.Domain;
+﻿using SharpFort.TenantManagement.Domain;
 
 namespace SharpFort.TenantManagement.Application
 {

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Volo.Abp.Data;
 using Volo.Abp.Domain;
-using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.TenantManagement;
 

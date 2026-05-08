@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Volo.Abp.DependencyInjection;
-using SharpFort.Core.Extensions;
 using SharpFort.WeChat.MiniProgram.HttpModels;
 using SharpFort.WeChat.MiniProgram.Token;
 

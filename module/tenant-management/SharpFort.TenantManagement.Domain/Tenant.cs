@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using SqlSugar;
-using Volo.Abp;
 using Volo.Abp.Auditing;
 using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities.Auditing;

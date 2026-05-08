@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
 namespace SharpFort.CasbinRbac.Application.Contracts.IServices

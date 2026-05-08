@@ -1,13 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Modularity;
-using Sf.Abp.Domain;
+﻿using Sf.Abp.Domain;
 using SharpFort.SqlSugarCore;
 using SharpFort.AuditLogging.SqlSugarCore;
 using SharpFort.CodeGen.SqlSugarCore;
 using SharpFort.Mapster;
 using SharpFort.SettingManagement.SqlSugarCore;
 using Sf.Abp.SqlSugarCore;
-using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.TenantManagement.SqlSugarCore;
 using SharpFort.CasbinRbac.SqlSugarCore;
 using SharpFort.FileManagement.SqlSugarCore;

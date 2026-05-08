@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.CasbinRbac.Domain.Shared.Etos
+﻿namespace SharpFort.CasbinRbac.Domain.Shared.Etos
 {
     /// <summary>
     /// 用户创建的id

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.CasbinRbac.Domain.Shared.Consts
+﻿namespace SharpFort.CasbinRbac.Domain.Shared.Consts
 {
     public class TokenTypeConst
     {

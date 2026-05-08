@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Modularity;
 using SharpFort.AuditLogging.Domain;
 using SharpFort.AuditLogging.Domain.Repositories;
 using SharpFort.AuditLogging.SqlSugarCore.Repositories;

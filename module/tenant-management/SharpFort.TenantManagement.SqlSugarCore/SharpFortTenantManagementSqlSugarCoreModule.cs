@@ -1,5 +1,4 @@
-﻿using Volo.Abp.Modularity;
-using SharpFort.TenantManagement.Domain;
+﻿using SharpFort.TenantManagement.Domain;
 
 namespace SharpFort.TenantManagement.SqlSugarCore
 {

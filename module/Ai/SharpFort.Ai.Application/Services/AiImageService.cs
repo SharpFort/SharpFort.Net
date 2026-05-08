@@ -1,10 +1,7 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SqlSugar;
-using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Guids;
@@ -14,7 +11,6 @@ using SharpFort.Ai.Application.Contracts.Dtos;
 using SharpFort.Ai.Application.Jobs;
 using SharpFort.Ai.Domain.Entities;
 using SharpFort.Ai.Domain.Managers;
-using SharpFort.Ai.Domain.Shared.Consts;
 using SharpFort.Ai.Domain.Shared.Enums;
 using SharpFort.SqlSugarCore.Abstractions;
 

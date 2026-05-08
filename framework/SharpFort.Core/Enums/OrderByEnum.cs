@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpFort.Core.Enums
+﻿namespace SharpFort.Core.Enums
 {
     /// <summary>
     /// 排序方向枚举

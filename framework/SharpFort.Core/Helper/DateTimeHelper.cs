@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SharpFort.Core.Helper
+﻿namespace SharpFort.Core.Helper
 {
     /// <summary>
     /// 日期时间辅助类

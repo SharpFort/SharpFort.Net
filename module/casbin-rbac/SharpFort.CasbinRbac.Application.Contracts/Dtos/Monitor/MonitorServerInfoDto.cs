@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Monitor
 {
     public class MonitorServerInfoDto

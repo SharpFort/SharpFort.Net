@@ -1,5 +1,4 @@
-﻿using Volo.Abp.Modularity;
-using SharpFort.Core;
+﻿using SharpFort.Core;
 
 namespace SharpFort.SqlSugarCore.Abstractions
 {

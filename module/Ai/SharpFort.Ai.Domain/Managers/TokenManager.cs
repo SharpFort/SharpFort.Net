@@ -1,9 +1,7 @@
-using SqlSugar;
 using Volo.Abp.Domain.Services;
 using SharpFort.Ai.Domain.Entities;
 // using SharpFort.Ai.Domain.Entities; // Merged into Entities
 // using SharpFort.Ai.Domain.Entities; // Token is now in Entities
-using SharpFort.Ai.Domain.Shared.Consts;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Managers;

@@ -6,7 +6,6 @@ using Volo.Abp.Auditing;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Uow;
 using SharpFort.AuditLogging.Domain.Repositories;
-using SharpFort.Core.Helper;
 
 namespace SharpFort.AuditLogging.Domain;
 

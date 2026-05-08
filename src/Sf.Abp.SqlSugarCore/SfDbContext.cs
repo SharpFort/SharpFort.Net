@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SqlSugar;
-using Volo.Abp.DependencyInjection;
+﻿using Volo.Abp.DependencyInjection;
 
 using SharpFort.SqlSugarCore;
 

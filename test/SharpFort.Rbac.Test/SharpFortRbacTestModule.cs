@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Auditing;
 using Volo.Abp.Autofac;
 using Volo.Abp.BackgroundWorkers;
 using SharpFort.CasbinRbac.Application;

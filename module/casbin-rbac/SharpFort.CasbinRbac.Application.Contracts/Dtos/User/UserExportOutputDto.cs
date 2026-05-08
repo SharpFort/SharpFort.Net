@@ -1,4 +1,3 @@
-using System;
 using MiniExcelLibs.Attributes;
 
 namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.User

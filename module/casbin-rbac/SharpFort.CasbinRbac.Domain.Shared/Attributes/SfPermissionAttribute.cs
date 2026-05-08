@@ -1,5 +1,3 @@
-using System;
-
 namespace SharpFort.CasbinRbac.Domain.Shared.Attributes
 {
     /// <summary>

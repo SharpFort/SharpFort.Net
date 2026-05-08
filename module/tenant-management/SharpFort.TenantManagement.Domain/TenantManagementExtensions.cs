@@ -1,6 +1,5 @@
 ﻿using Volo.Abp.Data;
 using Volo.Abp.MultiTenancy;
-using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.TenantManagement.Domain
 {

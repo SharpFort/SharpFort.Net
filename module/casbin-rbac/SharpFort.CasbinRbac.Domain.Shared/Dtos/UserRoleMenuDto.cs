@@ -1,4 +1,3 @@
-using SqlSugar;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
 
 namespace SharpFort.CasbinRbac.Domain.Shared.Dtos

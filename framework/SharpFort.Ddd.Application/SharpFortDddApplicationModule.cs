@@ -1,7 +1,5 @@
-﻿using Volo.Abp;
-using Volo.Abp.Application;
+﻿using Volo.Abp.Application;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Modularity;
 using SharpFort.Ddd.Application.Contracts;
 
 namespace SharpFort.Ddd.Application

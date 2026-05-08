@@ -1,10 +1,5 @@
-using System;
-using System.Globalization;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Hardware.Info;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

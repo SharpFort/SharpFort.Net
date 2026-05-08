@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using SharpFort.Ai.Domain.AiGateWay.Exceptions;
 using SharpFort.Ai.Domain.Shared.Dtos;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
-using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Responses;
 
 namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorGemini.Chats;
 

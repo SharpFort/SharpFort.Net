@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FluidSequence.Domain.Entities;
 
 namespace FluidSequence.Domain.Services.Strategies

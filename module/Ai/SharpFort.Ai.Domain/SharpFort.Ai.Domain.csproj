@@ -26,7 +26,7 @@
 
   <PropertyGroup>
     <!-- CA1725: parameter name mismatches with interfaces are acceptable in ABP framework -->
-    <NoWarn>$(NoWarn);CA1725</NoWarn>
+    <NoWarn>$(NoWarn);CA1725;IDE0058</NoWarn>
   </PropertyGroup>
 
 </Project>

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SqlSugar;
-using Volo.Abp.DependencyInjection;
+﻿using SqlSugar;
 
 namespace SharpFort.SqlSugarCore.Abstractions
 {

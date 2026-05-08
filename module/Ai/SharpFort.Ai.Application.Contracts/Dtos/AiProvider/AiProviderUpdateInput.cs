@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace SharpFort.Ai.Application.Contracts.Dtos.AiProvider;
 
 /// <summary>

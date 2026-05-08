@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Volo.Abp.Settings;
 
 namespace SharpFort.SettingManagement.Domain;
