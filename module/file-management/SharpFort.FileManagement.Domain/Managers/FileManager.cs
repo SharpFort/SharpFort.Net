@@ -175,12 +175,9 @@ namespace SharpFort.FileManagement.Domain.Managers
         /// </summary>
         private async Task<FileStorageProvider?> GetProviderConfigAsync(string? providerName)
         {
-            if (string.IsNullOrEmpty(providerName) || providerName == "Local")
-            {
-                return null;
-            }
-
-            return await _providerRepository
+            return string.IsNullOrEmpty(providerName) || providerName == "Local"
+                ? null
+                : await _providerRepository
                 .FindAsync(x => x.ProviderType.ToString() == providerName && x.IsEnabled);
         }
 

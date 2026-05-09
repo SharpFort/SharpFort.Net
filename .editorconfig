@@ -29,6 +29,10 @@ dotnet_diagnostic.IDE0071.severity = suggestion
 dotnet_diagnostic.IDE0160.severity = suggestion
 # IDE0058: "expression value is never used" — legitimate side-effect calls (StringBuilder.Append, Headers.TryAdd, etc.)
 dotnet_diagnostic.IDE0058.severity = suggestion
+# IDE0046: "if statement can be simplified" — converts if-return to ternary; skip because:
+#   (1) if-throw guards are legitimate business logic (DTO validation), ternary throw is unnatural
+#   (2) if-return followed by already-ternary return creates nested ternary (hard to read)
+dotnet_diagnostic.IDE0046.severity = suggestion
 
 # ── Naming Conventions (Microsoft defaults) ───────────────────────────────
 # Public members: PascalCase

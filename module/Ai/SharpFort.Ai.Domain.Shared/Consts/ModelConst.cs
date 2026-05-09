@@ -16,12 +16,9 @@ public class ModelConst
     /// </summary>
     private static string? GetModelPrefix(string? modelId)
     {
-        if (string.IsNullOrEmpty(modelId))
-        {
-            return null;
-        }
-
-        return ModelPrefixesToRemove.FirstOrDefault(prefix =>
+        return string.IsNullOrEmpty(modelId)
+            ? null
+            : ModelPrefixesToRemove.FirstOrDefault(prefix =>
             modelId!.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -36,11 +33,7 @@ public class ModelConst
         }
 
         var prefix = GetModelPrefix(modelId);
-        if (prefix != null)
-        {
-            return modelId[prefix.Length..];
-        }
-        return modelId;
+        return prefix != null ? modelId[prefix.Length..] : modelId;
     }
 
     /// <summary>

@@ -32,27 +32,13 @@ namespace SharpFort.TenantManagement.Domain
         {
             var tenantFromOptions = await base.FindAsync(normalizedName);
             //如果配置文件不存在改租户
-            if (tenantFromOptions is null)
-            {
-                return (await GetCacheItemAsync(null, normalizedName)).Value;
-            }
-            else
-            {
-                return tenantFromOptions;
-            }
+            return tenantFromOptions is null ? (await GetCacheItemAsync(null, normalizedName)).Value : tenantFromOptions;
         }
 
         public new async Task<TenantConfiguration?> FindAsync(Guid id)
         {
             var tenantFromOptions = await base.FindAsync(id);
-            if (tenantFromOptions is null)
-            {
-                return (await GetCacheItemAsync(id, null)).Value;
-            }
-            else
-            {
-                return tenantFromOptions;
-            }
+            return tenantFromOptions is null ? (await GetCacheItemAsync(id, null)).Value : tenantFromOptions;
         }
 
 

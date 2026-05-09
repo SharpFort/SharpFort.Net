@@ -23,12 +23,7 @@ public class GiteeManager(IConfiguration configuration, IHttpClientFactory httpC
         var response =
             await client.GetAsync(
                 $"{GiteeHost}/repos/{Owner}/{Repo}/branches/{branch}?access_token={_accessToken}");
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return false;
-        }
-
-        return true;
+        return response.StatusCode != HttpStatusCode.NotFound;
     }
 
     /// <summary>

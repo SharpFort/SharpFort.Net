@@ -39,12 +39,7 @@
             }
 
             string Value = Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
-            if (string.IsNullOrEmpty(Value))
-            {
-                return null;
-            }
-
-            return Value;
+            return string.IsNullOrEmpty(Value) ? null : Value;
         }
 
 

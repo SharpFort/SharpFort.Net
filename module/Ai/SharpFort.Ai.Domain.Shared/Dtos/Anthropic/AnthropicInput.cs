@@ -26,12 +26,7 @@ public sealed class AnthropicInput
                 return ToolChoiceString;
             }
 
-            if (ToolChoice?.Type == "function")
-            {
-                return ToolChoice;
-            }
-
-            return ToolChoice?.Type;
+            return ToolChoice?.Type == "function" ? ToolChoice : (ToolChoice?.Type);
         }
         set
         {
@@ -71,12 +66,7 @@ public sealed class AnthropicInput
                 throw new ValidationException("System 和 Systems 字段不能同时有值");
             }
 
-            if (System is not null)
-            {
-                return System;
-            }
-
-            return Systems!;
+            return System is not null ? System : Systems!;
         }
         set
         {

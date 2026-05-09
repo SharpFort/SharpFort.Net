@@ -85,12 +85,9 @@ namespace SharpFort.FileManagement.Application.Services
             }
 
             var stream = await _fileManager.GetFileStreamAsync(file, isThumbnail);
-            if (stream == null)
-            {
-                throw new UserFriendlyException("文件内容不存在");
-            }
-
-            return new FileStreamResult(stream, file.MimeType)
+            return stream == null
+                ? throw new UserFriendlyException("文件内容不存在")
+                : (IActionResult)new FileStreamResult(stream, file.MimeType)
             {
                 FileDownloadName = file.Name
             };
@@ -199,17 +196,14 @@ namespace SharpFort.FileManagement.Application.Services
                 .OrderByDescending(x => x.CreationTime)
                 .FirstAsync();
 
-            if (existingFile != null)
-            {
-                return new FileVerifyResultDto
+            return existingFile != null
+                ? new FileVerifyResultDto
                 {
                     CanQuickUpload = true,
                     FileId = existingFile.Id,
                     Url = existingFile.Url
-                };
-            }
-
-            return new FileVerifyResultDto { CanQuickUpload = false };
+                }
+                : new FileVerifyResultDto { CanQuickUpload = false };
         }
 
         /// <summary>

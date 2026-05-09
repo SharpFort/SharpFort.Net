@@ -96,12 +96,9 @@ public class AiImageService(
         var userId = CurrentUser.GetId();
 
         var task = await _imageTaskRepository.GetFirstAsync(x => x.Id == taskId && x.UserId == userId);
-        if (task == null)
-        {
-            throw new UserFriendlyException("任务不存在或无权访问");
-        }
-
-        return new ImageTaskOutput
+        return task == null
+            ? throw new UserFriendlyException("任务不存在或无权访问")
+            : new ImageTaskOutput
         {
             Id = task.Id,
             Prompt = task.Prompt,

@@ -14,11 +14,6 @@ public class TenantSettingManagementProvider(
 
     protected override string? NormalizeProviderKey(string? providerKey)
     {
-        if (providerKey != null)
-        {
-            return providerKey;
-        }
-
-        return CurrentTenant.Id?.ToString();
+        return providerKey != null ? providerKey : (CurrentTenant.Id?.ToString());
     }
 }

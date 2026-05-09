@@ -52,13 +52,10 @@ public static class JsonElementExtensions
     /// </summary>
     public static JsonElement? Get(this JsonElement element, string propertyName)
     {
-        if (element.ValueKind == JsonValueKind.Object &&
-            element.TryGetProperty(propertyName, out var value))
-        {
-            return value;
-        }
-
-        return null;
+        return element.ValueKind == JsonValueKind.Object &&
+            element.TryGetProperty(propertyName, out var value)
+            ? value
+            : null;
     }
 
     /// <summary>
@@ -66,13 +63,10 @@ public static class JsonElementExtensions
     /// </summary>
     public static JsonElement? Get(this JsonElement element, int index)
     {
-        if (element.ValueKind == JsonValueKind.Array &&
-            index >= 0 && index < element.GetArrayLength())
-        {
-            return element[index];
-        }
-
-        return null;
+        return element.ValueKind == JsonValueKind.Array &&
+            index >= 0 && index < element.GetArrayLength()
+            ? element[index]
+            : null;
     }
 
     /// <summary>

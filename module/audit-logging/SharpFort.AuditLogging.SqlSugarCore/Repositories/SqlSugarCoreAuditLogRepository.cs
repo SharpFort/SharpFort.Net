@@ -168,12 +168,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
                                 .OrderBy(x => x.Id)
                                 .FirstAsync(cancellationToken);
 
-        if (entityChange == null)
-        {
-            throw new EntityNotFoundException(typeof(EntityChange));
-        }
-
-        return entityChange;
+        return entityChange == null ? throw new EntityNotFoundException(typeof(EntityChange)) : entityChange;
     }
 
     public virtual async Task<List<EntityChange>> GetEntityChangeListAsync(

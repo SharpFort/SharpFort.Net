@@ -30,12 +30,9 @@ public class TenantConfigurationWrapper(IAbpLazyServiceProvider serviceProvider)
     /// </summary>
     public async Task<TenantConfiguration?> GetAsync()
     {
-        if (!DbConnectionOptions.EnabledSaasMultiTenancy)
-        {
-            return await TenantStoreService.FindAsync(ConnectionStrings.DefaultConnectionStringName);
-        }
-
-        return await GetTenantConfigurationByCurrentTenant();
+        return !DbConnectionOptions.EnabledSaasMultiTenancy
+            ? await TenantStoreService.FindAsync(ConnectionStrings.DefaultConnectionStringName)
+            : await GetTenantConfigurationByCurrentTenant();
     }
 
     private async Task<TenantConfiguration?> GetTenantConfigurationByCurrentTenant()
@@ -44,22 +41,14 @@ public class TenantConfigurationWrapper(IAbpLazyServiceProvider serviceProvider)
         if (CurrentTenantService.Id.HasValue)
         {
             var config = await TenantStoreService.FindAsync(CurrentTenantService.Id.Value);
-            if (config == null)
-            {
-                throw new InvalidOperationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}");
-            }
-            return config;
+            return config == null ? throw new InvalidOperationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}") : config;
         }
 
         // 通过租户名称查找
         if (!string.IsNullOrEmpty(CurrentTenantService.Name))
         {
             var config = await TenantStoreService.FindAsync(CurrentTenantService.Name);
-            if (config == null)
-            {
-                throw new InvalidOperationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}");
-            }
-            return config;
+            return config == null ? throw new InvalidOperationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}") : config;
         }
 
         // 返回默认配置

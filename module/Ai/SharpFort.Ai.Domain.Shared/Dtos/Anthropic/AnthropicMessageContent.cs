@@ -34,12 +34,7 @@ public class AnthropicMessageContent
                 throw new ValidationException("Messages 中 Content 和 Contents 字段不能同时有值");
             }
 
-            if (_content is not null)
-            {
-                return _content;
-            }
-
-            return _contents;
+            return _content is not null ? _content : _contents;
         }
         set
         {

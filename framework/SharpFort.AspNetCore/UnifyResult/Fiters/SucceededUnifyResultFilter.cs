@@ -296,10 +296,6 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
                      || method.ReflectedType!.IsDefined(typeof(NonUnifyAttribute), true)
                      || method.DeclaringType!.Assembly.GetName().Name!.StartsWith("Microsoft.AspNetCore.OData", StringComparison.Ordinal);
 
-        if (!isWebRequest)
-        {
-            return isSkip;
-        }
-        return isSkip;
+        return !isWebRequest ? isSkip : isSkip;
     }
 }

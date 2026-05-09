@@ -45,7 +45,9 @@
       "Bash(Get-Content build_baseline.txt)",
       "PowerShell($content = Get-Content build_baseline.txt; $allLines = $content.Count; $ideWarnings = \\($content | Select-String \"warning IDE\"\\).Count; $errors = \\($content | Select-String \"Error\" | Where-Object { $_ -match \"error \" }\\).Count; $nuWarnings = \\($content | Select-String \"warning NU\"\\).Count; Write-Output \"Total lines: $allLines\"; Write-Output \"IDE Warnings: $ideWarnings\"; Write-Output \"Build Errors: $errors\"; Write-Output \"NU Warnings: $nuWarnings\")",
       "Bash(Out-File -FilePath build_baseline.txt -Encoding utf8)",
-      "Bash(Select-Object -First 5)"
+      "Bash(Select-Object -First 5)",
+      "PowerShell(dotnet format analyzers *)",
+      "PowerShell(git checkout *)"
     ],
     "deny": [],
     "ask": []

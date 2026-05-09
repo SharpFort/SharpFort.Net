@@ -41,12 +41,7 @@ public record EmbeddingCreateRequest
                     "Input and InputAsList can not be assigned at the same time. One of them is should be null.");
             }
 
-            if (Input != null)
-            {
-                return [Input];
-            }
-
-            return InputAsList;
+            return Input != null ? [Input] : (IList<string>?)InputAsList;
         }
     }
 

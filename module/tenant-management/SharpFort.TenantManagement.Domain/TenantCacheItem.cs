@@ -24,12 +24,9 @@ public class TenantCacheItem
 
     public static string CalculateCacheKey(Guid? id, string name)
     {
-        if (id == null && name.IsNullOrWhiteSpace())
-        {
-            throw new AbpException("Both id and name can't be invalid.");
-        }
-
-        return string.Format(CultureInfo.InvariantCulture, CacheKeyFormat,
+        return id == null && name.IsNullOrWhiteSpace()
+            ? throw new AbpException("Both id and name can't be invalid.")
+            : string.Format(CultureInfo.InvariantCulture, CacheKeyFormat,
             id?.ToString() ?? "null",
             name.IsNullOrWhiteSpace() ? "null" : name);
     }

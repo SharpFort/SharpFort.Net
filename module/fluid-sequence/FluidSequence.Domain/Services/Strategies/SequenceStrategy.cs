@@ -17,12 +17,7 @@ namespace FluidSequence.Domain.Services.Strategies
                 return rule.CurrentValue.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(rule.SeqLength, '0');
             }
 
-            if (placeholderKey == "SEQ36")
-            {
-                return ConvertToBase36(rule.CurrentValue);
-            }
-
-            return placeholderKey;
+            return placeholderKey == "SEQ36" ? ConvertToBase36(rule.CurrentValue) : placeholderKey;
         }
 
         private static string ConvertToBase36(long value)

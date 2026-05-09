@@ -72,12 +72,7 @@ public class ThorToolFunctionPropertyDefinition
     {
         get
         {
-            if (Types is { Length: > 0 })
-            {
-                return Types;
-            }
-
-            return typeStr;
+            return Types is { Length: > 0 } ? Types : typeStr;
         }
         set
         {

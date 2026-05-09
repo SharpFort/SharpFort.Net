@@ -163,11 +163,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 userAction.Invoke(user);
             }
             //这里为了兼容解决数据库开启了大小写不敏感问题,还要将用户名进行二次校验
-            if (user != null && user.UserName == userName)
-            {
-                return true;
-            }
-            return false;
+            return user != null && user.UserName == userName;
         }
         /// <summary>
         /// 令牌转换

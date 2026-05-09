@@ -56,13 +56,8 @@ public class SfTenantConfigurationProvider(
 
     protected virtual async Task<TenantConfiguration?> FindTenantAsync(string tenantIdOrName)
     {
-        if (Guid.TryParse(tenantIdOrName, out var parsedTenantId))
-        {
-            return await TenantStore.FindAsync(parsedTenantId);
-        }
-        else
-        {
-            return await TenantStore.FindAsync(tenantIdOrName);
-        }
+        return Guid.TryParse(tenantIdOrName, out var parsedTenantId)
+            ? await TenantStore.FindAsync(parsedTenantId)
+            : await TenantStore.FindAsync(tenantIdOrName);
     }
 }

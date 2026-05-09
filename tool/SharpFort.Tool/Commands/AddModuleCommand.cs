@@ -60,12 +60,7 @@ namespace SharpFort.Tool.Commands
             {
                 throw new UserFriendlyException("当前目录包含多个sln解决方案，请只保留一个");
             }
-            if (slnFiles.Length == 0)
-            {
-                throw new UserFriendlyException("当前目录未找到sln解决方案，请检查");
-            }
-
-            return slnFiles[0];
+            return slnFiles.Length == 0 ? throw new UserFriendlyException("当前目录未找到sln解决方案，请检查") : slnFiles[0];
         }
 
 

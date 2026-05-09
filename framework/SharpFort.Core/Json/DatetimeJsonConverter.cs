@@ -23,13 +23,11 @@ public class DatetimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss") : Json
     /// <returns>DateTime值</returns>
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.String)
-        {
-            return DateTime.TryParse(reader.GetString(), out DateTime dateTime)
+        return reader.TokenType == JsonTokenType.String
+            ? DateTime.TryParse(reader.GetString(), out DateTime dateTime)
                 ? dateTime
-                : reader.GetDateTime();
-        }
-        return reader.GetDateTime();
+                : reader.GetDateTime()
+            : reader.GetDateTime();
     }
 
     /// <summary>

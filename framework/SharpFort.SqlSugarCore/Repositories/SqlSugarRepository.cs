@@ -252,14 +252,9 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
-            {
-                return await (await GetDbSimpleClientAsync()).AsUpdateable().SetColumns(nameof(ISoftDelete.IsDeleted), true).Where(predicate).ExecuteCommandAsync() > 0;
-            }
-            else
-            {
-                return await (await GetDbSimpleClientAsync()).DeleteAsync(predicate);
-            }
+            return typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity))
+                ? await (await GetDbSimpleClientAsync()).AsUpdateable().SetColumns(nameof(ISoftDelete.IsDeleted), true).Where(predicate).ExecuteCommandAsync() > 0
+                : await (await GetDbSimpleClientAsync()).DeleteAsync(predicate);
 
         }
 

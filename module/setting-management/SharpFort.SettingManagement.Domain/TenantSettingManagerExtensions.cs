@@ -37,11 +37,8 @@ public static class TenantSettingManagerExtensions
 
     public static Task SetForTenantOrGlobalAsync(this ISettingManager settingManager, Guid? tenantId, [NotNull] string name, [CanBeNull] string value, bool forceToSet = false)
     {
-        if (tenantId.HasValue)
-        {
-            return settingManager.SetForTenantAsync(tenantId.Value, name, value, forceToSet);
-        }
-
-        return settingManager.SetGlobalAsync(name, value);
+        return tenantId.HasValue
+            ? settingManager.SetForTenantAsync(tenantId.Value, name, value, forceToSet)
+            : settingManager.SetGlobalAsync(name, value);
     }
 }

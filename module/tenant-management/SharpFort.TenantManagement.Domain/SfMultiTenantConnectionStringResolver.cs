@@ -64,12 +64,9 @@ public class SfMultiTenantConnectionStringResolver(
         }
 
         //Fallback to tenant's default connection string if available
-        if (!tenantDefaultConnectionString.IsNullOrWhiteSpace())
-        {
-            return tenantDefaultConnectionString!;
-        }
-
-        return await base.ResolveAsync(connectionStringName);
+        return !tenantDefaultConnectionString.IsNullOrWhiteSpace()
+            ? tenantDefaultConnectionString!
+            : await base.ResolveAsync(connectionStringName);
     }
 
     [Obsolete("Use ResolveAsync method.")]
@@ -124,12 +121,9 @@ public class SfMultiTenantConnectionStringResolver(
 
         //Fallback to the global default connection string
         var defaultConnectionString = Options.ConnectionStrings.Default;
-        if (!defaultConnectionString.IsNullOrWhiteSpace())
-        {
-            return defaultConnectionString!;
-        }
-
-        throw new AbpException("No connection string defined!");
+        return !defaultConnectionString.IsNullOrWhiteSpace()
+            ? defaultConnectionString!
+            : throw new AbpException("No connection string defined!");
     }
 
     protected virtual async Task<TenantConfiguration?> FindTenantConfigurationAsync(Guid tenantId)

@@ -28,12 +28,9 @@ namespace FluidSequence.Application.Services
         public async Task<string> TestGenerateAsync(string ruleCode, Dictionary<string, string> context)
         {
             var rule = await _repository.GetAsync(r => r.RuleCode == ruleCode);
-            if (rule == null)
-            {
-                throw new Volo.Abp.UserFriendlyException($"Rule {ruleCode} not found");
-            }
-
-            return _domainService.TestGenerate(rule, context);
+            return rule == null
+                ? throw new Volo.Abp.UserFriendlyException($"Rule {ruleCode} not found")
+                : _domainService.TestGenerate(rule, context);
         }
 
         public Task<List<PlaceholderMetaDto>> GetPlaceholdersAsync()

@@ -41,11 +41,7 @@ namespace SharpFort.Ddd.Application.Contracts
         {
             get
             {
-                if (!string.IsNullOrWhiteSpace(OrderByColumn))
-                {
-                    return $"{OrderByColumn} {(IsAscending ? "ASC" : "DESC")}";
-                }
-                return _sorting;
+                return !string.IsNullOrWhiteSpace(OrderByColumn) ? $"{OrderByColumn} {(IsAscending ? "ASC" : "DESC")}" : _sorting;
             }
             set => _sorting = value;
         }

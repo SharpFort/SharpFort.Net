@@ -75,12 +75,7 @@
             string strText = System.Text.RegularExpressions.Regex.Replace(html, "<[^>]+>", "");
             strText = System.Text.RegularExpressions.Regex.Replace(strText, "&[^;]+;", "");
 
-            if (length > 0 && strText.Length > length)
-            {
-                return strText[..length];
-            }
-
-            return strText;
+            return length > 0 && strText.Length > length ? strText[..length] : strText;
         }
         #endregion
     }

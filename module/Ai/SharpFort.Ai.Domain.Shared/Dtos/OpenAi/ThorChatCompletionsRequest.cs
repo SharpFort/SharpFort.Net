@@ -109,12 +109,7 @@ public class ThorChatCompletionsRequest
                     "Stop 和 StopAsList 不能同时有值，其中一个应该为 null");
             }
 
-            if (Stop is not null)
-            {
-                return [Stop];
-            }
-
-            return StopAsList;
+            return Stop is not null ? [Stop] : StopAsList;
         }
     }
 
@@ -213,12 +208,7 @@ public class ThorChatCompletionsRequest
                     "当 type 为 \"function\" 时，属性 Function 不可为null。");
             }
 
-            if (ToolChoice?.Type == ThorToolChoiceTypeConst.Function)
-            {
-                return ToolChoice;
-            }
-
-            return ToolChoice?.Type;
+            return ToolChoice?.Type == ThorToolChoiceTypeConst.Function ? ToolChoice : (ToolChoice?.Type);
         }
         set
         {

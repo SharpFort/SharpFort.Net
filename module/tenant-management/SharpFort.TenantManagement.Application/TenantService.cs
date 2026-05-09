@@ -68,12 +68,9 @@ namespace SharpFort.TenantManagement.Application
         /// <returns></returns>
         public override async Task<TenantGetOutputDto> CreateAsync(TenantCreateInput input)
         {
-            if (await _repository.IsAnyAsync(x => x.Name == input.Name))
-            {
-                throw new UserFriendlyException("创建失败，当前租户已存在");
-            }
-
-            return await base.CreateAsync(input);
+            return await _repository.IsAnyAsync(x => x.Name == input.Name)
+                ? throw new UserFriendlyException("创建失败，当前租户已存在")
+                : await base.CreateAsync(input);
         }
 
         /// <summary>
@@ -84,12 +81,9 @@ namespace SharpFort.TenantManagement.Application
         /// <returns></returns>
         public override async Task<TenantGetOutputDto> UpdateAsync(Guid id, TenantUpdateInput input)
         {
-            if (await _repository.IsAnyAsync(x => x.Name == input.Name && x.Id != id))
-            {
-                throw new UserFriendlyException("更新后租户名已经存在");
-            }
-
-            return await base.UpdateAsync(id, input);
+            return await _repository.IsAnyAsync(x => x.Name == input.Name && x.Id != id)
+                ? throw new UserFriendlyException("更新后租户名已经存在")
+                : await base.UpdateAsync(id, input);
         }
 
 

@@ -164,11 +164,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         {
             var user = await _userRepository.GetUserAllInfoAsync(userId);
             var data = EntityMapToDto(user);
-            if (data is null)
-            {
-                throw new AbpAuthorizationException();
-            }
-            return data;
+            return data is null ? throw new AbpAuthorizationException() : data;
         }
 
         private async Task<UserRoleMenuDto> GetInfoByCacheAsync(Guid userId)

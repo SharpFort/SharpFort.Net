@@ -93,12 +93,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                 return p2;
             }
 
-            if (string.IsNullOrEmpty(p2))
-            {
-                return p1;
-            }
-
-            return $"{p1.TrimEnd('/')}/{p2.TrimStart('/')}";
+            return string.IsNullOrEmpty(p2) ? p1 : $"{p1.TrimEnd('/')}/{p2.TrimStart('/')}";
         }
 
         private static string ReplacePlaceholders(string path, string controllerName, string actionName)

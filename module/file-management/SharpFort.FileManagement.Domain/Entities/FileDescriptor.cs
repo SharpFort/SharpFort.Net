@@ -244,12 +244,9 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// </summary>
         private static FileType InferFileType(string? extension)
         {
-            if (string.IsNullOrEmpty(extension))
-            {
-                return FileType.File;
-            }
-
-            return extension.ToLowerInvariant() switch
+            return string.IsNullOrEmpty(extension)
+                ? FileType.File
+                : extension.ToLowerInvariant() switch
             {
                 ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" or ".svg" or ".ico" or ".avif"
                     => FileType.Image,
@@ -271,11 +268,7 @@ namespace SharpFort.FileManagement.Domain.Entities
         public static string GetMimeType(string fileName)
         {
             var provider = new FileExtensionContentTypeProvider();
-            if (provider.TryGetContentType(fileName, out var contentType))
-            {
-                return contentType;
-            }
-            return "application/octet-stream";
+            return provider.TryGetContentType(fileName, out var contentType) ? contentType : "application/octet-stream";
         }
 
         /// <summary>

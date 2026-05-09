@@ -62,12 +62,7 @@ public class ThorChatMessage
             //     throw new ValidationException("Messages 中 Content 和 Contents 字段不能同时有值");
             // }
 
-            if (Content is not null)
-            {
-                return Content;
-            }
-
-            return Contents!;
+            return Content is not null ? Content : Contents!;
         }
         set
         {
@@ -103,11 +98,7 @@ public class ThorChatMessage
                 return Content;
             }
 
-            if (Contents is not null && Contents.Any())
-            {
-                return JsonSerializer.Serialize(Contents);
-            }
-            return string.Empty;
+            return Contents is not null && Contents.Any() ? JsonSerializer.Serialize(Contents) : string.Empty;
         }
     }
 

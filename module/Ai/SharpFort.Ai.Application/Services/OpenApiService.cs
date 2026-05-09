@@ -284,13 +284,10 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
 
         // 再检查 Authorization 头
         string authHeader = httpContext.Request.Headers["Authorization"];
-        if (!string.IsNullOrWhiteSpace(authHeader) &&
-            authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-        {
-            return authHeader["Bearer ".Length..].Trim();
-        }
-
-        return null;
+        return !string.IsNullOrWhiteSpace(authHeader) &&
+            authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+            ? authHeader["Bearer ".Length..].Trim()
+            : null;
     }
 
     private void Intercept(HttpContext httpContext)
