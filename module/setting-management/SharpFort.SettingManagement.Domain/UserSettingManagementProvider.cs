@@ -4,19 +4,13 @@ using Volo.Abp.Users;
 
 namespace SharpFort.SettingManagement.Domain;
 
-public class UserSettingManagementProvider : SettingManagementProvider, ITransientDependency
+public class UserSettingManagementProvider(
+    ISettingManagementStore settingManagementStore,
+    ICurrentUser currentUser) : SettingManagementProvider(settingManagementStore), ITransientDependency
 {
     public override string Name => UserSettingValueProvider.ProviderName;
 
-    protected ICurrentUser CurrentUser { get; }
-
-    public UserSettingManagementProvider(
-        ISettingManagementStore settingManagementStore,
-        ICurrentUser currentUser)
-        : base(settingManagementStore)
-    {
-        CurrentUser = currentUser;
-    }
+    protected ICurrentUser CurrentUser { get; } = currentUser;
 
     protected override string? NormalizeProviderKey(string? providerKey)
     {

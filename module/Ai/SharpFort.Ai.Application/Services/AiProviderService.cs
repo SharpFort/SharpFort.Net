@@ -15,18 +15,12 @@ namespace SharpFort.Ai.Application.Services;
 /// AI供应商管理服务
 /// </summary>
 [Authorize]
-public class AiProviderService : ApplicationService, IAiProviderService
+public class AiProviderService(
+    ISqlSugarRepository<AiProvider, Guid> providerRepository,
+    ISqlSugarRepository<AiModel, Guid> modelRepository) : ApplicationService, IAiProviderService
 {
-    private readonly ISqlSugarRepository<AiProvider, Guid> _providerRepository;
-    private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository;
-
-    public AiProviderService(
-        ISqlSugarRepository<AiProvider, Guid> providerRepository,
-        ISqlSugarRepository<AiModel, Guid> modelRepository)
-    {
-        _providerRepository = providerRepository;
-        _modelRepository = modelRepository;
-    }
+    private readonly ISqlSugarRepository<AiProvider, Guid> _providerRepository = providerRepository;
+    private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository = modelRepository;
 
     /// <summary>
     /// 获取AI供应商列表

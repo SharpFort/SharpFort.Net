@@ -10,24 +10,16 @@ using Casbin.Adapter.SqlSugar.Entities;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public class CasbinPolicyManager : DomainService, ICasbinPolicyManager
+    public class CasbinPolicyManager(
+        IEnforcer enforcer,
+        IUnitOfWorkManager unitOfWorkManager,
+        ISqlSugarRepository<Role> roleRepository,
+        ICurrentTenant currentTenant) : DomainService, ICasbinPolicyManager
     {
-        private readonly IEnforcer _enforcer;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
-        private readonly ISqlSugarRepository<Role> _roleRepository;
-        private readonly ICurrentTenant _currentTenant;
-
-        public CasbinPolicyManager(
-            IEnforcer enforcer,
-            IUnitOfWorkManager unitOfWorkManager,
-            ISqlSugarRepository<Role> roleRepository,
-            ICurrentTenant currentTenant)
-        {
-            _enforcer = enforcer;
-            _unitOfWorkManager = unitOfWorkManager;
-            _roleRepository = roleRepository;
-            _currentTenant = currentTenant;
-        }
+        private readonly IEnforcer _enforcer = enforcer;
+        private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
+        private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
+        private readonly ICurrentTenant _currentTenant = currentTenant;
 
         #region Helper Methods
 

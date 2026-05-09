@@ -5,10 +5,7 @@ using SharpFort.SqlSugarCore;
 namespace SharpFort.Ai.SqlSugarCore
 {
     [ConnectionStringName("Ai")]
-    public class AiModuleDbContext : SqlSugarDbContext
+    public class AiModuleDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider)
     {
-        public AiModuleDbContext(IAbpLazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-        {
-        }
     }
 }

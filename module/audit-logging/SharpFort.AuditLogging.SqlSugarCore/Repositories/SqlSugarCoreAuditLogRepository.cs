@@ -12,11 +12,8 @@ using SharpFort.SqlSugarCore.Repositories;
 
 namespace SharpFort.AuditLogging.SqlSugarCore.Repositories;
 
-public class SqlSugarCoreAuditLogRepository : SqlSugarRepository<AuditLog, Guid>, IAuditLogRepository
+public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : SqlSugarRepository<AuditLog, Guid>(sugarDbContextProvider), IAuditLogRepository
 {
-    public SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
-    {
-    }
 
     /// <summary>
     /// 重写插入，支持导航属性

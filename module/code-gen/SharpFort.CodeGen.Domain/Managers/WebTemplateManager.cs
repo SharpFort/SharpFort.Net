@@ -11,15 +11,11 @@ namespace SharpFort.CodeGen.Domain.Managers
     /// <summary>
     /// 与webfrist相关，同步到web，code to web
     /// </summary>
-    public class WebTemplateManager : DomainService
+    public class WebTemplateManager(ISqlSugarRepository<Table> repository, IModuleContainer moduleContainer) : DomainService
     {
-        private ISqlSugarRepository<Table> _repository;
-        private IModuleContainer _moduleContainer;
-        public WebTemplateManager(ISqlSugarRepository<Table> repository, IModuleContainer moduleContainer)
-        {
-            _repository = repository;
-            _moduleContainer = moduleContainer;
-        }
+        private ISqlSugarRepository<Table> _repository = repository;
+        private IModuleContainer _moduleContainer = moduleContainer;
+
         /// <summary>
         /// 通过当前的实体代码获取表存储
         /// </summary>

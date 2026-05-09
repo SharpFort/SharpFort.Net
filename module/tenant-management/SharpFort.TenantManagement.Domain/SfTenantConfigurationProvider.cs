@@ -5,24 +5,16 @@ using Volo.Abp.MultiTenancy.Localization;
 namespace Volo.Abp.MultiTenancy;
 
 [Dependency(ReplaceServices = true)]
-public class SfTenantConfigurationProvider : ITenantConfigurationProvider, ITransientDependency
+public class SfTenantConfigurationProvider(
+    ITenantResolver tenantResolver,
+    ITenantStore tenantStore,
+    ITenantResolveResultAccessor tenantResolveResultAccessor,
+    IStringLocalizer<AbpMultiTenancyResource> stringLocalizer) : ITenantConfigurationProvider, ITransientDependency
 {
-    protected virtual ITenantResolver TenantResolver { get; }
-    protected virtual ITenantStore TenantStore { get; }
-    protected virtual ITenantResolveResultAccessor TenantResolveResultAccessor { get; }
-    protected virtual IStringLocalizer<AbpMultiTenancyResource> StringLocalizer { get; }
-
-    public SfTenantConfigurationProvider(
-        ITenantResolver tenantResolver,
-        ITenantStore tenantStore,
-        ITenantResolveResultAccessor tenantResolveResultAccessor,
-        IStringLocalizer<AbpMultiTenancyResource> stringLocalizer)
-    {
-        TenantResolver = tenantResolver;
-        TenantStore = tenantStore;
-        TenantResolveResultAccessor = tenantResolveResultAccessor;
-        StringLocalizer = stringLocalizer;
-    }
+    protected virtual ITenantResolver TenantResolver { get; } = tenantResolver;
+    protected virtual ITenantStore TenantStore { get; } = tenantStore;
+    protected virtual ITenantResolveResultAccessor TenantResolveResultAccessor { get; } = tenantResolveResultAccessor;
+    protected virtual IStringLocalizer<AbpMultiTenancyResource> StringLocalizer { get; } = stringLocalizer;
 
     public virtual async Task<TenantConfiguration?> GetAsync(bool saveResolveResult = false)
     {

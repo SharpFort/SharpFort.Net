@@ -9,19 +9,13 @@ using SharpFort.Ai.Domain.Shared.Attributes;
 namespace SharpFort.Ai.Domain.Mcp;
 
 [SfAgentTool]
-public class HttpRequestTool : ISingletonDependency
+public class HttpRequestTool(
+    IHttpClientFactory httpClientFactory,
+    ILogger<HttpRequestTool> logger) : ISingletonDependency
 {
     private static readonly JsonSerializerOptions s_indentedOptions = new() { WriteIndented = true };
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<HttpRequestTool> _logger;
-
-    public HttpRequestTool(
-        IHttpClientFactory httpClientFactory,
-        ILogger<HttpRequestTool> logger)
-    {
-        _httpClientFactory = httpClientFactory;
-        _logger = logger;
-    }
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly ILogger<HttpRequestTool> _logger = logger;
 
     [SfAgentTool("HTTP请求"), DisplayName("HttpRequest"),
      Description("发送HTTP请求，支持GET/POST/PUT/DELETE等方法，获取指定URL的响应内容")]
@@ -133,12 +127,8 @@ public class HttpRequestTool : ISingletonDependency
     /// </summary>
     private static bool IsJsonContentType(string? contentType)
     {
-        if (string.IsNullOrWhiteSpace(contentType))
-        {
-            return false;
-        }
-
-        return contentType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
-               contentType.Contains("text/json", StringComparison.OrdinalIgnoreCase);
+        return !string.IsNullOrWhiteSpace(contentType)
+            && (contentType.Contains("application/json", StringComparison.OrdinalIgnoreCase)
+                || contentType.Contains("text/json", StringComparison.OrdinalIgnoreCase));
     }
 }

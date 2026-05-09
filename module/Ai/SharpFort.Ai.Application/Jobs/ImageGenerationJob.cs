@@ -12,21 +12,14 @@ namespace SharpFort.Ai.Application.Jobs;
 /// <summary>
 /// 图片生成后台任务
 /// </summary>
-public class ImageGenerationJob : AsyncBackgroundJob<ImageGenerationJobArgs>, ITransientDependency
+public class ImageGenerationJob(
+    ILogger<ImageGenerationJob> logger,
+    AiGateWayManager aiGateWayManager,
+    ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageStoreTaskRepository) : AsyncBackgroundJob<ImageGenerationJobArgs>, ITransientDependency
 {
-    private readonly ILogger<ImageGenerationJob> _logger;
-    private readonly AiGateWayManager _aiGateWayManager;
-    private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageStoreTaskRepository;
-
-    public ImageGenerationJob(
-        ILogger<ImageGenerationJob> logger,
-        AiGateWayManager aiGateWayManager,
-        ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageStoreTaskRepository)
-    {
-        _logger = logger;
-        _aiGateWayManager = aiGateWayManager;
-        _imageStoreTaskRepository = imageStoreTaskRepository;
-    }
+    private readonly ILogger<ImageGenerationJob> _logger = logger;
+    private readonly AiGateWayManager _aiGateWayManager = aiGateWayManager;
+    private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageStoreTaskRepository = imageStoreTaskRepository;
 
     public override async Task ExecuteAsync(ImageGenerationJobArgs args)
     {

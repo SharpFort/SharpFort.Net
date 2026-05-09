@@ -6,15 +6,10 @@ using SharpFort.CasbinRbac.Domain.Shared.Options;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public partial class AliyunManger : DomainService, IAliyunManger
+    public partial class AliyunManger(ILogger<AliyunManger> logger, IOptions<AliyunOptions> options) : DomainService, IAliyunManger
     {
-        private readonly ILogger<AliyunManger> _logger;
-        private AliyunOptions Options { get; set; }
-        public AliyunManger(ILogger<AliyunManger> logger, IOptions<AliyunOptions> options)
-        {
-            Options = options.Value;
-            _logger = logger;
-        }
+        private readonly ILogger<AliyunManger> _logger = logger;
+        private AliyunOptions Options { get; set; } = options.Value;
 
         private Client CreateClient()
         {

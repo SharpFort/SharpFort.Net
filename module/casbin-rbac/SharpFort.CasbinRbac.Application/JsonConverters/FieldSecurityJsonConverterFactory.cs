@@ -9,14 +9,9 @@ using SharpFort.CasbinRbac.Domain.Shared.Attributes;
 
 namespace SharpFort.CasbinRbac.Application.JsonConverters
 {
-    public class FieldSecurityJsonConverterFactory : JsonConverterFactory
+    public class FieldSecurityJsonConverterFactory(IHttpContextAccessor httpContextAccessor) : JsonConverterFactory
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public FieldSecurityJsonConverterFactory(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
         public override bool CanConvert(Type typeToConvert)
         {
@@ -36,18 +31,12 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
         }
     }
 
-    public class FieldSecurityConverter<T> : JsonConverter<T> where T : class
+    public class FieldSecurityConverter<T>(IHttpContextAccessor httpContextAccessor, string resourceName) : JsonConverter<T> where T : class
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string _resourceName;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly string _resourceName = resourceName;
         // 静态缓存属性元数据，避免每次 Write 都反射
         private static readonly PropertyInfo[] _properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-        public FieldSecurityConverter(IHttpContextAccessor httpContextAccessor, string resourceName)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _resourceName = resourceName;
-        }
 
         public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

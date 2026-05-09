@@ -1,5 +1,5 @@
 #pragma warning disable CA1716
-namespace FluidSequence.Domain.Shared.Consts
+namespace SharpFort.FluidSequence.Domain.Shared.Consts
 {
     public static class FluidSequenceConsts
     {

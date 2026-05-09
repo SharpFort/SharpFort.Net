@@ -5,13 +5,10 @@ using SharpFort.CasbinRbac.Domain.Shared.Etos;
 
 namespace SharpFort.CasbinRbac.Domain.EventHandlers
 {
-    public class UserInfoHandler : ILocalEventHandler<UserRoleMenuQueryEventArgs>, ITransientDependency
+    public class UserInfoHandler(UserManager userManager) : ILocalEventHandler<UserRoleMenuQueryEventArgs>, ITransientDependency
     {
-        private UserManager _userManager;
-        public UserInfoHandler(UserManager userManager)
-        {
-            _userManager = userManager;
-        }
+        private UserManager _userManager = userManager;
+
         public async Task HandleEventAsync(UserRoleMenuQueryEventArgs eventData)
         {
             //数据库查询方式

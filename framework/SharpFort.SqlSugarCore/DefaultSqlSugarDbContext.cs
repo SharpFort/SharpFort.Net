@@ -21,7 +21,10 @@ namespace SharpFort.SqlSugarCore;
 /// <summary>
 /// 默认SqlSugar数据库上下文实现
 /// </summary>
-public class DefaultSqlSugarDbContext : SqlSugarDbContext
+/// <remarks>
+/// 构造函数
+/// </remarks>
+public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider)
 {
     #region Protected Properties
 
@@ -77,14 +80,6 @@ public class DefaultSqlSugarDbContext : SqlSugarDbContext
     protected virtual bool IsSoftDeleteFilterEnabled => DataFilterService?.IsEnabled<ISoftDelete>() ?? false;
 
     #endregion
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvider)
-        : base(lazyServiceProvider)
-    {
-    }
 
     /// <summary>
     /// 自定义数据过滤器

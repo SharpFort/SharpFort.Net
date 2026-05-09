@@ -1,7 +1,7 @@
 using SqlSugar;
 using System.Globalization;
 using Volo.Abp.Domain.Entities.Auditing;
-using FluidSequence.Domain.Shared.Enums;
+using SharpFort.FluidSequence.Domain.Shared.Enums;
 
 namespace FluidSequence.Domain.Entities
 {

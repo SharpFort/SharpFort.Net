@@ -6,23 +6,16 @@ namespace SharpFort.Mapster
     /// Mapster对象映射器
     /// 实现IObjectMapper接口，提供对象映射功能
     /// </summary>
-    public class MapsterObjectMapper : IObjectMapper
+    /// <remarks>
+    /// 构造函数
+    /// </remarks>
+    /// <param name="autoObjectMappingProvider">自动对象映射提供程序</param>
+    public class MapsterObjectMapper(IAutoObjectMappingProvider autoObjectMappingProvider) : IObjectMapper
     {
-        private readonly IAutoObjectMappingProvider _autoObjectMappingProvider;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="autoObjectMappingProvider">自动对象映射提供程序</param>
-        public MapsterObjectMapper(IAutoObjectMappingProvider autoObjectMappingProvider)
-        {
-            _autoObjectMappingProvider = autoObjectMappingProvider;
-        }
-
         /// <summary>
         /// 获取自动对象映射提供程序
         /// </summary>
-        public IAutoObjectMappingProvider AutoObjectMappingProvider => _autoObjectMappingProvider;
+        public IAutoObjectMappingProvider AutoObjectMappingProvider { get; } = autoObjectMappingProvider;
 
         /// <summary>
         /// 将源对象映射到目标类型

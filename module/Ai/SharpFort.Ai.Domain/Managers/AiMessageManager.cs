@@ -5,14 +5,9 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Managers;
 
-public class AiMessageManager : DomainService
+public class AiMessageManager(ISqlSugarRepository<ChatMessage> repository) : DomainService
 {
-    private readonly ISqlSugarRepository<ChatMessage> _repository;
-
-    public AiMessageManager(ISqlSugarRepository<ChatMessage> repository)
-    {
-        _repository = repository;
-    }
+    private readonly ISqlSugarRepository<ChatMessage> _repository = repository;
 
     /// <summary>
     /// 创建系统消息

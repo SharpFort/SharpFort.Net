@@ -2,20 +2,16 @@
 
 namespace SharpFort.CasbinRbac.Domain.Shared.Caches
 {
-    public class UserInfoCacheItem
+    public class UserInfoCacheItem(UserRoleMenuDto info)
     {
-        public UserInfoCacheItem(UserRoleMenuDto info) { Info = info; }
         /// <summary>
         /// 存储的用户信息
         /// </summary>
-        public UserRoleMenuDto Info { get; set; }
+        public UserRoleMenuDto Info { get; set; } = info;
     }
-    public class UserInfoCacheKey
+    public class UserInfoCacheKey(Guid userId)
     {
-        public UserInfoCacheKey(Guid userId) { UserId = userId; }
-
-        public Guid UserId { get; set; }
-
+        public Guid UserId { get; set; } = userId;
         public override string ToString()
         {
             return $"User:{UserId}";

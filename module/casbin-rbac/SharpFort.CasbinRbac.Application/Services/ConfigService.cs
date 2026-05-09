@@ -12,16 +12,11 @@ namespace SharpFort.CasbinRbac.Application.Services
     /// <summary>
     /// Config服务实现
     /// </summary>
-    public class ConfigService : SfCrudAppService<Config, ConfigGetOutputDto, ConfigGetListOutputDto, Guid,
-            ConfigGetListInputVo, ConfigCreateInputVo, ConfigUpdateInputVo>,
+    public class ConfigService(ISqlSugarRepository<Config, Guid> repository) : SfCrudAppService<Config, ConfigGetOutputDto, ConfigGetListOutputDto, Guid,
+            ConfigGetListInputVo, ConfigCreateInputVo, ConfigUpdateInputVo>(repository),
         IConfigService
     {
-        private ISqlSugarRepository<Config, Guid> _repository;
-
-        public ConfigService(ISqlSugarRepository<Config, Guid> repository) : base(repository)
-        {
-            _repository = repository;
-        }
+        private ISqlSugarRepository<Config, Guid> _repository = repository;
 
         /// <summary>
         /// 新增配置

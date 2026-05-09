@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using FluidSequence.Domain.Shared.Enums;
+using SharpFort.FluidSequence.Domain.Shared.Enums;
 
 namespace FluidSequence.Application.Contracts.Dtos
 {

@@ -7,12 +7,8 @@ using SharpFort.Ddd.Application;
 
 namespace SharpFort.CodeGen.Application.Services
 {
-    public class TableService : SfCrudAppService<Table, TableDto, Guid, TableGetListInput>, ITableService
+    public class TableService(IRepository<Table, Guid> repository) : SfCrudAppService<Table, TableDto, Guid, TableGetListInput>(repository), ITableService
     {
-        public TableService(IRepository<Table, Guid> repository) : base(repository)
-        {
-        }
-
         public override Task<PagedResultDto<TableDto>> GetListAsync(TableGetListInput input)
         {
             return base.GetListAsync(input);

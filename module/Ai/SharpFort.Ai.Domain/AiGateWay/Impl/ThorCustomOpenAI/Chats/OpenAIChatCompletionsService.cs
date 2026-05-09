@@ -27,7 +27,7 @@ public sealed class OpenAiChatCompletionsService(
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
-            endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
+            endpoint = endpoint[..^"/v1".Length];
         }
 
         var requestUri = endpoint + "/v1/chat/completions";
@@ -157,7 +157,7 @@ public sealed class OpenAiChatCompletionsService(
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
-            endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
+            endpoint = endpoint[..^"/v1".Length];
         }
         var requestUri = endpoint + "/v1/chat/completions";
         var response = await httpClientFactory.CreateClient().PostJsonAsync(

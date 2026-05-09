@@ -17,24 +17,15 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
     /// <summary>
     /// 第三方授权服务
     /// </summary>
-    public class AuthService :
-        SfCrudAppService<OpenAuth, AuthOutputDto, Guid, AuthGetListInput, AuthCreateOrUpdateInputDto>,
+    public class AuthService(IAccountManager accountManager, IHttpContextAccessor httpContextAccessor,
+        ILogger<AuthService> logger, ISqlSugarRepository<OpenAuth, Guid> repository) :
+        SfCrudAppService<OpenAuth, AuthOutputDto, Guid, AuthGetListInput, AuthCreateOrUpdateInputDto>(repository),
         IAuthService
     {
-        private HttpContext? HttpContext { get; set; }
-        private ILogger<AuthService> _logger;
-        private ISqlSugarRepository<OpenAuth, Guid> _repository;
-        private IAccountManager _accountManager;
-
-        public AuthService(IAccountManager accountManager, IHttpContextAccessor httpContextAccessor,
-            ILogger<AuthService> logger, ISqlSugarRepository<OpenAuth, Guid> repository) : base(repository)
-        {
-            _logger = logger;
-            //可能为空
-            HttpContext = httpContextAccessor.HttpContext;
-            _repository = repository;
-            _accountManager = accountManager;
-        }
+        private HttpContext? HttpContext { get; set; } = httpContextAccessor.HttpContext;
+        private ILogger<AuthService> _logger = logger;
+        private ISqlSugarRepository<OpenAuth, Guid> _repository = repository;
+        private IAccountManager _accountManager = accountManager;
 
         /// <summary>
         /// 第三方oauth登录

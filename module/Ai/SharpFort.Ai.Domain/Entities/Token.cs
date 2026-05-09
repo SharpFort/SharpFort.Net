@@ -58,17 +58,7 @@ public class Token : FullAuditedAggregateRoot<Guid>
     /// </summary>
     public bool IsAvailable()
     {
-        if (IsDisabled)
-        {
-            return false;
-        }
-
-        if (ExpireTime.HasValue && ExpireTime.Value < DateTime.Now)
-        {
-            return false;
-        }
-
-        return true;
+        return !IsDisabled && !(ExpireTime.HasValue && ExpireTime.Value < DateTime.Now);
     }
 
     /// <summary>

@@ -10,14 +10,9 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Adapters
     /// 作用域工厂适配器
     /// 为 Singleton 的 Enforcer 提供按需创建 Scope 的能力
     /// </summary>
-    public class ScopeFactoryCasbinAdapter : IAdapter
+    public class ScopeFactoryCasbinAdapter(IServiceScopeFactory scopeFactory) : IAdapter
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-
-        public ScopeFactoryCasbinAdapter(IServiceScopeFactory scopeFactory)
-        {
-            _scopeFactory = scopeFactory;
-        }
+        private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
         // 核心方法：加载策略
         public void LoadPolicy(IPolicyStore model)

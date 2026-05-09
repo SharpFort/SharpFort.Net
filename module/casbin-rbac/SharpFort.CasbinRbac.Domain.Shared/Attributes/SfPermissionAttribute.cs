@@ -6,16 +6,11 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Attributes
     /// 解决 URL 变更导致权限失效的问题。
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public class SfPermissionAttribute : Attribute
+    public class SfPermissionAttribute(string code) : Attribute
     {
         /// <summary>
         /// 权限代码 (e.g. "user:list")
         /// </summary>
-        public string Code { get; }
-
-        public SfPermissionAttribute(string code)
-        {
-            Code = code;
-        }
+        public string Code { get; } = code;
     }
 }

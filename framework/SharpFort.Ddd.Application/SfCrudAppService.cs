@@ -10,64 +10,48 @@ namespace SharpFort.Ddd.Application
     /// <summary>
     /// CRUD应用服务基类 - 基础版本
     /// </summary>
-    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey>
-        : SfCrudAppService<TEntity, TEntityDto, TKey, PagedAndSortedResultRequestDto>
+    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TKey, PagedAndSortedResultRequestDto>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
     }
 
     /// <summary>
     /// CRUD应用服务基类 - 支持自定义查询输入
     /// </summary>
-    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput>
-        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TEntityDto>
+    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TEntityDto>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
     }
 
     /// <summary>
     /// CRUD应用服务基类 - 支持自定义创建输入
     /// </summary>
-    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput>
-        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TCreateInput>
+    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TCreateInput>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
     }
 
     /// <summary>
     /// CRUD应用服务基类 - 支持自定义更新输入
     /// </summary>
-    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
-        : SfCrudAppService<TEntity, TEntityDto, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
+    public abstract class SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
     }
 
     /// <summary>
     /// CRUD应用服务基类 - 完整实现
     /// </summary>
-    public abstract class SfCrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
-        : CrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
+    public abstract class SfCrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(IRepository<TEntity, TKey> repository)
+        : CrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(repository)
         where TEntity : class, IEntity<TKey>
         where TGetOutputDto : IEntityDto<TKey>
         where TGetListOutputDto : IEntityDto<TKey>
@@ -76,11 +60,6 @@ namespace SharpFort.Ddd.Application
         /// 临时文件存储路径
         /// </summary>
         private const string TempFilePath = "/wwwroot/temp";
-
-        protected SfCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
 
         // /// <summary>
         // /// 获取单个实体详情

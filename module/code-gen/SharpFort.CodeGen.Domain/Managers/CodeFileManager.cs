@@ -8,17 +8,12 @@ namespace SharpFort.CodeGen.Domain.Managers
     /// <summary>
     /// 代码文件领域服务,与代码文件生成相关，web to code
     /// </summary>
-    public class CodeFileManager : DomainService
+    public class CodeFileManager(IEnumerable<ITemplateHandler> templateHandlers, ISqlSugarRepository<Field> fieldRepository, ISqlSugarRepository<Template> repository) : DomainService
     {
-        private IEnumerable<ITemplateHandler> _templateHandlers;
-        private ISqlSugarRepository<Template> _repository;
-        private ISqlSugarRepository<Field> _fieldRepository;
-        public CodeFileManager(IEnumerable<ITemplateHandler> templateHandlers, ISqlSugarRepository<Field> fieldRepository, ISqlSugarRepository<Template> repository)
-        {
-            _templateHandlers = templateHandlers;
-            _repository = repository;
-            _fieldRepository = fieldRepository;
-        }
+        private IEnumerable<ITemplateHandler> _templateHandlers = templateHandlers;
+        private ISqlSugarRepository<Template> _repository = repository;
+        private ISqlSugarRepository<Field> _fieldRepository = fieldRepository;
+
         public async Task BuildWebToCodeAsync(Table tableEntity)
         {
             var templates = await _repository.GetListAsync();

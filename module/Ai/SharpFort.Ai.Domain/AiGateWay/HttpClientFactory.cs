@@ -4,36 +4,23 @@ namespace SharpFort.Ai.Domain.AiGateWay;
 
 public static class HttpClientFactory
 {
-    /// <summary>
-    /// HttpClient池总数
-    /// </summary>
-    /// <returns></returns>
-    private static int _poolSize;
-
     private static int PoolSize
     {
         get
         {
-            if (_poolSize == 0)
+            if (field == 0)
             {
                 // 获取环境变量
                 var poolSize = Environment.GetEnvironmentVariable("HttpClientPoolSize");
-                if (!string.IsNullOrEmpty(poolSize) && int.TryParse(poolSize, out var size))
-                {
-                    _poolSize = size;
-                }
-                else
-                {
-                    _poolSize = Environment.ProcessorCount;
-                }
+                field = !string.IsNullOrEmpty(poolSize) && int.TryParse(poolSize, out var size) ? size : Environment.ProcessorCount;
 
-                if (_poolSize < 1)
+                if (field < 1)
                 {
-                    _poolSize = 2;
+                    field = 2;
                 }
             }
 
-            return _poolSize;
+            return field;
         }
     }
 

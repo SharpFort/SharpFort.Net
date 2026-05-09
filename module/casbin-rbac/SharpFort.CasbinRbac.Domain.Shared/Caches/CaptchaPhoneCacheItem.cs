@@ -2,21 +2,15 @@
 
 namespace SharpFort.CasbinRbac.Domain.Shared.Caches
 {
-    public class CaptchaPhoneCacheItem
+    public class CaptchaPhoneCacheItem(string code)
     {
-        public CaptchaPhoneCacheItem(string code) { Code = code; }
-        public string Code { get; set; }
+        public string Code { get; set; } = code;
     }
 
-    public class CaptchaPhoneCacheKey
+    public class CaptchaPhoneCacheKey(PhoneValidationType validationPhoneType, string phone)
     {
-        public CaptchaPhoneCacheKey(PhoneValidationType validationPhoneType, string phone)
-        {
-            Phone = phone;
-            PhoneValidationType = validationPhoneType;
-        }
-        public PhoneValidationType PhoneValidationType { get; set; }
-        public string Phone { get; set; }
+        public PhoneValidationType PhoneValidationType { get; set; } = validationPhoneType;
+        public string Phone { get; set; } = phone;
 
         public override string ToString()
         {

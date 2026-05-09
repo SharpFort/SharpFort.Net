@@ -3,10 +3,7 @@ using SharpFort.SqlSugarCore;
 
 namespace SharpFort.FileManagement.SqlSugarCore
 {
-    public class FileManagementDbContext : SqlSugarDbContext
+    public class FileManagementDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider)
     {
-        public FileManagementDbContext(IAbpLazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-        {
-        }
     }
 }

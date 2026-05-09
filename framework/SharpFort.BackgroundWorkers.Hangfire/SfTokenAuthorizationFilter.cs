@@ -9,24 +9,19 @@ namespace SharpFort.BackgroundWorkers.Hangfire;
 /// <summary>
 /// Hangfire 仪表盘的令牌认证过滤器
 /// </summary>
-public sealed class SfTokenAuthorizationFilter : IDashboardAsyncAuthorizationFilter, ITransientDependency
+/// <remarks>
+/// 初始化令牌认证过滤器
+/// </remarks>
+/// <param name="serviceProvider">服务提供者</param>
+public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider) : IDashboardAsyncAuthorizationFilter, ITransientDependency
 {
     private const string BearerPrefix = "Bearer ";
     private const string TokenCookieKey = "Token";
     private const string HtmlContentType = "text/html";
 
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private string _requiredUsername = "cc";
     private TimeSpan _tokenExpiration = TimeSpan.FromMinutes(10);
-
-    /// <summary>
-    /// 初始化令牌认证过滤器
-    /// </summary>
-    /// <param name="serviceProvider">服务提供者</param>
-    public SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     /// <summary>
     /// 设置需要的用户名

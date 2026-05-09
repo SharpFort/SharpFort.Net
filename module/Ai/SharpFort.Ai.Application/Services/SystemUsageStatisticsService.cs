@@ -14,18 +14,12 @@ namespace SharpFort.Ai.Application.Services;
 /// 系统使用量统计服务实现
 /// </summary>
 [Authorize]
-public class SystemUsageStatisticsService : ApplicationService, ISystemUsageStatisticsService
+public class SystemUsageStatisticsService(
+    ISqlSugarRepository<ChatMessage> messageRepository,
+    ISqlSugarRepository<AiModel, Guid> modelRepository) : ApplicationService, ISystemUsageStatisticsService
 {
-    private readonly ISqlSugarRepository<ChatMessage> _messageRepository;
-    private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository;
-
-    public SystemUsageStatisticsService(
-        ISqlSugarRepository<ChatMessage> messageRepository,
-        ISqlSugarRepository<AiModel, Guid> modelRepository)
-    {
-        _messageRepository = messageRepository;
-        _modelRepository = modelRepository;
-    }
+    private readonly ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
+    private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository = modelRepository;
 
 
 

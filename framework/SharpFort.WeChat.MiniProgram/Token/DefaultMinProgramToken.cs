@@ -4,14 +4,11 @@ using SharpFort.WeChat.MiniProgram.HttpModels;
 
 namespace SharpFort.WeChat.MiniProgram.Token;
 
-internal class DefaultMinProgramToken : IMiniProgramToken
+internal class DefaultMinProgramToken(IOptions<WeChatMiniProgramOptions> options) : IMiniProgramToken
 {
     private const string Url = "https://api.weixin.qq.com/cgi-bin/token";
-    private WeChatMiniProgramOptions _options;
-    public DefaultMinProgramToken(IOptions<WeChatMiniProgramOptions> options)
-    {
-        _options = options.Value;
-    }
+    private WeChatMiniProgramOptions _options = options.Value;
+
     public async Task<string> GetTokenAsync()
     {
         var token = await this.GetAccessToken();

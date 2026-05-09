@@ -13,17 +13,11 @@ namespace SharpFort.CodeGen.Application.Services
     /// <summary>
     /// CodeGen
     /// </summary>
-    public class CodeGenService : ApplicationService, ICodeGenService
+    public class CodeGenService(ISqlSugarRepository<Table, Guid> tableRepository, CodeFileManager codeFileManager, WebTemplateManager webTemplateManager) : ApplicationService, ICodeGenService
     {
-        private ISqlSugarRepository<Table, Guid> _tableRepository;
-        private CodeFileManager _codeFileManager;
-        private WebTemplateManager _webTemplateManager;
-        public CodeGenService(ISqlSugarRepository<Table, Guid> tableRepository, CodeFileManager codeFileManager, WebTemplateManager webTemplateManager)
-        {
-            _tableRepository = tableRepository;
-            _codeFileManager = codeFileManager;
-            _webTemplateManager = webTemplateManager;
-        }
+        private ISqlSugarRepository<Table, Guid> _tableRepository = tableRepository;
+        private CodeFileManager _codeFileManager = codeFileManager;
+        private WebTemplateManager _webTemplateManager = webTemplateManager;
 
         /// <summary>
         /// Web To Code

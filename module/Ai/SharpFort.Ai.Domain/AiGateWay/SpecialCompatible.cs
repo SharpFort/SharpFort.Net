@@ -5,14 +5,9 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Domain.AiGateWay;
 
-public class SpecialCompatible : ISpecialCompatible, ISingletonDependency
+public class SpecialCompatible(IOptions<SpecialCompatibleOptions> options) : ISpecialCompatible, ISingletonDependency
 {
-    private readonly IOptions<SpecialCompatibleOptions> _options;
-
-    public SpecialCompatible(IOptions<SpecialCompatibleOptions> options)
-    {
-        _options = options;
-    }
+    private readonly IOptions<SpecialCompatibleOptions> _options = options;
 
     public void Compatible(ThorChatCompletionsRequest request)
     {

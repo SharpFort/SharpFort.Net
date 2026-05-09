@@ -8,19 +8,12 @@ using SharpFort.Ai.Domain.Shared.Dtos.OpenAi;
 
 namespace SharpFort.Ai.Application.Services.FileMaster;
 
-public class FileMasterService : ApplicationService
+public class FileMasterService(IHttpContextAccessor httpContextAccessor, AiGateWayManager aiGateWayManager,
+    AiBlacklistManager aiBlacklistManager) : ApplicationService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly AiGateWayManager _aiGateWayManager;
-    private readonly AiBlacklistManager _aiBlacklistManager;
-
-    public FileMasterService(IHttpContextAccessor httpContextAccessor, AiGateWayManager aiGateWayManager,
-        AiBlacklistManager aiBlacklistManager)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _aiGateWayManager = aiGateWayManager;
-        _aiBlacklistManager = aiBlacklistManager;
-    }
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly AiGateWayManager _aiGateWayManager = aiGateWayManager;
+    private readonly AiBlacklistManager _aiBlacklistManager = aiBlacklistManager;
 
     /// <summary>
     /// 校验下一步

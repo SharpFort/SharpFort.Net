@@ -65,19 +65,24 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
     /// <summary>
     /// Swagger配置模型
     /// </summary>
-    public class SwaggerConfiguration
+    /// <remarks>
+    /// 创建自定义Swagger配置
+    /// </remarks>
+    /// <param name="url">Swagger JSON文档URL</param>
+    /// <param name="name">文档显示名称</param>
+    public class SwaggerConfiguration(string url, string name)
     {
         private const string DefaultSwaggerUrl = "/swagger/v1/swagger.json";
 
         /// <summary>
         /// Swagger JSON文档的URL
         /// </summary>
-        public string Url { get; }
+        public string Url { get; } = url ?? throw new ArgumentNullException(nameof(url));
 
         /// <summary>
         /// Swagger文档的显示名称
         /// </summary>
-        public string Name { get; }
+        public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
 
         /// <summary>
         /// 使用默认URL创建Swagger配置
@@ -86,17 +91,6 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
         public SwaggerConfiguration(string name)
             : this(DefaultSwaggerUrl, name)
         {
-        }
-
-        /// <summary>
-        /// 创建自定义Swagger配置
-        /// </summary>
-        /// <param name="url">Swagger JSON文档URL</param>
-        /// <param name="name">文档显示名称</param>
-        public SwaggerConfiguration(string url, string name)
-        {
-            Url = url ?? throw new ArgumentNullException(nameof(url));
-            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
     }
 }

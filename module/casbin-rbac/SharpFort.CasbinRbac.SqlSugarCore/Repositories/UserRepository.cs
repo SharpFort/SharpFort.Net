@@ -8,11 +8,8 @@ using SharpFort.SqlSugarCore.Repositories;
 
 namespace SharpFort.CasbinRbac.SqlSugarCore.Repositories
 {
-    public class UserRepository : SqlSugarRepository<User>, IUserRepository, ITransientDependency
+    public class UserRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : SqlSugarRepository<User>(sugarDbContextProvider), IUserRepository, ITransientDependency
     {
-        public UserRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
-        {
-        }
         /// <summary>
         /// 获取用户ids的全部信息
         /// </summary>

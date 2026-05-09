@@ -4,16 +4,10 @@ using Volo.Abp.Caching;
 
 namespace SharpFort.WeChat.MiniProgram.Token;
 
-internal class CacheMiniProgramToken : DefaultMinProgramToken, IMiniProgramToken
+internal class CacheMiniProgramToken(IOptions<WeChatMiniProgramOptions> options, IDistributedCache<string> cache) : DefaultMinProgramToken(options), IMiniProgramToken
 {
-    private IDistributedCache<string> _cache;
+    private IDistributedCache<string> _cache = cache;
     private const string CacheKey = "MiniProgramToken";
-
-    public CacheMiniProgramToken(IOptions<WeChatMiniProgramOptions> options, IDistributedCache<string> cache) :
-        base(options)
-    {
-        _cache = cache;
-    }
 
     public async Task<string> GetTokenAsync()
     {

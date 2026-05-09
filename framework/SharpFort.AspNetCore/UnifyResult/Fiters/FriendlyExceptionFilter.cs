@@ -25,14 +25,9 @@ namespace SharpFort.AspNetCore.UnifyResult.Fiters;
 /// <summary>
 /// 友好异常拦截器
 /// </summary>
-public sealed partial class FriendlyExceptionFilter : IAsyncExceptionFilter
+public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFilter> logger) : IAsyncExceptionFilter
 {
-    private readonly ILogger<FriendlyExceptionFilter> _logger;
-
-    public FriendlyExceptionFilter(ILogger<FriendlyExceptionFilter> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<FriendlyExceptionFilter> _logger = logger;
 
     /// <summary>
     /// 异常拦截

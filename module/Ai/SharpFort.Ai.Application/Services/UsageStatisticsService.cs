@@ -15,25 +15,17 @@ namespace SharpFort.Ai.Application.Services;
 /// 使用量统计服务
 /// </summary>
 [Authorize]
-public class UsageStatisticsService : ApplicationService, IUsageStatisticsService
+public class UsageStatisticsService(
+    ISqlSugarRepository<ChatMessage> messageRepository,
+    ISqlSugarRepository<AiUsage> usageStatisticsRepository,
+    ISqlSugarRepository<Token> tokenRepository,
+    ModelManager modelManager) : ApplicationService, IUsageStatisticsService
 {
-    private readonly ISqlSugarRepository<ChatMessage> _messageRepository;
-    private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository;
+    private readonly ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
+    private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository = usageStatisticsRepository;
     // private readonly ISqlSugarRepository<PremiumPackageAggregateRoot> _premiumPackageRepository;
-    private readonly ISqlSugarRepository<Token> _tokenRepository;
-    private readonly ModelManager _modelManager;
-
-    public UsageStatisticsService(
-        ISqlSugarRepository<ChatMessage> messageRepository,
-        ISqlSugarRepository<AiUsage> usageStatisticsRepository,
-        ISqlSugarRepository<Token> tokenRepository,
-        ModelManager modelManager)
-    {
-        _messageRepository = messageRepository;
-        _usageStatisticsRepository = usageStatisticsRepository;
-        _tokenRepository = tokenRepository;
-        _modelManager = modelManager;
-    }
+    private readonly ISqlSugarRepository<Token> _tokenRepository = tokenRepository;
+    private readonly ModelManager _modelManager = modelManager;
 
     /// <summary>
     /// 获取当前用户近7天的Token消耗统计

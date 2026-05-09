@@ -9,19 +9,14 @@ namespace SharpFort.BackgroundWorkers.Hangfire;
 /// Hangfire 工作单元过滤器
 /// 用于管理后台任务的事务处理
 /// </summary>
-public sealed class UnitOfWorkHangfireFilter : IServerFilter, ISingletonDependency
+/// <remarks>
+/// 初始化工作单元过滤器
+/// </remarks>
+/// <param name="unitOfWorkManager">工作单元管理器</param>
+public sealed class UnitOfWorkHangfireFilter(IUnitOfWorkManager unitOfWorkManager) : IServerFilter, ISingletonDependency
 {
     private const string UnitOfWorkItemKey = "HangfireUnitOfWork";
-    private readonly IUnitOfWorkManager _unitOfWorkManager;
-
-    /// <summary>
-    /// 初始化工作单元过滤器
-    /// </summary>
-    /// <param name="unitOfWorkManager">工作单元管理器</param>
-    public UnitOfWorkHangfireFilter(IUnitOfWorkManager unitOfWorkManager)
-    {
-        _unitOfWorkManager = unitOfWorkManager;
-    }
+    private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
 
     /// <summary>
     /// 任务执行前的处理

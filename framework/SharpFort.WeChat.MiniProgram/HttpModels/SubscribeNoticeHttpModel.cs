@@ -68,12 +68,7 @@ public class SubscribeNoticeResponse : IErrorObjct
 
 
 
-public class keyValueItem
+public class keyValueItem(string value)
 {
-    public keyValueItem(string value)
-    {
-        this.value = value;
-    }
-
-    public string value { get; set; }
+    public string value { get; set; } = value;
 }

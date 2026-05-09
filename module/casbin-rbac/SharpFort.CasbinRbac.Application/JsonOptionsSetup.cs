@@ -5,14 +5,9 @@ using SharpFort.CasbinRbac.Application.JsonConverters;
 
 namespace SharpFort.CasbinRbac.Application
 {
-    public class JsonOptionsSetup : IConfigureOptions<JsonOptions>
+    public class JsonOptionsSetup(IHttpContextAccessor httpContextAccessor) : IConfigureOptions<JsonOptions>
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public JsonOptionsSetup(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
         public void Configure(JsonOptions options)
         {

@@ -9,27 +9,17 @@ using SharpFort.AuditLogging.Domain.Repositories;
 
 namespace SharpFort.AuditLogging.Domain;
 
-public partial class AuditingStore : IAuditingStore, ITransientDependency
+public partial class AuditingStore(
+    IAuditLogRepository auditLogRepository,
+    IUnitOfWorkManager unitOfWorkManager,
+    IOptions<AbpAuditingOptions> options,
+    IAuditLogInfoToAuditLogConverter converter) : IAuditingStore, ITransientDependency
 {
-    public ILogger<AuditingStore> Logger { get; set; }
-    protected IAuditLogRepository AuditLogRepository { get; }
-    protected IUnitOfWorkManager UnitOfWorkManager { get; }
-    protected AbpAuditingOptions Options { get; }
-    protected IAuditLogInfoToAuditLogConverter Converter { get; }
-
-    public AuditingStore(
-        IAuditLogRepository auditLogRepository,
-        IUnitOfWorkManager unitOfWorkManager,
-        IOptions<AbpAuditingOptions> options,
-        IAuditLogInfoToAuditLogConverter converter)
-    {
-        AuditLogRepository = auditLogRepository;
-        UnitOfWorkManager = unitOfWorkManager;
-        Converter = converter;
-        Options = options.Value;
-
-        Logger = NullLogger<AuditingStore>.Instance;
-    }
+    public ILogger<AuditingStore> Logger { get; set; } = NullLogger<AuditingStore>.Instance;
+    protected IAuditLogRepository AuditLogRepository { get; } = auditLogRepository;
+    protected IUnitOfWorkManager UnitOfWorkManager { get; } = unitOfWorkManager;
+    protected AbpAuditingOptions Options { get; } = options.Value;
+    protected IAuditLogInfoToAuditLogConverter Converter { get; } = converter;
 
     public virtual async Task SaveAsync(AuditLogInfo auditInfo)
     {

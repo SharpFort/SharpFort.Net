@@ -6,12 +6,8 @@ using static SharpFort.AspNetCore.Authentication.OAuth.QQ.QQAuthenticationConsta
 
 namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
 {
-    public class QQAuthenticationHandler : OauthAuthenticationHandler<QQAuthenticationOptions>
+    public class QQAuthenticationHandler(IOptionsMonitor<QQAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IHttpClientFactory httpClientFactory) : OauthAuthenticationHandler<QQAuthenticationOptions>(options, logger, encoder, httpClientFactory)
     {
-        public QQAuthenticationHandler(IOptionsMonitor<QQAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IHttpClientFactory httpClientFactory) : base(options, logger, encoder, httpClientFactory)
-        {
-        }
-
         public override string AuthenticationSchemeNmae => QQAuthenticationDefaults.AuthenticationScheme;
 
         protected override async Task<List<Claim>> GetAuthTicketAsync(string code)

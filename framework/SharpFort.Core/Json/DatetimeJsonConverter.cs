@@ -6,18 +6,13 @@ namespace SharpFort.Core.Json;
 /// <summary>
 /// DateTime JSON序列化转换器
 /// </summary>
-public class DatetimeJsonConverter : JsonConverter<DateTime>
+/// <remarks>
+/// 初始化DateTime转换器
+/// </remarks>
+/// <param name="format">日期格式化字符串,默认为yyyy-MM-dd HH:mm:ss</param>
+public class DatetimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss") : JsonConverter<DateTime>
 {
-    private readonly string _dateFormat;
-
-    /// <summary>
-    /// 初始化DateTime转换器
-    /// </summary>
-    /// <param name="format">日期格式化字符串,默认为yyyy-MM-dd HH:mm:ss</param>
-    public DatetimeJsonConverter(string format = "yyyy-MM-dd HH:mm:ss")
-    {
-        _dateFormat = format;
-    }
+    private readonly string _dateFormat = format;
 
     /// <summary>
     /// 从JSON读取DateTime值

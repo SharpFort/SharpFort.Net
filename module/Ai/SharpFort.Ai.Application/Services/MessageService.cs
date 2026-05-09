@@ -11,14 +11,9 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
-public class MessageService : ApplicationService
+public class MessageService(ISqlSugarRepository<ChatMessage> repository) : ApplicationService
 {
-    private readonly ISqlSugarRepository<ChatMessage> _repository;
-
-    public MessageService(ISqlSugarRepository<ChatMessage> repository)
-    {
-        _repository = repository;
-    }
+    private readonly ISqlSugarRepository<ChatMessage> _repository = repository;
 
     /// <summary>
     /// 查询消息

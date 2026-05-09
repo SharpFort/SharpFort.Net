@@ -9,24 +9,18 @@ namespace SharpFort.Caching.FreeRedis
     /// 缓存键标准化处理器
     /// 用于处理缓存键的格式化和多租户支持
     /// </summary>
+    /// <remarks>
+    /// 构造函数
+    /// </remarks>
+    /// <param name="currentTenant">当前租户服务</param>
+    /// <param name="distributedCacheOptions">分布式缓存配置选项</param>
     [Dependency(ReplaceServices = true)]
-    public class SfDistributedCacheKeyNormalizer : IDistributedCacheKeyNormalizer, ITransientDependency
+    public class SfDistributedCacheKeyNormalizer(
+        ICurrentTenant currentTenant,
+        IOptions<AbpDistributedCacheOptions> distributedCacheOptions) : IDistributedCacheKeyNormalizer, ITransientDependency
     {
-        private readonly ICurrentTenant _currentTenant;
-        private readonly AbpDistributedCacheOptions _distributedCacheOptions;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="currentTenant">当前租户服务</param>
-        /// <param name="distributedCacheOptions">分布式缓存配置选项</param>
-        public SfDistributedCacheKeyNormalizer(
-            ICurrentTenant currentTenant,
-            IOptions<AbpDistributedCacheOptions> distributedCacheOptions)
-        {
-            _currentTenant = currentTenant;
-            _distributedCacheOptions = distributedCacheOptions.Value;
-        }
+        private readonly ICurrentTenant _currentTenant = currentTenant;
+        private readonly AbpDistributedCacheOptions _distributedCacheOptions = distributedCacheOptions.Value;
 
         /// <summary>
         /// 标准化缓存键

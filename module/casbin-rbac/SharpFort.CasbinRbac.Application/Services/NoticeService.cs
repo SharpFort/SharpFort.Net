@@ -14,16 +14,11 @@ namespace SharpFort.CasbinRbac.Application.Services
     /// <summary>
     /// Notice服务实现
     /// </summary>
-    public class NoticeService : SfCrudAppService<Notice, NoticeGetOutputDto, NoticeGetListOutputDto, Guid, NoticeGetListInput, NoticeCreateInput, NoticeUpdateInput>,
+    public class NoticeService(ISqlSugarRepository<Notice, Guid> repository, IHubContext<NoticeHub> hubContext) : SfCrudAppService<Notice, NoticeGetOutputDto, NoticeGetListOutputDto, Guid, NoticeGetListInput, NoticeCreateInput, NoticeUpdateInput>(repository),
        INoticeService
     {
-        private ISqlSugarRepository<Notice, Guid> _repository;
-        private IHubContext<NoticeHub> _hubContext;
-        public NoticeService(ISqlSugarRepository<Notice, Guid> repository, IHubContext<NoticeHub> hubContext) : base(repository)
-        {
-            _hubContext = hubContext;
-            _repository = repository;
-        }
+        private ISqlSugarRepository<Notice, Guid> _repository = repository;
+        private IHubContext<NoticeHub> _hubContext = hubContext;
 
         /// <summary>
         /// 多查

@@ -8,7 +8,7 @@ namespace SharpFort.Ai.Domain.AiGateWay.Impl.ThorAzureOpenAI.Images;
 public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory) : IImageService
 {
     public async Task<ImageCreateResponse> CreateImage(ImageCreateRequest imageCreate, AiModelDescribe? options = null,
-        CancellationToken cancellationToken = default(CancellationToken))
+        CancellationToken cancellationToken = default)
     {
         var createClient = AzureOpenAIFactory.CreateClient(options!);
 
@@ -58,7 +58,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
 
     public async Task<ImageCreateResponse> CreateImageEdit(ImageEditCreateRequest imageEditCreateRequest,
         AiModelDescribe? options = null,
-        CancellationToken cancellationToken = default(CancellationToken))
+        CancellationToken cancellationToken = default)
     {
         var url = AzureOpenAIFactory.GetEditImageAddress(options!, imageEditCreateRequest.Model!);
 
@@ -105,7 +105,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
 
     public Task<ImageCreateResponse> CreateImageVariation(ImageVariationCreateRequest imageEditCreateRequest,
         AiModelDescribe? options = null,
-        CancellationToken cancellationToken = default(CancellationToken))
+        CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

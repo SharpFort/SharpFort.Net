@@ -6,7 +6,7 @@ namespace SharpFort.FileManagement.Domain.Services
     /// <summary>
     /// 本地文件系统 Blob 存储提供者
     /// </summary>
-    public partial class LocalBlobStorageProvider : IBlobStorageProvider
+    public partial class LocalBlobStorageProvider(ILogger<LocalBlobStorageProvider> logger) : IBlobStorageProvider
     {
         [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "File saved to local: {FilePath}")]
         private partial void LogFileSavedToLocal(string filePath);
@@ -14,12 +14,7 @@ namespace SharpFort.FileManagement.Domain.Services
         [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "File deleted from local: {FilePath}")]
         private partial void LogFileDeletedFromLocal(string filePath);
 
-        private readonly ILogger<LocalBlobStorageProvider> _logger;
-
-        public LocalBlobStorageProvider(ILogger<LocalBlobStorageProvider> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<LocalBlobStorageProvider> _logger = logger;
 
         public string ProviderName => "Local";
 

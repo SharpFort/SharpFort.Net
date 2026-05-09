@@ -7,12 +7,8 @@ using static SharpFort.AspNetCore.Authentication.OAuth.Gitee.GiteeAuthentication
 
 namespace SharpFort.AspNetCore.Authentication.OAuth.Gitee
 {
-    public class GiteeAuthenticationHandler : OauthAuthenticationHandler<GiteeAuthenticationOptions>
+    public class GiteeAuthenticationHandler(IOptionsMonitor<GiteeAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IHttpClientFactory httpClientFactory) : OauthAuthenticationHandler<GiteeAuthenticationOptions>(options, logger, encoder, httpClientFactory)
     {
-        public GiteeAuthenticationHandler(IOptionsMonitor<GiteeAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, IHttpClientFactory httpClientFactory) : base(options, logger, encoder, httpClientFactory)
-        {
-        }
-
         public override string AuthenticationSchemeNmae => GiteeAuthenticationDefaults.AuthenticationScheme;
 
         protected override async Task<List<Claim>> GetAuthTicketAsync(string code)

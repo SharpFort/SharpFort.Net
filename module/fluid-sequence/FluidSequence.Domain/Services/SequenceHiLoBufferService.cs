@@ -24,7 +24,7 @@ namespace FluidSequence.Domain.Services
     ///   - 要求号码严格连续（不允许空洞）的场景，应关闭 EnableBuffer
     ///   - 多实例部署时如需跨实例共享缓冲队列，应替换为 Redis Stream 实现
     /// </summary>
-    public class SequenceHiLoBufferService : ISingletonDependency
+    public class SequenceHiLoBufferService(ISequenceRuleRepository repository) : ISingletonDependency
     {
         // 每个 ruleCode → 待使用的号码队列
         private readonly ConcurrentDictionary<string, ConcurrentQueue<int>> _buffers
@@ -34,12 +34,7 @@ namespace FluidSequence.Domain.Services
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks
             = new();
 
-        private readonly ISequenceRuleRepository _repository;
-
-        public SequenceHiLoBufferService(ISequenceRuleRepository repository)
-        {
-            _repository = repository;
-        }
+        private readonly ISequenceRuleRepository _repository = repository;
 
         /// <summary>
         /// 从缓冲队列中取出下一个序列号。

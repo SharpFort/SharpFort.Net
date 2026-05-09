@@ -54,21 +54,16 @@ namespace SharpFort.Core.Helper
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second) => first.Compose(second, Expression.Or);
     }
 
-    public class LambdaParameteRebinder : ExpressionVisitor
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="map"></param>
+    public class LambdaParameteRebinder(Dictionary<ParameterExpression, ParameterExpression> map) : ExpressionVisitor
     {
         /// <summary>
         /// 存放表达式树的参数的字典
         /// </summary>
-        private readonly Dictionary<ParameterExpression, ParameterExpression> map;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="map"></param>
-        public LambdaParameteRebinder(Dictionary<ParameterExpression, ParameterExpression> map)
-        {
-            this.map = map ?? [];
-        }
+        private readonly Dictionary<ParameterExpression, ParameterExpression> map = map ?? [];
 
         /// <summary>
         /// 重载参数访问的方法，访问表达式树参数，如果字典中包含，则取出

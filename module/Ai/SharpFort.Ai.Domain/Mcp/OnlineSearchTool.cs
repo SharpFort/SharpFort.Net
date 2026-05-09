@@ -11,22 +11,15 @@ using SharpFort.Ai.Domain.Shared.Attributes;
 namespace SharpFort.Ai.Domain.Mcp;
 
 [SfAgentTool]
-public class OnlineSearchTool : ISingletonDependency
+public class OnlineSearchTool(
+    IHttpClientFactory httpClientFactory,
+    ILogger<OnlineSearchTool> logger,
+    IConfiguration configuration) : ISingletonDependency
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<OnlineSearchTool> _logger;
-    private readonly string _baiduApiKey;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly ILogger<OnlineSearchTool> _logger = logger;
+    private readonly string _baiduApiKey = configuration["BaiduSearch:ApiKey"] ?? "";
     private const string BaiduSearchUrl = "https://qianfan.baidubce.com/v2/ai_search/web_search";
-
-    public OnlineSearchTool(
-        IHttpClientFactory httpClientFactory,
-        ILogger<OnlineSearchTool> logger,
-        IConfiguration configuration)
-    {
-        _httpClientFactory = httpClientFactory;
-        _logger = logger;
-        _baiduApiKey = configuration["BaiduSearch:ApiKey"] ?? "";
-    }
 
     [SfAgentTool("联网搜索"), DisplayName("OnlineSearch"), Description("进行在线搜索，获取最新的网络信息，近期信息是7天，实时信息是1天")]
     public async Task<string> OnlineSearch([Description("搜索关键字")] string keyword,

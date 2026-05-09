@@ -8,14 +8,9 @@ using SharpFort.Tool.Domain.Shared.Dtos;
 
 namespace SharpFort.Tool.Application
 {
-    public class TemplateGenService : ApplicationService, ITemplateGenService
+    public class TemplateGenService(TemplateGenManager templateGenManager) : ApplicationService, ITemplateGenService
     {
-        private readonly TemplateGenManager _templateGenManager;
-
-        public TemplateGenService(TemplateGenManager templateGenManager)
-        {
-            _templateGenManager = templateGenManager;
-        }
+        private readonly TemplateGenManager _templateGenManager = templateGenManager;
 
         /// <summary>
         /// 下载模块文件

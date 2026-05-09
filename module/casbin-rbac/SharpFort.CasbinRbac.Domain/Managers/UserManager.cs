@@ -19,39 +19,26 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public class UserManager : DomainService
+    public class UserManager(
+        ISqlSugarRepository<User> repository,
+        ISqlSugarRepository<UserRole> repositoryUserRole,
+        ISqlSugarRepository<UserPosition> repositoryUserPost,
+        IGuidGenerator guidGenerator,
+        IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache,
+        IUserRepository userRepository,
+        ILocalEventBus localEventBus,
+        ISqlSugarRepository<Role> roleRepository,
+        ICasbinPolicyManager casbinPolicyManager) : DomainService
     {
-        private readonly ISqlSugarRepository<User> _repository;
-        private readonly ISqlSugarRepository<UserRole> _repositoryUserRole;
-        private readonly ISqlSugarRepository<UserPosition> _repositoryUserPost;
-        private readonly ISqlSugarRepository<Role> _roleRepository;
-        private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache;
-        private readonly IGuidGenerator _guidGenerator;
-        private IUserRepository _userRepository;
-        private ILocalEventBus _localEventBus;
-        private readonly ICasbinPolicyManager _casbinPolicyManager; // 新增
-
-        public UserManager(
-            ISqlSugarRepository<User> repository,
-            ISqlSugarRepository<UserRole> repositoryUserRole,
-            ISqlSugarRepository<UserPosition> repositoryUserPost,
-            IGuidGenerator guidGenerator,
-            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache,
-            IUserRepository userRepository,
-            ILocalEventBus localEventBus,
-            ISqlSugarRepository<Role> roleRepository,
-            ICasbinPolicyManager casbinPolicyManager) // 注入
-        {
-            _repository = repository;
-            _repositoryUserRole = repositoryUserRole;
-            _repositoryUserPost = repositoryUserPost;
-            _guidGenerator = guidGenerator;
-            _userCache = userCache;
-            _userRepository = userRepository;
-            _localEventBus = localEventBus;
-            _roleRepository = roleRepository;
-            _casbinPolicyManager = casbinPolicyManager;
-        }
+        private readonly ISqlSugarRepository<User> _repository = repository;
+        private readonly ISqlSugarRepository<UserRole> _repositoryUserRole = repositoryUserRole;
+        private readonly ISqlSugarRepository<UserPosition> _repositoryUserPost = repositoryUserPost;
+        private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
+        private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
+        private readonly IGuidGenerator _guidGenerator = guidGenerator;
+        private IUserRepository _userRepository = userRepository;
+        private ILocalEventBus _localEventBus = localEventBus;
+        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager; // 新增
 
         /// <summary>
         /// 给用户设置角色

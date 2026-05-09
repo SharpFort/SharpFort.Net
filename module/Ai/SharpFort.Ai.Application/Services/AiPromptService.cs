@@ -14,14 +14,9 @@ namespace SharpFort.Ai.Application.Services;
 /// AI提示词管理服务
 /// </summary>
 [Authorize]
-public class AiPromptService : ApplicationService
+public class AiPromptService(ISqlSugarRepository<AiPrompt> repository) : ApplicationService
 {
-    private readonly ISqlSugarRepository<AiPrompt> _repository;
-
-    public AiPromptService(ISqlSugarRepository<AiPrompt> repository)
-    {
-        _repository = repository;
-    }
+    private readonly ISqlSugarRepository<AiPrompt> _repository = repository;
 
     /// <summary>
     /// 获取提示词列表

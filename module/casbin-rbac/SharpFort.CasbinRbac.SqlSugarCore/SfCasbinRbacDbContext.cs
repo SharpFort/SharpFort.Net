@@ -12,12 +12,8 @@ using SharpFort.SqlSugarCore;
 
 namespace SharpFort.CasbinRbac.SqlSugarCore
 {
-    public class SfCasbinRbacDbContext : SqlSugarDbContext
+    public class SfCasbinRbacDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider)
     {
-        public SfCasbinRbacDbContext(IAbpLazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-        {
-        }
-
         public ISqlSugarClient GetSqlSugarClient() => SqlSugarClient;
 
         protected IDataFilter DataFilter => LazyServiceProvider.LazyGetRequiredService<IDataFilter>();

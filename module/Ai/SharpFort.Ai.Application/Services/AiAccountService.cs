@@ -11,17 +11,12 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
-public class AiAccountService : ApplicationService
+public class AiAccountService(
+    IAccountService accountService,
+    ISqlSugarRepository<ChatMessage> messageRepository) : ApplicationService
 {
-    private IAccountService _accountService;
-    private ISqlSugarRepository<ChatMessage> _messageRepository;
-    public AiAccountService(
-        IAccountService accountService,
-        ISqlSugarRepository<ChatMessage> messageRepository)
-    {
-        _accountService = accountService;
-        _messageRepository = messageRepository;
-    }
+    private IAccountService _accountService = accountService;
+    private ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
 
     /// <summary>
     /// 获取ai用户信息

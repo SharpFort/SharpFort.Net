@@ -8,12 +8,12 @@ namespace SharpFort.SqlSugarCore;
 /// <summary>
 /// SqlSugar数据库上下文基类
 /// </summary>
-public abstract class SqlSugarDbContext : ISqlSugarDbContextDependencies
+public abstract class SqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvider) : ISqlSugarDbContextDependencies
 {
     /// <summary>
     /// 服务提供者
     /// </summary>
-    protected IAbpLazyServiceProvider LazyServiceProvider { get; }
+    protected IAbpLazyServiceProvider LazyServiceProvider { get; } = lazyServiceProvider;
 
     /// <summary>
     /// 数据库客户端实例
@@ -24,11 +24,6 @@ public abstract class SqlSugarDbContext : ISqlSugarDbContextDependencies
     /// 执行顺序
     /// </summary>
     public virtual int ExecutionOrder => 0;
-
-    protected SqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvider)
-    {
-        LazyServiceProvider = lazyServiceProvider;
-    }
 
     /// <summary>
     /// 配置SqlSugar客户端

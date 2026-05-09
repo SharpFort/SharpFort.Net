@@ -7,13 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public partial class TencentCloudManager : DomainService
+    public partial class TencentCloudManager(ILogger<TencentCloudManager> logger) : DomainService
     {
-        private readonly ILogger<TencentCloudManager> _logger;
-        public TencentCloudManager(ILogger<TencentCloudManager> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<TencentCloudManager> _logger = logger;
 
         public async Task SendSmsAsync()
         {

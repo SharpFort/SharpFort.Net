@@ -10,15 +10,10 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
-public class SessionService : CrudAppService<ChatSession, SessionDto, Guid, SessionGetListInput, SessionCreateAndUpdateInput>
+public class SessionService(ISqlSugarRepository<ChatSession, Guid> repository, ISqlSugarRepository<ChatMessage, Guid> messageRepository) : CrudAppService<ChatSession, SessionDto, Guid, SessionGetListInput, SessionCreateAndUpdateInput>(repository)
 {
-    private readonly ISqlSugarRepository<ChatSession, Guid> _repository;
-    public readonly ISqlSugarRepository<ChatMessage, Guid> _messageRepository;
-    public SessionService(ISqlSugarRepository<ChatSession, Guid> repository, ISqlSugarRepository<ChatMessage, Guid> messageRepository) : base(repository)
-    {
-        _repository = repository;
-        _messageRepository = messageRepository;
-    }
+    private readonly ISqlSugarRepository<ChatSession, Guid> _repository = repository;
+    public readonly ISqlSugarRepository<ChatMessage, Guid> _messageRepository = messageRepository;
 
     /// <summary>
     /// 创建会话

@@ -3,12 +3,8 @@
     /// <summary>
     /// 用户创建的id
     /// </summary>
-    public class UserCreateEventArgs
+    public class UserCreateEventArgs(Guid userId)
     {
-        public UserCreateEventArgs(Guid userId)
-        {
-            UserId = userId;
-        }
-        public Guid UserId { get; set; }
+        public Guid UserId { get; set; } = userId;
     }
 }

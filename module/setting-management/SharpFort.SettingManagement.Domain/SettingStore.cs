@@ -5,14 +5,9 @@ using Volo.Abp.Settings;
 
 namespace SharpFort.SettingManagement.Domain;
 
-public class SettingStore : ISettingStore, ITransientDependency
+public class SettingStore(ISettingManagementStore managementStore) : ISettingStore, ITransientDependency
 {
-    protected ISettingManagementStore ManagementStore { get; }
-
-    public SettingStore(ISettingManagementStore managementStore)
-    {
-        ManagementStore = managementStore;
-    }
+    protected ISettingManagementStore ManagementStore { get; } = managementStore;
 
     public virtual Task<string> GetOrNullAsync(string name, string providerName, string providerKey)
     {

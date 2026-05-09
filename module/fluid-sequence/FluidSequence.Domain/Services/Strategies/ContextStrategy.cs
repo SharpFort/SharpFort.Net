@@ -19,7 +19,7 @@ namespace FluidSequence.Domain.Services.Strategies
 
             if (placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal))
             {
-                var paramKey = placeholderKey.Substring(6);
+                var paramKey = placeholderKey[6..];
                 return context.TryGetValue(paramKey, out var val1) ? val1 : "";
             }
 

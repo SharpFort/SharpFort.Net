@@ -9,12 +9,17 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.SqlSugarCore.Uow
 {
-    public class UnitOfWorkSqlsugarDbContextProvider<TDbContext> : ISugarDbContextProvider<TDbContext> where TDbContext : ISqlSugarDbContext
+    public class UnitOfWorkSqlsugarDbContextProvider<TDbContext>(
+        IUnitOfWorkManager unitOfWorkManager,
+        IConnectionStringResolver connectionStringResolver,
+        ICancellationTokenProvider cancellationTokenProvider,
+        ICurrentTenant currentTenant,
+        TenantConfigurationWrapper tenantConfigurationWrapper) : ISugarDbContextProvider<TDbContext> where TDbContext : ISqlSugarDbContext
     {
         /// <summary>
         /// 日志记录器
         /// </summary>
-        public ILogger<UnitOfWorkSqlsugarDbContextProvider<TDbContext>> Logger { get; set; }
+        public ILogger<UnitOfWorkSqlsugarDbContextProvider<TDbContext>> Logger { get; set; } = NullLogger<UnitOfWorkSqlsugarDbContextProvider<TDbContext>>.Instance;
 
         /// <summary>
         /// 服务提供者
@@ -26,26 +31,11 @@ namespace SharpFort.SqlSugarCore.Uow
         /// </summary>
         private static AsyncLocalDbContextAccessor ContextInstance => AsyncLocalDbContextAccessor.Instance;
 
-        private readonly TenantConfigurationWrapper _tenantConfigurationWrapper;
-        private readonly IUnitOfWorkManager _unitOfWorkManager;
-        private readonly IConnectionStringResolver _connectionStringResolver;
-        private readonly ICancellationTokenProvider _cancellationTokenProvider;
-        private readonly ICurrentTenant _currentTenant;
-
-        public UnitOfWorkSqlsugarDbContextProvider(
-            IUnitOfWorkManager unitOfWorkManager,
-            IConnectionStringResolver connectionStringResolver,
-            ICancellationTokenProvider cancellationTokenProvider,
-            ICurrentTenant currentTenant,
-            TenantConfigurationWrapper tenantConfigurationWrapper)
-        {
-            _unitOfWorkManager = unitOfWorkManager;
-            _connectionStringResolver = connectionStringResolver;
-            _cancellationTokenProvider = cancellationTokenProvider;
-            _currentTenant = currentTenant;
-            _tenantConfigurationWrapper = tenantConfigurationWrapper;
-            Logger = NullLogger<UnitOfWorkSqlsugarDbContextProvider<TDbContext>>.Instance;
-        }
+        private readonly TenantConfigurationWrapper _tenantConfigurationWrapper = tenantConfigurationWrapper;
+        private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
+        private readonly IConnectionStringResolver _connectionStringResolver = connectionStringResolver;
+        private readonly ICancellationTokenProvider _cancellationTokenProvider = cancellationTokenProvider;
+        private readonly ICurrentTenant _currentTenant = currentTenant;
 
         /// <summary>
         /// 获取数据库上下文

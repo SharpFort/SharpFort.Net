@@ -15,32 +15,23 @@ namespace SharpFort.FileManagement.Domain.Managers
     /// 文件管理器领域服务
     /// 迁移自 CasbinRbac.Domain.Managers.FileManager 并增强
     /// </summary>
-    public partial class FileManager : DomainService, IFileManager
+    public partial class FileManager(
+        IGuidGenerator guidGenerator,
+        IRepository<FileDescriptor> fileRepository,
+        IRepository<FileStorageProvider> providerRepository,
+        IImageCompressor imageCompressor,
+        IEnumerable<IBlobStorageProvider> blobProviders) : DomainService, IFileManager
     {
         [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "未找到名为 {ProviderName} 的 Blob 存储提供者，回退到本地存储")]
         private static partial void LogProviderNotFound(ILogger logger, string providerName);
 
         [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "生成缩略图失败，文件ID: {FileId}")]
         private static partial void LogThumbnailGenerationFailed(ILogger logger, Exception ex, Guid fileId);
-        private readonly IGuidGenerator _guidGenerator;
-        private readonly IRepository<FileDescriptor> _fileRepository;
-        private readonly IRepository<FileStorageProvider> _providerRepository;
-        private readonly IImageCompressor _imageCompressor;
-        private readonly IEnumerable<IBlobStorageProvider> _blobProviders;
-
-        public FileManager(
-            IGuidGenerator guidGenerator,
-            IRepository<FileDescriptor> fileRepository,
-            IRepository<FileStorageProvider> providerRepository,
-            IImageCompressor imageCompressor,
-            IEnumerable<IBlobStorageProvider> blobProviders)
-        {
-            _guidGenerator = guidGenerator;
-            _fileRepository = fileRepository;
-            _providerRepository = providerRepository;
-            _imageCompressor = imageCompressor;
-            _blobProviders = blobProviders;
-        }
+        private readonly IGuidGenerator _guidGenerator = guidGenerator;
+        private readonly IRepository<FileDescriptor> _fileRepository = fileRepository;
+        private readonly IRepository<FileStorageProvider> _providerRepository = providerRepository;
+        private readonly IImageCompressor _imageCompressor = imageCompressor;
+        private readonly IEnumerable<IBlobStorageProvider> _blobProviders = blobProviders;
 
         /// <summary>
         /// 批量上传文件并创建记录

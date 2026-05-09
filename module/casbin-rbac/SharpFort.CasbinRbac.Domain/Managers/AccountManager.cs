@@ -21,32 +21,21 @@ namespace SharpFort.CasbinRbac.Domain.Managers
     /// <summary>
     /// 用户领域服务
     /// </summary>
-    public class AccountManager : DomainService, IAccountManager
-    {
-        private readonly IUserRepository _repository;
-        private readonly ILocalEventBus _localEventBus;
-        private readonly JwtOptions _jwtOptions;
-        private readonly RbacOptions _options;
-        private UserManager _userManager;
-        private ISqlSugarRepository<Role> _roleRepository;
-        private RefreshJwtOptions _refreshJwtOptions;
-
-        public AccountManager(IUserRepository repository
+    public class AccountManager(IUserRepository repository
             , IOptions<JwtOptions> jwtOptions
             , ILocalEventBus localEventBus
             , UserManager userManager
             , IOptions<RefreshJwtOptions> refreshJwtOptions
             , ISqlSugarRepository<Role> roleRepository
-            , IOptions<RbacOptions> options)
-        {
-            _repository = repository;
-            _jwtOptions = jwtOptions.Value;
-            _localEventBus = localEventBus;
-            _userManager = userManager;
-            _roleRepository = roleRepository;
-            _refreshJwtOptions = refreshJwtOptions.Value;
-            _options = options.Value;
-        }
+            , IOptions<RbacOptions> options) : DomainService, IAccountManager
+    {
+        private readonly IUserRepository _repository = repository;
+        private readonly ILocalEventBus _localEventBus = localEventBus;
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
+        private readonly RbacOptions _options = options.Value;
+        private UserManager _userManager = userManager;
+        private ISqlSugarRepository<Role> _roleRepository = roleRepository;
+        private RefreshJwtOptions _refreshJwtOptions = refreshJwtOptions.Value;
 
         /// <summary>
         /// 根据用户id获取token

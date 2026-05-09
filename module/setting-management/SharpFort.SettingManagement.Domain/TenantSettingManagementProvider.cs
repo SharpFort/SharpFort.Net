@@ -4,19 +4,13 @@ using Volo.Abp.Settings;
 
 namespace SharpFort.SettingManagement.Domain;
 
-public class TenantSettingManagementProvider : SettingManagementProvider, ITransientDependency
+public class TenantSettingManagementProvider(
+    ISettingManagementStore settingManagementStore,
+    ICurrentTenant currentTenant) : SettingManagementProvider(settingManagementStore), ITransientDependency
 {
     public override string Name => TenantSettingValueProvider.ProviderName;
 
-    protected ICurrentTenant CurrentTenant { get; }
-
-    public TenantSettingManagementProvider(
-        ISettingManagementStore settingManagementStore,
-        ICurrentTenant currentTenant)
-        : base(settingManagementStore)
-    {
-        CurrentTenant = currentTenant;
-    }
+    protected ICurrentTenant CurrentTenant { get; } = currentTenant;
 
     protected override string? NormalizeProviderKey(string? providerKey)
     {

@@ -10,7 +10,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.SqlSugarCore.Repositories
 {
-    public class SqlSugarRepository<TEntity> : ISqlSugarRepository<TEntity>, IRepository<TEntity> where TEntity : class, IEntity, new()
+    public class SqlSugarRepository<TEntity>(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : ISqlSugarRepository<TEntity>, IRepository<TEntity> where TEntity : class, IEntity, new()
     {
 #pragma warning disable CA1707 // 框架约定命名，与接口 ISqlSugarRepository._Db 保持一致
         public ISqlSugarClient _Db => AsyncContext.Run(async () => await GetDbContextAsync());
@@ -18,7 +18,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         public ISugarQueryable<TEntity> _DbQueryable => _Db.Queryable<TEntity>();
 #pragma warning restore CA1707
 
-        private readonly ISugarDbContextProvider<ISqlSugarDbContext> _dbContextProvider;
+        private readonly ISugarDbContextProvider<ISqlSugarDbContext> _dbContextProvider = dbContextProvider;
 
         /// <summary>
         /// 异步查询执行器
@@ -41,11 +41,6 @@ namespace SharpFort.SqlSugarCore.Repositories
         /// 提供程序名称
         /// </summary>
         public string ProviderName => "SqlSugar";
-
-        public SqlSugarRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider)
-        {
-            _dbContextProvider = dbContextProvider;
-        }
 
         /// <summary>
         /// 获取数据库上下文
@@ -421,12 +416,8 @@ namespace SharpFort.SqlSugarCore.Repositories
     }
 
 #pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配（继承自基类）
-    public class SqlSugarRepository<TEntity, TKey> : SqlSugarRepository<TEntity>, ISqlSugarRepository<TEntity, TKey>, IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
+    public class SqlSugarRepository<TEntity, TKey>(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : SqlSugarRepository<TEntity>(sugarDbContextProvider), ISqlSugarRepository<TEntity, TKey>, IRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
     {
-        public SqlSugarRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
-        {
-        }
-
         public virtual async Task DeleteAsync(TKey id, bool autoSave = false, CancellationToken cancellationToken = default)
         {
             await DeleteByIdAsync(id!);

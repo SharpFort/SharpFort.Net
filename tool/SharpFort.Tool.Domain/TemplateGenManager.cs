@@ -6,16 +6,10 @@ using SharpFort.Tool.Domain.Shared.Options;
 
 namespace SharpFort.Tool.Domain
 {
-    public class TemplateGenManager : ITransientDependency
+    public class TemplateGenManager(IOptionsMonitor<ToolOptions> toolOptions, GiteeManager giteeManager) : ITransientDependency
     {
-        private readonly ToolOptions _toolOptions;
-        private readonly GiteeManager _giteeManager;
-
-        public TemplateGenManager(IOptionsMonitor<ToolOptions> toolOptions, GiteeManager giteeManager)
-        {
-            _giteeManager = giteeManager;
-            _toolOptions = toolOptions.CurrentValue;
-        }
+        private readonly ToolOptions _toolOptions = toolOptions.CurrentValue;
+        private readonly GiteeManager _giteeManager = giteeManager;
 
         public async Task<string> CreateTemplateAsync(TemplateGenCreateDto input)
         {

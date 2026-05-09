@@ -11,18 +11,14 @@ namespace SharpFort.AspNetCore.Mvc
     /// <summary>
     /// 自定义路由构建器，用于生成API路由规则
     /// </summary>
+    /// <remarks>
+    /// 构造函数
+    /// </remarks>
+    /// <param name="options">ABP约定控制器配置选项</param>
     [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
     [ExposeServices(typeof(IConventionalRouteBuilder))]
-    public class SfConventionalRouteBuilder : ConventionalRouteBuilder
+    public class SfConventionalRouteBuilder(IOptions<AbpConventionalControllerOptions> options) : ConventionalRouteBuilder(options)
     {
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="options">ABP约定控制器配置选项</param>
-        public SfConventionalRouteBuilder(IOptions<AbpConventionalControllerOptions> options)
-            : base(options)
-        {
-        }
 
         /// <summary>
         /// 构建API路由

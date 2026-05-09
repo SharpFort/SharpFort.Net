@@ -21,21 +21,14 @@ namespace FluidSequence.Domain.Services
     ///       数据库写入次数降低 BufferCount 倍，适合高并发场景。
     ///     - 代价：应用重启会丢弃缓冲队列中剩余号码，号码序列可能出现空洞，但保证全局唯一递增。
     /// </summary>
-    public class SequenceDomainService : DomainService
+    public class SequenceDomainService(
+        ISequenceRuleRepository repository,
+        IEnumerable<IPlaceholderStrategy> strategies,
+        SequenceHiLoBufferService hiLoBuffer) : DomainService
     {
-        private readonly ISequenceRuleRepository _repository;
-        private readonly IEnumerable<IPlaceholderStrategy> _strategies;
-        private readonly SequenceHiLoBufferService _hiLoBuffer;
-
-        public SequenceDomainService(
-            ISequenceRuleRepository repository,
-            IEnumerable<IPlaceholderStrategy> strategies,
-            SequenceHiLoBufferService hiLoBuffer)
-        {
-            _repository = repository;
-            _strategies = strategies;
-            _hiLoBuffer = hiLoBuffer;
-        }
+        private readonly ISequenceRuleRepository _repository = repository;
+        private readonly IEnumerable<IPlaceholderStrategy> _strategies = strategies;
+        private readonly SequenceHiLoBufferService _hiLoBuffer = hiLoBuffer;
 
         /// <summary>
         /// 生成指定规则的下一个流水号（主入口）。

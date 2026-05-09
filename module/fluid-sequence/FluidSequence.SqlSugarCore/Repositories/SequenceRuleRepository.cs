@@ -7,11 +7,8 @@ using FluidSequence.Domain.Repositories;
 
 namespace FluidSequence.SqlSugarCore.Repositories
 {
-    public class SequenceRuleRepository : SqlSugarRepository<SysSequenceRule, Guid>, ISequenceRuleRepository, ITransientDependency
+    public class SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : SqlSugarRepository<SysSequenceRule, Guid>(dbContextProvider), ISequenceRuleRepository, ITransientDependency
     {
-        public SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : base(dbContextProvider)
-        {
-        }
 
         /// <summary>
         /// Hi-Lo 原子号段推进实现。

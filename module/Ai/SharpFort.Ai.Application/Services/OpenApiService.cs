@@ -18,35 +18,22 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
-public class OpenApiService : ApplicationService
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ILogger<OpenApiService> _logger;
-    private readonly TokenManager _tokenManager;
-    private readonly AiGateWayManager _aiGateWayManager;
-    private readonly ModelManager _modelManager;
-    private readonly AiBlacklistManager _aiBlacklistManager;
-    // private readonly PremiumPackageManager _premiumPackageManager;
-    private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageStoreRepository;
-    private readonly ISqlSugarRepository<AiModel> _aiModelRepository;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    public OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<OpenApiService> logger,
-        TokenManager tokenManager, AiGateWayManager aiGateWayManager,
-        ModelManager modelManager, AiBlacklistManager aiBlacklistManager,
+public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<OpenApiService> logger,
+    TokenManager tokenManager, AiGateWayManager aiGateWayManager,
+    ModelManager modelManager, AiBlacklistManager aiBlacklistManager,
          /* PremiumPackageManager premiumPackageManager, */ ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageStoreRepository, ISqlSugarRepository<AiModel> aiModelRepository,
-        IServiceScopeFactory serviceScopeFactory)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _logger = logger;
-        _tokenManager = tokenManager;
-        _aiGateWayManager = aiGateWayManager;
-        _modelManager = modelManager;
-        _aiBlacklistManager = aiBlacklistManager;
-        // _premiumPackageManager = premiumPackageManager;
-        _imageStoreRepository = imageStoreRepository;
-        _aiModelRepository = aiModelRepository;
-        _serviceScopeFactory = serviceScopeFactory;
-    }
+    IServiceScopeFactory serviceScopeFactory) : ApplicationService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly ILogger<OpenApiService> _logger = logger;
+    private readonly TokenManager _tokenManager = tokenManager;
+    private readonly AiGateWayManager _aiGateWayManager = aiGateWayManager;
+    private readonly ModelManager _modelManager = modelManager;
+    private readonly AiBlacklistManager _aiBlacklistManager = aiBlacklistManager;
+    // private readonly PremiumPackageManager _premiumPackageManager;
+    private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageStoreRepository = imageStoreRepository;
+    private readonly ISqlSugarRepository<AiModel> _aiModelRepository = aiModelRepository;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
 
     /// <summary>
     /// 对话
@@ -300,7 +287,7 @@ public class OpenApiService : ApplicationService
         if (!string.IsNullOrWhiteSpace(authHeader) &&
             authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
         {
-            return authHeader.Substring("Bearer ".Length).Trim();
+            return authHeader["Bearer ".Length..].Trim();
         }
 
         return null;

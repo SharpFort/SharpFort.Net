@@ -12,14 +12,10 @@ namespace SharpFort.CasbinRbac.Application.Services
     /// <summary>
     /// DictionaryType服务实现
     /// </summary>
-    public class DictionaryTypeService : SfCrudAppService<DictionaryType, DictionaryTypeGetOutputDto, DictionaryTypeGetListOutputDto, Guid, DictionaryTypeGetListInputVo, DictionaryTypeCreateInputVo, DictionaryTypeUpdateInputVo>,
+    public class DictionaryTypeService(ISqlSugarRepository<DictionaryType, Guid> repository) : SfCrudAppService<DictionaryType, DictionaryTypeGetOutputDto, DictionaryTypeGetListOutputDto, Guid, DictionaryTypeGetListInputVo, DictionaryTypeCreateInputVo, DictionaryTypeUpdateInputVo>(repository),
        IDictionaryTypeService
     {
-        private ISqlSugarRepository<DictionaryType, Guid> _repository;
-        public DictionaryTypeService(ISqlSugarRepository<DictionaryType, Guid> repository) : base(repository)
-        {
-            _repository = repository;
-        }
+        private ISqlSugarRepository<DictionaryType, Guid> _repository = repository;
 
         public override async Task<PagedResultDto<DictionaryTypeGetListOutputDto>> GetListAsync(DictionaryTypeGetListInputVo input)
         {

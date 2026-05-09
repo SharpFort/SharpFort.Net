@@ -9,30 +9,22 @@ namespace SharpFort.Core.Modularity;
 /// <summary>
 /// Sf框架模块管理器
 /// </summary>
+/// <remarks>
+/// 初始化模块管理器
+/// </remarks>
 [Dependency(ReplaceServices = true)]
-public partial class SfModuleManager : ModuleManager, IModuleManager, ISingletonDependency
+public partial class SfModuleManager(
+    IModuleContainer moduleContainer,
+    ILogger<SfModuleManager> logger,
+    IOptions<AbpModuleLifecycleOptions> options,
+    IServiceProvider serviceProvider) : ModuleManager(moduleContainer, logger, options, serviceProvider), IModuleManager, ISingletonDependency
 {
-    private readonly IModuleContainer _moduleContainer;
-    private readonly IEnumerable<IModuleLifecycleContributor> _lifecycleContributors;
-    private readonly ILogger<SfModuleManager> _logger;
-
-    /// <summary>
-    /// 初始化模块管理器
-    /// </summary>
-    public SfModuleManager(
-        IModuleContainer moduleContainer,
-        ILogger<SfModuleManager> logger,
-        IOptions<AbpModuleLifecycleOptions> options,
-        IServiceProvider serviceProvider)
-        : base(moduleContainer, logger, options, serviceProvider)
-    {
-        _moduleContainer = moduleContainer;
-        _logger = logger;
-        _lifecycleContributors = options.Value.Contributors
+    private readonly IModuleContainer _moduleContainer = moduleContainer;
+    private readonly IEnumerable<IModuleLifecycleContributor> _lifecycleContributors = options.Value.Contributors
             .Select(serviceProvider.GetRequiredService)
             .Cast<IModuleLifecycleContributor>()
             .ToArray();
-    }
+    private readonly ILogger<SfModuleManager> _logger = logger;
 
     /// <summary>
     /// 初始化所有模块

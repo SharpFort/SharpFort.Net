@@ -8,12 +8,8 @@ using SharpFort.SqlSugarCore.Repositories;
 
 namespace SharpFort.CasbinRbac.SqlSugarCore.Repositories
 {
-    public class DeptRepository : SqlSugarRepository<Department, Guid>, IDeptRepository, ITransientDependency
+    public class DeptRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : SqlSugarRepository<Department, Guid>(sugarDbContextProvider), IDeptRepository, ITransientDependency
     {
-        public DeptRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
-        {
-        }
-
         public async Task<List<Guid>> GetChildListAsync(Guid deptId)
         {
             var entities = await _DbQueryable.ToChildListAsync(x => x.ParentId, deptId);

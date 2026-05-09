@@ -4,24 +4,16 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
-    public class RoleManager : DomainService
+    public class RoleManager(
+        ISqlSugarRepository<Role> repository,
+        ISqlSugarRepository<RoleMenu> roleMenuRepository,
+        ISqlSugarRepository<Menu> menuRepository,
+        ICasbinPolicyManager casbinPolicyManager) : DomainService
     {
-        private ISqlSugarRepository<Role> _repository;
-        private ISqlSugarRepository<RoleMenu> _roleMenuRepository;
-        private ISqlSugarRepository<Menu> _menuRepository;
-        private ICasbinPolicyManager _casbinPolicyManager;
-
-        public RoleManager(
-            ISqlSugarRepository<Role> repository,
-            ISqlSugarRepository<RoleMenu> roleMenuRepository,
-            ISqlSugarRepository<Menu> menuRepository,
-            ICasbinPolicyManager casbinPolicyManager)
-        {
-            _repository = repository;
-            _roleMenuRepository = roleMenuRepository;
-            _menuRepository = menuRepository;
-            _casbinPolicyManager = casbinPolicyManager;
-        }
+        private ISqlSugarRepository<Role> _repository = repository;
+        private ISqlSugarRepository<RoleMenu> _roleMenuRepository = roleMenuRepository;
+        private ISqlSugarRepository<Menu> _menuRepository = menuRepository;
+        private ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
 
         /// <summary>
         /// 给角色设置菜单

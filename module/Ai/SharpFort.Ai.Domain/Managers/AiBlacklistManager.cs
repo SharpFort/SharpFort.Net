@@ -4,14 +4,9 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Managers;
 
-public class AiBlacklistManager : DomainService
+public class AiBlacklistManager(ISqlSugarRepository<AiBlacklist> aiBlacklistRepository) : DomainService
 {
-    private readonly ISqlSugarRepository<AiBlacklist> _aiBlacklistRepository;
-
-    public AiBlacklistManager(ISqlSugarRepository<AiBlacklist> aiBlacklistRepository)
-    {
-        _aiBlacklistRepository = aiBlacklistRepository;
-    }
+    private readonly ISqlSugarRepository<AiBlacklist> _aiBlacklistRepository = aiBlacklistRepository;
 
     /// <summary>
     /// 校验黑名单

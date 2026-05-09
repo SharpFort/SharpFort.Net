@@ -3,10 +3,9 @@ using SharpFort.Tool.Domain;
 
 namespace SharpFort.Tool.Application
 {
-    public class NueGetInfoService : ApplicationService
+    public class NueGetInfoService(NugetCrawlerManager nugetCrawlerManager) : ApplicationService
     {
-        private NugetCrawlerManager _nugetCrawlerManager;
-        public NueGetInfoService(NugetCrawlerManager nugetCrawlerManager) { _nugetCrawlerManager = nugetCrawlerManager; }
+        private NugetCrawlerManager _nugetCrawlerManager = nugetCrawlerManager;
 
         /// <summary>
         /// 获取爬虫结果

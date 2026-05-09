@@ -6,15 +6,9 @@ using SharpFort.Tool.Application.Contracts.Dtos;
 
 namespace SharpFort.Tool.Commands
 {
-    public class NewCommand : ICommand
+    public class NewCommand(ITemplateGenService templateGenService) : ICommand
     {
-        private readonly ITemplateGenService _templateGenService;
-
-        public NewCommand(ITemplateGenService templateGenService)
-        {
-            _templateGenService = templateGenService;
-        }
-
+        private readonly ITemplateGenService _templateGenService = templateGenService;
 
         public string Command => "new";
         public string? Description => "创建项目模板` yi-abp new <name> -csf `";

@@ -6,14 +6,9 @@ namespace SharpFort.SqlSugarCore.Uow
     /// <summary>
     /// SqlSugar事务API实现
     /// </summary>
-    public class SqlSugarTransactionApi : ITransactionApi, ISupportsRollback
+    public class SqlSugarTransactionApi(ISqlSugarDbContext dbContext) : ITransactionApi, ISupportsRollback
     {
-        private readonly ISqlSugarDbContext _dbContext;
-
-        public SqlSugarTransactionApi(ISqlSugarDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        private readonly ISqlSugarDbContext _dbContext = dbContext;
 
         /// <summary>
         /// 获取数据库上下文

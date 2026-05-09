@@ -4,10 +4,7 @@ using SharpFort.SqlSugarCore;
 
 namespace Sf.Abp.SqlSugarCore
 {
-    public class SfDbContext : SqlSugarDbContext
+    public class SfDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider)
     {
-        public SfDbContext(IAbpLazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-        {
-        }
     }
 }

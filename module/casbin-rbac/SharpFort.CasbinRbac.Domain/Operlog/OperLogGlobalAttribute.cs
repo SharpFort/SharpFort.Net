@@ -13,21 +13,13 @@ using SharpFort.CasbinRbac.Domain.Shared.OperLog;
 
 namespace SharpFort.CasbinRbac.Domain.Operlog
 {
-    public class OperLogGlobalAttribute : ActionFilterAttribute, ITransientDependency
+    public class OperLogGlobalAttribute(ILogger<OperLogGlobalAttribute> logger, IRepository<OperationLogEntity> repository, ICurrentUser currentUser, IUnitOfWorkManager unitOfWorkManager) : ActionFilterAttribute, ITransientDependency
     {
-        private ILogger<OperLogGlobalAttribute> _logger;
-        private IRepository<OperationLogEntity> _repository;
-        private ICurrentUser _currentUser;
+        private ILogger<OperLogGlobalAttribute> _logger = logger;
+        private IRepository<OperationLogEntity> _repository = repository;
+        private ICurrentUser _currentUser = currentUser;
 
-        private IUnitOfWorkManager _unitOfWorkManager;
-        //注入一个日志服务
-        public OperLogGlobalAttribute(ILogger<OperLogGlobalAttribute> logger, IRepository<OperationLogEntity> repository, ICurrentUser currentUser, IUnitOfWorkManager unitOfWorkManager)
-        {
-            _logger = logger;
-            _repository = repository;
-            _currentUser = currentUser;
-            _unitOfWorkManager = unitOfWorkManager;
-        }
+        private IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {

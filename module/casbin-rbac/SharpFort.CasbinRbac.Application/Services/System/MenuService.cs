@@ -13,25 +13,17 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     /// <summary>
     /// Menu服务实现
     /// </summary>
-    public class MenuService : SfCrudAppService<Menu, MenuGetOutputDto, MenuGetListOutputDto, Guid, MenuGetListInputVo, MenuCreateInputVo, MenuUpdateInputVo>,
+    public class MenuService(
+        ISqlSugarRepository<Menu, Guid> repository,
+        ISqlSugarRepository<RoleMenu> roleMenuRepository,
+        ICasbinPolicyManager casbinPolicyManager,
+        ISqlSugarRepository<Role, Guid> roleRepository) : SfCrudAppService<Menu, MenuGetOutputDto, MenuGetListOutputDto, Guid, MenuGetListInputVo, MenuCreateInputVo, MenuUpdateInputVo>(repository),
        IMenuService
     {
-        private readonly ISqlSugarRepository<Menu, Guid> _repository;
-        private readonly ISqlSugarRepository<RoleMenu> _roleMenuRepository;
-        private readonly ICasbinPolicyManager _casbinPolicyManager;
-        private readonly ISqlSugarRepository<Role, Guid> _roleRepository;
-
-        public MenuService(
-            ISqlSugarRepository<Menu, Guid> repository,
-            ISqlSugarRepository<RoleMenu> roleMenuRepository,
-            ICasbinPolicyManager casbinPolicyManager,
-            ISqlSugarRepository<Role, Guid> roleRepository) : base(repository)
-        {
-            _repository = repository;
-            _roleMenuRepository = roleMenuRepository;
-            _casbinPolicyManager = casbinPolicyManager;
-            _roleRepository = roleRepository;
-        }
+        private readonly ISqlSugarRepository<Menu, Guid> _repository = repository;
+        private readonly ISqlSugarRepository<RoleMenu> _roleMenuRepository = roleMenuRepository;
+        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
+        private readonly ISqlSugarRepository<Role, Guid> _roleRepository = roleRepository;
 
         /// <summary>
         /// 新增菜单

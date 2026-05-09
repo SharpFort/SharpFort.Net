@@ -18,18 +18,12 @@ namespace SharpFort.FileManagement.Application.Services
     /// 迁移自 CasbinRbac.Application.Services.FileService 并增强
     /// </summary>
     [Authorize]
-    public class FileDescriptorService : ApplicationService, IFileDescriptorService
+    public class FileDescriptorService(
+        ISqlSugarRepository<FileDescriptor> repository,
+        IFileManager fileManager) : ApplicationService, IFileDescriptorService
     {
-        private readonly ISqlSugarRepository<FileDescriptor> _repository;
-        private readonly IFileManager _fileManager;
-
-        public FileDescriptorService(
-            ISqlSugarRepository<FileDescriptor> repository,
-            IFileManager fileManager)
-        {
-            _repository = repository;
-            _fileManager = fileManager;
-        }
+        private readonly ISqlSugarRepository<FileDescriptor> _repository = repository;
+        private readonly IFileManager _fileManager = fileManager;
 
         /// <summary>
         /// 上传文件

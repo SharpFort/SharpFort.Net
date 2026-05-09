@@ -13,21 +13,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
     /// Casbin Data Migration Service
     /// Migrates role, menu, and user-role data to Casbin policy table
     /// </summary>
-    public partial class CasbinSeedService : DomainService
+    public partial class CasbinSeedService(
+        IEnforcer enforcer,
+        ISqlSugarRepository<Role> roleRepo,
+        ILogger<CasbinSeedService> logger) : DomainService
     {
-        private readonly IEnforcer _enforcer;
-        private readonly ISqlSugarRepository<Role> _roleRepo;
-        private readonly ILogger<CasbinSeedService> _logger;
-
-        public CasbinSeedService(
-            IEnforcer enforcer,
-            ISqlSugarRepository<Role> roleRepo,
-            ILogger<CasbinSeedService> logger)
-        {
-            _enforcer = enforcer;
-            _roleRepo = roleRepo;
-            _logger = logger;
-        }
+        private readonly IEnforcer _enforcer = enforcer;
+        private readonly ISqlSugarRepository<Role> _roleRepo = roleRepo;
+        private readonly ILogger<CasbinSeedService> _logger = logger;
 
         /// <summary>
         /// Perform Full Migration with COMPLETELY DECOUPLED phases

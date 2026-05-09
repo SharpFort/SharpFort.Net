@@ -8,15 +8,9 @@ namespace SharpFort.Ai.Application.Services;
 /// AI工具服务
 /// </summary>
 [Authorize]
-public class AiToolService : ApplicationService, IAiToolService
+public class AiToolService(AiChatService chatService) : ApplicationService, IAiToolService
 {
-    private readonly AiChatService _chatService;
-    // Assume we use ChatService for implementing tools or direct gateway access
-
-    public AiToolService(AiChatService chatService)
-    {
-        _chatService = chatService;
-    }
+    private readonly AiChatService _chatService = chatService;
 
     public Task<string> TranslateAsync(string text, string targetLang, string? modelId = null)
     {

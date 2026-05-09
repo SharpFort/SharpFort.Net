@@ -9,9 +9,12 @@ namespace SharpFort.SqlSugarCore;
 /// <summary>
 /// 租户配置包装器
 /// </summary>
-public class TenantConfigurationWrapper : ITransientDependency
+/// <remarks>
+/// 构造函数
+/// </remarks>
+public class TenantConfigurationWrapper(IAbpLazyServiceProvider serviceProvider) : ITransientDependency
 {
-    private readonly IAbpLazyServiceProvider _serviceProvider;
+    private readonly IAbpLazyServiceProvider _serviceProvider = serviceProvider;
 
     private ICurrentTenant CurrentTenantService =>
         _serviceProvider.LazyGetRequiredService<ICurrentTenant>();
@@ -21,14 +24,6 @@ public class TenantConfigurationWrapper : ITransientDependency
 
     private DbConnOptions DbConnectionOptions =>
         _serviceProvider.LazyGetRequiredService<IOptions<DbConnOptions>>().Value;
-
-    /// <summary>
-    /// 构造函数
-    /// </summary>
-    public TenantConfigurationWrapper(IAbpLazyServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     /// <summary>
     /// 获取租户配置信息

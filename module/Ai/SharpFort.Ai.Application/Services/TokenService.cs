@@ -16,21 +16,14 @@ namespace SharpFort.Ai.Application.Services;
 /// Token服务
 /// </summary>
 [Authorize]
-public class TokenService : ApplicationService
+public class TokenService(
+    ISqlSugarRepository<Token> tokenRepository,
+    ISqlSugarRepository<AiUsage> usageStatisticsRepository,
+    ModelManager modelManager) : ApplicationService
 {
-    private readonly ISqlSugarRepository<Token> _tokenRepository;
-    private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository;
-    private readonly ModelManager _modelManager;
-
-    public TokenService(
-        ISqlSugarRepository<Token> tokenRepository,
-        ISqlSugarRepository<AiUsage> usageStatisticsRepository,
-        ModelManager modelManager)
-    {
-        _tokenRepository = tokenRepository;
-        _usageStatisticsRepository = usageStatisticsRepository;
-        _modelManager = modelManager;
-    }
+    private readonly ISqlSugarRepository<Token> _tokenRepository = tokenRepository;
+    private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository = usageStatisticsRepository;
+    private readonly ModelManager _modelManager = modelManager;
 
     /// <summary>
     /// 获取当前用户的Token列表

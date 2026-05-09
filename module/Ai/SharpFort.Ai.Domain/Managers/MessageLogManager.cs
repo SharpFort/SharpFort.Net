@@ -5,14 +5,9 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Managers;
 
-public class MessageLogManager : DomainService
+public class MessageLogManager(ISqlSugarRepository<MessageLogAggregateRoot> repository) : DomainService
 {
-    private readonly ISqlSugarRepository<MessageLogAggregateRoot> _repository;
-
-    public MessageLogManager(ISqlSugarRepository<MessageLogAggregateRoot> repository)
-    {
-        _repository = repository;
-    }
+    private readonly ISqlSugarRepository<MessageLogAggregateRoot> _repository = repository;
 
     /// <summary>
     /// 创建消息日志

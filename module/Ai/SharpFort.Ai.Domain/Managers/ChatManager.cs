@@ -24,35 +24,22 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Managers;
 
-public class ChatManager : DomainService
+public class ChatManager(ILoggerFactory loggerFactory,
+    ISqlSugarRepository<ChatMessage> messageRepository,
+    ISqlSugarRepository<AgentStore> agentStoreRepository, AiMessageManager aiMessageManager,
+    UsageStatisticsManager usageStatisticsManager,
+    AiGateWayManager aiGateWayManager, ISqlSugarRepository<AiModel, Guid> aiModelRepository,
+    IUnitOfWorkManager unitOfWorkManager) : DomainService
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ISqlSugarRepository<ChatMessage> _messageRepository;
-    private readonly ISqlSugarRepository<AgentStore> _agentStoreRepository;
-    private readonly AiMessageManager _aiMessageManager;
-    private readonly UsageStatisticsManager _usageStatisticsManager;
+    private readonly ILoggerFactory _loggerFactory = loggerFactory;
+    private readonly ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
+    private readonly ISqlSugarRepository<AgentStore> _agentStoreRepository = agentStoreRepository;
+    private readonly AiMessageManager _aiMessageManager = aiMessageManager;
+    private readonly UsageStatisticsManager _usageStatisticsManager = usageStatisticsManager;
     // private readonly PremiumPackageManager _premiumPackageManager;
-    private readonly AiGateWayManager _aiGateWayManager;
-    private readonly ISqlSugarRepository<AiModel, Guid> _aiModelRepository;
-    private readonly IUnitOfWorkManager _unitOfWorkManager;
-
-    public ChatManager(ILoggerFactory loggerFactory,
-        ISqlSugarRepository<ChatMessage> messageRepository,
-        ISqlSugarRepository<AgentStore> agentStoreRepository, AiMessageManager aiMessageManager,
-        UsageStatisticsManager usageStatisticsManager,
-        AiGateWayManager aiGateWayManager, ISqlSugarRepository<AiModel, Guid> aiModelRepository,
-        IUnitOfWorkManager unitOfWorkManager)
-    {
-        _loggerFactory = loggerFactory;
-        _messageRepository = messageRepository;
-        _agentStoreRepository = agentStoreRepository;
-        _aiMessageManager = aiMessageManager;
-        _usageStatisticsManager = usageStatisticsManager;
-        // _premiumPackageManager = premiumPackageManager;
-        _aiGateWayManager = aiGateWayManager;
-        _aiModelRepository = aiModelRepository;
-        _unitOfWorkManager = unitOfWorkManager;
-    }
+    private readonly AiGateWayManager _aiGateWayManager = aiGateWayManager;
+    private readonly ISqlSugarRepository<AiModel, Guid> _aiModelRepository = aiModelRepository;
+    private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
 
     /// <summary>
     /// agent流式对话 
@@ -291,14 +278,7 @@ public class ChatManager : DomainService
     {
         var response = httpContext.Response;
         string output;
-        if (isDone)
-        {
-            output = "[DONE]";
-        }
-        else
-        {
-            output = JsonSerializer.Serialize(content, ThorJsonSerializer.DefaultOptions);
-        }
+        output = isDone ? "[DONE]" : JsonSerializer.Serialize(content, ThorJsonSerializer.DefaultOptions);
 
         await response.WriteAsync($"data: {output}\n\n", Encoding.UTF8, cancellationToken).ConfigureAwait(false);
         await response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);

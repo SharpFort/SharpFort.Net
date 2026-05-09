@@ -11,17 +11,10 @@ using SharpFort.CasbinRbac.Application.Contracts.Dtos.Monitor;
 
 namespace SharpFort.CasbinRbac.Application.Services.Monitor
 {
-    public class MonitorServerService : ApplicationService, IMonitorServerService
+    public class MonitorServerService(IWebHostEnvironment hostEnvironment, IHttpContextAccessor httpContextAccessor) : ApplicationService, IMonitorServerService
     {
-        private readonly IWebHostEnvironment _hostEnvironment;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public MonitorServerService(IWebHostEnvironment hostEnvironment, IHttpContextAccessor httpContextAccessor)
-        {
-            _hostEnvironment = hostEnvironment;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
+        private readonly IWebHostEnvironment _hostEnvironment = hostEnvironment;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private static List<NetworkAdapterDto> _cachedNetworks = null!;
         private static List<AssemblyInfoDto> _cachedAssemblies = null!;
         private static DateTime _lastStaticCacheTime = DateTime.MinValue;

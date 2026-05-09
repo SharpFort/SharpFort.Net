@@ -11,16 +11,10 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     /// 用于将 casbin_sys_role、casbin_sys_menu、casbin_sys_role_menu、casbin_sys_user_role 表的数据
     /// 迁移到 casbin_rule 表中，生成 Casbin 权限策略
     /// </summary>
-    public partial class CasbinMigrationService : ApplicationService, ICasbinMigrationService
+    public partial class CasbinMigrationService(CasbinSeedService casbinSeedService, ILogger<CasbinMigrationService> logger) : ApplicationService, ICasbinMigrationService
     {
-        private readonly CasbinSeedService _casbinSeedService;
-        private readonly ILogger<CasbinMigrationService> _logger;
-
-        public CasbinMigrationService(CasbinSeedService casbinSeedService, ILogger<CasbinMigrationService> logger)
-        {
-            _casbinSeedService = casbinSeedService;
-            _logger = logger;
-        }
+        private readonly CasbinSeedService _casbinSeedService = casbinSeedService;
+        private readonly ILogger<CasbinMigrationService> _logger = logger;
 
         /// <summary>
         /// 全量数据迁移

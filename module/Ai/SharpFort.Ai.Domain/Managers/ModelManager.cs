@@ -9,17 +9,10 @@ namespace SharpFort.Ai.Domain.Managers;
 /// <summary>
 /// 模型管理器
 /// </summary>
-public class ModelManager : DomainService
+public class ModelManager(
+    ISqlSugarRepository<AiModel> aiModelRepository,
+    ILogger<ModelManager> logger) : DomainService
 {
-    private readonly ISqlSugarRepository<AiModel> _aiModelRepository;
-    private readonly ILogger<ModelManager> _logger;
-    public ModelManager(
-        ISqlSugarRepository<AiModel> aiModelRepository,
-        ILogger<ModelManager> logger)
-    {
-        _aiModelRepository = aiModelRepository;
-        _logger = logger;
-    }
-
-
+    private readonly ISqlSugarRepository<AiModel> _aiModelRepository = aiModelRepository;
+    private readonly ILogger<ModelManager> _logger = logger;
 }

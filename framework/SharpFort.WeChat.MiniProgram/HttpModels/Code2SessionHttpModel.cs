@@ -20,12 +20,7 @@ public class Code2SessionRequest
     public string grant_type => "authorization_code";
 }
 
-public class Code2SessionInput
+public class Code2SessionInput(string js_code)
 {
-    public Code2SessionInput(string js_code)
-    {
-
-        this.js_code = js_code;
-    }
-    public string js_code { get; set; }
+    public string js_code { get; set; } = js_code;
 }

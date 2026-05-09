@@ -16,7 +16,7 @@ namespace SharpFort.FileManagement.Domain.Services
     /// - AccessKey: R2 API Token 的 Access Key ID
     /// - SecretKey: R2 API Token 的 Secret Access Key
     /// </remarks>
-    public partial class S3BlobStorageProvider : IBlobStorageProvider
+    public partial class S3BlobStorageProvider(ILogger<S3BlobStorageProvider> logger) : IBlobStorageProvider
     {
         [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "S3BlobStorageProvider.SaveAsync: S3 SDK 尚未接入，请安装 AWSSDK.S3 后实现此方法")]
         private partial void LogSaveSdkNotImplemented();
@@ -30,12 +30,7 @@ namespace SharpFort.FileManagement.Domain.Services
         [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "S3BlobStorageProvider.ExistsAsync: S3 SDK 尚未接入")]
         private partial void LogExistsSdkNotImplemented();
 
-        private readonly ILogger<S3BlobStorageProvider> _logger;
-
-        public S3BlobStorageProvider(ILogger<S3BlobStorageProvider> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<S3BlobStorageProvider> _logger = logger;
 
         public string ProviderName => "S3Compatible";
 

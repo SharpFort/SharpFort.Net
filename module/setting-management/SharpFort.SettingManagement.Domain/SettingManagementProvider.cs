@@ -2,17 +2,12 @@
 
 namespace SharpFort.SettingManagement.Domain;
 
-public abstract class SettingManagementProvider : ISettingManagementProvider
+public abstract class SettingManagementProvider(ISettingManagementStore settingManagementStore) : ISettingManagementProvider
 {
     public abstract string Name { get; }
 
     //TODO: Rename to Store
-    protected ISettingManagementStore SettingManagementStore { get; }
-
-    protected SettingManagementProvider(ISettingManagementStore settingManagementStore)
-    {
-        SettingManagementStore = settingManagementStore;
-    }
+    protected ISettingManagementStore SettingManagementStore { get; } = settingManagementStore;
 
     public virtual async Task<string?> GetOrNullAsync(SettingDefinition setting, string? providerKey)
     {

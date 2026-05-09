@@ -9,16 +9,10 @@ using SharpFort.CasbinRbac.Domain.Shared.Model;
 
 namespace SharpFort.CasbinRbac.Application.Services.Monitor
 {
-    public class OnlineService : ApplicationService, IOnlineService
+    public class OnlineService(ILogger<OnlineService> logger, IHubContext<OnlineHub> hub) : ApplicationService, IOnlineService
     {
-        private ILogger<OnlineService> _logger;
-        private IHubContext<OnlineHub> _hub;
-
-        public OnlineService(ILogger<OnlineService> logger, IHubContext<OnlineHub> hub)
-        {
-            _logger = logger;
-            _hub = hub;
-        }
+        private ILogger<OnlineService> _logger = logger;
+        private IHubContext<OnlineHub> _hub = hub;
 
         /// <summary>
         /// 动态条件获取当前在线用户

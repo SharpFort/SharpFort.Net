@@ -4,16 +4,11 @@ using Volo.Abp.Settings;
 
 namespace SharpFort.SettingManagement.Domain;
 
-public class ConfigurationSettingManagementProvider : ISettingManagementProvider, ITransientDependency
+public class ConfigurationSettingManagementProvider(IConfiguration configuration) : ISettingManagementProvider, ITransientDependency
 {
     public string Name => ConfigurationSettingValueProvider.ProviderName;
 
-    protected IConfiguration Configuration { get; }
-
-    public ConfigurationSettingManagementProvider(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
+    protected IConfiguration Configuration { get; } = configuration;
 
     public virtual Task<string?> GetOrNullAsync(SettingDefinition setting, string? providerKey)
     {

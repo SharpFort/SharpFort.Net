@@ -12,16 +12,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     /// <summary>
     /// Post服务实现
     /// </summary>
-    public class PostService : SfCrudAppService<Position, PostGetOutputDto, PostGetListOutputDto, Guid,
-            PostGetListInputVo, PostCreateInputVo, PostUpdateInputVo>,
+    public class PostService(ISqlSugarRepository<Position, Guid> repository) : SfCrudAppService<Position, PostGetOutputDto, PostGetListOutputDto, Guid,
+            PostGetListInputVo, PostCreateInputVo, PostUpdateInputVo>(repository),
         IPostService
     {
-        private readonly ISqlSugarRepository<Position, Guid> _repository;
-
-        public PostService(ISqlSugarRepository<Position, Guid> repository) : base(repository)
-        {
-            _repository = repository;
-        }
+        private readonly ISqlSugarRepository<Position, Guid> _repository = repository;
 
         public override async Task<PagedResultDto<PostGetListOutputDto>> GetListAsync(PostGetListInputVo input)
         {

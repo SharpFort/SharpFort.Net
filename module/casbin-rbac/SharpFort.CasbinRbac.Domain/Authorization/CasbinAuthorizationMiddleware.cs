@@ -12,24 +12,16 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
     /// <summary>
     /// Casbin Authorization Middleware
     /// </summary>
-    public class CasbinAuthorizationMiddleware : IMiddleware, ITransientDependency
+    public class CasbinAuthorizationMiddleware(
+        ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
+        IEnforcer enforcer,
+        IOptions<CasbinOptions> options) : IMiddleware, ITransientDependency
     {
-        private readonly CasbinOptions _options;
-        private readonly ICurrentUser _currentUser;
-        private readonly ICurrentTenant _currentTenant;
-        private readonly IEnforcer _enforcer;
-
-        public CasbinAuthorizationMiddleware(
-            ICurrentUser currentUser,
-            ICurrentTenant currentTenant,
-            IEnforcer enforcer,
-            IOptions<CasbinOptions> options)
-        {
-            _currentUser = currentUser;
-            _currentTenant = currentTenant;
-            _enforcer = enforcer;
-            _options = options.Value;
-        }
+        private readonly CasbinOptions _options = options.Value;
+        private readonly ICurrentUser _currentUser = currentUser;
+        private readonly ICurrentTenant _currentTenant = currentTenant;
+        private readonly IEnforcer _enforcer = enforcer;
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {

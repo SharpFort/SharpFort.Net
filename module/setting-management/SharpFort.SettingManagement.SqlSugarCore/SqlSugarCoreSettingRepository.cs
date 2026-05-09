@@ -5,13 +5,9 @@ using SharpFort.SqlSugarCore.Repositories;
 namespace Volo.Abp.SettingManagement.EntityFrameworkCore;
 
 #pragma warning disable CS8767 // ABP IRepository 接口 setter 参数可空性不匹配（继承自基类）
-public class SqlSugarCoreSettingRepository : SqlSugarRepository<SettingAggregateRoot, Guid>,
+public class SqlSugarCoreSettingRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : SqlSugarRepository<SettingAggregateRoot, Guid>(sugarDbContextProvider),
     ISettingRepository
 {
-    public SqlSugarCoreSettingRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
-    {
-    }
-
     public virtual async Task<SettingAggregateRoot> FindAsync(
         string name,
         string providerName,

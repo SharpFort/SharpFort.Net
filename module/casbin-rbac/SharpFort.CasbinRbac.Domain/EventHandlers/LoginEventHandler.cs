@@ -8,22 +8,15 @@ using SharpFort.CasbinRbac.Domain.Shared.Etos;
 
 namespace SharpFort.CasbinRbac.Domain.EventHandlers
 {
-    public partial class LoginEventHandler : ILocalEventHandler<LoginEventArgs>,
+    public partial class LoginEventHandler(
+        ILogger<LoginEventHandler> logger,
+        IRepository<LoginLog> loginLogRepository,
+        IGuidGenerator guidGenerator) : ILocalEventHandler<LoginEventArgs>,
           ITransientDependency
     {
-        private readonly ILogger<LoginEventHandler> _logger;
-        private readonly IRepository<LoginLog> _loginLogRepository;
-        private readonly IGuidGenerator _guidGenerator;
-
-        public LoginEventHandler(
-            ILogger<LoginEventHandler> logger,
-            IRepository<LoginLog> loginLogRepository,
-            IGuidGenerator guidGenerator)
-        {
-            _logger = logger;
-            _loginLogRepository = loginLogRepository;
-            _guidGenerator = guidGenerator;
-        }
+        private readonly ILogger<LoginEventHandler> _logger = logger;
+        private readonly IRepository<LoginLog> _loginLogRepository = loginLogRepository;
+        private readonly IGuidGenerator _guidGenerator = guidGenerator;
 
         public async Task HandleEventAsync(LoginEventArgs eventData)
         {

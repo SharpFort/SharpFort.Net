@@ -8,22 +8,15 @@ using Volo.Abp.Uow;
 
 namespace SharpFort.TenantManagement.Domain
 {
-    public class SqlSugarAndConfigurationTenantStore : DefaultTenantStore, ITenantStore
+    public class SqlSugarAndConfigurationTenantStore(ISqlSugarTenantRepository repository,
+        IDistributedCache<TenantCacheItem> cache,
+    ICurrentTenant currentTenant,
+    IOptionsMonitor<AbpDefaultTenantStoreOptions> options, IUnitOfWorkManager unitOfWorkManager) : DefaultTenantStore(options), ITenantStore
     {
-        private ISqlSugarTenantRepository TenantRepository { get; }
-        protected ICurrentTenant CurrentTenant { get; }
-        protected IDistributedCache<TenantCacheItem> Cache { get; }
-        private IUnitOfWorkManager _unitOfWorkManager;
-        public SqlSugarAndConfigurationTenantStore(ISqlSugarTenantRepository repository,
-            IDistributedCache<TenantCacheItem> cache,
-        ICurrentTenant currentTenant,
-        IOptionsMonitor<AbpDefaultTenantStoreOptions> options, IUnitOfWorkManager unitOfWorkManager) : base(options)
-        {
-            TenantRepository = repository;
-            Cache = cache;
-            CurrentTenant = currentTenant;
-            _unitOfWorkManager = unitOfWorkManager;
-        }
+        private ISqlSugarTenantRepository TenantRepository { get; } = repository;
+        protected ICurrentTenant CurrentTenant { get; } = currentTenant;
+        protected IDistributedCache<TenantCacheItem> Cache { get; } = cache;
+        private IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
 
         public new TenantConfiguration? Find(string normalizedName)
         {

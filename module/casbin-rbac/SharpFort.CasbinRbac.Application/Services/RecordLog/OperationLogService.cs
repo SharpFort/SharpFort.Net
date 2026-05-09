@@ -11,14 +11,10 @@ namespace SharpFort.CasbinRbac.Application.Services.RecordLog
     /// <summary>
     /// OperationLog服务实现
     /// </summary>
-    public class OperationLogService : SfCrudAppService<OperationLogEntity, OperationLogGetListOutputDto, Guid, OperationLogGetListInputVo>,
+    public class OperationLogService(ISqlSugarRepository<OperationLogEntity, Guid> repository) : SfCrudAppService<OperationLogEntity, OperationLogGetListOutputDto, Guid, OperationLogGetListInputVo>(repository),
        IOperationLogService
     {
-        private ISqlSugarRepository<OperationLogEntity, Guid> _repository;
-        public OperationLogService(ISqlSugarRepository<OperationLogEntity, Guid> repository) : base(repository)
-        {
-            _repository = repository;
-        }
+        private ISqlSugarRepository<OperationLogEntity, Guid> _repository = repository;
 
         public override async Task<PagedResultDto<OperationLogGetListOutputDto>> GetListAsync(OperationLogGetListInputVo input)
         {

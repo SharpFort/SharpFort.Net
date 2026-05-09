@@ -6,12 +6,8 @@ using SharpFort.TenantManagement.Domain;
 
 namespace SharpFort.TenantManagement.SqlSugarCore
 {
-    public class SqlSugarTenantRepository : SqlSugarRepository<Tenant, Guid>, ISqlSugarTenantRepository, ITransientDependency
+    public class SqlSugarTenantRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : SqlSugarRepository<Tenant, Guid>(sugarDbContextProvider), ISqlSugarTenantRepository, ITransientDependency
     {
-        public SqlSugarTenantRepository(ISugarDbContextProvider<ISqlSugarDbContext> sugarDbContextProvider) : base(sugarDbContextProvider)
-        {
-        }
-
         public async Task<Tenant> FindByNameAsync(string name, bool includeDetails = true)
         {
             return await _DbQueryable.FirstAsync(x => x.Name == name);

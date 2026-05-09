@@ -11,54 +11,41 @@ namespace SharpFort.Ddd.Application
     /// <typeparam name="TEntity">实体类型</typeparam>
     /// <typeparam name="TEntityDto">实体DTO类型</typeparam>
     /// <typeparam name="TKey">主键类型</typeparam>
-    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey>
-        : SfCrudAppService<TEntity, TEntityDto, TKey, PagedAndSortedResultRequestDto>
+    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TKey, PagedAndSortedResultRequestDto>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
     }
 
-    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey, TGetListInput>
-        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TEntityDto>
+    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey, TGetListInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TEntityDto>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository) : base(repository)
-        {
-        }
     }
 
 
-    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput>
-        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TCreateInput>
+    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TCreateInput>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository) : base(repository)
-        {
-        }
     }
 
-    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
-        : SfCrudAppService<TEntity, TEntityDto, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
+    public abstract class SfCacheCrudAppService<TEntity, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TEntityDto, TEntityDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(repository)
         where TEntity : class, IEntity<TKey>
         where TEntityDto : IEntityDto<TKey>
     {
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository) : base(repository)
-        {
-        }
     }
 
 
     /// <summary>
     /// 完整的带缓存CRUD应用服务实现
     /// </summary>
-    public abstract class SfCacheCrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
-        : SfCrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>
+    public abstract class SfCacheCrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(IRepository<TEntity, TKey> repository)
+        : SfCrudAppService<TEntity, TGetOutputDto, TGetListOutputDto, TKey, TGetListInput, TCreateInput, TUpdateInput>(repository)
         where TEntity : class, IEntity<TKey>
         where TGetOutputDto : IEntityDto<TKey>
         where TGetListOutputDto : IEntityDto<TKey>
@@ -74,11 +61,6 @@ namespace SharpFort.Ddd.Application
         /// </summary>
         protected virtual string GenerateCacheKey(TKey id) =>
             $"{typeof(TEntity).Name}:{CurrentTenant.Id ?? Guid.Empty}:{id}";
-
-        protected SfCacheCrudAppService(IRepository<TEntity, TKey> repository)
-            : base(repository)
-        {
-        }
 
         /// <summary>
         /// 更新实体并清除缓存

@@ -11,26 +11,19 @@ using FluidSequence.Domain.Repositories;
 namespace FluidSequence.Application.Services
 {
     [Authorize]
-    public class SequenceRuleAppService : SfCrudAppService<
+    public class SequenceRuleAppService(
+        ISequenceRuleRepository repository,
+        SequenceDomainService domainService) : SfCrudAppService<
         SysSequenceRule,
         SequenceRuleDto,
         Guid,
         SequenceRuleGetListInput,
         CreateSequenceRuleInput,
-        UpdateSequenceRuleInput>,
+        UpdateSequenceRuleInput>(repository),
         ISequenceRuleAppService
     {
-        private readonly SequenceDomainService _domainService;
-        private readonly ISequenceRuleRepository _repository;
-
-        public SequenceRuleAppService(
-            ISequenceRuleRepository repository,
-            SequenceDomainService domainService)
-            : base(repository)
-        {
-            _repository = repository;
-            _domainService = domainService;
-        }
+        private readonly SequenceDomainService _domainService = domainService;
+        private readonly ISequenceRuleRepository _repository = repository;
 
         public async Task<string> TestGenerateAsync(string ruleCode, Dictionary<string, string> context)
         {

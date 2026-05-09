@@ -5,19 +5,13 @@ using Volo.Abp.DependencyInjection;
 
 namespace SharpFort.Tool.Domain;
 
-public class GiteeManager : ITransientDependency
+public class GiteeManager(IConfiguration configuration, IHttpClientFactory httpClientFactory) : ITransientDependency
 {
-    private readonly string? _accessToken;
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly string? _accessToken = configuration.GetValue<string>("GiteeAccession");
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
     private const string GiteeHost = "https://gitee.com/api/v5";
     private const string Owner = "ccnetcore";
     private const string Repo = "yi-template";
-
-    public GiteeManager(IConfiguration configuration, IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-        _accessToken = configuration.GetValue<string>("GiteeAccession");
-    }
 
     /// <summary>
     /// 是否存在当前分支

@@ -17,40 +17,26 @@ namespace SharpFort.Ai.Application.Services;
 /// <summary>
 /// AI聊天服务
 /// </summary>
-public class AiChatService : ApplicationService, IAiChatService
+public class AiChatService(IHttpContextAccessor httpContextAccessor,
+    AiBlacklistManager aiBlacklistManager,
+    ILogger<AiChatService> logger,
+    AiGateWayManager aiGateWayManager,
+    ModelManager modelManager,
+    ChatManager chatManager, TokenManager tokenManager, IAccountService accountService,
+    ISqlSugarRepository<AgentStore> agentStoreRepository,
+    ISqlSugarRepository<AiModel> aiModelRepository) : ApplicationService, IAiChatService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly AiBlacklistManager _aiBlacklistManager;
-    private readonly ILogger<AiChatService> _logger;
-    private readonly AiGateWayManager _aiGateWayManager;
-    private readonly ModelManager _modelManager;
-    private readonly ChatManager _chatManager;
-    private readonly TokenManager _tokenManager;
-    private readonly IAccountService _accountService;
-    private readonly ISqlSugarRepository<AgentStore> _agentStoreRepository;
-    private readonly ISqlSugarRepository<AiModel> _aiModelRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly AiBlacklistManager _aiBlacklistManager = aiBlacklistManager;
+    private readonly ILogger<AiChatService> _logger = logger;
+    private readonly AiGateWayManager _aiGateWayManager = aiGateWayManager;
+    private readonly ModelManager _modelManager = modelManager;
+    private readonly ChatManager _chatManager = chatManager;
+    private readonly TokenManager _tokenManager = tokenManager;
+    private readonly IAccountService _accountService = accountService;
+    private readonly ISqlSugarRepository<AgentStore> _agentStoreRepository = agentStoreRepository;
+    private readonly ISqlSugarRepository<AiModel> _aiModelRepository = aiModelRepository;
     private const string FreeModelId = "DeepSeek-V3-0324"; // Keep constant or move to config
-
-    public AiChatService(IHttpContextAccessor httpContextAccessor,
-        AiBlacklistManager aiBlacklistManager,
-        ILogger<AiChatService> logger,
-        AiGateWayManager aiGateWayManager,
-        ModelManager modelManager,
-        ChatManager chatManager, TokenManager tokenManager, IAccountService accountService,
-        ISqlSugarRepository<AgentStore> agentStoreRepository,
-        ISqlSugarRepository<AiModel> aiModelRepository)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _aiBlacklistManager = aiBlacklistManager;
-        _logger = logger;
-        _aiGateWayManager = aiGateWayManager;
-        _modelManager = modelManager;
-        _chatManager = chatManager;
-        _tokenManager = tokenManager;
-        _accountService = accountService;
-        _agentStoreRepository = agentStoreRepository;
-        _aiModelRepository = aiModelRepository;
-    }
 
     /// <summary>
     /// 获取可用的对话模型列表

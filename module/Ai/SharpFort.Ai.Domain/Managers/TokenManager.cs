@@ -37,21 +37,14 @@ public class TokenValidationResult
     public bool IsEnableLog { get; set; }
 }
 
-public class TokenManager : DomainService
+public class TokenManager(
+    ISqlSugarRepository<Token> tokenRepository,
+    ISqlSugarRepository<AiUsage> usageStatisticsRepository,
+    ISqlSugarRepository<AiModel, Guid> aiModelRepository) : DomainService
 {
-    private readonly ISqlSugarRepository<Token> _tokenRepository;
-    private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository;
-    private readonly ISqlSugarRepository<AiModel, Guid> _aiModelRepository;
-
-    public TokenManager(
-        ISqlSugarRepository<Token> tokenRepository,
-        ISqlSugarRepository<AiUsage> usageStatisticsRepository,
-        ISqlSugarRepository<AiModel, Guid> aiModelRepository)
-    {
-        _tokenRepository = tokenRepository;
-        _usageStatisticsRepository = usageStatisticsRepository;
-        _aiModelRepository = aiModelRepository;
-    }
+    private readonly ISqlSugarRepository<Token> _tokenRepository = tokenRepository;
+    private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository = usageStatisticsRepository;
+    private readonly ISqlSugarRepository<AiModel, Guid> _aiModelRepository = aiModelRepository;
 
     /// <summary>
     /// 验证Token并返回用户Id和TokenId

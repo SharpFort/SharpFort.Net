@@ -7,13 +7,9 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Application.Services.RecordLog
 {
-    public class LoginLogService : SfCrudAppService<LoginLog, LoginLogGetListOutputDto, Guid, LoginLogGetListInputVo>
+    public class LoginLogService(ISqlSugarRepository<LoginLog, Guid> repository) : SfCrudAppService<LoginLog, LoginLogGetListOutputDto, Guid, LoginLogGetListInputVo>(repository)
     {
-        private readonly ISqlSugarRepository<LoginLog> _repository;
-        public LoginLogService(ISqlSugarRepository<LoginLog, Guid> repository) : base(repository)
-        {
-            _repository = repository;
-        }
+        private readonly ISqlSugarRepository<LoginLog> _repository = repository;
 
         public override async Task<PagedResultDto<LoginLogGetListOutputDto>> GetListAsync(LoginLogGetListInputVo input)
         {

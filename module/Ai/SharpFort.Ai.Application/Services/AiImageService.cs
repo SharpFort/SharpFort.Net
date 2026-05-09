@@ -21,35 +21,23 @@ namespace SharpFort.Ai.Application.Services;
 /// AI图片生成服务
 /// </summary>
 [Authorize]
-public class AiImageService : ApplicationService
+public class AiImageService(
+    ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageTaskRepository,
+    IBackgroundJobManager backgroundJobManager,
+    AiBlacklistManager aiBlacklistManager,
+    ModelManager modelManager,
+    IGuidGenerator guidGenerator,
+    IWebHostEnvironment webHostEnvironment, TokenManager tokenManager,
+    ISqlSugarRepository<AiModel> aiModelRepository) : ApplicationService
 {
-    private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageTaskRepository;
-    private readonly IBackgroundJobManager _backgroundJobManager;
-    private readonly AiBlacklistManager _aiBlacklistManager;
-    private readonly ModelManager _modelManager;
-    private readonly IGuidGenerator _guidGenerator;
-    private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly TokenManager _tokenManager;
-    private readonly ISqlSugarRepository<AiModel> _aiModelRepository;
-
-    public AiImageService(
-        ISqlSugarRepository<ImageStoreTaskAggregateRoot> imageTaskRepository,
-        IBackgroundJobManager backgroundJobManager,
-        AiBlacklistManager aiBlacklistManager,
-        ModelManager modelManager,
-        IGuidGenerator guidGenerator,
-        IWebHostEnvironment webHostEnvironment, TokenManager tokenManager,
-        ISqlSugarRepository<AiModel> aiModelRepository)
-    {
-        _imageTaskRepository = imageTaskRepository;
-        _backgroundJobManager = backgroundJobManager;
-        _aiBlacklistManager = aiBlacklistManager;
-        _modelManager = modelManager;
-        _guidGenerator = guidGenerator;
-        _webHostEnvironment = webHostEnvironment;
-        _tokenManager = tokenManager;
-        _aiModelRepository = aiModelRepository;
-    }
+    private readonly ISqlSugarRepository<ImageStoreTaskAggregateRoot> _imageTaskRepository = imageTaskRepository;
+    private readonly IBackgroundJobManager _backgroundJobManager = backgroundJobManager;
+    private readonly AiBlacklistManager _aiBlacklistManager = aiBlacklistManager;
+    private readonly ModelManager _modelManager = modelManager;
+    private readonly IGuidGenerator _guidGenerator = guidGenerator;
+    private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
+    private readonly TokenManager _tokenManager = tokenManager;
+    private readonly ISqlSugarRepository<AiModel> _aiModelRepository = aiModelRepository;
 
     /// <summary>
     /// 生成图片（异步任务）
@@ -367,21 +355,15 @@ public class AiImageService : ApplicationService
 /// 分页结果
 /// </summary>
 /// <typeparam name="T">数据类型</typeparam>
-public class PagedResult<T>
+public class PagedResult<T>(long total, List<T> items)
 {
     /// <summary>
     /// 总数
     /// </summary>
-    public long Total { get; set; }
+    public long Total { get; set; } = total;
 
     /// <summary>
     /// 数据列表
     /// </summary>
-    public List<T> Items { get; set; }
-
-    public PagedResult(long total, List<T> items)
-    {
-        Total = total;
-        Items = items;
-    }
+    public List<T> Items { get; set; } = items;
 }

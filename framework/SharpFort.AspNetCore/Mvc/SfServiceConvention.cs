@@ -12,21 +12,17 @@ namespace SharpFort.AspNetCore.Mvc
     /// <summary>
     /// 自定义服务约定实现,用于处理API路由和HTTP方法约束
     /// </summary>
+    /// <remarks>
+    /// 初始化服务约定的新实例
+    /// </remarks>
+    /// <param name="options">ABP AspNetCore MVC 配置选项</param>
+    /// <param name="conventionalRouteBuilder">约定路由构建器</param>
     [Dependency(ServiceLifetime.Transient, ReplaceServices = true)]
     [ExposeServices(typeof(IAbpServiceConvention))]
-    public class SfServiceConvention : AbpServiceConvention
+    public class SfServiceConvention(
+        IOptions<AbpAspNetCoreMvcOptions> options,
+        IConventionalRouteBuilder conventionalRouteBuilder) : AbpServiceConvention(options, conventionalRouteBuilder)
     {
-        /// <summary>
-        /// 初始化服务约定的新实例
-        /// </summary>
-        /// <param name="options">ABP AspNetCore MVC 配置选项</param>
-        /// <param name="conventionalRouteBuilder">约定路由构建器</param>
-        public SfServiceConvention(
-            IOptions<AbpAspNetCoreMvcOptions> options,
-            IConventionalRouteBuilder conventionalRouteBuilder)
-            : base(options, conventionalRouteBuilder)
-        {
-        }
 
         /// <summary>
         /// 配置选择器,处理路由和HTTP方法约束

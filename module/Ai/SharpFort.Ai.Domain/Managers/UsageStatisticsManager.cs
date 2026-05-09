@@ -6,14 +6,9 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Domain.Managers;
 
-public class UsageStatisticsManager : DomainService
+public class UsageStatisticsManager(ISqlSugarRepository<AiUsage> repository) : DomainService
 {
-    private readonly ISqlSugarRepository<AiUsage> _repository;
-
-    public UsageStatisticsManager(ISqlSugarRepository<AiUsage> repository)
-    {
-        _repository = repository;
-    }
+    private readonly ISqlSugarRepository<AiUsage> _repository = repository;
 
     private IDistributedLockProvider DistributedLock =>
         LazyServiceProvider.LazyGetRequiredService<IDistributedLockProvider>();

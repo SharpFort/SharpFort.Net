@@ -9,23 +9,17 @@ namespace SharpFort.AspNetCore;
 /// <summary>
 /// 真实IP地址提供程序,支持代理服务器场景
 /// </summary>
-public partial class RealIpHttpContextWebClientInfoProvider : HttpContextWebClientInfoProvider
+/// <remarks>
+/// 初始化真实IP地址提供程序的新实例
+/// </remarks>
+public partial class RealIpHttpContextWebClientInfoProvider(
+    ILogger<HttpContextWebClientInfoProvider> logger,
+    IHttpContextAccessor httpContextAccessor,
+    IHttpUserAgentParserProvider httpUserAgentParser) : HttpContextWebClientInfoProvider(logger, httpContextAccessor, httpUserAgentParser)
 {
     private const string XForwardedForHeader = "X-Forwarded-For";
 
-    private readonly ILogger _logger;
-
-    /// <summary>
-    /// 初始化真实IP地址提供程序的新实例
-    /// </summary>
-    public RealIpHttpContextWebClientInfoProvider(
-        ILogger<HttpContextWebClientInfoProvider> logger,
-        IHttpContextAccessor httpContextAccessor,
-        IHttpUserAgentParserProvider httpUserAgentParser)
-        : base(logger, httpContextAccessor, httpUserAgentParser)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger _logger = logger;
 
     /// <summary>
     /// 获取客户端IP地址,优先从X-Forwarded-For头部获取

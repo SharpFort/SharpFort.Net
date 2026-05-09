@@ -10,20 +10,12 @@ using SharpFort.AuditLogging.Domain.Entities;
 
 namespace SharpFort.AuditLogging.Domain;
 
-public class AuditLogInfoToAuditLogConverter : IAuditLogInfoToAuditLogConverter, ITransientDependency
+public class AuditLogInfoToAuditLogConverter(IGuidGenerator guidGenerator, IExceptionToErrorInfoConverter exceptionToErrorInfoConverter, IJsonSerializer jsonSerializer, IOptions<AbpExceptionHandlingOptions> exceptionHandlingOptions) : IAuditLogInfoToAuditLogConverter, ITransientDependency
 {
-    protected IGuidGenerator GuidGenerator { get; }
-    protected IExceptionToErrorInfoConverter ExceptionToErrorInfoConverter { get; }
-    protected IJsonSerializer JsonSerializer { get; }
-    protected AbpExceptionHandlingOptions ExceptionHandlingOptions { get; }
-
-    public AuditLogInfoToAuditLogConverter(IGuidGenerator guidGenerator, IExceptionToErrorInfoConverter exceptionToErrorInfoConverter, IJsonSerializer jsonSerializer, IOptions<AbpExceptionHandlingOptions> exceptionHandlingOptions)
-    {
-        GuidGenerator = guidGenerator;
-        ExceptionToErrorInfoConverter = exceptionToErrorInfoConverter;
-        JsonSerializer = jsonSerializer;
-        ExceptionHandlingOptions = exceptionHandlingOptions.Value;
-    }
+    protected IGuidGenerator GuidGenerator { get; } = guidGenerator;
+    protected IExceptionToErrorInfoConverter ExceptionToErrorInfoConverter { get; } = exceptionToErrorInfoConverter;
+    protected IJsonSerializer JsonSerializer { get; } = jsonSerializer;
+    protected AbpExceptionHandlingOptions ExceptionHandlingOptions { get; } = exceptionHandlingOptions.Value;
 
     public virtual Task<AuditLog> ConvertAsync(AuditLogInfo auditLogInfo)
     {

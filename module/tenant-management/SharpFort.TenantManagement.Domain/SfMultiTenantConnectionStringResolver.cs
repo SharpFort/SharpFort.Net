@@ -7,20 +7,13 @@ using Volo.Abp.MultiTenancy;
 namespace SharpFort.TenantManagement.Domain;
 
 [Dependency(ReplaceServices = true)]
-public class SfMultiTenantConnectionStringResolver : DefaultConnectionStringResolver
+public class SfMultiTenantConnectionStringResolver(
+    IOptionsMonitor<AbpDbConnectionOptions> options,
+    ICurrentTenant currentTenant,
+    IServiceProvider serviceProvider) : DefaultConnectionStringResolver(options)
 {
-    private readonly ICurrentTenant _currentTenant;
-    private readonly IServiceProvider _serviceProvider;
-
-    public SfMultiTenantConnectionStringResolver(
-        IOptionsMonitor<AbpDbConnectionOptions> options,
-        ICurrentTenant currentTenant,
-        IServiceProvider serviceProvider)
-        : base(options)
-    {
-        _currentTenant = currentTenant;
-        _serviceProvider = serviceProvider;
-    }
+    private readonly ICurrentTenant _currentTenant = currentTenant;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public override async Task<string> ResolveAsync(string? connectionStringName = null)
     {

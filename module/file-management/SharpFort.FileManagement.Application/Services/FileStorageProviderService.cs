@@ -14,23 +14,17 @@ namespace SharpFort.FileManagement.Application.Services
     /// 继承 SfCrudAppService 标准 CRUD 模式（参考 DeptService、RoleService）
     /// </summary>
     [Authorize]
-    public class FileStorageProviderService : SfCrudAppService<
+    public class FileStorageProviderService(ISqlSugarRepository<FileStorageProvider, Guid> repository) : SfCrudAppService<
         FileStorageProvider,
         FileStorageProviderGetOutputDto,
         FileStorageProviderGetListOutputDto,
         Guid,
         FileStorageProviderGetListInput,
         FileStorageProviderCreateInput,
-        FileStorageProviderUpdateInput>,
+        FileStorageProviderUpdateInput>(repository),
         IFileStorageProviderService
     {
-        private readonly ISqlSugarRepository<FileStorageProvider, Guid> _repository;
-
-        public FileStorageProviderService(ISqlSugarRepository<FileStorageProvider, Guid> repository)
-            : base(repository)
-        {
-            _repository = repository;
-        }
+        private readonly ISqlSugarRepository<FileStorageProvider, Guid> _repository = repository;
 
         /// <summary>
         /// 获取存储提供者列表（支持筛选）

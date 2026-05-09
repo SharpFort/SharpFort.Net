@@ -10,23 +10,17 @@ using SharpFort.Ai.Domain.Shared.Attributes;
 namespace SharpFort.Ai.Domain.Mcp;
 
 [SfAgentTool]
-public class YxaiKnowledgeTool : ISingletonDependency
+public class YxaiKnowledgeTool(
+    IHttpClientFactory httpClientFactory,
+    ILogger<YxaiKnowledgeTool> logger) : ISingletonDependency
 {
     private static readonly CompositeFormat ContentUrlFormat = CompositeFormat.Parse("https://ccnetcore.com/prod-api/article/{0}");
 
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<YxaiKnowledgeTool> _logger;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly ILogger<YxaiKnowledgeTool> _logger = logger;
 
     private const string DirectoryUrl =
         "https://ccnetcore.com/prod-api/article/all/discuss-id/3a1efdde-dbff-aa86-d843-00278a8c1839";
-
-    public YxaiKnowledgeTool(
-        IHttpClientFactory httpClientFactory,
-        ILogger<YxaiKnowledgeTool> logger)
-    {
-        _httpClientFactory = httpClientFactory;
-        _logger = logger;
-    }
 
     [SfAgentTool("意心Ai平台知识库"), DisplayName("YxaiKnowledge"),
      Description("获取意心AI相关内容的知识库目录及内容列表")]

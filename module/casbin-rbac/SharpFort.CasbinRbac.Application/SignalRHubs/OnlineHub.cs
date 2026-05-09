@@ -12,18 +12,12 @@ namespace SharpFort.CasbinRbac.Application.SignalRHubs
     [HubRoute("/hub/main")]
     //开放不需要授权
     //[Authorize]
-    public partial class OnlineHub : AbpHub
+    public partial class OnlineHub(IHttpContextAccessor httpContextAccessor, ILogger<OnlineHub> logger) : AbpHub
     {
         public static ConcurrentDictionary<string, OnlineUserModel> ClientUsersDic { get; set; } = new();
 
-        private readonly HttpContext? _httpContext;
-        private readonly ILogger<OnlineHub> _logger;
-
-        public OnlineHub(IHttpContextAccessor httpContextAccessor, ILogger<OnlineHub> logger)
-        {
-            _httpContext = httpContextAccessor?.HttpContext;
-            _logger = logger;
-        }
+        private readonly HttpContext? _httpContext = httpContextAccessor?.HttpContext;
+        private readonly ILogger<OnlineHub> _logger = logger;
 
 
         /// <summary>

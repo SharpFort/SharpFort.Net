@@ -15,21 +15,14 @@ namespace SharpFort.Ai.Application.Services;
 /// 渠道商管理服务实现
 /// </summary>
 [Authorize]
-public class ChannelService : ApplicationService, IChannelService
+public class ChannelService(
+    ISqlSugarRepository<AiProvider, Guid> appRepository,
+    ISqlSugarRepository<AiModel, Guid> modelRepository,
+    ISqlSugarRepository<AiAppShortcutAggregateRoot, Guid> appShortcutRepository) : ApplicationService, IChannelService
 {
-    private readonly ISqlSugarRepository<AiProvider, Guid> _appRepository;
-    private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository;
-    private readonly ISqlSugarRepository<AiAppShortcutAggregateRoot, Guid> _appShortcutRepository;
-
-    public ChannelService(
-        ISqlSugarRepository<AiProvider, Guid> appRepository,
-        ISqlSugarRepository<AiModel, Guid> modelRepository,
-        ISqlSugarRepository<AiAppShortcutAggregateRoot, Guid> appShortcutRepository)
-    {
-        _appRepository = appRepository;
-        _modelRepository = modelRepository;
-        _appShortcutRepository = appShortcutRepository;
-    }
+    private readonly ISqlSugarRepository<AiProvider, Guid> _appRepository = appRepository;
+    private readonly ISqlSugarRepository<AiModel, Guid> _modelRepository = modelRepository;
+    private readonly ISqlSugarRepository<AiAppShortcutAggregateRoot, Guid> _appShortcutRepository = appShortcutRepository;
 
     #region AI应用管理
 

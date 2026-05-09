@@ -5,14 +5,9 @@ using Volo.Abp.EventBus;
 
 namespace SharpFort.SettingManagement.Domain;
 
-public class SettingCacheItemInvalidator : ILocalEventHandler<EntityChangedEventData<SettingAggregateRoot>>, ITransientDependency
+public class SettingCacheItemInvalidator(IDistributedCache<SettingCacheItem> cache) : ILocalEventHandler<EntityChangedEventData<SettingAggregateRoot>>, ITransientDependency
 {
-    protected IDistributedCache<SettingCacheItem> Cache { get; }
-
-    public SettingCacheItemInvalidator(IDistributedCache<SettingCacheItem> cache)
-    {
-        Cache = cache;
-    }
+    protected IDistributedCache<SettingCacheItem> Cache { get; } = cache;
 
     public virtual async Task HandleEventAsync(EntityChangedEventData<SettingAggregateRoot> eventData)
     {

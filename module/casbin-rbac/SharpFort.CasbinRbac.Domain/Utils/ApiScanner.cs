@@ -11,14 +11,9 @@ namespace SharpFort.CasbinRbac.Domain.Utils
     /// API 扫描工具
     /// 扫描所有 Controller 中的 Action，提取 API 路径并同步到 Menu 表 (作为备选权限资源)
     /// </summary>
-    public class ApiScanner : ITransientDependency
+    public class ApiScanner(ISqlSugarRepository<Menu> menuRepo) : ITransientDependency
     {
-        private readonly ISqlSugarRepository<Menu> _menuRepo;
-
-        public ApiScanner(ISqlSugarRepository<Menu> menuRepo)
-        {
-            _menuRepo = menuRepo;
-        }
+        private readonly ISqlSugarRepository<Menu> _menuRepo = menuRepo;
 
         public async Task ScanAndSyncAsync(Assembly[] assemblies)
         {
@@ -109,7 +104,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
         private static string ReplacePlaceholders(string path, string controllerName, string actionName)
         {
             // ControllerName usually ends with "Controller"
-            var cName = controllerName.EndsWith("Controller", StringComparison.Ordinal) ? controllerName.Substring(0, controllerName.Length - 10) : controllerName;
+            var cName = controllerName.EndsWith("Controller", StringComparison.Ordinal) ? controllerName[..^10] : controllerName;
 
             path = path.Replace("[controller]", cName, StringComparison.OrdinalIgnoreCase);
             path = path.Replace("[action]", actionName, StringComparison.OrdinalIgnoreCase);

@@ -3,17 +3,13 @@ using Volo.Abp.DependencyInjection;
 using SqlSugar;
 using SharpFort.SqlSugarCore;
 using SharpFort.SqlSugarCore.Abstractions;
-using FluidSequence.Domain.Shared.Consts;
+using SharpFort.FluidSequence.Domain.Shared.Consts;
 
 namespace FluidSequence.SqlSugarCore
 {
     [ConnectionStringName(FluidSequenceConsts.ConnectionStringName)]
-    public class FluidSequenceDbContext : SqlSugarDbContext, ISqlSugarDbContext
+    public class FluidSequenceDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider), ISqlSugarDbContext
     {
-        public FluidSequenceDbContext(IAbpLazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-        {
-        }
-
         public new ISqlSugarClient SqlSugarClient => base.SqlSugarClient;
 
         public void BackupDataBase()

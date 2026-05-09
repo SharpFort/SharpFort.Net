@@ -28,7 +28,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
-            endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
+            endpoint = endpoint[..^"/v1".Length];
         }
         var requestUri = endpoint + "/v1/responses";
 
@@ -108,7 +108,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
-            endpoint = endpoint.Substring(0, endpoint.Length - "/v1".Length);
+            endpoint = endpoint[..^"/v1".Length];
         }
         var requestUri = endpoint + "/v1/responses";
 

@@ -6,24 +6,16 @@ using Volo.Abp.Uow;
 
 namespace SharpFort.SettingManagement.Domain;
 
-public class SettingManagementStore : ISettingManagementStore, ITransientDependency
+public class SettingManagementStore(
+    ISettingRepository settingRepository,
+    IGuidGenerator guidGenerator,
+    IDistributedCache<SettingCacheItem> cache,
+    ISettingDefinitionManager settingDefinitionManager) : ISettingManagementStore, ITransientDependency
 {
-    protected IDistributedCache<SettingCacheItem> Cache { get; }
-    protected ISettingDefinitionManager SettingDefinitionManager { get; }
-    protected ISettingRepository SettingRepository { get; }
-    protected IGuidGenerator GuidGenerator { get; }
-
-    public SettingManagementStore(
-        ISettingRepository settingRepository,
-        IGuidGenerator guidGenerator,
-        IDistributedCache<SettingCacheItem> cache,
-        ISettingDefinitionManager settingDefinitionManager)
-    {
-        SettingRepository = settingRepository;
-        GuidGenerator = guidGenerator;
-        Cache = cache;
-        SettingDefinitionManager = settingDefinitionManager;
-    }
+    protected IDistributedCache<SettingCacheItem> Cache { get; } = cache;
+    protected ISettingDefinitionManager SettingDefinitionManager { get; } = settingDefinitionManager;
+    protected ISettingRepository SettingRepository { get; } = settingRepository;
+    protected IGuidGenerator GuidGenerator { get; } = guidGenerator;
 
     [UnitOfWork]
     public virtual async Task<string> GetOrNullAsync(string name, string providerName, string providerKey)

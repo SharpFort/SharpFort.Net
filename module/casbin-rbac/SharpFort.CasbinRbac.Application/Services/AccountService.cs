@@ -30,49 +30,31 @@ using SharpFort.Core.Helper;
 
 namespace SharpFort.CasbinRbac.Application.Services
 {
-    public class AccountService : ApplicationService, IAccountService
+    public class AccountService(IUserRepository userRepository,
+        ICurrentUser currentUser,
+        IAccountManager accountManager,
+        ISqlSugarRepository<Menu> menuRepository,
+        IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> phoneCache,
+        IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache,
+        ICaptcha captcha,
+        IGuidGenerator guidGenerator,
+        IOptions<RbacOptions> options,
+        IAliyunManger aliyunManger,
+        UserManager userManager, IHttpContextAccessor httpContextAccessor) : ApplicationService, IAccountService
     {
         protected ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
-        private IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> _phoneCache;
-        private readonly ICaptcha _captcha;
-        private readonly IGuidGenerator _guidGenerator;
-        private readonly RbacOptions _rbacOptions;
-        private readonly IAliyunManger _aliyunManger;
-        private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache;
-        private UserManager _userManager;
-        private IHttpContextAccessor _httpContextAccessor;
-
-        public AccountService(IUserRepository userRepository,
-            ICurrentUser currentUser,
-            IAccountManager accountManager,
-            ISqlSugarRepository<Menu> menuRepository,
-            IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> phoneCache,
-            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache,
-            ICaptcha captcha,
-            IGuidGenerator guidGenerator,
-            IOptions<RbacOptions> options,
-            IAliyunManger aliyunManger,
-            UserManager userManager, IHttpContextAccessor httpContextAccessor)
-        {
-            _userRepository = userRepository;
-            _currentUser = currentUser;
-            _accountManager = accountManager;
-            _menuRepository = menuRepository;
-            _phoneCache = phoneCache;
-            _captcha = captcha;
-            _guidGenerator = guidGenerator;
-            _rbacOptions = options.Value;
-            _aliyunManger = aliyunManger;
-            _userCache = userCache;
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-
-        private IUserRepository _userRepository;
-        private ICurrentUser _currentUser;
-        private IAccountManager _accountManager;
-        private ISqlSugarRepository<Menu> _menuRepository;
+        private IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> _phoneCache = phoneCache;
+        private readonly ICaptcha _captcha = captcha;
+        private readonly IGuidGenerator _guidGenerator = guidGenerator;
+        private readonly RbacOptions _rbacOptions = options.Value;
+        private readonly IAliyunManger _aliyunManger = aliyunManger;
+        private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
+        private UserManager _userManager = userManager;
+        private IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private IUserRepository _userRepository = userRepository;
+        private ICurrentUser _currentUser = currentUser;
+        private IAccountManager _accountManager = accountManager;
+        private ISqlSugarRepository<Menu> _menuRepository = menuRepository;
 
         /// <summary>
         /// 校验图片登录验证码,无需和账号绑定
@@ -263,7 +245,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             //生成一个4位数的验证码
             //发送短信，同时生成uuid
             ////key： 电话号码  value:验证码+uuid  
-            var code = Guid.NewGuid().ToString().Substring(0, 4);
+            var code = Guid.NewGuid().ToString()[..4];
             var uuid = Guid.NewGuid();
             await _aliyunManger.SendSmsAsync(input.Phone, code);
 

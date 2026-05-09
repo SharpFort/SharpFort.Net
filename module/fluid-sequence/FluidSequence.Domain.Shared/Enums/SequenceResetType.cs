@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace FluidSequence.Domain.Shared.Enums
+namespace SharpFort.FluidSequence.Domain.Shared.Enums
 {
     public enum SequenceResetType
     {

@@ -13,21 +13,14 @@ namespace SharpFort.FileManagement.Application.Services
     /// 目录描述符服务
     /// </summary>
     [Authorize]
-    public class DirectoryDescriptorService : ApplicationService, IDirectoryDescriptorService
+    public class DirectoryDescriptorService(
+        ISqlSugarRepository<DirectoryDescriptor> repository,
+        ISqlSugarRepository<FileDescriptor> fileRepository,
+        IGuidGenerator guidGenerator) : ApplicationService, IDirectoryDescriptorService
     {
-        private readonly ISqlSugarRepository<DirectoryDescriptor> _repository;
-        private readonly ISqlSugarRepository<FileDescriptor> _fileRepository;
-        private readonly IGuidGenerator _guidGenerator;
-
-        public DirectoryDescriptorService(
-            ISqlSugarRepository<DirectoryDescriptor> repository,
-            ISqlSugarRepository<FileDescriptor> fileRepository,
-            IGuidGenerator guidGenerator)
-        {
-            _repository = repository;
-            _fileRepository = fileRepository;
-            _guidGenerator = guidGenerator;
-        }
+        private readonly ISqlSugarRepository<DirectoryDescriptor> _repository = repository;
+        private readonly ISqlSugarRepository<FileDescriptor> _fileRepository = fileRepository;
+        private readonly IGuidGenerator _guidGenerator = guidGenerator;
 
         /// <summary>
         /// 创建目录

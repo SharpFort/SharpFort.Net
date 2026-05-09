@@ -223,7 +223,7 @@ public static class GeminiGenerateContentAcquirer
             var endIndex = text.IndexOf(')', startIndex);
             if (endIndex > startIndex)
             {
-                return text.Substring(startIndex, endIndex - startIndex);
+                return text[startIndex..endIndex];
             }
         }
 
