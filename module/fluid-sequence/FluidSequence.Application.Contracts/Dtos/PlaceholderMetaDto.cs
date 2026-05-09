@@ -1,4 +1,4 @@
-namespace FluidSequence.Application.Contracts.Dtos
+namespace SharpFort.FluidSequence.Application.Contracts.Dtos
 {
     public class PlaceholderMetaDto
     {

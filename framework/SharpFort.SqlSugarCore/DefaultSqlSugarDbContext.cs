@@ -125,6 +125,10 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
             case DataFilterType.InsertByObject:
                 HandleInsertAuditFields(oldValue, entityInfo);
                 break;
+            case DataFilterType.DeleteByObject:
+                break;
+            default:
+                break;
         }
     }
 
@@ -227,6 +231,8 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
                         EntityChangeEventHelperService.PublishEntityDeletedEvent(entityValue);
                     }
                 }
+                break;
+            default:
                 break;
         }
     }

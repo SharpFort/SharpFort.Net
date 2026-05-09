@@ -2,10 +2,10 @@
 using Volo.Abp.DependencyInjection;
 using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.SqlSugarCore.Repositories;
-using FluidSequence.Domain.Entities;
-using FluidSequence.Domain.Repositories;
+using SharpFort.FluidSequence.Domain.Entities;
+using SharpFort.FluidSequence.Domain.Repositories;
 
-namespace FluidSequence.SqlSugarCore.Repositories
+namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
 {
     public class SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : SqlSugarRepository<SysSequenceRule, Guid>(dbContextProvider), ISequenceRuleRepository, ITransientDependency
     {

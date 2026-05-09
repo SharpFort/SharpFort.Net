@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Application.Dtos;
 using SqlSugar;
 using SharpFort.Ddd.Application;
-using FluidSequence.Application.Contracts.Dtos;
-using FluidSequence.Application.Contracts.IServices;
-using FluidSequence.Domain.Entities;
-using FluidSequence.Domain.Services;
-using FluidSequence.Domain.Repositories;
+using SharpFort.FluidSequence.Application.Contracts.Dtos;
+using SharpFort.FluidSequence.Application.Contracts.IServices;
+using SharpFort.FluidSequence.Domain.Entities;
+using SharpFort.FluidSequence.Domain.Services;
+using SharpFort.FluidSequence.Domain.Repositories;
 
-namespace FluidSequence.Application.Services
+namespace SharpFort.FluidSequence.Application.Services
 {
     [Authorize]
     public class SequenceRuleAppService(

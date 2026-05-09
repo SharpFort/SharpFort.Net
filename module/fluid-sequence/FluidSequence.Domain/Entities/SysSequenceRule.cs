@@ -3,7 +3,7 @@ using System.Globalization;
 using Volo.Abp.Domain.Entities.Auditing;
 using SharpFort.FluidSequence.Domain.Shared.Enums;
 
-namespace FluidSequence.Domain.Entities
+namespace SharpFort.FluidSequence.Domain.Entities
 {
     /// <summary>
     /// 流水号规则表
@@ -171,6 +171,10 @@ namespace FluidSequence.Domain.Entities
                     }
 
                     shouldReset = lastFy != currentFy;
+                    break;
+                case SequenceResetType.None:
+                    break;
+                default:
                     break;
             }
 

@@ -15,7 +15,7 @@ public class AiBlacklistManager(ISqlSugarRepository<AiBlacklist> aiBlacklistRepo
     /// <exception cref="UserFriendlyException"></exception>
     public async Task VerifiyAiBlacklist(Guid userId)
     {
-        var now = DateTime.Now;
+        DateTime now = DateTime.Now;
         if (await _aiBlacklistRepository._DbQueryable
                 .Where(x => now >= x.StartTime && now <= x.EndTime)
                 .AnyAsync(x => x.UserId == userId))

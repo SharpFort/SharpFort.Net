@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 using Volo.Abp.Domain.Services;
-using FluidSequence.Domain.Entities;
-using FluidSequence.Domain.Repositories;
-using FluidSequence.Domain.Services.Strategies;
+using SharpFort.FluidSequence.Domain.Entities;
+using SharpFort.FluidSequence.Domain.Repositories;
+using SharpFort.FluidSequence.Domain.Services.Strategies;
 
-namespace FluidSequence.Domain.Services
+namespace SharpFort.FluidSequence.Domain.Services
 {
     /// <summary>
     /// 流水号核心领域服务，负责生成下一个流水号。

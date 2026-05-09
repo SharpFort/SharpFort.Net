@@ -1,5 +1,5 @@
-using FluidSequence.Application.Contracts;
-using FluidSequence.Domain;
+using SharpFort.FluidSequence.Application.Contracts;
+using SharpFort.FluidSequence.Domain;
 using SharpFort.Ddd.Application;
 
 namespace SharpFort.FluidSequence.Application

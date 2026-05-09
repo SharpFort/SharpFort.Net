@@ -16,7 +16,7 @@ namespace SharpFort.TenantManagement.Domain
         private ISqlSugarTenantRepository TenantRepository { get; } = repository;
         protected ICurrentTenant CurrentTenant { get; } = currentTenant;
         protected IDistributedCache<TenantCacheItem> Cache { get; } = cache;
-        private IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
+        private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
 
         public new TenantConfiguration? Find(string normalizedName)
         {

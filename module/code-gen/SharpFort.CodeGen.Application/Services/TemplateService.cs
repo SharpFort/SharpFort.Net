@@ -11,7 +11,7 @@ namespace SharpFort.CodeGen.Application.Services;
 
 public class TemplateService(ISqlSugarRepository<Template, Guid> repository) : SfCrudAppService<Template, TemplateDto, Guid, TemplateGetListInput>(repository), ITemplateService
 {
-    private ISqlSugarRepository<Template, Guid> _repository = repository;
+    private readonly ISqlSugarRepository<Template, Guid> _repository = repository;
 
     public async override Task<PagedResultDto<TemplateDto>> GetListAsync([FromQuery] TemplateGetListInput input)
     {

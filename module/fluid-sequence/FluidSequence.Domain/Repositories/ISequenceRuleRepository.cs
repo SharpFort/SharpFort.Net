@@ -1,7 +1,7 @@
-using FluidSequence.Domain.Entities;
+using SharpFort.FluidSequence.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
 
-namespace FluidSequence.Domain.Repositories
+namespace SharpFort.FluidSequence.Domain.Repositories
 {
     public interface ISequenceRuleRepository : ISqlSugarRepository<SysSequenceRule, Guid>
     {

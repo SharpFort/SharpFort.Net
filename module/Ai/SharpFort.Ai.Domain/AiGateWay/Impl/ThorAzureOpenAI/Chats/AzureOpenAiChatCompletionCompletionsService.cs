@@ -17,11 +17,11 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
         ThorChatCompletionsRequest chatCompletionCreate,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("Azure OpenAI 对话流式补全");
-        var url = AzureOpenAIFactory.GetAddress(options, chatCompletionCreate.Model);
+        string url = AzureOpenAIFactory.GetAddress(options, chatCompletionCreate.Model);
 
-        var response = await httpClientFactory.CreateClient().HttpRequestRaw(url,
+        HttpResponseMessage response = await httpClientFactory.CreateClient().HttpRequestRaw(url,
             chatCompletionCreate, options.ApiKey, "Api-Key");
 
         openai?.SetTag("Model", chatCompletionCreate.Model);
@@ -29,7 +29,7 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
 
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken);
 
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Azure对话异常 , StatusCode: {StatusCode} 错误响应内容：{Content}", response.StatusCode,
@@ -78,7 +78,7 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
                 continue;
             }
 
-            var result = JsonSerializer.Deserialize<ThorChatCompletionsResponse>(line,
+            ThorChatCompletionsResponse? result = JsonSerializer.Deserialize<ThorChatCompletionsResponse>(line,
                 ThorJsonSerializer.DefaultOptions);
 
             yield return result!;
@@ -89,11 +89,11 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
         ThorChatCompletionsRequest chatCompletionCreate,
         CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("Azure OpenAI 对话补全");
-        var url = AzureOpenAIFactory.GetAddress(options, chatCompletionCreate.Model);
+        string url = AzureOpenAIFactory.GetAddress(options, chatCompletionCreate.Model);
 
-        var response =
+        HttpResponseMessage response =
             await httpClientFactory.CreateClient()
                 .PostJsonAsync(url, chatCompletionCreate, options.ApiKey, "Api-Key");
 
@@ -113,7 +113,7 @@ public class AzureOpenAiChatCompletionCompletionsService(ILogger<AzureOpenAiChat
 #pragma warning restore CA1848
         }
 
-        var result = await response.Content
+        ThorChatCompletionsResponse? result = await response.Content
             .ReadFromJsonAsync<ThorChatCompletionsResponse>(ThorJsonSerializer.DefaultOptions,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);

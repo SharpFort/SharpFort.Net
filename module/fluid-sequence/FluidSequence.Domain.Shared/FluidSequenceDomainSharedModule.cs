@@ -1,7 +1,7 @@
 using Volo.Abp.Domain;
 using Volo.Abp.SettingManagement;
 
-namespace FluidSequence.Domain.Shared
+namespace SharpFort.FluidSequence.Domain.Shared
 {
     [DependsOn(
 

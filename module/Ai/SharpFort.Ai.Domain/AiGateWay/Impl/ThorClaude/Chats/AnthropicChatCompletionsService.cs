@@ -18,7 +18,7 @@ public class AnthropicChatCompletionsService(
     public async Task<AnthropicChatCompletionDto> ChatCompletionsAsync(AiModelDescribe options, AnthropicInput input,
         CancellationToken cancellationToken = default)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("Claudia 对话补全");
 
         if (string.IsNullOrEmpty(options.Endpoint))
@@ -26,9 +26,9 @@ public class AnthropicChatCompletionsService(
             options.Endpoint = "https://api.anthropic.com/";
         }
 
-        var client = httpClientFactory.CreateClient();
+        HttpClient client = httpClientFactory.CreateClient();
 
-        var headers = new Dictionary<string, string>
+        Dictionary<string, string> headers = new()
         {
             { "x-api-key", options.ApiKey },
             { "authorization", "Bearer " + options.ApiKey },
@@ -65,7 +65,7 @@ public class AnthropicChatCompletionsService(
             }
         }
 
-        var response =
+        HttpResponseMessage response =
             await client.PostJsonAsync(options.Endpoint.TrimEnd('/') + "/v1/messages", input, string.Empty, headers);
 
         openai?.SetTag("Model", input.Model);
@@ -75,9 +75,9 @@ public class AnthropicChatCompletionsService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             Guid errorId = Guid.NewGuid();
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-            var message = $"恭喜你运气爆棚遇到了错误，对话异常：StatusCode【{response.StatusCode.GetHashCode()}】，ErrorId【{errorId}】";
+            string message = $"恭喜你运气爆棚遇到了错误，对话异常：StatusCode【{response.StatusCode.GetHashCode()}】，ErrorId【{errorId}】";
             if (error.Contains("prompt is too long") || error.Contains("提示词太长") || error.Contains("input tokens exceeds the model's maximum context length"))
             {
                 message += $", tip: 当前提示词过长，上下文已达到上限，如在 claudecode中使用，建议执行/compact压缩当前会话，或开启新会话后重试";
@@ -91,7 +91,7 @@ public class AnthropicChatCompletionsService(
             throw new InvalidOperationException(message);
         }
 
-        var value =
+        AnthropicChatCompletionDto? value =
             await response.Content.ReadFromJsonAsync<AnthropicChatCompletionDto>(ThorJsonSerializer.DefaultOptions,
                 cancellationToken: cancellationToken);
 
@@ -102,7 +102,7 @@ public class AnthropicChatCompletionsService(
         AnthropicInput input,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("Claudia 对话补全");
 
         if (string.IsNullOrEmpty(options.Endpoint))
@@ -110,16 +110,16 @@ public class AnthropicChatCompletionsService(
             options.Endpoint = "https://api.anthropic.com/";
         }
 
-        var client = httpClientFactory.CreateClient();
+        HttpClient client = httpClientFactory.CreateClient();
 
-        var headers = new Dictionary<string, string>
+        Dictionary<string, string> headers = new()
         {
             { "x-api-key", options.ApiKey },
             { "authorization", options.ApiKey },
             { "anthropic-version", "2023-06-01" }
         };
 
-        var response = await client.HttpRequestRaw(options.Endpoint.TrimEnd('/') + "/v1/messages", input, string.Empty,
+        HttpResponseMessage response = await client.HttpRequestRaw(options.Endpoint.TrimEnd('/') + "/v1/messages", input, string.Empty,
             headers);
 
         openai?.SetTag("Model", input.Model);
@@ -129,9 +129,9 @@ public class AnthropicChatCompletionsService(
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
             Guid errorId = Guid.NewGuid();
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-            var message = $"恭喜你运气爆棚遇到了错误，对话异常：StatusCode【{response.StatusCode.GetHashCode()}】，ErrorId【{errorId}】";
+            string message = $"恭喜你运气爆棚遇到了错误，对话异常：StatusCode【{response.StatusCode.GetHashCode()}】，ErrorId【{errorId}】";
             if (error.Contains("prompt is too long") || error.Contains("提示词太长") || error.Contains("input tokens exceeds the model's maximum context length"))
             {
                 message += $", tip: 当前提示词过长，上下文已达到上限，如在 claudecode中使用，建议执行/compact压缩当前会话，或开启新会话后重试";
@@ -146,7 +146,7 @@ public class AnthropicChatCompletionsService(
             throw new InvalidOperationException(message);
         }
 
-        using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
+        using StreamReader stream = new(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
@@ -192,7 +192,7 @@ public class AnthropicChatCompletionsService(
                 break;
             }
 
-            var result = JsonSerializer.Deserialize<AnthropicStreamDto>(data,
+            AnthropicStreamDto? result = JsonSerializer.Deserialize<AnthropicStreamDto>(data,
                 ThorJsonSerializer.DefaultOptions);
 
             yield return (eventType, result);

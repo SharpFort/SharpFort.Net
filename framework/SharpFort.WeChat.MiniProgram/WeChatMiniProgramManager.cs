@@ -9,8 +9,8 @@ namespace SharpFort.WeChat.MiniProgram;
 
 public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<WeChatMiniProgramOptions> options) : IWeChatMiniProgramManager, ISingletonDependency
 {
-    private IMiniProgramToken _weChatToken = weChatToken;
-    private WeChatMiniProgramOptions _options = options.Value;
+    private readonly IMiniProgramToken _weChatToken = weChatToken;
+    private readonly WeChatMiniProgramOptions _options = options.Value;
 
     /// <summary>
     /// 获取用户openid

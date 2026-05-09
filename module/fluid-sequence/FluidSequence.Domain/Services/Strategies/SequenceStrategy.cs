@@ -1,7 +1,7 @@
 using Volo.Abp.DependencyInjection;
-using FluidSequence.Domain.Entities;
+using SharpFort.FluidSequence.Domain.Entities;
 
-namespace FluidSequence.Domain.Services.Strategies
+namespace SharpFort.FluidSequence.Domain.Services.Strategies
 {
     public class SequenceStrategy : IPlaceholderStrategy, ISingletonDependency
     {

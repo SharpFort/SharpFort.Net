@@ -119,6 +119,8 @@ namespace SharpFort.Core.Helper
             {
                 case 2: incoming += "=="; break;
                 case 3: incoming += "="; break;
+                default:
+                    break;
             }
             byte[] bytes = Convert.FromBase64String(incoming);
 

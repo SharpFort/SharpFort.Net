@@ -17,22 +17,22 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
     public async IAsyncEnumerable<(string, JsonElement?)> ResponsesStreamAsync(AiModelDescribe options, OpenAiResponsesInput input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
            Activity.Current?.Source.StartActivity("OpenAi 响应");
 
 
-        var client = httpClientFactory.CreateClient();
+        HttpClient client = httpClientFactory.CreateClient();
 
-        var endpoint = options.Endpoint.TrimEnd('/');
+        string endpoint = options.Endpoint.TrimEnd('/');
 
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint[..^"/v1".Length];
         }
-        var requestUri = endpoint + "/v1/responses";
+        string requestUri = endpoint + "/v1/responses";
 
-        var response = await client.HttpRequestRaw(requestUri, input, options.ApiKey);
+        HttpResponseMessage response = await client.HttpRequestRaw(requestUri, input, options.ApiKey);
 
         openai?.SetTag("Model", input.Model);
         openai?.SetTag("Response", response.StatusCode.ToString());
@@ -40,7 +40,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI响应异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
@@ -50,7 +50,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
             throw new InvalidOperationException("OpenAI响应异常" + response.StatusCode);
         }
 
-        using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
+        using StreamReader stream = new(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
@@ -90,7 +90,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
 
             data = line[OpenAIConstant.Data.Length..].Trim();
 
-            var result = JsonSerializer.Deserialize<JsonElement>(data,
+            JsonElement result = JsonSerializer.Deserialize<JsonElement>(data,
                 ThorJsonSerializer.DefaultOptions);
 
             yield return (eventType, result);
@@ -100,19 +100,19 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
     public async Task<OpenAiResponsesOutput> ResponsesAsync(AiModelDescribe options, OpenAiResponsesInput chatCompletionCreate,
         CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("OpenAI 响应");
 
-        var endpoint = options.Endpoint.TrimEnd('/');
+        string endpoint = options.Endpoint.TrimEnd('/');
 
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint[..^"/v1".Length];
         }
-        var requestUri = endpoint + "/v1/responses";
+        string requestUri = endpoint + "/v1/responses";
 
-        var response = await httpClientFactory.CreateClient().PostJsonAsync(
+        HttpResponseMessage response = await httpClientFactory.CreateClient().PostJsonAsync(
             requestUri,
             chatCompletionCreate, options.ApiKey).ConfigureAwait(false);
 
@@ -133,7 +133,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI 响应异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}", options.Endpoint,
                 response.StatusCode, error);
@@ -142,7 +142,7 @@ public class OpenAiResponseService(ILogger<OpenAiResponseService> logger, IHttpC
             throw new BusinessException("OpenAI响应异常", response.StatusCode.ToString());
         }
 
-        var result =
+        OpenAiResponsesOutput? result =
             await response.Content.ReadFromJsonAsync<OpenAiResponsesOutput>(
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 

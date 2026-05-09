@@ -20,8 +20,8 @@ namespace SharpFort.TenantManagement.Application
         SfCrudAppService<Tenant, TenantGetOutputDto, TenantGetListOutputDto, Guid, TenantGetListInput,
             TenantCreateInput, TenantUpdateInput>(repository), ITenantService
     {
-        private ISqlSugarRepository<Tenant, Guid> _repository = repository;
-        private IDataSeeder _dataSeeder = dataSeeder;
+        private readonly ISqlSugarRepository<Tenant, Guid> _repository = repository;
+        private readonly IDataSeeder _dataSeeder = dataSeeder;
 
         /// <summary>
         /// 租户单查

@@ -7,7 +7,7 @@ namespace SharpFort.WeChat.MiniProgram.Token;
 internal class DefaultMinProgramToken(IOptions<WeChatMiniProgramOptions> options) : IMiniProgramToken
 {
     private const string Url = "https://api.weixin.qq.com/cgi-bin/token";
-    private WeChatMiniProgramOptions _options = options.Value;
+    private readonly WeChatMiniProgramOptions _options = options.Value;
 
     public async Task<string> GetTokenAsync()
     {

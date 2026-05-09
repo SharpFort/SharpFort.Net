@@ -6,7 +6,7 @@ namespace SharpFort.Core.Helper
     {
 
         // the valid chars for the encoding
-        private static string ValidChars = "QAZ2WSX3" + "EDC4RFV5" + "TGB6YHN7" + "UJM8K9LP";
+        private static readonly string ValidChars = "QAZ2WSX3" + "EDC4RFV5" + "TGB6YHN7" + "UJM8K9LP";
 
         /// <summary>
         /// Converts an array of bytes to a Base32-k string.

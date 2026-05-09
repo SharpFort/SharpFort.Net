@@ -13,7 +13,7 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
     [DebuggerStepThrough]
     public class RefreshTokenMiddleware(AccountManager accountManager) : IMiddleware, ITransientDependency
     {
-        private AccountManager _accountManager = accountManager;
+        private readonly AccountManager _accountManager = accountManager;
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {

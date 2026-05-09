@@ -41,12 +41,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 (roleManager, roleDeptRepository, userRoleRepository, repository, enforcer, menuRepository, casbinPolicyManager, userRepository);
         }
 
-        private ISqlSugarRepository<Role, Guid> _repository;
+        private readonly ISqlSugarRepository<Role, Guid> _repository;
         private RoleManager _roleManager { get; set; }
 
-        private ISqlSugarRepository<RoleDepartment> _roleDeptRepository;
+        private readonly ISqlSugarRepository<RoleDepartment> _roleDeptRepository;
 
-        private ISqlSugarRepository<UserRole> _userRoleRepository;
+        private readonly ISqlSugarRepository<UserRole> _userRoleRepository;
 
         public async Task UpdateDataScopeAsync(UpdateDataScopeInput input)
         {

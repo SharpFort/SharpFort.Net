@@ -48,7 +48,10 @@
       "Bash(Select-Object -First 5)",
       "PowerShell(dotnet format analyzers *)",
       "PowerShell(git checkout *)",
-      "WebSearch"
+      "WebSearch",
+      "PowerShell($content = Get-Content ide_all.txt; $nonAi = $content | Where-Object { $_ -notmatch 'SharpFort\\\\.Ai\\\\.Domain' }; Write-Host \"Non-Ai.Domain count: $\\($nonAi.Count\\)\"; $nonAi | ForEach-Object { $_ })",
+      "PowerShell($content = Get-Content ide_all.txt; $content | Where-Object { $_ -notmatch 'SharpFort\\\\.Ai\\\\.Domain' })",
+      "PowerShell(dotnet sln *)"
     ],
     "deny": [],
     "ask": []

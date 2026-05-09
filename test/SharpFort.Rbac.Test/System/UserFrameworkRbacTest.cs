@@ -12,8 +12,8 @@ namespace SharpFort.Rbac.Test.System
 {
     public class UserFrameworkRbacTest : SharpFortCasbinRbacTestBase
     {
-        private IUserService _userService;
-        private ISqlSugarRepository<User> _repository;
+        private readonly IUserService _userService;
+        private readonly ISqlSugarRepository<User> _repository;
         public UserFrameworkRbacTest()
         {
             _userService = ServiceProvider.GetRequiredService<IUserService>();

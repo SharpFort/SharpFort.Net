@@ -11,7 +11,7 @@ public class SpecialCompatible(IOptions<SpecialCompatibleOptions> options) : ISp
 
     public void Compatible(ThorChatCompletionsRequest request)
     {
-        foreach (var handle in _options.Value.Handles)
+        foreach (Action<ThorChatCompletionsRequest> handle in _options.Value.Handles)
         {
             handle(request);
         }
@@ -19,7 +19,7 @@ public class SpecialCompatible(IOptions<SpecialCompatibleOptions> options) : ISp
 
     public void AnthropicCompatible(AnthropicInput request)
     {
-        foreach (var handle in _options.Value.AnthropicHandles)
+        foreach (Action<AnthropicInput> handle in _options.Value.AnthropicHandles)
         {
             handle(request);
         }

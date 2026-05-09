@@ -23,9 +23,9 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         IAuthService
     {
         private HttpContext? HttpContext { get; set; } = httpContextAccessor.HttpContext;
-        private ILogger<AuthService> _logger = logger;
-        private ISqlSugarRepository<OpenAuth, Guid> _repository = repository;
-        private IAccountManager _accountManager = accountManager;
+        private readonly ILogger<AuthService> _logger = logger;
+        private readonly ISqlSugarRepository<OpenAuth, Guid> _repository = repository;
+        private readonly IAccountManager _accountManager = accountManager;
 
         /// <summary>
         /// 第三方oauth登录

@@ -23,7 +23,7 @@ public static class HttpClientExtensions
             else
             {
                 string jsonContent = JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                StringContent stringContent = new(jsonContent, Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
         }
@@ -33,7 +33,7 @@ public static class HttpClientExtensions
             req.Headers.Add("Authorization", $"Bearer {token}");
         }
 
-        var response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+        HttpResponseMessage response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
 
         return response;
     }
@@ -53,7 +53,7 @@ public static class HttpClientExtensions
             else
             {
                 string jsonContent = JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                StringContent stringContent = new(jsonContent, Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
         }
@@ -64,7 +64,7 @@ public static class HttpClientExtensions
         }
 
 
-        var response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+        HttpResponseMessage response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
 
         return response;
     }
@@ -84,7 +84,7 @@ public static class HttpClientExtensions
             else
             {
                 string jsonContent = JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                StringContent stringContent = new(jsonContent, Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
         }
@@ -94,13 +94,13 @@ public static class HttpClientExtensions
             req.Headers.Add("Authorization", $"Bearer {token}");
         }
 
-        foreach (var header in headers)
+        foreach (KeyValuePair<string, string> header in headers)
         {
             req.Headers.Add(header.Key, header.Value);
         }
 
 
-        var response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+        HttpResponseMessage response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
 
         return response;
     }
@@ -117,12 +117,12 @@ public static class HttpClientExtensions
             else
             {
                 string jsonContent = JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                StringContent stringContent = new(jsonContent, Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
         }
 
-        var response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+        HttpResponseMessage response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
 
         return response;
     }
@@ -141,8 +141,8 @@ public static class HttpClientExtensions
             }
             else
             {
-                var stringContent =
-                    new StringContent(JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions),
+                StringContent stringContent =
+                    new(JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions),
                         Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
@@ -171,7 +171,7 @@ public static class HttpClientExtensions
             else
             {
                 string jsonContent = JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                StringContent stringContent = new(jsonContent, Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
         }
@@ -181,7 +181,7 @@ public static class HttpClientExtensions
             req.Headers.Add("Authorization", $"Bearer {token}");
         }
 
-        foreach (var header in headers)
+        foreach (KeyValuePair<string, string> header in headers)
         {
             req.Headers.Add(header.Key, header.Value);
         }
@@ -203,7 +203,7 @@ public static class HttpClientExtensions
             else
             {
                 string jsonContent = JsonSerializer.Serialize(postData, ThorJsonSerializer.DefaultOptions);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                StringContent stringContent = new(jsonContent, Encoding.UTF8, "application/json");
                 req.Content = stringContent;
             }
         }
@@ -220,7 +220,7 @@ public static class HttpClientExtensions
     public static async Task<TResponse> PostAndReadAsAsync<TResponse>(this HttpClient client, string uri,
         object? requestModel, CancellationToken cancellationToken = default) where TResponse : ThorBaseResponse, new()
     {
-        var response = await client.PostAsJsonAsync(uri, requestModel, new JsonSerializerOptions
+        HttpResponseMessage response = await client.PostAsJsonAsync(uri, requestModel, new JsonSerializerOptions
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
         }, cancellationToken);
@@ -230,21 +230,21 @@ public static class HttpClientExtensions
     public static async Task<TResponse> PostFileAndReadAsAsync<TResponse>(this HttpClient client, string uri,
         HttpContent content, CancellationToken cancellationToken = default) where TResponse : ThorBaseResponse, new()
     {
-        var response = await client.PostAsync(uri, content, cancellationToken);
+        HttpResponseMessage response = await client.PostAsync(uri, content, cancellationToken);
         return await HandleResponseContent<TResponse>(response, cancellationToken);
     }
 
     public static async Task<string> PostFileAndReadAsStringAsync(this HttpClient client, string uri,
         HttpContent content, CancellationToken cancellationToken = default)
     {
-        var response = await client.PostAsync(uri, content, cancellationToken);
+        HttpResponseMessage response = await client.PostAsync(uri, content, cancellationToken);
         return await response.Content.ReadAsStringAsync(cancellationToken) ?? throw new InvalidOperationException();
     }
 
     public static async Task<TResponse> DeleteAndReadAsAsync<TResponse>(this HttpClient client, string uri,
         CancellationToken cancellationToken = default) where TResponse : ThorBaseResponse, new()
     {
-        var response = await client.DeleteAsync(uri, cancellationToken);
+        HttpResponseMessage response = await client.DeleteAsync(uri, cancellationToken);
         return await HandleResponseContent<TResponse>(response, cancellationToken);
     }
 

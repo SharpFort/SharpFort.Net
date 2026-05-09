@@ -1,8 +1,8 @@
 using Volo.Abp.SettingManagement;
-using FluidSequence.Domain.Shared;
+using SharpFort.FluidSequence.Domain.Shared;
 using SharpFort.Ddd.Application.Contracts;
 
-namespace FluidSequence.Application.Contracts
+namespace SharpFort.FluidSequence.Application.Contracts
 {
     [DependsOn(
         typeof(FluidSequenceDomainSharedModule),

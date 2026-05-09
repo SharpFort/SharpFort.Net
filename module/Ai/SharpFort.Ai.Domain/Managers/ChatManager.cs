@@ -64,16 +64,16 @@ public class ChatManager(ILoggerFactory loggerFactory,
         , CancellationToken cancellationToken)
     {
         // HttpClient.DefaultProxy = new WebProxy("127.0.0.1:8888");
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 SSE 流
         response.ContentType = "text/event-stream;charset=utf-8;";
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var modelDescribe = await _aiGateWayManager.GetModelAsync(ModelApiType.Completions, modelId);
+        AiModelDescribe modelDescribe = await _aiGateWayManager.GetModelAsync(ModelApiType.Completions, modelId);
 
         //token状态检查，在应用层统一处理
-        var client = new OpenAIClient(new ApiKeyCredential(token),
+        OpenAIClient client = new(new ApiKeyCredential(token),
             new OpenAIClientOptions
             {
                 Endpoint = new Uri("https://yxai.chat/v1"),
@@ -105,7 +105,7 @@ public class ChatManager(ILoggerFactory loggerFactory,
             });
 
         //线程根据sessionId数据库中获取
-        var agentStore =
+        AgentStore agentStore =
             await _agentStoreRepository.GetFirstAsync(x => x.SessionId == sessionId) ?? new AgentStore(sessionId);
 
         //获取当前线程
@@ -122,8 +122,8 @@ public class ChatManager(ILoggerFactory loggerFactory,
         }
 
         //给agent塞入工具
-        var toolContents = GetTools();
-        var chatOptions = new ChatOptions()
+        List<(string Code, string? Name, AIFunction Tool)> toolContents = GetTools();
+        ChatOptions chatOptions = new()
         {
             Tools = [.. toolContents
                 .Where(x => tools.Contains(x.Code))
@@ -176,9 +176,9 @@ public class ChatManager(ILoggerFactory loggerFactory,
                     //用量统计
                     case UsageContent usageContent:
                         //由于MAF线程问题
-                        using (var uow = _unitOfWorkManager.Begin(requiresNew: true))
+                        using (IUnitOfWork uow = _unitOfWorkManager.Begin(requiresNew: true))
                         {
-                            var usage = new ThorUsageResponse
+                            ThorUsageResponse usage = new()
                             {
                                 InputTokens = Convert.ToInt32(usageContent.Details.InputTokenCount ?? 0, CultureInfo.InvariantCulture),
                                 OutputTokens = Convert.ToInt32(usageContent.Details.OutputTokenCount ?? 0, CultureInfo.InvariantCulture),
@@ -215,6 +215,9 @@ public class ChatManager(ILoggerFactory loggerFactory,
                                 isDone: false, cancellationToken);
                             break;
                         }
+
+                    default:
+                        break;
                 }
             }
         }
@@ -227,7 +230,7 @@ public class ChatManager(ILoggerFactory loggerFactory,
         agentStore.Store = serializedJson;
 
         //由于MAF线程问题
-        using (var uow = _unitOfWorkManager.Begin(requiresNew: true))
+        using (IUnitOfWork uow = _unitOfWorkManager.Begin(requiresNew: true))
         {
             //插入或者更新
             await _agentStoreRepository.InsertOrUpdateAsync(agentStore);
@@ -238,20 +241,17 @@ public class ChatManager(ILoggerFactory loggerFactory,
 
     public List<(string Code, string? Name, AIFunction Tool)> GetTools()
     {
-        var toolClasses = typeof(ChatManager).Assembly.GetTypes()
-            .Where(x => x.GetCustomAttribute<SfAgentToolAttribute>() is not null)
-            .ToList();
+        List<Type> toolClasses = [.. typeof(ChatManager).Assembly.GetTypes().Where(x => x.GetCustomAttribute<SfAgentToolAttribute>() is not null)];
 
         List<(string Code, string? Name, AIFunction Tool)> mcpTools = [];
-        foreach (var toolClass in toolClasses)
+        foreach (Type? toolClass in toolClasses)
         {
-            var instance = LazyServiceProvider.GetRequiredService(toolClass);
-            var toolMethods = toolClass.GetMethods()
-                .Where(y => y.GetCustomAttribute<SfAgentToolAttribute>() is not null).ToList();
-            foreach (var toolMethod in toolMethods)
+            object instance = LazyServiceProvider.GetRequiredService(toolClass);
+            List<MethodInfo> toolMethods = [.. toolClass.GetMethods().Where(y => y.GetCustomAttribute<SfAgentToolAttribute>() is not null)];
+            foreach (MethodInfo? toolMethod in toolMethods)
             {
-                var display = toolMethod.GetCustomAttribute<SfAgentToolAttribute>()?.Name;
-                var tool = AIFunctionFactory.Create(toolMethod, instance);
+                string? display = toolMethod.GetCustomAttribute<SfAgentToolAttribute>()?.Name;
+                AIFunction tool = AIFunctionFactory.Create(toolMethod, instance);
                 mcpTools.add((tool.Name, display, tool));
             }
         }
@@ -272,7 +272,7 @@ public class ChatManager(ILoggerFactory loggerFactory,
         bool isDone = false,
         CancellationToken cancellationToken = default)
     {
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         string output;
         output = isDone ? "[DONE]" : JsonSerializer.Serialize(content, ThorJsonSerializer.DefaultOptions);
 

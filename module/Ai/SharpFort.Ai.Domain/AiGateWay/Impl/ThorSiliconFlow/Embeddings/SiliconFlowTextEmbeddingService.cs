@@ -12,11 +12,11 @@ public sealed class SiliconFlowTextEmbeddingService(IHttpClientFactory httpClien
         AiModelDescribe? options = null,
         CancellationToken cancellationToken = default)
     {
-        var response = await httpClientFactory.CreateClient().PostJsonAsync(
+        HttpResponseMessage response = await httpClientFactory.CreateClient().PostJsonAsync(
             options?.Endpoint.TrimEnd('/') + "/v1/embeddings",
             createEmbeddingModel, options!.ApiKey);
 
-        var result =
+        EmbeddingCreateResponse? result =
             await response.Content.ReadFromJsonAsync<EmbeddingCreateResponse>(cancellationToken: cancellationToken);
 
         return result!;

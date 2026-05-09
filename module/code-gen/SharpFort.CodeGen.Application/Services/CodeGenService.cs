@@ -15,9 +15,9 @@ namespace SharpFort.CodeGen.Application.Services
     /// </summary>
     public class CodeGenService(ISqlSugarRepository<Table, Guid> tableRepository, CodeFileManager codeFileManager, WebTemplateManager webTemplateManager) : ApplicationService, ICodeGenService
     {
-        private ISqlSugarRepository<Table, Guid> _tableRepository = tableRepository;
-        private CodeFileManager _codeFileManager = codeFileManager;
-        private WebTemplateManager _webTemplateManager = webTemplateManager;
+        private readonly ISqlSugarRepository<Table, Guid> _tableRepository = tableRepository;
+        private readonly CodeFileManager _codeFileManager = codeFileManager;
+        private readonly WebTemplateManager _webTemplateManager = webTemplateManager;
 
         /// <summary>
         /// Web To Code

@@ -5,7 +5,7 @@ using SharpFort.SqlSugarCore;
 using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.FluidSequence.Domain.Shared.Consts;
 
-namespace FluidSequence.SqlSugarCore
+namespace SharpFort.FluidSequence.SqlSugarCore
 {
     [ConnectionStringName(FluidSequenceConsts.ConnectionStringName)]
     public class FluidSequenceDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider), ISqlSugarDbContext

@@ -1,7 +1,7 @@
-using FluidSequence.Domain;
+using SharpFort.FluidSequence.Domain;
 using SharpFort.SqlSugarCore;
 
-namespace FluidSequence.SqlSugarCore
+namespace SharpFort.FluidSequence.SqlSugarCore
 {
     [DependsOn(
         typeof(FluidSequenceDomainModule),

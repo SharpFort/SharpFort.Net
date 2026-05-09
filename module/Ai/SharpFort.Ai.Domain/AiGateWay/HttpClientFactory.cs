@@ -11,8 +11,8 @@ public static class HttpClientFactory
             if (field == 0)
             {
                 // 获取环境变量
-                var poolSize = Environment.GetEnvironmentVariable("HttpClientPoolSize");
-                field = !string.IsNullOrEmpty(poolSize) && int.TryParse(poolSize, out var size) ? size : Environment.ProcessorCount;
+                string? poolSize = Environment.GetEnvironmentVariable("HttpClientPoolSize");
+                field = !string.IsNullOrEmpty(poolSize) && int.TryParse(poolSize, out int size) ? size : Environment.ProcessorCount;
 
                 if (field < 1)
                 {
@@ -36,9 +36,9 @@ public static class HttpClientFactory
     {
         return HttpClientPool.GetOrAdd(key, k => new Lazy<List<HttpClient>>(() =>
         {
-            var clients = new List<HttpClient>(PoolSize);
+            List<HttpClient> clients = new(PoolSize);
 
-            for (var i = 0; i < PoolSize; i++)
+            for (int i = 0; i < PoolSize; i++)
             {
                 clients.Add(new HttpClient(new SocketsHttpHandler
                 {

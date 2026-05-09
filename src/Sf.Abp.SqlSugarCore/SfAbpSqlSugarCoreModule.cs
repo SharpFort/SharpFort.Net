@@ -9,7 +9,7 @@ using SharpFort.TenantManagement.SqlSugarCore;
 using SharpFort.CasbinRbac.SqlSugarCore;
 using SharpFort.FileManagement.SqlSugarCore;
 using SharpFort.Ai.SqlSugarCore;
-using FluidSequence.SqlSugarCore;
+using SharpFort.FluidSequence.SqlSugarCore;
 
 
 namespace Sf.Abp.SqlsugarCore

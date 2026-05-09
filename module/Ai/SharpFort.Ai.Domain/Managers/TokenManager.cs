@@ -69,7 +69,7 @@ public class TokenManager(
         }
         else
         {
-            var tokenStr = tokenOrId.ToString() ?? string.Empty;
+            string tokenStr = tokenOrId.ToString() ?? string.Empty;
             if (!tokenStr.StartsWith("yi-", StringComparison.Ordinal))
             {
                 throw new UserFriendlyException("当前请求token非法", "401");
@@ -116,7 +116,7 @@ public class TokenManager(
     [Obsolete("请使用 ValidateTokenAsync 方法")]
     public async Task<string?> GetAsync(Guid userId)
     {
-        var entity = await _tokenRepository._DbQueryable
+        Token entity = await _tokenRepository._DbQueryable
             .Where(x => x.UserId == userId && !x.IsDisabled)
             .OrderBy(x => x.CreationTime)
             .FirstAsync();
@@ -130,7 +130,7 @@ public class TokenManager(
     [Obsolete("请使用 ValidateTokenAsync 方法")]
     public async Task<Guid> GetUserIdAsync(string? token)
     {
-        var result = await ValidateTokenAsync(token!);
+        TokenValidationResult result = await ValidateTokenAsync(token!);
         return result.UserId;
     }
 }

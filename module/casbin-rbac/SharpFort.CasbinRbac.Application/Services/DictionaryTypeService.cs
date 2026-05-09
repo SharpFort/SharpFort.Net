@@ -15,7 +15,7 @@ namespace SharpFort.CasbinRbac.Application.Services
     public class DictionaryTypeService(ISqlSugarRepository<DictionaryType, Guid> repository) : SfCrudAppService<DictionaryType, DictionaryTypeGetOutputDto, DictionaryTypeGetListOutputDto, Guid, DictionaryTypeGetListInputVo, DictionaryTypeCreateInputVo, DictionaryTypeUpdateInputVo>(repository),
        IDictionaryTypeService
     {
-        private ISqlSugarRepository<DictionaryType, Guid> _repository = repository;
+        private readonly ISqlSugarRepository<DictionaryType, Guid> _repository = repository;
 
         public override async Task<PagedResultDto<DictionaryTypeGetListOutputDto>> GetListAsync(DictionaryTypeGetListInputVo input)
         {

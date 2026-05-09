@@ -34,10 +34,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly ISqlSugarRepository<UserRole> _repositoryUserRole = repositoryUserRole;
         private readonly ISqlSugarRepository<UserPosition> _repositoryUserPost = repositoryUserPost;
         private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
-        private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
+        private readonly IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
         private readonly IGuidGenerator _guidGenerator = guidGenerator;
-        private IUserRepository _userRepository = userRepository;
-        private ILocalEventBus _localEventBus = localEventBus;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly ILocalEventBus _localEventBus = localEventBus;
         private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager; // 新增
 
         /// <summary>

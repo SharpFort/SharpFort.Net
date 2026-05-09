@@ -13,8 +13,8 @@ namespace SharpFort.CodeGen.Domain.Managers
     /// </summary>
     public class WebTemplateManager(ISqlSugarRepository<Table> repository, IModuleContainer moduleContainer) : DomainService
     {
-        private ISqlSugarRepository<Table> _repository = repository;
-        private IModuleContainer _moduleContainer = moduleContainer;
+        private readonly ISqlSugarRepository<Table> _repository = repository;
+        private readonly IModuleContainer _moduleContainer = moduleContainer;
 
         /// <summary>
         /// 通过当前的实体代码获取表存储

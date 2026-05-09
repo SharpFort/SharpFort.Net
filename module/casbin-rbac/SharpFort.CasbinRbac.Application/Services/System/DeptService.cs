@@ -15,7 +15,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     public class DeptService(IDeptRepository repository) : SfCrudAppService<Department, DeptGetOutputDto, DeptGetListOutputDto, Guid,
         DeptGetListInputVo, DeptCreateInputVo, DeptUpdateInputVo>(repository), IDeptService
     {
-        private IDeptRepository _repository = repository;
+        private readonly IDeptRepository _repository = repository;
 
         [RemoteService(false)]
         public async Task<List<Guid>> GetChildListAsync(Guid deptId)

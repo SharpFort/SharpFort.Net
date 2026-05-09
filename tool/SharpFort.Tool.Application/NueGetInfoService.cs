@@ -5,7 +5,7 @@ namespace SharpFort.Tool.Application
 {
     public class NueGetInfoService(NugetCrawlerManager nugetCrawlerManager) : ApplicationService
     {
-        private NugetCrawlerManager _nugetCrawlerManager = nugetCrawlerManager;
+        private readonly NugetCrawlerManager _nugetCrawlerManager = nugetCrawlerManager;
 
         /// <summary>
         /// 获取爬虫结果

@@ -53,6 +53,8 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
                         Messages = [.. list.Cast<JsonElement>().Select(e => e.GetString())];
                         Message = string.Join(Environment.NewLine, Messages);
                         break;
+                    default:
+                        break;
                 }
             }
 

@@ -20,7 +20,7 @@ public class AiMessageManager(ISqlSugarRepository<ChatMessage> repository) : Dom
     public async Task<Guid> CreateSystemMessageAsync(Guid? userId, Guid? sessionId, MessageInputDto input, Guid? tokenId = null)
     {
         input.Role = "system";
-        var message = new ChatMessage(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId);
+        ChatMessage message = new(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId);
         await _repository.InsertAsync(message);
         return message.Id;
     }
@@ -37,7 +37,7 @@ public class AiMessageManager(ISqlSugarRepository<ChatMessage> repository) : Dom
     public async Task<Guid> CreateUserMessageAsync(Guid? userId, Guid? sessionId, MessageInputDto input, Guid? tokenId = null, DateTime? createTime = null)
     {
         input.Role = "user";
-        var message = new ChatMessage(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId)
+        ChatMessage message = new(userId, sessionId, input.Content ?? string.Empty, input.Role, input.ModelId, input.TokenUsage, tokenId)
         {
             CreationTime = createTime ?? DateTime.Now
         };

@@ -37,8 +37,8 @@ public class HttpRequestTool(
 
         try
         {
-            var client = _httpClientFactory.CreateClient();
-            var request = new HttpRequestMessage(new HttpMethod(method.ToUpper(CultureInfo.InvariantCulture)), url);
+            HttpClient client = _httpClientFactory.CreateClient();
+            HttpRequestMessage request = new(new HttpMethod(method.ToUpper(CultureInfo.InvariantCulture)), url);
 
             // 添加请求体
             if (!string.IsNullOrWhiteSpace(body))
@@ -52,7 +52,7 @@ public class HttpRequestTool(
                 AddHeaders(request, headers);
             }
 
-            var response = await client.SendAsync(request);
+            HttpResponseMessage response = await client.SendAsync(request);
             return await FormatResponse(response);
         }
         catch (Exception ex)
@@ -69,10 +69,10 @@ public class HttpRequestTool(
     /// </summary>
     private static void AddHeaders(HttpRequestMessage request, string headers)
     {
-        var headerPairs = headers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        foreach (var pair in headerPairs)
+        string[] headerPairs = headers.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (string pair in headerPairs)
         {
-            var parts = pair.Split(':', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            string[] parts = pair.Split(':', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             if (parts.Length == 2)
             {
                 request.Headers.TryAddWithoutValidation(parts[0], parts[1]);
@@ -85,12 +85,12 @@ public class HttpRequestTool(
     /// </summary>
     private static async Task<string> FormatResponse(HttpResponseMessage response)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.AppendLine(CultureInfo.InvariantCulture, $"状态码: {(int)response.StatusCode} {response.StatusCode}");
         sb.AppendLine(CultureInfo.InvariantCulture, $"Content-Type: {response.Content.Headers.ContentType?.ToString() ?? "未知"}");
         sb.AppendLine();
 
-        var content = await response.Content.ReadAsStringAsync();
+        string content = await response.Content.ReadAsStringAsync();
         if (string.IsNullOrWhiteSpace(content))
         {
             sb.AppendLine("响应内容为空");
@@ -102,7 +102,7 @@ public class HttpRequestTool(
             {
                 try
                 {
-                    var jsonDoc = JsonDocument.Parse(content);
+                    JsonDocument jsonDoc = JsonDocument.Parse(content);
                     sb.AppendLine("响应内容（JSON格式化）：");
                     sb.AppendLine(JsonSerializer.Serialize(jsonDoc, s_indentedOptions));
                 }

@@ -1,9 +1,9 @@
 using Volo.Abp.Caching;
 using Volo.Abp.Domain;
-using FluidSequence.Domain.Shared;
+using SharpFort.FluidSequence.Domain.Shared;
 using SharpFort.Mapster;
 
-namespace FluidSequence.Domain
+namespace SharpFort.FluidSequence.Domain
 {
     [DependsOn(
         typeof(FluidSequenceDomainSharedModule),

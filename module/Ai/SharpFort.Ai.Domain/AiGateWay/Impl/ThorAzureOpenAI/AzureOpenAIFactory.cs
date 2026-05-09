@@ -65,7 +65,7 @@ public static class AzureOpenAIFactory
         {
             const AzureOpenAIClientOptions.ServiceVersion version = AzureOpenAIClientOptions.ServiceVersion.V2024_06_01;
 
-            var client = new AzureOpenAIClient(new Uri(options.Endpoint), new ApiKeyCredential(options.ApiKey),
+            AzureOpenAIClient client = new(new Uri(options.Endpoint), new ApiKeyCredential(options.ApiKey),
                 new AzureOpenAIClientOptions(version));
 
             return client;

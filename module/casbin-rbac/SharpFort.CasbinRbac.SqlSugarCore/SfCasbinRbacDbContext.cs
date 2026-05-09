@@ -99,6 +99,10 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                         // 仅本人
                         expUser.Or(u => u.Id == CurrentUser.Id);
                         break;
+                    case DataScope.ALL:
+                        break;
+                    default:
+                        break;
                 }
             }
 

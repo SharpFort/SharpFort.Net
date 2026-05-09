@@ -1,7 +1,7 @@
 using Volo.Abp.Application.Services;
-using FluidSequence.Application.Contracts.Dtos;
+using SharpFort.FluidSequence.Application.Contracts.Dtos;
 
-namespace FluidSequence.Application.Contracts.IServices
+namespace SharpFort.FluidSequence.Application.Contracts.IServices
 {
     public interface ISequenceRuleAppService : ICrudAppService<
         SequenceRuleDto,

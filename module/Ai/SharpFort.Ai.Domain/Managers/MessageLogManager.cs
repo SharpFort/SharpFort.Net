@@ -14,7 +14,7 @@ public class MessageLogManager(ISqlSugarRepository<MessageLogAggregateRoot> repo
     /// </summary>
     public async Task CreateAsync(string requestBody, string apiKey, string apiKeyName, string modelId, ModelApiType apiType)
     {
-        var entity = new MessageLogAggregateRoot
+        MessageLogAggregateRoot entity = new()
         {
             RequestBody = requestBody,
             ApiKey = apiKey,

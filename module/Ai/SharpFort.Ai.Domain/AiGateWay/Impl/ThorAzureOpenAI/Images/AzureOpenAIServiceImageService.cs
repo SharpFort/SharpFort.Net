@@ -1,4 +1,6 @@
+using System.ClientModel;
 using System.Globalization;
+using Azure.AI.OpenAI;
 using OpenAI.Images;
 using SharpFort.Ai.Domain.Shared.Dtos;
 using SharpFort.Ai.Domain.Shared.Dtos.OpenAi.Images;
@@ -10,19 +12,19 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
     public async Task<ImageCreateResponse> CreateImage(ImageCreateRequest imageCreate, AiModelDescribe? options = null,
         CancellationToken cancellationToken = default)
     {
-        var createClient = AzureOpenAIFactory.CreateClient(options!);
+        AzureOpenAIClient createClient = AzureOpenAIFactory.CreateClient(options!);
 
-        var client = createClient.GetImageClient(imageCreate.Model);
+        ImageClient client = createClient.GetImageClient(imageCreate.Model);
         imageCreate.Size ??= "1024x1024";
         // 将size字符串拆分为宽度和高度
-        var size = imageCreate.Size.Split('x');
+        string[] size = imageCreate.Size.Split('x');
         if (size.Length != 2)
         {
             throw new ArgumentException("Size must be in the format of 'width x height'");
         }
 
 
-        var response = await client.GenerateImageAsync(imageCreate.Prompt, new ImageGenerationOptions()
+        ClientResult<GeneratedImage> response = await client.GenerateImageAsync(imageCreate.Prompt, new ImageGenerationOptions()
         {
             Quality = imageCreate.Quality == "standard" ? GeneratedImageQuality.Standard : GeneratedImageQuality.High,
             Size = new GeneratedImageSize(Convert.ToInt32(size[0], CultureInfo.InvariantCulture), Convert.ToInt32(size[1], CultureInfo.InvariantCulture)),
@@ -33,7 +35,7 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
             EndUserId = imageCreate.User
         }, cancellationToken);
 
-        var ret = new ImageCreateResponse()
+        ImageCreateResponse ret = new()
         {
             Results = []
         };
@@ -60,9 +62,9 @@ public class AzureOpenAIServiceImageService(IHttpClientFactory httpClientFactory
         AiModelDescribe? options = null,
         CancellationToken cancellationToken = default)
     {
-        var url = AzureOpenAIFactory.GetEditImageAddress(options!, imageEditCreateRequest.Model!);
+        string url = AzureOpenAIFactory.GetEditImageAddress(options!, imageEditCreateRequest.Model!);
 
-        var multipartContent = new MultipartFormDataContent();
+        MultipartFormDataContent multipartContent = [];
         if (imageEditCreateRequest.User != null)
         {
             multipartContent.Add(new StringContent(imageEditCreateRequest.User), "user");

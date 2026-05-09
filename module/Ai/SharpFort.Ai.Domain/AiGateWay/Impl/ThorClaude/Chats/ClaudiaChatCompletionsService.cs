@@ -17,8 +17,8 @@ public sealed class ClaudiaChatCompletionsService(
 {
     public static List<ThorChatChoiceResponse> CreateResponse(AnthropicChatCompletionDto completionDto)
     {
-        var response = new ThorChatChoiceResponse();
-        var chatMessage = new ThorChatMessage();
+        ThorChatChoiceResponse response = new();
+        ThorChatMessage chatMessage = new();
         if (completionDto == null)
         {
             return [];
@@ -46,7 +46,7 @@ public sealed class ClaudiaChatCompletionsService(
 
         if (completionDto.content.Any(x => x.type.Equals("tool_use", StringComparison.OrdinalIgnoreCase)))
         {
-            var toolUse = completionDto.content
+            AnthropicChatCompletionDtoContent toolUse = completionDto.content
                 .First(x => x.type.Equals("tool_use", StringComparison.OrdinalIgnoreCase));
 
             chatMessage.ToolCalls =
@@ -75,9 +75,9 @@ public sealed class ClaudiaChatCompletionsService(
 
     private static List<object> CreateMessage(List<ThorChatMessage> messages, AiModelDescribe options)
     {
-        var list = new List<object>();
+        List<object> list = [];
 
-        foreach (var message in messages)
+        foreach (ThorChatMessage message in messages)
         {
             // 如果是图片
             if (message.ContentCalculated is IList<ThorChatMessageContent> contentCalculated)
@@ -109,7 +109,7 @@ public sealed class ClaudiaChatCompletionsService(
                             };
                         }
 
-                        var isBase64 = x.ImageUrl?.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true;
+                        bool isBase64 = x.ImageUrl?.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase) == true;
 
                         if ("true".Equals(options.ModelExtraInfo, StringComparison.OrdinalIgnoreCase))
                         {
@@ -215,7 +215,7 @@ public sealed class ClaudiaChatCompletionsService(
                         // },
                         if (message.ToolCalls?.Count > 0)
                         {
-                            var content = new List<object>();
+                            List<object> content = [];
                             if (!string.IsNullOrEmpty(message.Content))
                             {
                                 content.Add(new
@@ -225,7 +225,7 @@ public sealed class ClaudiaChatCompletionsService(
                                 });
                             }
 
-                            foreach (var toolCall in message.ToolCalls)
+                            foreach (ThorToolCall toolCall in message.ToolCalls)
                             {
                                 content.Add(new
                                 {
@@ -279,7 +279,7 @@ public sealed class ClaudiaChatCompletionsService(
         ThorChatCompletionsRequest input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("Claudia 对话补全");
 
         if (string.IsNullOrEmpty(options.Endpoint))
@@ -287,17 +287,17 @@ public sealed class ClaudiaChatCompletionsService(
             options.Endpoint = "https://api.anthropic.com/";
         }
 
-        var client = httpClientFactory.CreateClient();
+        HttpClient client = httpClientFactory.CreateClient();
 
-        var headers = new Dictionary<string, string>
+        Dictionary<string, string> headers = new()
         {
             { "x-api-key", options.ApiKey },
             { "anthropic-version", "2023-06-01" }
         };
 
-        var isThinking = input.Model.EndsWith("thinking", StringComparison.Ordinal);
+        bool isThinking = input.Model.EndsWith("thinking", StringComparison.Ordinal);
         input.Model = input.Model.Replace("-thinking", string.Empty);
-        var budgetTokens = 1024;
+        int budgetTokens = 1024;
 
         if (input.MaxTokens is < 2048)
         {
@@ -343,7 +343,7 @@ public sealed class ClaudiaChatCompletionsService(
             tool_choice = null;
         }
 
-        var response = await client.HttpRequestRaw(options.Endpoint.TrimEnd('/') + "/v1/messages", new
+        HttpResponseMessage response = await client.HttpRequestRaw(options.Endpoint.TrimEnd('/') + "/v1/messages", new
         {
             model = input.Model,
             max_tokens = input.MaxTokens ?? 64000,
@@ -384,7 +384,7 @@ public sealed class ClaudiaChatCompletionsService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
@@ -394,12 +394,12 @@ public sealed class ClaudiaChatCompletionsService(
             throw new InvalidOperationException("OpenAI对话异常" + response.StatusCode);
         }
 
-        using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
+        using StreamReader stream = new(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
-        var first = true;
-        var isThink = false;
+        bool first = true;
+        bool isThink = false;
 
         string? toolId = null;
         string? toolName = null;
@@ -444,7 +444,7 @@ public sealed class ClaudiaChatCompletionsService(
                 continue;
             }
 
-            var result = JsonSerializer.Deserialize<AnthropicStreamDto>(line,
+            AnthropicStreamDto? result = JsonSerializer.Deserialize<AnthropicStreamDto>(line,
                 ThorJsonSerializer.DefaultOptions);
 
             if (result?.Type == "content_block_delta")
@@ -638,7 +638,7 @@ public sealed class ClaudiaChatCompletionsService(
 
             if (result?.Type == "message_delta")
             {
-                var deltaOutput = new ThorChatCompletionsResponse()
+                ThorChatCompletionsResponse deltaOutput = new()
                 {
                     Choices =
                     [
@@ -676,9 +676,9 @@ public sealed class ClaudiaChatCompletionsService(
                 continue;
             }
 
-            var chat = CreateResponse(result.Message);
+            List<ThorChatChoiceResponse>? chat = CreateResponse(result.Message);
 
-            var content = chat?.FirstOrDefault()?.Delta;
+            ThorChatMessage? content = chat?.FirstOrDefault()?.Delta;
 
             if (first && string.IsNullOrWhiteSpace(content?.Content) && string.IsNullOrEmpty(content?.ReasoningContent))
             {
@@ -702,7 +702,7 @@ public sealed class ClaudiaChatCompletionsService(
             if (isThink)
             {
                 // 需要将content的内容转换到其他字段
-                foreach (var choice in chat!)
+                foreach (ThorChatChoiceResponse choice in chat!)
                 {
                     choice.Delta.ReasoningContent = choice.Delta.Content;
                     choice.Delta.Content = string.Empty;
@@ -711,7 +711,7 @@ public sealed class ClaudiaChatCompletionsService(
 
             first = false;
 
-            var output = new ThorChatCompletionsResponse()
+            ThorChatCompletionsResponse output = new()
             {
                 Choices = chat,
                 Model = input.Model,
@@ -735,7 +735,7 @@ public sealed class ClaudiaChatCompletionsService(
         ThorChatCompletionsRequest input,
         CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("Claudia 对话补全");
 
         if (string.IsNullOrEmpty(options.Endpoint))
@@ -743,9 +743,9 @@ public sealed class ClaudiaChatCompletionsService(
             options.Endpoint = "https://api.anthropic.com/";
         }
 
-        var client = httpClientFactory.CreateClient();
+        HttpClient client = httpClientFactory.CreateClient();
 
-        var headers = new Dictionary<string, string>
+        Dictionary<string, string> headers = new()
         {
             { "x-api-key", options.ApiKey },
             { "anthropic-version", "2023-06-01" }
@@ -754,7 +754,7 @@ public sealed class ClaudiaChatCompletionsService(
         bool isThink = input.Model.EndsWith("-thinking", StringComparison.Ordinal);
         input.Model = input.Model.Replace("-thinking", string.Empty, StringComparison.Ordinal);
 
-        var budgetTokens = 1024;
+        int budgetTokens = 1024;
         if (input.MaxTokens is < 2048)
         {
             input.MaxTokens = 2048;
@@ -799,7 +799,7 @@ public sealed class ClaudiaChatCompletionsService(
         // budgetTokens最大4096
         budgetTokens = Math.Min(budgetTokens, 4096);
 
-        var response = await client.PostJsonAsync(options.Endpoint.TrimEnd('/') + "/v1/messages", new
+        HttpResponseMessage response = await client.PostJsonAsync(options.Endpoint.TrimEnd('/') + "/v1/messages", new
         {
             model = input.Model,
             max_tokens = input.MaxTokens ?? 2000,
@@ -839,7 +839,7 @@ public sealed class ClaudiaChatCompletionsService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
@@ -849,11 +849,11 @@ public sealed class ClaudiaChatCompletionsService(
             throw new InvalidOperationException("OpenAI对话异常" + response.StatusCode.ToString());
         }
 
-        var value =
+        AnthropicChatCompletionDto? value =
             await response.Content.ReadFromJsonAsync<AnthropicChatCompletionDto>(ThorJsonSerializer.DefaultOptions,
                 cancellationToken: cancellationToken);
 
-        var thor = new ThorChatCompletionsResponse()
+        ThorChatCompletionsResponse thor = new()
         {
             Choices = CreateResponse(value!),
             Model = input.Model,

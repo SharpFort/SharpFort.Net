@@ -7,7 +7,7 @@ namespace SharpFort.CasbinRbac.Domain.EventHandlers
 {
     public class UserInfoHandler(UserManager userManager) : ILocalEventHandler<UserRoleMenuQueryEventArgs>, ITransientDependency
     {
-        private UserManager _userManager = userManager;
+        private readonly UserManager _userManager = userManager;
 
         public async Task HandleEventAsync(UserRoleMenuQueryEventArgs eventData)
         {

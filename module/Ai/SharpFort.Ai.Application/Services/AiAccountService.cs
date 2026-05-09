@@ -15,8 +15,8 @@ public class AiAccountService(
     IAccountService accountService,
     ISqlSugarRepository<ChatMessage> messageRepository) : ApplicationService
 {
-    private IAccountService _accountService = accountService;
-    private ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
+    private readonly IAccountService _accountService = accountService;
+    private readonly ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
 
     /// <summary>
     /// 获取ai用户信息

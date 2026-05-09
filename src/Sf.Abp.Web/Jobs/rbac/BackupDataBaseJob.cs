@@ -7,8 +7,8 @@ namespace Sf.Abp.Web.Jobs.rbac
 {
     public class BackupDataBaseJob : HangfireBackgroundWorkerBase
     {
-        private ISqlSugarDbContext _dbContext;
-        private IOptions<RbacOptions> _options;
+        private readonly ISqlSugarDbContext _dbContext;
+        private readonly IOptions<RbacOptions> _options;
         public BackupDataBaseJob(ISqlSugarDbContext dbContext, IOptions<RbacOptions> options)
         {
 

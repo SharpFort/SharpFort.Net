@@ -19,10 +19,10 @@ public sealed class OpenAiChatCompletionsService(
         ThorChatCompletionsRequest chatCompletionCreate,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("OpenAI 对话流式补全");
 
-        var endpoint = options.Endpoint.TrimEnd('/');
+        string endpoint = options.Endpoint.TrimEnd('/');
 
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
@@ -30,9 +30,9 @@ public sealed class OpenAiChatCompletionsService(
             endpoint = endpoint[..^"/v1".Length];
         }
 
-        var requestUri = endpoint + "/v1/chat/completions";
+        string requestUri = endpoint + "/v1/chat/completions";
 
-        var response = await httpClientFactory.CreateClient().HttpRequestRaw(
+        HttpResponseMessage response = await httpClientFactory.CreateClient().HttpRequestRaw(
             requestUri,
             chatCompletionCreate, options.ApiKey);
 
@@ -53,7 +53,7 @@ public sealed class OpenAiChatCompletionsService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 , StatusCode: {StatusCode} 错误响应内容：{Content}", response.StatusCode,
                 error);
@@ -62,12 +62,12 @@ public sealed class OpenAiChatCompletionsService(
             throw new BusinessException("OpenAI对话异常：" + error, response.StatusCode.ToString());
         }
 
-        using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
+        using StreamReader stream = new(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
-        var first = true;
-        var isThink = false;
+        bool first = true;
+        bool isThink = false;
         while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
         {
             line += Environment.NewLine;
@@ -105,7 +105,7 @@ public sealed class OpenAiChatCompletionsService(
             }
 
 
-            var result = JsonSerializer.Deserialize<ThorChatCompletionsResponse>(line,
+            ThorChatCompletionsResponse? result = JsonSerializer.Deserialize<ThorChatCompletionsResponse>(line,
                 ThorJsonSerializer.DefaultOptions);
 
             if (result == null)
@@ -113,7 +113,7 @@ public sealed class OpenAiChatCompletionsService(
                 continue;
             }
 
-            var content = result?.Choices?.FirstOrDefault()?.Delta;
+            ThorChatMessage? content = result?.Choices?.FirstOrDefault()?.Delta;
 
             if (first && content?.Content == OpenAIConstant.ThinkStart)
             {
@@ -132,7 +132,7 @@ public sealed class OpenAiChatCompletionsService(
             if (isThink && result?.Choices != null)
             {
                 // 需要将content的内容转换到其他字段
-                foreach (var choice in result.Choices)
+                foreach (ThorChatChoiceResponse choice in result.Choices)
                 {
                     choice.Delta.ReasoningContent = choice.Delta.Content;
                     choice.Delta.Content = string.Empty;
@@ -149,18 +149,18 @@ public sealed class OpenAiChatCompletionsService(
         ThorChatCompletionsRequest chatCompletionCreate,
         CancellationToken cancellationToken)
     {
-        using var openai =
+        using Activity? openai =
             Activity.Current?.Source.StartActivity("OpenAI 对话补全");
 
-        var endpoint = options.Endpoint.TrimEnd('/');
+        string endpoint = options.Endpoint.TrimEnd('/');
 
         //兼容 v1结尾
         if (endpoint.EndsWith("/v1", StringComparison.OrdinalIgnoreCase))
         {
             endpoint = endpoint[..^"/v1".Length];
         }
-        var requestUri = endpoint + "/v1/chat/completions";
-        var response = await httpClientFactory.CreateClient().PostJsonAsync(
+        string requestUri = endpoint + "/v1/chat/completions";
+        HttpResponseMessage response = await httpClientFactory.CreateClient().PostJsonAsync(
             requestUri,
             chatCompletionCreate, options.ApiKey).ConfigureAwait(false);
 
@@ -181,7 +181,7 @@ public sealed class OpenAiChatCompletionsService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("OpenAI对话异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
@@ -191,7 +191,7 @@ public sealed class OpenAiChatCompletionsService(
             throw new BusinessException("OpenAI对话异常", response.StatusCode.ToString());
         }
 
-        var result =
+        ThorChatCompletionsResponse? result =
             await response.Content.ReadFromJsonAsync<ThorChatCompletionsResponse>(
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 

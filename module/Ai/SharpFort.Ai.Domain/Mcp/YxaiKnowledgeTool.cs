@@ -28,10 +28,10 @@ public class YxaiKnowledgeTool(
     {
         try
         {
-            var client = _httpClientFactory.CreateClient();
+            HttpClient client = _httpClientFactory.CreateClient();
 
             // 1. 先获取目录列表
-            var directoryResponse = await client.GetAsync(DirectoryUrl);
+            HttpResponseMessage directoryResponse = await client.GetAsync(DirectoryUrl);
             if (!directoryResponse.IsSuccessStatusCode)
             {
 #pragma warning disable CA1848 // Business guard protects this call
@@ -40,8 +40,8 @@ public class YxaiKnowledgeTool(
                 return [];
             }
 
-            var directoryJson = await directoryResponse.Content.ReadAsStringAsync();
-            var directories = JsonSerializer.Deserialize(directoryJson,
+            string directoryJson = await directoryResponse.Content.ReadAsStringAsync();
+            List<YxaiKnowledgeDirectoryItem>? directories = JsonSerializer.Deserialize(directoryJson,
                 YxaiKnowledgeJsonContext.Default.ListYxaiKnowledgeDirectoryItem);
 
             if (directories == null || directories.Count == 0)
@@ -50,18 +50,18 @@ public class YxaiKnowledgeTool(
             }
 
             // 2. 循环调用内容接口获取每个目录的内容
-            var result = new List<YxaiKnowledgeItem>();
-            foreach (var directory in directories)
+            List<YxaiKnowledgeItem> result = [];
+            foreach (YxaiKnowledgeDirectoryItem? directory in directories)
             {
                 try
                 {
-                    var contentUrl = string.Format(CultureInfo.InvariantCulture, ContentUrlFormat, directory.Id);
-                    var contentResponse = await client.GetAsync(contentUrl);
+                    string contentUrl = string.Format(CultureInfo.InvariantCulture, ContentUrlFormat, directory.Id);
+                    HttpResponseMessage contentResponse = await client.GetAsync(contentUrl);
 
                     if (contentResponse.IsSuccessStatusCode)
                     {
-                        var contentJson = await contentResponse.Content.ReadAsStringAsync();
-                        var contentResult = JsonSerializer.Deserialize(contentJson,
+                        string contentJson = await contentResponse.Content.ReadAsStringAsync();
+                        YxaiKnowledgeContentResponse? contentResult = JsonSerializer.Deserialize(contentJson,
                             YxaiKnowledgeJsonContext.Default.YxaiKnowledgeContentResponse);
 
                         result.Add(new YxaiKnowledgeItem

@@ -11,8 +11,8 @@ namespace SharpFort.Rbac.Test.System
     public class AccountFrameworkRbacTest : SharpFortRbacTestWebBase
     {
 
-        private IAccountService _accountService;
-        private ISqlSugarRepository<User> _userRepository;
+        private readonly IAccountService _accountService;
+        private readonly ISqlSugarRepository<User> _userRepository;
         public AccountFrameworkRbacTest()
         {
             _accountService = GetRequiredService<IAccountService>();

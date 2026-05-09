@@ -11,8 +11,8 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
 {
     public class OnlineService(ILogger<OnlineService> logger, IHubContext<OnlineHub> hub) : ApplicationService, IOnlineService
     {
-        private ILogger<OnlineService> _logger = logger;
-        private IHubContext<OnlineHub> _hub = hub;
+        private readonly ILogger<OnlineService> _logger = logger;
+        private readonly IHubContext<OnlineHub> _hub = hub;
 
         /// <summary>
         /// 动态条件获取当前在线用户

@@ -1,4 +1,4 @@
-namespace FluidSequence.Domain.Services
+namespace SharpFort.FluidSequence.Domain.Services
 {
     public class PlaceholderMeta
     {

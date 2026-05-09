@@ -15,7 +15,7 @@ public class UsageStatisticsManager(ISqlSugarRepository<AiUsage> repository) : D
 
     public async Task SetUsageAsync(Guid? userId, string modelId, ThorUsageResponse? tokenUsage, Guid? tokenId = null)
     {
-        var actualTokenId = tokenId ?? Guid.Empty;
+        Guid actualTokenId = tokenId ?? Guid.Empty;
 
         long inputTokenCount = tokenUsage?.PromptTokens > 0
             ? tokenUsage.PromptTokens.Value
@@ -27,7 +27,7 @@ public class UsageStatisticsManager(ISqlSugarRepository<AiUsage> repository) : D
 
         await using (await DistributedLock.AcquireLockAsync($"UsageStatistics:{userId?.ToString()}:{actualTokenId}:{modelId}"))
         {
-            var entity = await _repository._DbQueryable.FirstAsync(x => x.UserId == userId && x.ModelId == modelId && x.TokenId == actualTokenId);
+            AiUsage? entity = await _repository._DbQueryable.FirstAsync(x => x.UserId == userId && x.ModelId == modelId && x.TokenId == actualTokenId);
             //存在数据，更新
             if (entity is not null)
             {
@@ -37,7 +37,7 @@ public class UsageStatisticsManager(ISqlSugarRepository<AiUsage> repository) : D
             //不存在插入
             else
             {
-                var usage = new AiUsage(userId, modelId, actualTokenId);
+                AiUsage usage = new(userId, modelId, actualTokenId);
                 usage.AddOnceChat(inputTokenCount, outputTokenCount);
                 await _repository.InsertAsync(usage);
             }

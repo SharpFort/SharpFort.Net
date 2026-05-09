@@ -10,9 +10,9 @@ namespace SharpFort.CodeGen.Domain.Managers
     /// </summary>
     public class CodeFileManager(IEnumerable<ITemplateHandler> templateHandlers, ISqlSugarRepository<Field> fieldRepository, ISqlSugarRepository<Template> repository) : DomainService
     {
-        private IEnumerable<ITemplateHandler> _templateHandlers = templateHandlers;
-        private ISqlSugarRepository<Template> _repository = repository;
-        private ISqlSugarRepository<Field> _fieldRepository = fieldRepository;
+        private readonly IEnumerable<ITemplateHandler> _templateHandlers = templateHandlers;
+        private readonly ISqlSugarRepository<Template> _repository = repository;
+        private readonly ISqlSugarRepository<Field> _fieldRepository = fieldRepository;
 
         public async Task BuildWebToCodeAsync(Table tableEntity)
         {

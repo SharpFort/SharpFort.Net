@@ -37,10 +37,10 @@ public class OnlineSearchTool(
 
         try
         {
-            var client = _httpClientFactory.CreateClient();
+            HttpClient client = _httpClientFactory.CreateClient();
 
             // 构建请求体
-            var requestBody = new BaiduSearchRequest
+            BaiduSearchRequest requestBody = new()
             {
                 Messages =
                 [
@@ -65,29 +65,29 @@ public class OnlineSearchTool(
                 };
             }
 
-            var jsonContent = JsonSerializer.Serialize(requestBody, BaiduJsonContext.Default.BaiduSearchRequest);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            string jsonContent = JsonSerializer.Serialize(requestBody, BaiduJsonContext.Default.BaiduSearchRequest);
+            StringContent content = new(jsonContent, Encoding.UTF8, "application/json");
 
             // 设置请求头
-            var request = new HttpRequestMessage(HttpMethod.Post, BaiduSearchUrl)
+            HttpRequestMessage request = new(HttpMethod.Post, BaiduSearchUrl)
             {
                 Content = content
             };
             request.Headers.Add("Authorization", $"Bearer {_baiduApiKey}");
 
             // 发送请求
-            var response = await client.SendAsync(request);
+            HttpResponseMessage response = await client.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
+                string errorContent = await response.Content.ReadAsStringAsync();
 #pragma warning disable CA1848 // Error handler — infrequent calls
                 _logger.LogError("百度搜索接口调用失败: {StatusCode}, {Error}", response.StatusCode, errorContent);
                 return $"搜索失败: {response.StatusCode}";
             }
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var searchResult = JsonSerializer.Deserialize(responseJson, BaiduJsonContext.Default.BaiduSearchResponse);
+            string responseJson = await response.Content.ReadAsStringAsync();
+            BaiduSearchResponse? searchResult = JsonSerializer.Deserialize(responseJson, BaiduJsonContext.Default.BaiduSearchResponse);
 
             if (searchResult?.References == null || searchResult.References.Count == 0)
             {
@@ -131,12 +131,12 @@ public class OnlineSearchTool(
     /// </summary>
     private static string FormatSearchResults(List<BaiduSearchReference> references)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.AppendLine("搜索结果：");
         sb.AppendLine();
 
-        var count = 0;
-        foreach (var item in references.Take(10)) // 最多返回10条
+        int count = 0;
+        foreach (BaiduSearchReference? item in references.Take(10)) // 最多返回10条
         {
             count++;
             sb.AppendLine(CultureInfo.InvariantCulture, $"【{count}】{item.Title}");

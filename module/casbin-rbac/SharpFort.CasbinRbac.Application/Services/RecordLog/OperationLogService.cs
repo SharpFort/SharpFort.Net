@@ -14,7 +14,7 @@ namespace SharpFort.CasbinRbac.Application.Services.RecordLog
     public class OperationLogService(ISqlSugarRepository<OperationLogEntity, Guid> repository) : SfCrudAppService<OperationLogEntity, OperationLogGetListOutputDto, Guid, OperationLogGetListInputVo>(repository),
        IOperationLogService
     {
-        private ISqlSugarRepository<OperationLogEntity, Guid> _repository = repository;
+        private readonly ISqlSugarRepository<OperationLogEntity, Guid> _repository = repository;
 
         public override async Task<PagedResultDto<OperationLogGetListOutputDto>> GetListAsync(OperationLogGetListInputVo input)
         {

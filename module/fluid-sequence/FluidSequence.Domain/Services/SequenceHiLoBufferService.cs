@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using Volo.Abp.DependencyInjection;
-using FluidSequence.Domain.Repositories;
+using SharpFort.FluidSequence.Domain.Repositories;
 
-namespace FluidSequence.Domain.Services
+namespace SharpFort.FluidSequence.Domain.Services
 {
     /// <summary>
     /// Hi-Lo 序列号缓冲服务（单例）。

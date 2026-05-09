@@ -16,7 +16,7 @@ namespace SharpFort.CasbinRbac.Application.Services
     public class DictionaryDataService(ISqlSugarRepository<Dictionary, Guid> repository) : SfCrudAppService<Dictionary, DictionaryGetOutputDto, DictionaryGetListOutputDto, Guid, DictionaryGetListInputVo, DictionaryCreateInputVo, DictionaryUpdateInputVo>(repository),
        IDictionaryDataService
     {
-        private ISqlSugarRepository<Dictionary, Guid> _repository = repository;
+        private readonly ISqlSugarRepository<Dictionary, Guid> _repository = repository;
 
         /// <summary>
         /// 新增字典数据

@@ -43,18 +43,18 @@ namespace SharpFort.CasbinRbac.Application.Services
         UserManager userManager, IHttpContextAccessor httpContextAccessor) : ApplicationService, IAccountService
     {
         protected ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
-        private IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> _phoneCache = phoneCache;
+        private readonly IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> _phoneCache = phoneCache;
         private readonly ICaptcha _captcha = captcha;
         private readonly IGuidGenerator _guidGenerator = guidGenerator;
         private readonly RbacOptions _rbacOptions = options.Value;
         private readonly IAliyunManger _aliyunManger = aliyunManger;
-        private IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
-        private UserManager _userManager = userManager;
-        private IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-        private IUserRepository _userRepository = userRepository;
-        private ICurrentUser _currentUser = currentUser;
-        private IAccountManager _accountManager = accountManager;
-        private ISqlSugarRepository<Menu> _menuRepository = menuRepository;
+        private readonly IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
+        private readonly UserManager _userManager = userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly ICurrentUser _currentUser = currentUser;
+        private readonly IAccountManager _accountManager = accountManager;
+        private readonly ISqlSugarRepository<Menu> _menuRepository = menuRepository;
 
         /// <summary>
         /// 校验图片登录验证码,无需和账号绑定

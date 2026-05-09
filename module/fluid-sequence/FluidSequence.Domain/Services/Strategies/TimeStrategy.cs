@@ -1,7 +1,7 @@
-using FluidSequence.Domain.Entities;
+using SharpFort.FluidSequence.Domain.Entities;
 using System.Globalization;
 
-namespace FluidSequence.Domain.Services.Strategies
+namespace SharpFort.FluidSequence.Domain.Services.Strategies
 {
     public class TimeStrategy : IPlaceholderStrategy
     {
@@ -42,6 +42,8 @@ namespace FluidSequence.Domain.Services.Strategies
                     }
 
                     return fy.ToString(CultureInfo.InvariantCulture);
+                default:
+                    break;
             }
             return placeholderKey;
         }

@@ -314,7 +314,70 @@ namespace SharpFort.SqlSugarCore
                         SqlSugarClient.Ado.Connection.Database,
                         Path.Combine(backupDirectory, $"{fileName}.bak"));
                     break;
-
+                case DbType.Oracle:
+                    break;
+                case DbType.PostgreSQL:
+                    break;
+                case DbType.Dm:
+                    break;
+                case DbType.Kdbndp:
+                    break;
+                case DbType.Oscar:
+                    break;
+                case DbType.MySqlConnector:
+                    break;
+                case DbType.Access:
+                    break;
+                case DbType.OpenGauss:
+                    break;
+                case DbType.QuestDB:
+                    break;
+                case DbType.HG:
+                    break;
+                case DbType.ClickHouse:
+                    break;
+                case DbType.GBase:
+                    break;
+                case DbType.Odbc:
+                    break;
+                case DbType.OceanBaseForOracle:
+                    break;
+                case DbType.TDengine:
+                    break;
+                case DbType.GaussDB:
+                    break;
+                case DbType.OceanBase:
+                    break;
+                case DbType.Tidb:
+                    break;
+                case DbType.Vastbase:
+                    break;
+                case DbType.PolarDB:
+                    break;
+                case DbType.Doris:
+                    break;
+                case DbType.Xugu:
+                    break;
+                case DbType.GoldenDB:
+                    break;
+                case DbType.TDSQLForPGODBC:
+                    break;
+                case DbType.TDSQL:
+                    break;
+                case DbType.HANA:
+                    break;
+                case DbType.DB2:
+                    break;
+                case DbType.GaussDBNative:
+                    break;
+                case DbType.DuckDB:
+                    break;
+                case DbType.MongoDb:
+                    break;
+                case DbType.Custom:
+                    break;
+                case null:
+                    break;
                 default:
                     throw new NotImplementedException($"数据库类型 {DbConnectionOptions.DbType} 的备份操作尚未实现");
             }

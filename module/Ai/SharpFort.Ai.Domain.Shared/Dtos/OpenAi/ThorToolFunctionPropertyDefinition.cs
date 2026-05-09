@@ -86,6 +86,20 @@ public class ThorToolFunctionPropertyDefinition
                     case JsonValueKind.Array:
                         Types = JsonSerializer.Deserialize<string[]>(str.GetRawText())!;
                         break;
+                    case JsonValueKind.Undefined:
+                        break;
+                    case JsonValueKind.Object:
+                        break;
+                    case JsonValueKind.Number:
+                        break;
+                    case JsonValueKind.True:
+                        break;
+                    case JsonValueKind.False:
+                        break;
+                    case JsonValueKind.Null:
+                        break;
+                    default:
+                        break;
                 }
             }
             else

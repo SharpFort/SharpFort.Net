@@ -179,6 +179,20 @@ public static class GeminiGenerateContentAcquirer
                     CollectLastBase64(item, ref lastBase64, ref lastMimeType, minLength);
                 }
                 break;
+            case JsonValueKind.Undefined:
+                break;
+            case JsonValueKind.String:
+                break;
+            case JsonValueKind.Number:
+                break;
+            case JsonValueKind.True:
+                break;
+            case JsonValueKind.False:
+                break;
+            case JsonValueKind.Null:
+                break;
+            default:
+                break;
         }
     }
 
@@ -260,6 +274,20 @@ public static class GeminiGenerateContentAcquirer
                 {
                     CollectTextFields(item, texts);
                 }
+                break;
+            case JsonValueKind.Undefined:
+                break;
+            case JsonValueKind.String:
+                break;
+            case JsonValueKind.Number:
+                break;
+            case JsonValueKind.True:
+                break;
+            case JsonValueKind.False:
+                break;
+            case JsonValueKind.Null:
+                break;
+            default:
                 break;
         }
     }

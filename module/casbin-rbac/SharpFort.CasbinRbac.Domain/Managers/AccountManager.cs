@@ -33,9 +33,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly ILocalEventBus _localEventBus = localEventBus;
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
         private readonly RbacOptions _options = options.Value;
-        private UserManager _userManager = userManager;
-        private ISqlSugarRepository<Role> _roleRepository = roleRepository;
-        private RefreshJwtOptions _refreshJwtOptions = refreshJwtOptions.Value;
+        private readonly UserManager _userManager = userManager;
+        private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
+        private readonly RefreshJwtOptions _refreshJwtOptions = refreshJwtOptions.Value;
 
         /// <summary>
         /// 根据用户id获取token

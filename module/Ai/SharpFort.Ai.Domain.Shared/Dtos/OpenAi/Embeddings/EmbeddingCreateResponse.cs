@@ -65,6 +65,9 @@ public record EmbeddingCreateResponse : ThorBaseResponse
 
                     break;
                 }
+
+            default:
+                break;
         }
     }
 

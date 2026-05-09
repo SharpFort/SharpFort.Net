@@ -10,6 +10,12 @@ root = true
 # Category-wide: all Style rules are safe (see exceptions below)
 dotnet_analyzer_diagnostic.category-Style.severity = warning
 
+# IDE0008: prefer explicit type over var (var → explicit type)
+# Three sub-rules control when var is preferred vs explicit type
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = false:warning
+csharp_style_var_elsewhere = false:warning
+
 # Category-wide: all UnnecessaryCode rules are safe
 dotnet_analyzer_diagnostic.category-UnnecessaryCode.severity = warning
 
@@ -33,6 +39,12 @@ dotnet_diagnostic.IDE0058.severity = suggestion
 #   (1) if-throw guards are legitimate business logic (DTO validation), ternary throw is unnatural
 #   (2) if-return followed by already-ternary return creates nested ternary (hard to read)
 dotnet_diagnostic.IDE0046.severity = suggestion
+# IDE1006: naming rule violations — suppressed globally because:
+#   (A) HTTP/API DTO property names must match external JSON fields (snake_case/camelCase from OAuth/WeChat/Anthropic/OpenAI)
+#   (B) SqlSugar framework convention uses _Db, _DbQueryable as public interface members
+#   (C) Some private properties intentionally use _camelCase field-style naming
+#   Renaming any of these would either break serialization or violate external API contracts.
+dotnet_diagnostic.IDE1006.severity = suggestion
 
 # ── Naming Conventions (Microsoft defaults) ───────────────────────────────
 # Public members: PascalCase

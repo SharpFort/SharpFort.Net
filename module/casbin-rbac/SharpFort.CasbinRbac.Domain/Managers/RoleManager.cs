@@ -10,10 +10,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         ISqlSugarRepository<Menu> menuRepository,
         ICasbinPolicyManager casbinPolicyManager) : DomainService
     {
-        private ISqlSugarRepository<Role> _repository = repository;
-        private ISqlSugarRepository<RoleMenu> _roleMenuRepository = roleMenuRepository;
-        private ISqlSugarRepository<Menu> _menuRepository = menuRepository;
-        private ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
+        private readonly ISqlSugarRepository<Role> _repository = repository;
+        private readonly ISqlSugarRepository<RoleMenu> _roleMenuRepository = roleMenuRepository;
+        private readonly ISqlSugarRepository<Menu> _menuRepository = menuRepository;
+        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
 
         /// <summary>
         /// 给角色设置菜单

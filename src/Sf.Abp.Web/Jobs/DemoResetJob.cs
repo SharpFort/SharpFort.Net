@@ -7,10 +7,10 @@ namespace Sf.Abp.Web.Jobs
 {
     public class DemoResetJob : HangfireBackgroundWorkerBase
     {
-        private ISqlSugarDbContext _dbContext;
+        private readonly ISqlSugarDbContext _dbContext;
         private ILogger<DemoResetJob> _logger => LoggerFactory.CreateLogger<DemoResetJob>();
-        private IDataSeeder _dataSeeder;
-        private IConfiguration _configuration;
+        private readonly IDataSeeder _dataSeeder;
+        private readonly IConfiguration _configuration;
         public DemoResetJob(ISqlSugarDbContext dbContext, IDataSeeder dataSeeder, IConfiguration configuration)
         {
             _dbContext = dbContext;

@@ -65,7 +65,7 @@ public class AiGateWayManager : DomainService
     /// <returns></returns>
     public async Task<AiModelDescribe> GetModelAsync(ModelApiType modelApiType, string modelId)
     {
-        var aiModelDescribe = await _aiModelRepository._DbQueryable
+        AiModelDescribe aiModelDescribe = await _aiModelRepository._DbQueryable
             .LeftJoin<AiProvider>((model, app) => model.AiProviderId == app.Id)
             .Where((model, app) => model.ModelId == modelId)
             .Where((model, app) => model.ModelApiType == modelApiType)
@@ -112,17 +112,17 @@ public class AiGateWayManager : DomainService
         CancellationToken cancellationToken = default)
     {
         _specialCompatible.Compatible(request);
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 json
         //response.ContentType = "application/json; charset=UTF-8";
-        var modelDescribe = await GetModelAsync(ModelApiType.Completions, request.Model);
-        var chatService =
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Completions, request.Model);
+        IChatCompletionService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IChatCompletionService>(modelDescribe.HandlerName);
 
-        var sourceModelId = request.Model;
+        string sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var data = await chatService.CompleteChatAsync(modelDescribe, request, cancellationToken);
+        ThorChatCompletionsResponse data = await chatService.CompleteChatAsync(modelDescribe, request, cancellationToken);
         data.SupplementalMultiplier(modelDescribe.Multiplier);
         if (userId is not null)
         {
@@ -170,7 +170,7 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 SSE 流
         response.ContentType = "text/event-stream;charset=utf-8;";
         response.Headers.TryAdd("Cache-Control", "no-cache");
@@ -178,31 +178,31 @@ public class AiGateWayManager : DomainService
 
 
         _specialCompatible.Compatible(request);
-        var modelDescribe = await GetModelAsync(ModelApiType.Completions, request.Model);
-        var chatService =
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Completions, request.Model);
+        IChatCompletionService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IChatCompletionService>(modelDescribe.HandlerName);
 
-        var sourceModelId = request.Model;
+        string sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var completeChatResponse = chatService.CompleteChatStreamAsync(modelDescribe, request, cancellationToken);
-        var tokenUsage = new ThorUsageResponse();
+        IAsyncEnumerable<ThorChatCompletionsResponse> completeChatResponse = chatService.CompleteChatStreamAsync(modelDescribe, request, cancellationToken);
+        ThorUsageResponse tokenUsage = new();
 
         //缓存队列算法
         // 创建一个队列来缓存消息
-        var messageQueue = new ConcurrentQueue<string>();
+        ConcurrentQueue<string> messageQueue = new();
 
         StringBuilder backupSystemContent = new();
         // 设置输出速率（例如每50毫秒输出一次）
-        var outputInterval = TimeSpan.FromMilliseconds(75);
+        TimeSpan outputInterval = TimeSpan.FromMilliseconds(75);
         // 标记是否完成接收
-        var isComplete = false;
+        bool isComplete = false;
         // 启动一个后台任务来消费队列
-        var outputTask = Task.Run(async () =>
+        Task outputTask = Task.Run(async () =>
         {
             while (!(isComplete && messageQueue.IsEmpty))
             {
-                if (messageQueue.TryDequeue(out var message))
+                if (messageQueue.TryDequeue(out string? message))
                 {
                     await response.WriteAsync(message, Encoding.UTF8, cancellationToken).ConfigureAwait(false);
                     await response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -225,7 +225,7 @@ public class AiGateWayManager : DomainService
         //IAsyncEnumerable 只能在最外层捕获异常（如果你有其他办法的话...）
         try
         {
-            await foreach (var data in completeChatResponse)
+            await foreach (ThorChatCompletionsResponse data in completeChatResponse)
             {
                 data.SupplementalMultiplier(modelDescribe.Multiplier);
                 if (data.Usage is not null && (data.Usage.CompletionTokens > 0 || data.Usage.OutputTokens > 0))
@@ -233,7 +233,7 @@ public class AiGateWayManager : DomainService
                     tokenUsage = data.Usage;
                 }
 
-                var message = JsonSerializer.Serialize(data, ThorJsonSerializer.DefaultOptions);
+                string message = JsonSerializer.Serialize(data, ThorJsonSerializer.DefaultOptions);
                 backupSystemContent.Append(data.Choices?.FirstOrDefault()?.Delta.Content);
                 // 将消息加入队列而不是直接写入
                 messageQueue.Enqueue($"data: {message}\n\n");
@@ -244,8 +244,8 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
-            var model = new ThorChatCompletionsResponse()
+            string errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            ThorChatCompletionsResponse model = new()
             {
                 Choices =
                 [
@@ -258,7 +258,7 @@ public class AiGateWayManager : DomainService
                     }
                 ]
             };
-            var message = JsonConvert.SerializeObject(model, new JsonSerializerSettings
+            string message = JsonConvert.SerializeObject(model, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
@@ -311,19 +311,19 @@ public class AiGateWayManager : DomainService
     {
         try
         {
-            var model = request.Model;
+            string? model = request.Model;
             if (string.IsNullOrEmpty(model))
             {
                 model = "dall-e-2";
             }
 
-            var modelDescribe = await GetModelAsync(ModelApiType.Completions, model);
+            AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Completions, model);
 
             // 获取渠道指定的实现类型的服务
-            var imageService =
+            IImageService imageService =
                 LazyServiceProvider.GetRequiredKeyedService<IImageService>(modelDescribe.HandlerName);
 
-            var response = await imageService.CreateImage(request, modelDescribe);
+            ImageCreateResponse response = await imageService.CreateImage(request, modelDescribe);
 
             if (response.Error != null || response.Results.Count == 0)
             {
@@ -354,7 +354,7 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
-            var errorContent = $"图片生成Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"图片生成Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
     }
@@ -380,16 +380,16 @@ public class AiGateWayManager : DomainService
                 throw new ArgumentNullException(nameof(input), "模型校验异常");
             }
 
-            using var embedding =
+            using Activity? embedding =
                 Activity.Current?.Source.StartActivity("向量模型调用");
 
-            var modelDescribe = await GetModelAsync(ModelApiType.Completions, input.Model);
+            AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Completions, input.Model);
 
             // 获取渠道指定的实现类型的服务
-            var embeddingService =
+            ITextEmbeddingService embeddingService =
                 LazyServiceProvider.GetRequiredKeyedService<ITextEmbeddingService>(modelDescribe.HandlerName);
 
-            var embeddingCreateRequest = new EmbeddingCreateRequest
+            EmbeddingCreateRequest embeddingCreateRequest = new()
             {
                 Model = input.Model,
                 EncodingFormat = input.EncodingFormat
@@ -404,7 +404,7 @@ public class AiGateWayManager : DomainService
                 }
                 else if (str.ValueKind == JsonValueKind.Array)
                 {
-                    var inputString = str.EnumerateArray().Select(x => x.ToString()).ToArray();
+                    string[] inputString = [.. str.EnumerateArray().Select(x => x.ToString())];
                     embeddingCreateRequest.InputAsList = [.. inputString];
                 }
                 else
@@ -422,10 +422,10 @@ public class AiGateWayManager : DomainService
             }
 
 
-            var stream =
+            EmbeddingCreateResponse stream =
                 await embeddingService.EmbeddingAsync(embeddingCreateRequest, modelDescribe, context.RequestAborted);
 
-            var usage = new ThorUsageResponse()
+            ThorUsageResponse usage = new()
             {
                 PromptTokens = stream.Usage?.PromptTokens ?? 0,
                 InputTokens = stream.Usage?.InputTokens ?? 0,
@@ -470,7 +470,7 @@ public class AiGateWayManager : DomainService
         }
         catch (Exception e)
         {
-            var errorContent = $"嵌入Ai异常，异常信息：\n当前Ai模型：{input.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"嵌入Ai异常，异常信息：\n当前Ai模型：{input.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
     }
@@ -494,19 +494,19 @@ public class AiGateWayManager : DomainService
         CancellationToken cancellationToken = default)
     {
         _specialCompatible.AnthropicCompatible(request);
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 json
         //response.ContentType = "application/json; charset=UTF-8";
-        var modelDescribe = await GetModelAsync(ModelApiType.Messages, request.Model);
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Messages, request.Model);
 
-        var sourceModelId = request.Model;
+        string sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var chatService =
+        IAnthropicChatCompletionService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IAnthropicChatCompletionService>(modelDescribe.HandlerName);
-        var data = await chatService.ChatCompletionsAsync(modelDescribe, request, cancellationToken);
+        AnthropicChatCompletionDto data = await chatService.ChatCompletionsAsync(modelDescribe, request, cancellationToken);
 
-        var currentUsage = data.Usage;
+        AnthropicCompletionDtoUsage? currentUsage = data.Usage;
         ThorUsageResponse tokenUsage = new()
         {
             InputTokens = (currentUsage?.InputTokens ?? 0) + (currentUsage?.CacheCreationInputTokens ?? 0) + (currentUsage?.CacheReadInputTokens ?? 0),
@@ -562,23 +562,23 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 注意：SSE响应头推迟到第一条消息成功获取后再设置
 
         _specialCompatible.AnthropicCompatible(request);
-        var modelDescribe = await GetModelAsync(ModelApiType.Messages, request.Model);
-        var chatService =
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Messages, request.Model);
+        IAnthropicChatCompletionService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IAnthropicChatCompletionService>(modelDescribe.HandlerName);
 
-        var sourceModelId = request.Model;
+        string sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var completeChatResponse = chatService.StreamChatCompletionsAsync(modelDescribe, request, cancellationToken);
+        IAsyncEnumerable<(string, AnthropicStreamDto?)> completeChatResponse = chatService.StreamChatCompletionsAsync(modelDescribe, request, cancellationToken);
         ThorUsageResponse? tokenUsage = new();
         bool isFirst = true;
         try
         {
-            await foreach (var responseResult in completeChatResponse)
+            await foreach ((string, AnthropicStreamDto?) responseResult in completeChatResponse)
             {
                 // 第一条消息成功获取，才设置 SSE 响应头
                 if (isFirst)
@@ -597,7 +597,7 @@ public class AiGateWayManager : DomainService
                 //部分供应商message_start放一部分
                 if (responseResult.Item1.Contains("message_start"))
                 {
-                    var currentTokenUsage = responseResult.Item2!.Message!.Usage!;
+                    AnthropicCompletionDtoUsage currentTokenUsage = responseResult.Item2!.Message!.Usage!;
                     if ((currentTokenUsage.InputTokens ?? 0) != 0)
                     {
                         tokenUsage.InputTokens = (currentTokenUsage.InputTokens ?? 0) + (currentTokenUsage.CacheCreationInputTokens ?? 0) + (currentTokenUsage.CacheReadInputTokens ?? 0);
@@ -611,7 +611,7 @@ public class AiGateWayManager : DomainService
                 //message_delta又放一部分
                 if (responseResult.Item1.Contains("message_delta"))
                 {
-                    var currentTokenUsage = responseResult.Item2!.Usage!;
+                    AnthropicCompletionDtoUsage currentTokenUsage = responseResult.Item2!.Usage!;
 
                     if ((currentTokenUsage.InputTokens ?? 0) != 0)
                     {
@@ -633,7 +633,7 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{sourceModelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{sourceModelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
         tokenUsage.TotalTokens = (tokenUsage.InputTokens ?? 0) + (tokenUsage.OutputTokens ?? 0);
@@ -677,21 +677,21 @@ public class AiGateWayManager : DomainService
         CancellationToken cancellationToken = default)
     {
         // _specialCompatible.AnthropicCompatible(request);
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 json
         //response.ContentType = "application/json; charset=UTF-8";
-        var modelDescribe = await GetModelAsync(ModelApiType.Responses, request.Model);
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Responses, request.Model);
 
-        var chatService =
+        IOpenAiResponseService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IOpenAiResponseService>(modelDescribe.HandlerName);
-        var sourceModelId = request.Model;
+        string sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var data = await chatService.ResponsesAsync(modelDescribe, request, cancellationToken);
+        OpenAiResponsesOutput data = await chatService.ResponsesAsync(modelDescribe, request, cancellationToken);
 
         data.SupplementalMultiplier(modelDescribe.Multiplier);
 
-        var tokenUsage = new ThorUsageResponse
+        ThorUsageResponse tokenUsage = new()
         {
             InputTokens = data.Usage!.InputTokens,
             OutputTokens = data.Usage!.OutputTokens,
@@ -742,28 +742,28 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 SSE 流
         response.ContentType = "text/event-stream;charset=utf-8;";
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var modelDescribe = await GetModelAsync(ModelApiType.Responses, request.Model);
-        var chatService =
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.Responses, request.Model);
+        IOpenAiResponseService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IOpenAiResponseService>(modelDescribe.HandlerName);
-        var sourceModelId = request.Model;
+        string sourceModelId = request.Model;
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var completeChatResponse = chatService.ResponsesStreamAsync(modelDescribe, request, cancellationToken);
+        IAsyncEnumerable<(string, JsonElement?)> completeChatResponse = chatService.ResponsesStreamAsync(modelDescribe, request, cancellationToken);
         ThorUsageResponse? tokenUsage = null;
         try
         {
-            await foreach (var responseResult in completeChatResponse)
+            await foreach ((string, JsonElement?) responseResult in completeChatResponse)
             {
                 //message_start是为了保底机制
                 if (responseResult.Item1.Contains("response.completed"))
                 {
-                    var obj = responseResult.Item2!.Value;
+                    JsonElement obj = responseResult.Item2!.Value;
                     int inputTokens = obj.GetPath("response", "usage", "input_tokens").GetInt();
                     int outputTokens = obj.GetPath("response", "usage", "output_tokens").GetInt();
                     inputTokens = Convert.ToInt32(inputTokens * modelDescribe.Multiplier, CultureInfo.InvariantCulture);
@@ -787,7 +787,7 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai响应异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"响应Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"响应Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
 
@@ -831,14 +831,14 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var response = httpContext.Response;
-        var modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
+        HttpResponse response = httpContext.Response;
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
 
-        var chatService =
+        IGeminiGenerateContentService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
-        var data = await chatService.GenerateContentAsync(modelDescribe, request, cancellationToken);
+        JsonElement data = await chatService.GenerateContentAsync(modelDescribe, request, cancellationToken);
 
-        var tokenUsage = GeminiGenerateContentAcquirer.GetUsage(data);
+        ThorUsageResponse? tokenUsage = GeminiGenerateContentAcquirer.GetUsage(data);
         //如果是图片模型，单独扣费
         if (modelDescribe.ModelType == ModelType.Image)
         {
@@ -899,21 +899,21 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var response = httpContext.Response;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 SSE 流
         response.ContentType = "text/event-stream;charset=utf-8;";
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
-        var chatService =
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
+        IGeminiGenerateContentService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
 
-        var completeChatResponse = chatService.GenerateContentStreamAsync(modelDescribe, request, cancellationToken);
+        IAsyncEnumerable<JsonElement?> completeChatResponse = chatService.GenerateContentStreamAsync(modelDescribe, request, cancellationToken);
         ThorUsageResponse? tokenUsage = null;
         try
         {
-            await foreach (var responseResult in completeChatResponse)
+            await foreach (JsonElement? responseResult in completeChatResponse)
             {
                 if (responseResult!.Value.GetPath("candidates", 0, "finishReason").GetString() == "STOP")
                 {
@@ -944,7 +944,7 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai生成异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"生成Ai异常，异常信息：\n当前Ai模型：{modelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"生成Ai异常，异常信息：\n当前Ai模型：{modelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
             throw new UserFriendlyException(errorContent);
         }
 
@@ -989,15 +989,15 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var imageStoreTask = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == taskId);
-        var modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
+        ImageStoreTaskAggregateRoot imageStoreTask = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == taskId);
+        AiModelDescribe modelDescribe = await GetModelAsync(ModelApiType.GenerateContent, modelId);
 
-        var chatService =
+        IGeminiGenerateContentService chatService =
             LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
-        var data = await chatService.GenerateContentAsync(modelDescribe, request, cancellationToken);
+        JsonElement data = await chatService.GenerateContentAsync(modelDescribe, request, cancellationToken);
 
         // 检查是否被大模型内容安全策略拦截
-        var rawResponse = data.GetRawText();
+        string rawResponse = data.GetRawText();
         if (rawResponse.Contains("policies.google.com/terms/generative-ai/use-policy"))
         {
 #pragma warning disable CA1848 // Business guard protects this call
@@ -1007,7 +1007,7 @@ public class AiGateWayManager : DomainService
         }
 
         //解析json，获取base64字符串
-        var imagePrefixBase64 = GeminiGenerateContentAcquirer.GetImagePrefixBase64(data);
+        string imagePrefixBase64 = GeminiGenerateContentAcquirer.GetImagePrefixBase64(data);
         if (string.IsNullOrWhiteSpace(imagePrefixBase64))
         {
 #pragma warning disable CA1848 // Business guard protects this call
@@ -1017,15 +1017,15 @@ public class AiGateWayManager : DomainService
         }
 
         //远程调用上传接口，将base64转换为URL
-        var httpClient = LazyServiceProvider.LazyGetRequiredService<IHttpClientFactory>().CreateClient();
+        HttpClient httpClient = LazyServiceProvider.LazyGetRequiredService<IHttpClientFactory>().CreateClient();
         // var uploadUrl = $"https://ccnetcore.com/prod-api/ai-hub/ai-image/upload-base64";
-        var uploadUrl = $"{ImageStoreHost}/ai-image/upload-base64";
-        var content = new StringContent(JsonSerializer.Serialize(imagePrefixBase64), Encoding.UTF8, "application/json");
-        var uploadResponse = await httpClient.PostAsync(uploadUrl, content, cancellationToken);
+        string uploadUrl = $"{ImageStoreHost}/ai-image/upload-base64";
+        StringContent content = new(JsonSerializer.Serialize(imagePrefixBase64), Encoding.UTF8, "application/json");
+        HttpResponseMessage uploadResponse = await httpClient.PostAsync(uploadUrl, content, cancellationToken);
         uploadResponse.EnsureSuccessStatusCode();
-        var storeUrl = await uploadResponse.Content.ReadAsStringAsync(cancellationToken);
+        string storeUrl = await uploadResponse.Content.ReadAsStringAsync(cancellationToken);
 
-        var tokenUsage = new ThorUsageResponse
+        ThorUsageResponse tokenUsage = new()
         {
             InputTokens = (int)modelDescribe.Multiplier,
             OutputTokens = (int)modelDescribe.Multiplier,
@@ -1060,30 +1060,30 @@ public class AiGateWayManager : DomainService
         Guid? tokenId = null,
         CancellationToken cancellationToken = default)
     {
-        var startTime = DateTime.Now;
-        var response = httpContext.Response;
+        DateTime startTime = DateTime.Now;
+        HttpResponse response = httpContext.Response;
         // 设置响应头，声明是 SSE 流
         response.ContentType = "text/event-stream;charset=utf-8;";
         response.Headers.TryAdd("Cache-Control", "no-cache");
         response.Headers.TryAdd("Connection", "keep-alive");
 
-        var sourceModelId = modelId;
+        string sourceModelId = modelId;
         // 处理模型前缀
         modelId = ModelConst.RemoveModelPrefix(modelId);
 
-        var modelDescribe = await GetModelAsync(apiType, sourceModelId);
+        AiModelDescribe modelDescribe = await GetModelAsync(apiType, sourceModelId);
 
         // 公共缓存队列
-        var messageQueue = new ConcurrentQueue<string>();
-        var outputInterval = TimeSpan.FromMilliseconds(75);
-        var isComplete = false;
+        ConcurrentQueue<string> messageQueue = new();
+        TimeSpan outputInterval = TimeSpan.FromMilliseconds(75);
+        bool isComplete = false;
 
         // 公共消费任务
-        var outputTask = Task.Run(async () =>
+        Task outputTask = Task.Run(async () =>
         {
             while (!(isComplete && messageQueue.IsEmpty))
             {
-                if (messageQueue.TryDequeue(out var message))
+                if (messageQueue.TryDequeue(out string? message))
                 {
                     await response.WriteAsync(message, Encoding.UTF8, cancellationToken).ConfigureAwait(false);
                     await response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -1122,7 +1122,7 @@ public class AiGateWayManager : DomainService
 
 
         // 统一的统计处理
-        var userMessageId = await _aiMessageManager.CreateUserMessageAsync(userId, sessionId,
+        Guid userMessageId = await _aiMessageManager.CreateUserMessageAsync(userId, sessionId,
             new MessageInputDto
             {
                 Content = sessionId is null ? "不予存储" : processResult?.UserContent ?? string.Empty,
@@ -1130,7 +1130,7 @@ public class AiGateWayManager : DomainService
                 TokenUsage = processResult?.TokenUsage,
             }, tokenId, createTime: startTime);
 
-        var systemMessageId = await _aiMessageManager.CreateSystemMessageAsync(userId, sessionId,
+        Guid systemMessageId = await _aiMessageManager.CreateSystemMessageAsync(userId, sessionId,
             new MessageInputDto
             {
                 Content = sessionId is null ? "不予存储" : processResult?.SystemContent ?? string.Empty,
@@ -1139,8 +1139,8 @@ public class AiGateWayManager : DomainService
             }, tokenId);
 
         // 流式返回消息ID
-        var now = DateTime.Now;
-        var userMessageOutput = new MessageCreatedOutput
+        DateTime now = DateTime.Now;
+        MessageCreatedOutput userMessageOutput = new()
         {
             TypeEnum = ChatMessageTypeEnum.UserMessage,
             MessageId = userMessageId,
@@ -1148,7 +1148,7 @@ public class AiGateWayManager : DomainService
         };
         messageQueue.Enqueue($"data: {JsonSerializer.Serialize(userMessageOutput, ThorJsonSerializer.DefaultOptions)}\n\n");
 
-        var systemMessageOutput = new MessageCreatedOutput
+        MessageCreatedOutput systemMessageOutput = new()
         {
             TypeEnum = ChatMessageTypeEnum.SystemMessage,
             MessageId = systemMessageId,
@@ -1187,23 +1187,23 @@ public class AiGateWayManager : DomainService
         Guid? userId,
         CancellationToken cancellationToken)
     {
-        var request = requestBody.Deserialize<ThorChatCompletionsRequest>(ThorJsonSerializer.DefaultOptions)!;
+        ThorChatCompletionsRequest request = requestBody.Deserialize<ThorChatCompletionsRequest>(ThorJsonSerializer.DefaultOptions)!;
         _specialCompatible.Compatible(request);
 
         // 提取用户最后一条消息
-        var userContent = request.Messages?.LastOrDefault()?.MessagesStore ?? string.Empty;
+        string userContent = request.Messages?.LastOrDefault()?.MessagesStore ?? string.Empty;
 
         // 处理模型前缀
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var chatService = LazyServiceProvider.GetRequiredKeyedService<IChatCompletionService>(modelDescribe.HandlerName);
-        var completeChatResponse = chatService.CompleteChatStreamAsync(modelDescribe, request, cancellationToken);
-        var tokenUsage = new ThorUsageResponse();
-        var systemContentBuilder = new StringBuilder();
+        IChatCompletionService chatService = LazyServiceProvider.GetRequiredKeyedService<IChatCompletionService>(modelDescribe.HandlerName);
+        IAsyncEnumerable<ThorChatCompletionsResponse> completeChatResponse = chatService.CompleteChatStreamAsync(modelDescribe, request, cancellationToken);
+        ThorUsageResponse tokenUsage = new();
+        StringBuilder systemContentBuilder = new();
 
         try
         {
-            await foreach (var data in completeChatResponse)
+            await foreach (ThorChatCompletionsResponse data in completeChatResponse)
             {
                 data.SupplementalMultiplier(modelDescribe.Multiplier);
                 if (data.Usage is not null && (data.Usage.CompletionTokens > 0 || data.Usage.OutputTokens > 0))
@@ -1212,13 +1212,13 @@ public class AiGateWayManager : DomainService
                 }
 
                 // 累加系统输出内容 (choices[].delta.content)
-                var deltaContent = data.Choices?.FirstOrDefault()?.Delta?.Content;
+                string? deltaContent = data.Choices?.FirstOrDefault()?.Delta?.Content;
                 if (!string.IsNullOrEmpty(deltaContent))
                 {
                     systemContentBuilder.Append(deltaContent);
                 }
 
-                var message = JsonSerializer.Serialize(data, ThorJsonSerializer.DefaultOptions);
+                string message = JsonSerializer.Serialize(data, ThorJsonSerializer.DefaultOptions);
                 messageQueue.Enqueue($"data: {message}\n\n");
             }
         }
@@ -1227,9 +1227,9 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
-            var model = new ThorChatCompletionsResponse()
+            ThorChatCompletionsResponse model = new()
             {
                 Choices =
                 [
@@ -1242,7 +1242,7 @@ public class AiGateWayManager : DomainService
                     }
                 ]
             };
-            var errorMessage = JsonConvert.SerializeObject(model, new JsonSerializerSettings
+            string errorMessage = JsonConvert.SerializeObject(model, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
@@ -1267,35 +1267,35 @@ public class AiGateWayManager : DomainService
         Guid? userId,
         CancellationToken cancellationToken)
     {
-        var request = requestBody.Deserialize<AnthropicInput>(ThorJsonSerializer.DefaultOptions)!;
+        AnthropicInput request = requestBody.Deserialize<AnthropicInput>(ThorJsonSerializer.DefaultOptions)!;
         _specialCompatible.AnthropicCompatible(request);
 
         // 提取用户最后一条消息
-        var lastMessage = request.Messages?.LastOrDefault();
-        var userContent = lastMessage?.Content ?? string.Empty;
+        AnthropicMessageInput? lastMessage = request.Messages?.LastOrDefault();
+        string userContent = lastMessage?.Content ?? string.Empty;
         if (string.IsNullOrEmpty(userContent) && lastMessage?.Contents != null && lastMessage.Contents.Any())
         {
             // 如果是 Contents 数组，提取第一个 text 类型的内容
-            var textContent = lastMessage.Contents.FirstOrDefault(c => c.Type == "text");
+            AnthropicMessageContent? textContent = lastMessage.Contents.FirstOrDefault(c => c.Type == "text");
             userContent = textContent?.Text ?? System.Text.Json.JsonSerializer.Serialize(lastMessage.Contents);
         }
 
         // 处理模型前缀
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var chatService = LazyServiceProvider.GetRequiredKeyedService<IAnthropicChatCompletionService>(modelDescribe.HandlerName);
-        var completeChatResponse = chatService.StreamChatCompletionsAsync(modelDescribe, request, cancellationToken);
-        var tokenUsage = new ThorUsageResponse();
-        var systemContentBuilder = new StringBuilder();
+        IAnthropicChatCompletionService chatService = LazyServiceProvider.GetRequiredKeyedService<IAnthropicChatCompletionService>(modelDescribe.HandlerName);
+        IAsyncEnumerable<(string, AnthropicStreamDto?)> completeChatResponse = chatService.StreamChatCompletionsAsync(modelDescribe, request, cancellationToken);
+        ThorUsageResponse tokenUsage = new();
+        StringBuilder systemContentBuilder = new();
 
         try
         {
-            await foreach (var responseResult in completeChatResponse)
+            await foreach ((string, AnthropicStreamDto?) responseResult in completeChatResponse)
             {
                 // 部分供应商message_start放一部分
                 if (responseResult.Item1.Contains("message_start"))
                 {
-                    var currentTokenUsage = responseResult.Item2?.Message?.Usage;
+                    AnthropicCompletionDtoUsage? currentTokenUsage = responseResult.Item2?.Message?.Usage;
                     if (currentTokenUsage != null)
                     {
                         if ((currentTokenUsage.InputTokens ?? 0) != 0)
@@ -1314,7 +1314,7 @@ public class AiGateWayManager : DomainService
                 // message_delta又放一部分
                 if (responseResult.Item1.Contains("message_delta"))
                 {
-                    var currentTokenUsage = responseResult.Item2?.Usage;
+                    AnthropicCompletionDtoUsage? currentTokenUsage = responseResult.Item2?.Usage;
                     if (currentTokenUsage != null)
                     {
                         if ((currentTokenUsage.InputTokens ?? 0) != 0)
@@ -1331,14 +1331,14 @@ public class AiGateWayManager : DomainService
                 }
 
                 // 累加系统输出内容 (delta.text)
-                var deltaText = responseResult.Item2?.Delta?.Text;
+                string? deltaText = responseResult.Item2?.Delta?.Text;
                 if (!string.IsNullOrEmpty(deltaText))
                 {
                     systemContentBuilder.Append(deltaText);
                 }
 
                 // 序列化为SSE格式字符串
-                var data = JsonSerializer.Serialize(responseResult.Item2, ThorJsonSerializer.DefaultOptions);
+                string data = JsonSerializer.Serialize(responseResult.Item2, ThorJsonSerializer.DefaultOptions);
                 messageQueue.Enqueue($"{responseResult.Item1.Trim()}\ndata: {data}\n\n");
             }
         }
@@ -1347,7 +1347,7 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai对话异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"对话Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             throw new UserFriendlyException(errorContent);
         }
@@ -1373,10 +1373,10 @@ public class AiGateWayManager : DomainService
         Guid? userId,
         CancellationToken cancellationToken)
     {
-        var request = requestBody.Deserialize<OpenAiResponsesInput>(ThorJsonSerializer.DefaultOptions)!;
+        OpenAiResponsesInput request = requestBody.Deserialize<OpenAiResponsesInput>(ThorJsonSerializer.DefaultOptions)!;
 
         // 提取用户输入内容 (input 字段可能是字符串或数组)
-        var userContent = string.Empty;
+        string userContent = string.Empty;
         if (request.Input.ValueKind == JsonValueKind.String)
         {
             userContent = request.Input.GetString() ?? string.Empty;
@@ -1384,12 +1384,12 @@ public class AiGateWayManager : DomainService
         else if (request.Input.ValueKind == JsonValueKind.Array)
         {
             // 获取最后一个 user 角色的消息
-            var inputArray = request.Input.EnumerateArray().ToList();
-            var lastUserMessage = inputArray.LastOrDefault(x =>
-                x.TryGetProperty("role", out var role) && role.GetString() == "user");
+            List<JsonElement> inputArray = [.. request.Input.EnumerateArray()];
+            JsonElement lastUserMessage = inputArray.LastOrDefault(x =>
+                x.TryGetProperty("role", out JsonElement role) && role.GetString() == "user");
             if (lastUserMessage.ValueKind != JsonValueKind.Undefined)
             {
-                if (lastUserMessage.TryGetProperty("content", out var content))
+                if (lastUserMessage.TryGetProperty("content", out JsonElement content))
                 {
                     userContent = content.GetString() ?? string.Empty;
                 }
@@ -1399,19 +1399,19 @@ public class AiGateWayManager : DomainService
         // 处理模型前缀
         request.Model = ModelConst.ProcessModelId(request.Model);
 
-        var chatService = LazyServiceProvider.GetRequiredKeyedService<IOpenAiResponseService>(modelDescribe.HandlerName);
-        var completeChatResponse = chatService.ResponsesStreamAsync(modelDescribe, request, cancellationToken);
+        IOpenAiResponseService chatService = LazyServiceProvider.GetRequiredKeyedService<IOpenAiResponseService>(modelDescribe.HandlerName);
+        IAsyncEnumerable<(string, JsonElement?)> completeChatResponse = chatService.ResponsesStreamAsync(modelDescribe, request, cancellationToken);
         ThorUsageResponse? tokenUsage = null;
-        var systemContentBuilder = new StringBuilder();
+        StringBuilder systemContentBuilder = new();
 
         try
         {
-            await foreach (var responseResult in completeChatResponse)
+            await foreach ((string, JsonElement?) responseResult in completeChatResponse)
             {
                 // 提取输出文本内容 (response.output_text.delta 事件)
                 if (responseResult.Item1.Contains("response.output_text.delta"))
                 {
-                    var delta = responseResult.Item2?.GetPath("delta").GetString();
+                    string? delta = responseResult.Item2?.GetPath("delta").GetString();
                     if (!string.IsNullOrEmpty(delta))
                     {
                         systemContentBuilder.Append(delta);
@@ -1420,7 +1420,7 @@ public class AiGateWayManager : DomainService
 
                 if (responseResult.Item1.Contains("response.completed"))
                 {
-                    var obj = responseResult.Item2!.Value;
+                    JsonElement obj = responseResult.Item2!.Value;
                     int inputTokens = obj.GetPath("response", "usage", "input_tokens").GetInt();
                     int outputTokens = obj.GetPath("response", "usage", "output_tokens").GetInt();
                     inputTokens = Convert.ToInt32(inputTokens * modelDescribe.Multiplier, CultureInfo.InvariantCulture);
@@ -1436,7 +1436,7 @@ public class AiGateWayManager : DomainService
                 }
 
                 // 序列化为SSE格式字符串
-                var data = JsonSerializer.Serialize(responseResult.Item2, ThorJsonSerializer.DefaultOptions);
+                string data = JsonSerializer.Serialize(responseResult.Item2, ThorJsonSerializer.DefaultOptions);
                 messageQueue.Enqueue($"{responseResult.Item1.Trim()}\ndata: {data}\n\n");
             }
         }
@@ -1445,7 +1445,7 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai响应异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"响应Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"响应Ai异常，异常信息：\n当前Ai模型：{request.Model}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             throw new UserFriendlyException(errorContent);
         }
@@ -1469,19 +1469,19 @@ public class AiGateWayManager : DomainService
         CancellationToken cancellationToken)
     {
         // 提取用户最后一条消息 (contents[last].parts[last].text)
-        var userContent = GeminiGenerateContentAcquirer.GetLastUserContent(requestBody);
+        string userContent = GeminiGenerateContentAcquirer.GetLastUserContent(requestBody);
 
-        var chatService = LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
-        var completeChatResponse = chatService.GenerateContentStreamAsync(modelDescribe, requestBody, cancellationToken);
+        IGeminiGenerateContentService chatService = LazyServiceProvider.GetRequiredKeyedService<IGeminiGenerateContentService>(modelDescribe.HandlerName);
+        IAsyncEnumerable<JsonElement?> completeChatResponse = chatService.GenerateContentStreamAsync(modelDescribe, requestBody, cancellationToken);
         ThorUsageResponse? tokenUsage = null;
-        var systemContentBuilder = new StringBuilder();
+        StringBuilder systemContentBuilder = new();
 
         try
         {
-            await foreach (var responseResult in completeChatResponse)
+            await foreach (JsonElement? responseResult in completeChatResponse)
             {
                 // 累加系统输出内容 (candidates[0].content.parts[].text，排除 thought)
-                var textContent = GeminiGenerateContentAcquirer.GetTextContent(responseResult!.Value);
+                string textContent = GeminiGenerateContentAcquirer.GetTextContent(responseResult!.Value);
                 if (!string.IsNullOrEmpty(textContent))
                 {
                     systemContentBuilder.Append(textContent);
@@ -1514,7 +1514,7 @@ public class AiGateWayManager : DomainService
 #pragma warning disable CA1848 // Business guard protects this call (catch block)
             _logger.LogError(e, "Ai生成异常，用户ID：{UserId}", userId);
 #pragma warning restore CA1848
-            var errorContent = $"生成Ai异常，异常信息：\n当前Ai模型：{modelDescribe.ModelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
+            string errorContent = $"生成Ai异常，异常信息：\n当前Ai模型：{modelDescribe.ModelId}\n异常信息：{e.Message}\n异常堆栈：{e}";
             systemContentBuilder.Append(errorContent);
             throw new UserFriendlyException(errorContent);
         }
@@ -1545,8 +1545,8 @@ public class AiGateWayManager : DomainService
         T value,
         CancellationToken cancellationToken = default)
     {
-        var response = context.Response;
-        var bodyStream = response.Body;
+        HttpResponse response = context.Response;
+        Stream bodyStream = response.Body;
         // 确保 SSE Header 已经设置好
         // e.g. Content-Type: text/event-stream; charset=utf-8
         await response.StartAsync(cancellationToken).ConfigureAwait(false);
@@ -1577,7 +1577,7 @@ public class AiGateWayManager : DomainService
             return;
         }
 
-        var buffer = Encoding.UTF8.GetBytes(value);
+        byte[] buffer = Encoding.UTF8.GetBytes(value);
         await stream.WriteAsync(buffer, token).ConfigureAwait(false);
     }
 

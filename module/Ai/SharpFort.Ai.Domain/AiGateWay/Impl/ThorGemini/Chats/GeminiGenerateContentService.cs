@@ -16,7 +16,7 @@ public class GeminiGenerateContentService(
     public async IAsyncEnumerable<JsonElement?> GenerateContentStreamAsync(AiModelDescribe options, JsonElement input,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var response = await httpClientFactory.CreateClient().PostJsonAsync(
+        HttpResponseMessage response = await httpClientFactory.CreateClient().PostJsonAsync(
             options.Endpoint.TrimEnd('/') + $"/v1beta/models/{options.ModelId}:streamGenerateContent?alt=sse",
             input, null, new Dictionary<string, string>()
             {
@@ -27,7 +27,7 @@ public class GeminiGenerateContentService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Gemini生成异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
@@ -37,7 +37,7 @@ public class GeminiGenerateContentService(
             throw new InvalidOperationException("Gemini生成异常" + response.StatusCode);
         }
 
-        using var stream = new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken));
+        using StreamReader stream = new(await response.Content.ReadAsStreamAsync(cancellationToken));
 
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken));
         string? line = string.Empty;
@@ -55,9 +55,9 @@ public class GeminiGenerateContentService(
                 continue;
             }
 
-            var data = line[OpenAIConstant.Data.Length..].Trim();
+            string data = line[OpenAIConstant.Data.Length..].Trim();
 
-            var result = JsonSerializer.Deserialize<JsonElement>(data,
+            JsonElement result = JsonSerializer.Deserialize<JsonElement>(data,
                 ThorJsonSerializer.DefaultOptions);
 
             yield return result;
@@ -67,7 +67,7 @@ public class GeminiGenerateContentService(
     public async Task<JsonElement> GenerateContentAsync(AiModelDescribe options, JsonElement input,
         CancellationToken cancellationToken)
     {
-        var response = await httpClientFactory.CreateClient().PostJsonAsync(
+        HttpResponseMessage response = await httpClientFactory.CreateClient().PostJsonAsync(
             options.Endpoint.TrimEnd('/') + $"/v1beta/models/{options.ModelId}:generateContent",
             input, null, new Dictionary<string, string>()
             {
@@ -88,7 +88,7 @@ public class GeminiGenerateContentService(
         // 大于等于400的状态码都认为是异常
         if (response.StatusCode >= HttpStatusCode.BadRequest)
         {
-            var error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            string error = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 #pragma warning disable CA1848 // Business guard protects this call
             logger.LogError("Gemini 生成异常 请求地址：{Address}, StatusCode: {StatusCode} Response: {Response}",
                 options.Endpoint,
@@ -98,7 +98,7 @@ public class GeminiGenerateContentService(
             throw new BusinessException("Gemini 生成异常", response.StatusCode.ToString());
         }
 
-        var result =
+        JsonElement result =
             await response.Content.ReadFromJsonAsync<JsonElement>(
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 

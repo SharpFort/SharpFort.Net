@@ -1,4 +1,6 @@
-﻿using SharpFort.SettingManagement.Domain;
+﻿// IDE0130: ABP 框架覆盖, 必须使用 Volo.Abp 命名空间才能被 ABP DI 扫描替换
+#pragma warning disable IDE0130
+using SharpFort.SettingManagement.Domain;
 using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.SqlSugarCore.Repositories;
 

@@ -16,7 +16,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             ConfigGetListInputVo, ConfigCreateInputVo, ConfigUpdateInputVo>(repository),
         IConfigService
     {
-        private ISqlSugarRepository<Config, Guid> _repository = repository;
+        private readonly ISqlSugarRepository<Config, Guid> _repository = repository;
 
         /// <summary>
         /// 新增配置

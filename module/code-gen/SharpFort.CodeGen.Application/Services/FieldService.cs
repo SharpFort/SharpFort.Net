@@ -16,7 +16,7 @@ namespace SharpFort.CodeGen.Application.Services
     /// </summary>
     public class FieldService(ISqlSugarRepository<Field, Guid> repository) : SfCrudAppService<Field, FieldDto, Guid, FieldGetListInput>(repository), IFieldService
     {
-        private ISqlSugarRepository<Field, Guid> _repository = repository;
+        private readonly ISqlSugarRepository<Field, Guid> _repository = repository;
 
         public async override Task<PagedResultDto<FieldDto>> GetListAsync([FromQuery] FieldGetListInput input)
         {

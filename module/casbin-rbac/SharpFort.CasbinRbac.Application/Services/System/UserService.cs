@@ -41,13 +41,13 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 (userManager, userRepository, currentUser, deptService, repository, localEventBus, enforcer);
 
         private UserManager _userManager { get; set; }
-        private ISqlSugarRepository<User, Guid> _repository;
+        private readonly ISqlSugarRepository<User, Guid> _repository;
         private IUserRepository _userRepository { get; set; }
         private IDeptService _deptService { get; set; }
 
         private ICurrentUser _currentUser { get; set; }
 
-        private ILocalEventBus _localEventBus;
+        private readonly ILocalEventBus _localEventBus;
         private readonly IEnforcer _enforcer;
 
         /// <summary>
