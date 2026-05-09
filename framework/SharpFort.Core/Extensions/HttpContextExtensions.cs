@@ -25,7 +25,7 @@ namespace SharpFort.Core.Extensions
         /// </remarks>
         public static void FileInlineHandle(this HttpContext httpContext, string fileName)
         {
-            var encodeFilename = System.Web.HttpUtility.UrlEncode(fileName, Encoding.UTF8);
+            string encodeFilename = System.Web.HttpUtility.UrlEncode(fileName, Encoding.UTF8);
             httpContext.Response.Headers["Content-Disposition"] = $"inline;filename={encodeFilename}";
         }
 
@@ -45,7 +45,7 @@ namespace SharpFort.Core.Extensions
         /// </remarks>
         public static void FileAttachmentHandle(this HttpContext httpContext, string fileName)
         {
-            var encodeFilename = System.Web.HttpUtility.UrlEncode(fileName, Encoding.UTF8);
+            string encodeFilename = System.Web.HttpUtility.UrlEncode(fileName, Encoding.UTF8);
             httpContext.Response.Headers["Content-Disposition"] = $"attachment;filename={encodeFilename}";
         }
 
@@ -57,7 +57,7 @@ namespace SharpFort.Core.Extensions
         public static string GetLanguage(this HttpContext httpContext)
         {
             const string defaultLanguage = "zh-CN";
-            var acceptLanguage = httpContext.Request.Headers["Accept-Language"].FirstOrDefault();
+            string? acceptLanguage = httpContext.Request.Headers["Accept-Language"].FirstOrDefault();
 
             return string.IsNullOrEmpty(acceptLanguage)
                 ? defaultLanguage
@@ -90,7 +90,7 @@ namespace SharpFort.Core.Extensions
             }
 
             // 尝试获取X-Forwarded-For头
-            var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            string? ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
 
             // 如果没有代理头,则获取远程IP
             if (string.IsNullOrEmpty(ip))
@@ -111,7 +111,7 @@ namespace SharpFort.Core.Extensions
             ip = Regex.Replace(ip, @":\d{1,5}$", "");
 
             // 验证IP格式
-            var isValidIp = Regex.IsMatch(ip, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") ||
+            bool isValidIp = Regex.IsMatch(ip, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$") ||
                            Regex.IsMatch(ip, @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?):\d{1,5}$");
 
             return isValidIp ? ip : localhost;

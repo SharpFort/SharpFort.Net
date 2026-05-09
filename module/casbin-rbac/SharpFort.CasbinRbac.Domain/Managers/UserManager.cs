@@ -52,11 +52,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             if (roleIds is not null)
             {
                 // 遍历用户
-                foreach (var userId in userIds)
+                foreach (Guid userId in userIds)
                 {
                     // 添加新的关系
                     List<UserRole> userRoleEntities = [];
-                    foreach (var roleId in roleIds)
+                    foreach (Guid roleId in roleIds)
                     {
                         userRoleEntities.Add(new UserRole() { UserId = userId, RoleId = roleId });
                     }
@@ -66,14 +66,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             // 2. Casbin 同步逻辑
-            var users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
-            var roles = new List<Role>();
+            List<User> users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
+            List<Role> roles = new List<Role>();
             if (roleIds is not null && roleIds.Count > 0)
             {
                 roles = await _roleRepository.GetListAsync(r => roleIds.Contains(r.Id));
             }
 
-            foreach (var user in users)
+            foreach (User user in users)
             {
                 // 将选中的 roles 赋给该 user (Casbin g 策略)
                 await _casbinPolicyManager.SetUserRolesAsync(user, roles);
@@ -89,10 +89,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             await _repositoryUserPost.DeleteAsync(u => userIds.Contains(u.UserId));
             if (postIds is not null)
             {
-                foreach (var userId in userIds)
+                foreach (Guid userId in userIds)
                 {
                     List<UserPosition> userPostEntities = [];
-                    foreach (var post in postIds)
+                    foreach (Guid post in postIds)
                     {
                         userPostEntities.Add(new UserPosition() { UserId = userId, PostId = post });
                     }
@@ -116,13 +116,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 }
             }
 
-            var isExist = await _repository.IsAnyAsync(x => x.UserName == userEntity.UserName);
+            bool isExist = await _repository.IsAnyAsync(x => x.UserName == userEntity.UserName);
             if (isExist)
             {
                 throw new UserFriendlyException(UserConst.Exist);
             }
 
-            var entity = await _repository.InsertReturnEntityAsync(userEntity);
+            User entity = await _repository.InsertReturnEntityAsync(userEntity);
 
             // 发布事件 (可能会触发 SetDefautRoleAsync，进而触发 Casbin 同步)
             await _localEventBus.PublishAsync(new UserCreateEventArgs(entity.Id));
@@ -131,7 +131,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task SetDefautRoleAsync(Guid userId)
         {
-            var role = await _roleRepository.GetFirstAsync(x => x.RoleCode == UserConst.DefaultRoleCode);
+            Role? role = await _roleRepository.GetFirstAsync(x => x.RoleCode == UserConst.DefaultRoleCode);
             if (role is not null)
             {
                 // 这会调用上面修改过的 GiveUserSetRoleAsync，从而自动同步 Casbin
@@ -162,20 +162,20 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task<UserRoleMenuDto> GetInfoAsync(Guid userId)
         {
-            var user = await _userRepository.GetUserAllInfoAsync(userId);
-            var data = EntityMapToDto(user);
+            User user = await _userRepository.GetUserAllInfoAsync(userId);
+            UserRoleMenuDto? data = EntityMapToDto(user);
             return data is null ? throw new AbpAuthorizationException() : data;
         }
 
         private async Task<UserRoleMenuDto> GetInfoByCacheAsync(Guid userId)
         {
             UserRoleMenuDto? output = null;
-            var tokenExpiresMinuteTime = LazyServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value.ExpiresMinuteTime;
-            var cacheData = await _userCache.GetOrAddAsync(new UserInfoCacheKey(userId),
+            long tokenExpiresMinuteTime = LazyServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value.ExpiresMinuteTime;
+            UserInfoCacheItem? cacheData = await _userCache.GetOrAddAsync(new UserInfoCacheKey(userId),
                async () =>
                {
-                   var user = await _userRepository.GetUserAllInfoAsync(userId);
-                   var data = EntityMapToDto(user) ?? throw new AbpAuthorizationException();
+                   User user = await _userRepository.GetUserAllInfoAsync(userId);
+                   UserRoleMenuDto data = EntityMapToDto(user) ?? throw new AbpAuthorizationException();
                    output = data;
                    return new UserInfoCacheItem(data);
                },
@@ -192,7 +192,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public async Task<List<UserRoleMenuDto>> GetInfoListAsync(List<Guid> userIds)
         {
             List<UserRoleMenuDto> output = [];
-            foreach (var userId in userIds)
+            foreach (Guid userId in userIds)
             {
                 output.Add(await GetInfoByCacheAsync(userId));
             }
@@ -201,7 +201,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private static UserRoleMenuDto EntityMapToDto(User user)
         {
-            var userRoleMenu = new UserRoleMenuDto();
+            UserRoleMenuDto userRoleMenu = new UserRoleMenuDto();
             if (user is null)
             {
                 throw new UserFriendlyException($"数据错误，查询用户不存在，请重新登录");
@@ -218,15 +218,15 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 return userRoleMenu;
             }
 
-            var roleList = user.Roles;
+            List<Role> roleList = user.Roles;
 
-            foreach (var role in roleList)
+            foreach (Role role in roleList)
             {
                 userRoleMenu.RoleCodes.Add(role.RoleCode);
 
                 if (role.Menus is not null)
                 {
-                    foreach (var menu in role.Menus)
+                    foreach (Menu menu in role.Menus)
                     {
                         if (!string.IsNullOrEmpty(menu.PermissionCode))
                         {

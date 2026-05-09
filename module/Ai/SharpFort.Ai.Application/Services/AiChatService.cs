@@ -43,13 +43,13 @@ public class AiChatService(IHttpContextAccessor httpContextAccessor,
     /// </summary>
     public async Task<List<AiModelDto>> GetModelListAsync()
     {
-        var entities = await _aiModelRepository._DbQueryable
+        List<AiModel> entities = await _aiModelRepository._DbQueryable
             .Where(x => x.IsEnabled == true)
             .Where(x => x.ModelType == ModelType.Chat)
             .OrderByDescending(x => x.OrderNum)
             .ToListAsync();
 
-        var output = entities.Adapt<List<AiModelDto>>();
+        List<AiModelDto> output = entities.Adapt<List<AiModelDto>>();
 
         // Custom logic for free model if needed, adapted from original
         output.ForEach(x =>
@@ -106,7 +106,7 @@ public class AiChatService(IHttpContextAccessor httpContextAccessor,
     {
         try
         {
-            if (input.TryGetProperty("model", out var modelProperty))
+            if (input.TryGetProperty("model", out JsonElement modelProperty))
             {
                 return modelProperty.GetString() ?? string.Empty;
             }

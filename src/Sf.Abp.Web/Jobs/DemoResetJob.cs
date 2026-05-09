@@ -2,6 +2,7 @@
 using Volo.Abp.Data;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
+using SqlSugar;
 
 namespace Sf.Abp.Web.Jobs
 {
@@ -29,7 +30,7 @@ namespace Sf.Abp.Web.Jobs
             {
                 //定时任务，非常简单
                 _logger.LogWarning("演示环境正在还原！");
-                var db = _dbContext.SqlSugarClient.CopyNew();
+                SqlSugarClient db = _dbContext.SqlSugarClient.CopyNew();
                 db.DbMaintenance.TruncateTable<User>();
                 db.DbMaintenance.TruncateTable<UserRole>();
                 db.DbMaintenance.TruncateTable<Role>();

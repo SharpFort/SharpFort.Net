@@ -25,7 +25,7 @@ public sealed class UnitOfWorkHangfireFilter(IUnitOfWorkManager unitOfWorkManage
     public void OnPerforming(PerformingContext context)
     {
         // 开启一个工作单元并存储到上下文中
-        var uow = _unitOfWorkManager.Begin();
+        IUnitOfWork uow = _unitOfWorkManager.Begin();
         context.Items.Add(UnitOfWorkItemKey, uow);
     }
 
@@ -44,7 +44,7 @@ public sealed class UnitOfWorkHangfireFilter(IUnitOfWorkManager unitOfWorkManage
     /// <param name="context">执行上下文</param>
     private async Task OnPerformedAsync(PerformedContext context)
     {
-        if (!context.Items.TryGetValue(UnitOfWorkItemKey, out var obj) ||
+        if (!context.Items.TryGetValue(UnitOfWorkItemKey, out object? obj) ||
             obj is not IUnitOfWork uow)
         {
             return;

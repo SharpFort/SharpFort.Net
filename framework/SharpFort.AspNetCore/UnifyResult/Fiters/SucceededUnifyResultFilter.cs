@@ -48,7 +48,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         // 执行 Action 并获取结果
-        var actionExecutedContext = await next();
+        ActionExecutedContext actionExecutedContext = await next();
 
         // 排除 WebSocket 请求处理
         if (actionExecutedContext.HttpContext.IsWebSocketRequest())
@@ -64,10 +64,10 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             if (statusCodeResult.StatusCode.Value < 200 || statusCodeResult.StatusCode.Value > 299)
             {
                 // 处理规范化结果
-                if (!CheckStatusCodeNonUnify(context.HttpContext, out var unifyRes))
+                if (!CheckStatusCodeNonUnify(context.HttpContext, out IUnifyResultProvider? unifyRes))
                 {
-                    var httpContext = context.HttpContext;
-                    var statusCode = statusCodeResult.StatusCode.Value;
+                    HttpContext httpContext = context.HttpContext;
+                    int statusCode = statusCodeResult.StatusCode.Value;
 
                     // 解决刷新 Token 时间和 Token 时间相近问题
                     if (statusCodeResult.StatusCode.Value == StatusCodes.Status401Unauthorized
@@ -98,7 +98,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         }
 
         // 获取控制器信息
-        var actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
+        ControllerActionDescriptor? actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
 
         // 判断是否支持 MVC 规范化处理，检测配置而已
         // if (!UnifyContext.CheckSupportMvcController(context.HttpContext, actionDescriptor, out _)) return;
@@ -114,9 +114,9 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         if (actionExecutedContext.Result is BadRequestObjectResult badRequestObjectResult)
         {
             // 解析验证消息
-            var validationMetadata = GetValidationMetadata(badRequestObjectResult.Value!);
+            ValidationMetadata validationMetadata = GetValidationMetadata(badRequestObjectResult.Value!);
 
-            var result = unifyResult.OnValidateFailed(context, validationMetadata);
+            IActionResult result = unifyResult.OnValidateFailed(context, validationMetadata);
             if (result != null)
             {
                 actionExecutedContext.Result = result;
@@ -127,7 +127,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             IActionResult? result = default;
 
             // 检查是否是有效的结果（可进行规范化的结果）
-            if (CheckVaildResult(actionExecutedContext.Result!, out var data))
+            if (CheckVaildResult(actionExecutedContext.Result!, out object? data))
             {
                 result = unifyResult.OnSucceeded(actionExecutedContext, data);
             }
@@ -210,7 +210,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         data = null!;
 
         // 排除以下结果，跳过规范化处理
-        var isDataResult = result switch
+        bool isDataResult = result switch
         {
             ViewResult => false,
             PartialViewResult => false,
@@ -259,14 +259,14 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
     internal static bool CheckStatusCodeNonUnify(HttpContext context, out IUnifyResultProvider unifyResult)
     {
         // 获取终点路由特性
-        var endpointFeature = context.Features.Get<IEndpointFeature>();
+        IEndpointFeature? endpointFeature = context.Features.Get<IEndpointFeature>();
         if (endpointFeature == null)
         {
             return (unifyResult = null!) == null;
         }
 
         // 判断是否跳过规范化处理
-        var isSkip = context.GetEndpoint()?.Metadata?.GetMetadata<NonUnifyAttribute>() != null
+        bool isSkip = context.GetEndpoint()?.Metadata?.GetMetadata<NonUnifyAttribute>() != null
                      || endpointFeature?.Endpoint?.Metadata?.GetMetadata<NonUnifyAttribute>() != null
                      || context.Request.Headers["accept"].ToString().Contains("odata.metadata=", StringComparison.OrdinalIgnoreCase)
                      || context.Request.Headers["accept"].ToString().Contains("odata.streaming=", StringComparison.OrdinalIgnoreCase);
@@ -292,7 +292,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
     private static bool CheckSucceededNonUnify(MethodInfo method, bool isWebRequest = true)
     {
         // 判断是否跳过规范化处理
-        var isSkip = method.CustomAttributes.Any(x => typeof(NonUnifyAttribute).IsAssignableFrom(x.AttributeType) || typeof(ProducesResponseTypeAttribute).IsAssignableFrom(x.AttributeType) || typeof(IApiResponseMetadataProvider).IsAssignableFrom(x.AttributeType))
+        bool isSkip = method.CustomAttributes.Any(x => typeof(NonUnifyAttribute).IsAssignableFrom(x.AttributeType) || typeof(ProducesResponseTypeAttribute).IsAssignableFrom(x.AttributeType) || typeof(IApiResponseMetadataProvider).IsAssignableFrom(x.AttributeType))
                      || method.ReflectedType!.IsDefined(typeof(NonUnifyAttribute), true)
                      || method.DeclaringType!.Assembly.GetName().Name!.StartsWith("Microsoft.AspNetCore.OData", StringComparison.Ordinal);
 

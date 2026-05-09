@@ -30,7 +30,7 @@ namespace SharpFort.Caching.FreeRedis
         public virtual string NormalizeKey(DistributedCacheKeyNormalizeArgs args)
         {
             // 添加全局缓存前缀
-            var normalizedKey = $"{_distributedCacheOptions.KeyPrefix}{args.Key}";
+            string normalizedKey = $"{_distributedCacheOptions.KeyPrefix}{args.Key}";
 
             //todo 多租户支持已注释，如需启用取消注释即可
             //if (!args.IgnoreMultiTenancy && _currentTenant.Id.HasValue)

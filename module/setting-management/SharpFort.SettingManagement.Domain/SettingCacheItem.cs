@@ -31,7 +31,7 @@ public class SettingCacheItem
 
     public static string? GetSettingNameFormCacheKeyOrNull(string cacheKey)
     {
-        var result = FormattedStringValueExtracter.Extract(cacheKey, CacheKeyFormatString, true);
+        FormattedStringValueExtracter.ExtractionResult result = FormattedStringValueExtracter.Extract(cacheKey, CacheKeyFormatString, true);
         return result.IsMatch ? result.Matches.Last().Value : null;
     }
 }

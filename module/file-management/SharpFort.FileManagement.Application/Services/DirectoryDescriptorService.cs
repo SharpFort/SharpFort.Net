@@ -28,14 +28,14 @@ namespace SharpFort.FileManagement.Application.Services
         public async Task<DirectoryDescriptorGetOutputDto> CreateAsync(DirectoryDescriptorCreateInput input)
         {
             // 检查同级目录下是否重名
-            var exists = await _repository.IsAnyAsync(x =>
+            bool exists = await _repository.IsAnyAsync(x =>
                 x.ParentId == input.ParentId && x.Name == input.Name);
             if (exists)
             {
                 throw new UserFriendlyException("同级目录下已存在同名目录");
             }
 
-            var entity = new DirectoryDescriptor(_guidGenerator.Create(), input.Name, input.ParentId);
+            DirectoryDescriptor entity = new DirectoryDescriptor(_guidGenerator.Create(), input.Name, input.ParentId);
             await _repository.InsertAsync(entity);
 
             return entity.Adapt<DirectoryDescriptorGetOutputDto>();
@@ -46,7 +46,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task<DirectoryDescriptorGetOutputDto> GetAsync(Guid id)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id);
+            DirectoryDescriptor entity = await _repository.GetAsync(x => x.Id == id);
             return entity.Adapt<DirectoryDescriptorGetOutputDto>();
         }
 
@@ -55,7 +55,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task<List<DirectoryDescriptorGetOutputDto>> GetListAsync(Guid? parentId = null)
         {
-            var entities = await _repository.GetListAsync(x => x.ParentId == parentId);
+            List<DirectoryDescriptor> entities = await _repository.GetListAsync(x => x.ParentId == parentId);
             return entities.Adapt<List<DirectoryDescriptorGetOutputDto>>();
         }
 
@@ -64,10 +64,10 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task<DirectoryDescriptorGetOutputDto> UpdateAsync(Guid id, DirectoryDescriptorUpdateInput input)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
+            DirectoryDescriptor entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
 
             // 检查同级目录下是否重名
-            var exists = await _repository.IsAnyAsync(x =>
+            bool exists = await _repository.IsAnyAsync(x =>
                 x.ParentId == entity.ParentId && x.Name == input.Name && x.Id != id);
             if (exists)
             {
@@ -85,17 +85,17 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task DeleteAsync(Guid id)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
+            DirectoryDescriptor entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
 
             // 检查是否有子目录
-            var hasChildren = await _repository.IsAnyAsync(x => x.ParentId == id);
+            bool hasChildren = await _repository.IsAnyAsync(x => x.ParentId == id);
             if (hasChildren)
             {
                 throw new UserFriendlyException("目录下存在子目录，请先删除子目录");
             }
 
             // 检查是否有文件
-            var hasFiles = await _fileRepository.IsAnyAsync(x => x.DirectoryId == id);
+            bool hasFiles = await _fileRepository.IsAnyAsync(x => x.DirectoryId == id);
             if (hasFiles)
             {
                 throw new UserFriendlyException("目录下存在文件，请先删除文件");
@@ -109,7 +109,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task MoveAsync(Guid id, Guid? newParentId)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
+            DirectoryDescriptor entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
             entity.MoveTo(newParentId);
             await _repository.UpdateAsync(entity);
         }

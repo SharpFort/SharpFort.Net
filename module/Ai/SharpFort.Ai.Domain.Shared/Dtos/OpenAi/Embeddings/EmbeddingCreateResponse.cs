@@ -30,7 +30,7 @@ public record EmbeddingCreateResponse : ThorBaseResponse
             // 否则转换成float[]
             case null or "float":
                 {
-                    foreach (var embeddingResponse in Data)
+                    foreach (EmbeddingResponse embeddingResponse in Data)
                     {
                         if (embeddingResponse.Embedding is string base64)
                         {
@@ -46,13 +46,13 @@ public record EmbeddingCreateResponse : ThorBaseResponse
             // 否则转换成base64
             case "base64":
                 {
-                    foreach (var embeddingResponse in Data)
+                    foreach (EmbeddingResponse embeddingResponse in Data)
                     {
                         if (embeddingResponse.Embedding is JsonElement str)
                         {
                             if (str.ValueKind == JsonValueKind.Array)
                             {
-                                var floats = str.EnumerateArray().Select(element => element.GetSingle()).ToArray();
+                                float[] floats = str.EnumerateArray().Select(element => element.GetSingle()).ToArray();
 
                                 embeddingResponse.Embedding = ConvertFloatArrayToBase64(floats);
                             }

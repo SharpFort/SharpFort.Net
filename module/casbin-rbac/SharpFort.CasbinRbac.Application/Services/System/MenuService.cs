@@ -66,7 +66,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             }
 
             // 获取旧菜单数据
-            var oldMenu = await _repository.GetByIdAsync(id);
+            Menu oldMenu = await _repository.GetByIdAsync(id);
             bool isApiChanged = oldMenu != null &&
                 (oldMenu.ApiUrl != input.ApiUrl || (oldMenu.ApiMethod?.ToUpper(CultureInfo.InvariantCulture) ?? "") != (input.ApiMethod?.ToUpper(CultureInfo.InvariantCulture) ?? ""));
 
@@ -75,19 +75,19 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // // 这涉及到复杂的策略查找与替换，建议后续完善
             // // 现阶段，如果是修改，建议先手动在界面删除再添加，或开发专门的策略同步功能
 
-            var result = await base.UpdateAsync(id, input);
+            MenuGetOutputDto result = await base.UpdateAsync(id, input);
 
             // 如果 API 路由发生了变化，找到所有拥有此菜单的角色，并刷新其 Casbin 权限
             if (isApiChanged)
             {
-                var roleIds = await _roleMenuRepository._DbQueryable.Where(x => x.MenuId == id).Select(x => x.RoleId).ToListAsync();
+                List<Guid> roleIds = await _roleMenuRepository._DbQueryable.Where(x => x.MenuId == id).Select(x => x.RoleId).ToListAsync();
                 if (roleIds.Count > 0)  // CA1860: prefer Count > 0
                 {
-                    var roles = await _roleRepository.GetListAsync(x => roleIds.Contains(x.Id));
-                    foreach (var role in roles)
+                    List<Role> roles = await _roleRepository.GetListAsync(x => roleIds.Contains(x.Id));
+                    foreach (Role role in roles)
                     {
-                        var menuIds = await _roleMenuRepository._DbQueryable.Where(x => x.RoleId == role.Id).Select(x => x.MenuId).ToListAsync();
-                        var menus = await _repository.GetListAsync(x => menuIds.Contains(x.Id));
+                        List<Guid> menuIds = await _roleMenuRepository._DbQueryable.Where(x => x.RoleId == role.Id).Select(x => x.MenuId).ToListAsync();
+                        List<Menu> menus = await _repository.GetListAsync(x => menuIds.Contains(x.Id));
                         await _casbinPolicyManager.SetRolePermissionsAsync(role, menus);
                     }
                 }
@@ -105,7 +105,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task<PagedResultDto<MenuGetListOutputDto>> GetListAsync(MenuGetListInputVo input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName.Contains(input.MenuName!))
+            List<Menu> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName.Contains(input.MenuName!))
                         .WhereIF(input.State is not null, x => x.State == input.State)
                         .Where(x => x.MenuSource == input.MenuSource)
                         .OrderBy(x => x.OrderNum)
@@ -121,7 +121,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns></returns>
         public async Task<List<MenuGetListOutputDto>> GetListRoleIdAsync(Guid roleId)
         {
-            var entities = await _repository._DbQueryable.Where(m => SqlFunc.Subqueryable<RoleMenu>().Where(rm => rm.RoleId == roleId && rm.MenuId == m.Id).Any()).ToListAsync();
+            List<Menu> entities = await _repository._DbQueryable.Where(m => SqlFunc.Subqueryable<RoleMenu>().Where(rm => rm.RoleId == roleId && rm.MenuId == m.Id).Any()).ToListAsync();
 
             return await MapToGetListOutputDtosAsync(entities);
         }
@@ -143,7 +143,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task DeleteAsync(IEnumerable<Guid> ids)
         {
             // 在物理删除之前，找出这些被删除菜单影响到的角色
-            var affectedRoleIds = await _roleMenuRepository._DbQueryable
+            List<Guid> affectedRoleIds = await _roleMenuRepository._DbQueryable
                 .Where(x => ids.Contains(x.MenuId))
                 .Select(x => x.RoleId)
                 .Distinct()
@@ -155,12 +155,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 物理删除后，刷新受影响角色的 Casbin 权限
             if (affectedRoleIds.Count > 0)  // CA1860: prefer Count > 0
             {
-                var roles = await _roleRepository.GetListAsync(x => affectedRoleIds.Contains(x.Id));
-                foreach (var role in roles)
+                List<Role> roles = await _roleRepository.GetListAsync(x => affectedRoleIds.Contains(x.Id));
+                foreach (Role role in roles)
                 {
                     // 获取删除剩余的有效菜单
-                    var menuIds = await _roleMenuRepository._DbQueryable.Where(x => x.RoleId == role.Id).Select(x => x.MenuId).ToListAsync();
-                    var menus = await _repository.GetListAsync(x => menuIds.Contains(x.Id));
+                    List<Guid> menuIds = await _roleMenuRepository._DbQueryable.Where(x => x.RoleId == role.Id).Select(x => x.MenuId).ToListAsync();
+                    List<Menu> menus = await _repository.GetListAsync(x => menuIds.Contains(x.Id));
                     await _casbinPolicyManager.SetRolePermissionsAsync(role, menus);
                 }
             }

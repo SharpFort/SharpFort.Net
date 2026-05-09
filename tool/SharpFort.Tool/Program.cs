@@ -41,7 +41,7 @@ sealed class Program
                 //})
                 .UseAutofac()
                 .Build();
-            var commandSelector = host.Services.GetRequiredService<CommandInvoker>();
+            CommandInvoker commandSelector = host.Services.GetRequiredService<CommandInvoker>();
             await commandSelector.InvokerAsync(args);
         }
         catch (Exception ex)

@@ -21,7 +21,7 @@ public class SfTenantConfigurationProvider(
     public virtual async Task<TenantConfiguration?> GetAsync(bool saveResolveResult = false)
     {
         //租户解析器获取到当前解析成功的租户
-        var resolveResult = await TenantResolver.ResolveTenantIdOrNameAsync();
+        TenantResolveResult resolveResult = await TenantResolver.ResolveTenantIdOrNameAsync();
 
         if (saveResolveResult)
         {
@@ -52,7 +52,7 @@ public class SfTenantConfigurationProvider(
 
     protected virtual async Task<TenantConfiguration?> FindTenantAsync(string tenantIdOrName)
     {
-        return Guid.TryParse(tenantIdOrName, out var parsedTenantId)
+        return Guid.TryParse(tenantIdOrName, out Guid parsedTenantId)
             ? await TenantStore.FindAsync(parsedTenantId)
             : await TenantStore.FindAsync(tenantIdOrName);
     }

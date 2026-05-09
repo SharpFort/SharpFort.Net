@@ -30,14 +30,14 @@ namespace SharpFort.TenantManagement.Domain
 
         public new async Task<TenantConfiguration?> FindAsync(string normalizedName)
         {
-            var tenantFromOptions = await base.FindAsync(normalizedName);
+            TenantConfiguration? tenantFromOptions = await base.FindAsync(normalizedName);
             //如果配置文件不存在改租户
             return tenantFromOptions is null ? (await GetCacheItemAsync(null, normalizedName)).Value : tenantFromOptions;
         }
 
         public new async Task<TenantConfiguration?> FindAsync(Guid id)
         {
-            var tenantFromOptions = await base.FindAsync(id);
+            TenantConfiguration? tenantFromOptions = await base.FindAsync(id);
             return tenantFromOptions is null ? (await GetCacheItemAsync(id, null)).Value : tenantFromOptions;
         }
 
@@ -47,9 +47,9 @@ namespace SharpFort.TenantManagement.Domain
 
         protected virtual async Task<TenantCacheItem> GetCacheItemAsync(Guid? id, string? name)
         {
-            var cacheKey = CalculateCacheKey(id, name!);
+            string cacheKey = CalculateCacheKey(id, name!);
 
-            var cacheItem = await Cache.GetAsync(cacheKey, considerUow: true);
+            TenantCacheItem? cacheItem = await Cache.GetAsync(cacheKey, considerUow: true);
             if (cacheItem != null)
             {
                 return cacheItem;
@@ -60,7 +60,7 @@ namespace SharpFort.TenantManagement.Domain
                 using (CurrentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
                 {
                     Tenant? tenant = null;
-                    using (var uow = _unitOfWorkManager.Begin(isTransactional: false))
+                    using (IUnitOfWork uow = _unitOfWorkManager.Begin(isTransactional: false))
                     {
                         tenant = await TenantRepository.FindAsync(id.Value);
                         await uow.CompleteAsync();
@@ -74,7 +74,7 @@ namespace SharpFort.TenantManagement.Domain
             {
                 using (CurrentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
                 {
-                    var tenant = await TenantRepository.FindByNameAsync(name);
+                    Tenant tenant = await TenantRepository.FindByNameAsync(name);
                     return await SetCacheAsync(cacheKey, tenant);
                 }
             }
@@ -83,15 +83,15 @@ namespace SharpFort.TenantManagement.Domain
 
         protected virtual async Task<TenantCacheItem> SetCacheAsync(string cacheKey, [CanBeNull] Tenant? tenant)
         {
-            var tenantConfiguration = tenant != null ? MapToConfiguration(tenant) : null;
-            var cacheItem = new TenantCacheItem(tenantConfiguration!);
+            TenantConfiguration? tenantConfiguration = tenant != null ? MapToConfiguration(tenant) : null;
+            TenantCacheItem cacheItem = new TenantCacheItem(tenantConfiguration!);
             await Cache.SetAsync(cacheKey, cacheItem, considerUow: true);
             return cacheItem;
         }
 
         private static TenantConfiguration MapToConfiguration(Tenant Tenant)
         {
-            var tenantConfiguration = new TenantConfiguration();
+            TenantConfiguration tenantConfiguration = new TenantConfiguration();
             tenantConfiguration.Id = Tenant.Id;
             tenantConfiguration.Name = Tenant.Name;
             tenantConfiguration.ConnectionStrings = MaptoString(Tenant.TenantConnectionString);
@@ -101,7 +101,7 @@ namespace SharpFort.TenantManagement.Domain
 
         private static ConnectionStrings? MaptoString(string tenantConnectionString)
         {
-            var connectionStrings = new ConnectionStrings
+            ConnectionStrings connectionStrings = new ConnectionStrings
             {
                 [ConnectionStrings.DefaultConnectionStringName] = tenantConnectionString
             };

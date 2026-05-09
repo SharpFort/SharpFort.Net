@@ -6,6 +6,7 @@ using Volo.Abp.Application.Services;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Application.SignalRHubs;
 using SharpFort.CasbinRbac.Domain.Shared.Model;
+using System.Collections.Concurrent;
 
 namespace SharpFort.CasbinRbac.Application.Services.Monitor
 {
@@ -21,7 +22,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         /// <returns></returns>
         public Task<PagedResultDto<OnlineUserModel>> GetListAsync([FromQuery] OnlineUserModel online)
         {
-            var data = OnlineHub.ClientUsersDic;
+            ConcurrentDictionary<string, OnlineUserModel> data = OnlineHub.ClientUsersDic;
             IEnumerable<OnlineUserModel> dataWhere = data.Values.AsEnumerable();
 
             if (!string.IsNullOrEmpty(online.Ipaddr))

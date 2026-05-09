@@ -29,7 +29,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
         /// <returns></returns>
         public Dictionary<string, object> ParseArguments()
         {
-            var result = string.IsNullOrWhiteSpace(Arguments) == false ? JsonSerializer.Deserialize<Dictionary<string, object>>(Arguments) ?? [] : [];
+            Dictionary<string, object> result = string.IsNullOrWhiteSpace(Arguments) == false ? JsonSerializer.Deserialize<Dictionary<string, object>>(Arguments) ?? [] : [];
             return result;
         }
     }

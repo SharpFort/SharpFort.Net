@@ -66,7 +66,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
 
             List<Guid>? ids = input.Ids?.Split(",").Select(x => Guid.Parse(x)).ToList();
-            var outPut = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.UserName),
+            List<UserGetListOutputDto> outPut = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.UserName),
                     x => x.UserName.Contains(input.UserName!))
                 .WhereIF(input.Phone is not null, x => x.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name!.Contains(input.Name!))
@@ -82,18 +82,18 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .Select((user, dept) => new UserGetListOutputDto(), true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-            var userIds = outPut.Select(x => x.Id).ToList();
+            List<Guid> userIds = outPut.Select(x => x.Id).ToList();
             if (userIds.Count > 0)
             {
-                var usersWithRelations = await _repository._DbQueryable
+                List<User> usersWithRelations = await _repository._DbQueryable
                     .Includes(u => u.Roles)
                     .Includes(u => u.Posts)
                     .Where(u => userIds.Contains(u.Id))
                     .ToListAsync();
 
-                foreach (var dto in outPut)
+                foreach (UserGetListOutputDto? dto in outPut)
                 {
-                    var userEntity = usersWithRelations.FirstOrDefault(u => u.Id == dto.Id);
+                    User? userEntity = usersWithRelations.FirstOrDefault(u => u.Id == dto.Id);
                     if (userEntity != null)
                     {
                         dto.Roles = ObjectMapper.Map<List<Role>, List<RoleGetListOutputDto>>(userEntity.Roles);
@@ -102,7 +102,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 }
             }
 
-            var result = new PagedResultDto<UserGetListOutputDto>();
+            PagedResultDto<UserGetListOutputDto> result = new PagedResultDto<UserGetListOutputDto>();
             result.Items = outPut;
             result.TotalCount = total;
             return result;
@@ -116,10 +116,10 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("添加用户", OperationType.Insert)]
         public async override Task<UserGetOutputDto> CreateAsync(UserCreateInputVo input)
         {
-            var entitiy = await MapToEntityAsync(input);
+            User entitiy = await MapToEntityAsync(input);
 
             // 处理密码加密（与 UpdateAsync 保持一致的逻辑）
-            var password = string.IsNullOrEmpty(input.Password) ? "123456" : input.Password;
+            string password = string.IsNullOrEmpty(input.Password) ? "123456" : input.Password;
             entitiy.SetPassword(password);
 
             await _userManager.CreateAsync(entitiy);
@@ -143,7 +143,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 建议：封装一个私有方法或领域服务处理 Casbin 同步
             await SyncCasbinUserRoles(entitiy.Id, input.RoleIds ?? []);
 
-            var result = await MapToGetOutputDtoAsync(entitiy);
+            UserGetOutputDto result = await MapToGetOutputDtoAsync(entitiy);
             return result;
         }
 
@@ -159,10 +159,10 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             string domain = "default"; // 默认域
 
             // 查询实际的 RoleCode
-            var roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
-            var roleCodes = roles.Select(r => r.RoleCode).ToList();
+            List<Role> roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
+            List<string> roleCodes = roles.Select(r => r.RoleCode).ToList();
 
-            var policies = roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain }).ToList();
+            List<string[]> policies = roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain }).ToList();
 
             // 必须禁用 AutoSave 并手动 Save，因为在外层事务中
             // 已在 DI 中全局禁用 AutoSave
@@ -174,7 +174,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         protected override async Task<User> MapToEntityAsync(UserCreateInputVo createInput)
         {
             // 使用基类的映射逻辑
-            var entitiy = await base.MapToEntityAsync(createInput);
+            User entitiy = await base.MapToEntityAsync(createInput);
             // 注意：此时密码是明文，会在 CreateAsync 中调用 SetPassword 加密
             return entitiy;
         }
@@ -187,7 +187,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task<UserGetOutputDto> GetAsync(Guid id)
         {
             //使用导航树形查询
-            var entity = await _repository._DbQueryable.Includes(u => u.Roles).Includes(u => u.Posts)
+            User entity = await _repository._DbQueryable.Includes(u => u.Roles).Includes(u => u.Posts)
                 .Includes(u => u.Dept).InSingleAsync(id);
 
             return await MapToGetOutputDtoAsync(entity);
@@ -212,7 +212,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 throw new UserFriendlyException(UserConst.Exist);
             }
 
-            var entity = await _repository.GetByIdAsync(id);
+            User entity = await _repository.GetByIdAsync(id);
             //更新密码，特殊处理
             if (!string.IsNullOrWhiteSpace(input.Password))
             {
@@ -221,7 +221,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             await MapToEntityAsync(input, entity);
 
-            var res1 = await _repository.UpdateAsync(entity);
+            bool res1 = await _repository.UpdateAsync(entity);
             await _userManager.GiveUserSetRoleAsync([id], input.RoleIds ?? []);
             await _userManager.GiveUserSetPostAsync([id], input.PostIds ?? []);
 
@@ -242,11 +242,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("更新个人信息", OperationType.Update)]
         public async Task<UserGetOutputDto> UpdateProfileAsync(ProfileUpdateInputVo input)
         {
-            var entity = await _repository.GetByIdAsync(_currentUser.Id.GetValueOrDefault());
+            User entity = await _repository.GetByIdAsync(_currentUser.Id.GetValueOrDefault());
             ObjectMapper.Map(input, entity);
 
             await _repository.UpdateAsync(entity);
-            var dto = await MapToGetOutputDtoAsync(entity);
+            UserGetOutputDto dto = await MapToGetOutputDtoAsync(entity);
 
             return dto;
         }
@@ -261,7 +261,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("更新用户状态", OperationType.Update)]
         public async Task<UserGetOutputDto> UpdateStateAsync([FromRoute] Guid id, [FromRoute] bool state)
         {
-            var entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("用户未存在");
+            User entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("用户未存在");
             entity.State = state;
             await _repository.UpdateAsync(entity);
             return await MapToGetOutputDtoAsync(entity);
@@ -285,10 +285,10 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 1. 获取包含关联关系的数据（复用已有的分页查询逻辑，但获取全部数据）
             input.SkipCount = 0;
             input.MaxResultCount = LimitedResultRequestDto.MaxMaxResultCount;
-            var listResult = await GetListAsync(input);
+            PagedResultDto<UserGetListOutputDto> listResult = await GetListAsync(input);
 
             // 2. 将数据映射为专用的导出 DTO，处理“性别”、“角色”、“岗位”等字段的展示格式
-            var exportData = listResult.Items.Select(x => new UserExportOutputDto
+            List<UserExportOutputDto> exportData = listResult.Items.Select(x => new UserExportOutputDto
             {
                 UserName = x.UserName,
                 Name = x.Name,
@@ -311,14 +311,14 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             }).ToList();
 
             // 3. 生成 Excel 文件
-            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "temp");
+            string tempPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "temp");
             if (!Directory.Exists(tempPath))
             {
                 Directory.CreateDirectory(tempPath);
             }
 
-            var fileName = $"User_{DateTime.Now:yyyyMMddHHmmss}_{Guid.NewGuid()}.xlsx";
-            var filePath = Path.Combine(tempPath, fileName);
+            string fileName = $"User_{DateTime.Now:yyyyMMddHHmmss}_{Guid.NewGuid()}.xlsx";
+            string filePath = Path.Combine(tempPath, fileName);
 
             // MiniExcel 会根据 UserExportOutputDto 上的特性自动处理表头和格式
             await MiniExcel.SaveAsAsync(filePath, exportData);

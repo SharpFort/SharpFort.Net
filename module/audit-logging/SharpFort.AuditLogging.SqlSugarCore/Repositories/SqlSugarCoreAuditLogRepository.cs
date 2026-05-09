@@ -48,7 +48,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         HttpStatusCode? httpStatusCode = null,
         bool includeDetails = false)
     {
-        var query = await GetListQueryAsync(
+        ISugarQueryable<AuditLog> query = await GetListQueryAsync(
             startTime,
             endTime,
             httpMethod,
@@ -65,7 +65,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
             includeDetails
         );
 
-        var auditLogs = await query
+        List<AuditLog> auditLogs = await query
             .OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(AuditLog.ExecutionTime) + " DESC") : sorting)
             .ToPageListAsync(skipCount, maxResultCount);
 
@@ -88,7 +88,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         HttpStatusCode? httpStatusCode = null,
         CancellationToken cancellationToken = default)
     {
-        var query = await GetListQueryAsync(
+        ISugarQueryable<AuditLog> query = await GetListQueryAsync(
             startTime,
             endTime,
             httpMethod,
@@ -104,7 +104,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
             httpStatusCode
         );
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        int totalCount = await query.CountAsync(cancellationToken);
 
         return totalCount;
     }
@@ -125,7 +125,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         HttpStatusCode? httpStatusCode = null,
         bool includeDetails = false)
     {
-        var nHttpStatusCode = (int?)httpStatusCode;
+        int? nHttpStatusCode = (int?)httpStatusCode;
         return _DbQueryable
             .WhereIF(startTime.HasValue, auditLog => auditLog.ExecutionTime >= startTime)
             .WhereIF(endTime.HasValue, auditLog => auditLog.ExecutionTime <= endTime)
@@ -163,7 +163,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         Guid entityChangeId,
         CancellationToken cancellationToken = default)
     {
-        var entityChange = await (await GetDbContextAsync()).Queryable<EntityChange>()
+        EntityChange entityChange = await (await GetDbContextAsync()).Queryable<EntityChange>()
                                 .Where(x => x.Id == entityChangeId)
                                 .OrderBy(x => x.Id)
                                 .FirstAsync(cancellationToken);
@@ -184,7 +184,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         bool includeDetails = false,
         CancellationToken cancellationToken = default)
     {
-        var query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName, includeDetails);
+        ISugarQueryable<EntityChange> query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName, includeDetails);
 
         return await query.OrderBy(sorting.IsNullOrWhiteSpace() ? (nameof(EntityChange.ChangeTime) + " DESC") : sorting)
             .ToPageListAsync(skipCount, maxResultCount, cancellationToken);
@@ -199,9 +199,9 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         string? entityTypeFullName = null,
         CancellationToken cancellationToken = default)
     {
-        var query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName);
+        ISugarQueryable<EntityChange> query = await GetEntityChangeListQueryAsync(auditLogId, startTime, endTime, changeType, entityId, entityTypeFullName);
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        int totalCount = await query.CountAsync(cancellationToken);
 
         return totalCount;
     }
@@ -209,7 +209,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
     public virtual async Task<EntityChangeWithUsername> GetEntityChangeWithUsernameAsync(
         Guid entityChangeId)
     {
-        var auditLog = await _DbQueryable
+        AuditLog auditLog = await _DbQueryable
             .Where(x => x.EntityChanges.Any(y => y.Id == entityChangeId)).FirstAsync();
 
         return new EntityChangeWithUsername()
@@ -224,9 +224,9 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         string entityTypeFullName,
         CancellationToken cancellationToken = default)
     {
-        var dbContext = await GetDbContextAsync();
+        ISqlSugarClient dbContext = await GetDbContextAsync();
 
-        var query = dbContext.Queryable<EntityChange>()
+        ISugarQueryable<EntityChange> query = dbContext.Queryable<EntityChange>()
                             .Where(x => x.EntityId == entityId && x.EntityTypeFullName == entityTypeFullName);
         return await query.LeftJoin<AuditLog>((x, audit) => x.AuditLogId == audit.Id)
              .Select((x, audit) => new EntityChangeWithUsername { EntityChange = x, UserName = audit.UserName! })

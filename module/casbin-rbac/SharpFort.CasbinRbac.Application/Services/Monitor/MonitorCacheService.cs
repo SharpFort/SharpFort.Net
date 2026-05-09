@@ -22,7 +22,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         {
             get
             {
-                var redisEnabled = LazyServiceProvider.LazyGetRequiredService<IConfiguration>()["Redis:IsEnabled"];
+                string? redisEnabled = LazyServiceProvider.LazyGetRequiredService<IConfiguration>()["Redis:IsEnabled"];
                 return redisEnabled.IsNullOrEmpty() || bool.Parse(redisEnabled);
             }
         }
@@ -39,9 +39,9 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         public List<MonitorCacheNameGetListOutputDto> GetName()
         {
             VerifyRedisCacheEnable();
-            var keys = RedisClient.Keys(CacheKeyPrefix + "*");
-            var result = GroupedKeys([.. keys]);
-            var output = result.Select(x => new MonitorCacheNameGetListOutputDto { CacheName = x }).ToList();
+            string[] keys = RedisClient.Keys(CacheKeyPrefix + "*");
+            List<string> result = GroupedKeys([.. keys]);
+            List<MonitorCacheNameGetListOutputDto> output = result.Select(x => new MonitorCacheNameGetListOutputDto { CacheName = x }).ToList();
             return output;
         }
 
@@ -83,7 +83,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         public List<string> GetKey(string cacaheName)
         {
             VerifyRedisCacheEnable();
-            var output = RedisClient.Keys($"{cacaheName}:*").Select(x => x.RemovePreFix(cacaheName + ":"));
+            IEnumerable<string> output = RedisClient.Keys($"{cacaheName}:*").Select(x => x.RemovePreFix(cacaheName + ":"));
             return [.. output];
         }
 
@@ -91,7 +91,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         [HttpGet("monitor-cache/value/{cacaheName}/{cacaheKey}")]
         public MonitorCacheGetListOutputDto GetValue(string cacaheName, string cacaheKey)
         {
-            var value = RedisClient.HGet($"{cacaheName}:{cacaheKey}", "data");
+            string value = RedisClient.HGet($"{cacaheName}:{cacaheKey}", "data");
             return new MonitorCacheGetListOutputDto() { CacheKey = cacaheKey, CacheName = cacaheName, CacheValue = value };
         }
 

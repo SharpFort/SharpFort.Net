@@ -23,21 +23,21 @@ public class ImageGenerationJob(
 
     public override async Task ExecuteAsync(ImageGenerationJobArgs args)
     {
-        var task = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == args.TaskId) ?? throw new UserFriendlyException($"{args.TaskId} 图片生成任务不存在");
+        ImageStoreTaskAggregateRoot task = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == args.TaskId) ?? throw new UserFriendlyException($"{args.TaskId} 图片生成任务不存在");
         _logger.LogInformation("开始执行图片生成任务，TaskId: {TaskId}, ModelId: {ModelId}, UserId: {UserId}",
             task.Id, task.ModelId, task.UserId);
         try
         {
             // 构建 Gemini API 请求对象
-            var parts = new List<object>
+            List<object> parts = new List<object>
             {
                 new { text = task.Prompt }
             };
 
             // 添加参考图（如果有）
-            foreach (var prefixBase64 in task.ReferenceImagesPrefixBase64)
+            foreach (string prefixBase64 in task.ReferenceImagesPrefixBase64)
             {
-                var (mimeType, base64Data) = ParsePrefixBase64(prefixBase64);
+                (string? mimeType, string? base64Data) = ParsePrefixBase64(prefixBase64);
                 parts.Add(new
                 {
                     inline_data = new
@@ -63,7 +63,7 @@ public class ImageGenerationJob(
                 }
             };
 
-            var request = JsonSerializer.Deserialize<JsonElement>(
+            JsonElement request = JsonSerializer.Deserialize<JsonElement>(
                 JsonSerializer.Serialize(requestObj));
 
             //里面生成成功已经包含扣款了
@@ -79,7 +79,7 @@ public class ImageGenerationJob(
         }
         catch (Exception ex)
         {
-            var error = $"图片任务失败，TaskId: {args.TaskId}，错误信息: {ex.Message}，错误堆栈：{ex.StackTrace}";
+            string error = $"图片任务失败，TaskId: {args.TaskId}，错误信息: {ex.Message}，错误堆栈：{ex.StackTrace}";
             _logger.LogError(ex, error);
 
             task.TaskStatus = TaskStatusEnum.Fail;
@@ -95,15 +95,15 @@ public class ImageGenerationJob(
     private static (string mimeType, string base64Data) ParsePrefixBase64(string prefixBase64)
     {
         // 默认值
-        var mimeType = "image/png";
-        var base64Data = prefixBase64;
+        string mimeType = "image/png";
+        string base64Data = prefixBase64;
 
         if (prefixBase64.Contains(","))
         {
-            var parts = prefixBase64.Split(',');
+            string[] parts = prefixBase64.Split(',');
             if (parts.Length == 2)
             {
-                var header = parts[0];
+                string header = parts[0];
                 if (header.Contains(":") && header.Contains(";"))
                 {
                     mimeType = header.Split(':')[1].Split(';')[0];

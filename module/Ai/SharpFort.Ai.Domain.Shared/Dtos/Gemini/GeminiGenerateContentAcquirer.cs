@@ -12,33 +12,33 @@ public static class GeminiGenerateContentAcquirer
     /// </summary>
     public static string GetLastUserContent(JsonElement request)
     {
-        var contents = request.GetPath("contents");
+        JsonElement? contents = request.GetPath("contents");
         if (!contents.HasValue || contents.Value.ValueKind != JsonValueKind.Array)
         {
             return string.Empty;
         }
 
-        var contentsArray = contents.Value.EnumerateArray().ToList();
+        List<JsonElement> contentsArray = contents.Value.EnumerateArray().ToList();
         if (contentsArray.Count == 0)
         {
             return string.Empty;
         }
 
-        var lastContent = contentsArray[^1];
-        var parts = lastContent.GetPath("parts");
+        JsonElement lastContent = contentsArray[^1];
+        JsonElement? parts = lastContent.GetPath("parts");
         if (!parts.HasValue || parts.Value.ValueKind != JsonValueKind.Array)
         {
             return string.Empty;
         }
 
-        var partsArray = parts.Value.EnumerateArray().ToList();
+        List<JsonElement> partsArray = parts.Value.EnumerateArray().ToList();
         if (partsArray.Count == 0)
         {
             return string.Empty;
         }
 
         // 获取最后一个 part 的 text
-        var lastPart = partsArray[^1];
+        JsonElement lastPart = partsArray[^1];
         return lastPart.GetPath("text").GetString() ?? string.Empty;
     }
 
@@ -48,31 +48,31 @@ public static class GeminiGenerateContentAcquirer
     /// </summary>
     public static string GetTextContent(JsonElement response)
     {
-        var candidates = response.GetPath("candidates");
+        JsonElement? candidates = response.GetPath("candidates");
         if (!candidates.HasValue || candidates.Value.ValueKind != JsonValueKind.Array)
         {
             return string.Empty;
         }
 
-        var candidatesArray = candidates.Value.EnumerateArray().ToList();
+        List<JsonElement> candidatesArray = candidates.Value.EnumerateArray().ToList();
         if (candidatesArray.Count == 0)
         {
             return string.Empty;
         }
 
-        var parts = candidatesArray[0].GetPath("content", "parts");
+        JsonElement? parts = candidatesArray[0].GetPath("content", "parts");
         if (!parts.HasValue || parts.Value.ValueKind != JsonValueKind.Array)
         {
             return string.Empty;
         }
 
         // 遍历所有 parts，只取非 thought 的 text
-        foreach (var part in parts.Value.EnumerateArray())
+        foreach (JsonElement part in parts.Value.EnumerateArray())
         {
-            var isThought = part.GetPath("thought").GetBool();
+            bool isThought = part.GetPath("thought").GetBool();
             if (!isThought)
             {
-                var text = part.GetPath("text").GetString();
+                string? text = part.GetPath("text").GetString();
                 if (!string.IsNullOrEmpty(text))
                 {
                     return text;
@@ -85,14 +85,14 @@ public static class GeminiGenerateContentAcquirer
 
     public static ThorUsageResponse? GetUsage(JsonElement response)
     {
-        var usage = response.GetPath("usageMetadata");
+        JsonElement? usage = response.GetPath("usageMetadata");
         if (!usage.HasValue)
         {
             return null;
         }
 
-        var inputTokens = usage.Value.GetPath("promptTokenCount").GetInt();
-        var outputTokens = usage.Value.GetPath("candidatesTokenCount").GetInt()
+        int inputTokens = usage.Value.GetPath("promptTokenCount").GetInt();
+        int outputTokens = usage.Value.GetPath("candidatesTokenCount").GetInt()
                            + usage.Value.GetPath("cachedContentTokenCount").GetInt()
                            + usage.Value.GetPath("thoughtsTokenCount").GetInt()
                            + usage.Value.GetPath("toolUsePromptTokenCount").GetInt();
@@ -121,7 +121,7 @@ public static class GeminiGenerateContentAcquirer
 
         if (!string.IsNullOrEmpty(lastBase64))
         {
-            var mimeType = lastMimeType ?? "image/png";
+            string mimeType = lastMimeType ?? "image/png";
             return $"data:{mimeType};base64,{lastBase64}";
         }
 
@@ -140,9 +140,9 @@ public static class GeminiGenerateContentAcquirer
                 string? currentMimeType = null;
                 string? currentData = null;
 
-                foreach (var prop in element.EnumerateObject())
+                foreach (JsonProperty prop in element.EnumerateObject())
                 {
-                    var name = prop.Name.ToLowerInvariant();
+                    string name = prop.Name.ToLowerInvariant();
 
                     // 记录 mimeType / mime_type
                     if (name is "mimetype" or "mime_type" && prop.Value.ValueKind == JsonValueKind.String)
@@ -152,7 +152,7 @@ public static class GeminiGenerateContentAcquirer
                     // 记录 data 字段（检查是否像 base64）
                     else if (name == "data" && prop.Value.ValueKind == JsonValueKind.String)
                     {
-                        var val = prop.Value.GetString();
+                        string? val = prop.Value.GetString();
                         if (!string.IsNullOrEmpty(val) && val.Length >= minLength && LooksLikeBase64(val))
                         {
                             currentData = val;
@@ -174,7 +174,7 @@ public static class GeminiGenerateContentAcquirer
                 break;
 
             case JsonValueKind.Array:
-                foreach (var item in element.EnumerateArray())
+                foreach (JsonElement item in element.EnumerateArray())
                 {
                     CollectLastBase64(item, ref lastBase64, ref lastMimeType, minLength);
                 }
@@ -217,24 +217,24 @@ public static class GeminiGenerateContentAcquirer
     /// </summary>
     private static string FindMarkdownImageInResponse(JsonElement element)
     {
-        var allTexts = new List<string>();
+        List<string> allTexts = new List<string>();
         CollectTextFields(element, allTexts);
 
         // 从最后一个 text 开始查找
         for (int i = allTexts.Count - 1; i >= 0; i--)
         {
-            var text = allTexts[i];
+            string text = allTexts[i];
 
             // markdown 图片格式: ![image](data:image/png;base64,xxx)
-            var startMarker = "(data:image/";
-            var startIndex = text.IndexOf(startMarker, StringComparison.Ordinal);
+            string startMarker = "(data:image/";
+            int startIndex = text.IndexOf(startMarker, StringComparison.Ordinal);
             if (startIndex < 0)
             {
                 continue;
             }
 
             startIndex += 1; // 跳过 "("
-            var endIndex = text.IndexOf(')', startIndex);
+            int endIndex = text.IndexOf(')', startIndex);
             if (endIndex > startIndex)
             {
                 return text[startIndex..endIndex];
@@ -252,11 +252,11 @@ public static class GeminiGenerateContentAcquirer
         switch (element.ValueKind)
         {
             case JsonValueKind.Object:
-                foreach (var prop in element.EnumerateObject())
+                foreach (JsonProperty prop in element.EnumerateObject())
                 {
                     if (prop.Name == "text" && prop.Value.ValueKind == JsonValueKind.String)
                     {
-                        var val = prop.Value.GetString();
+                        string? val = prop.Value.GetString();
                         if (!string.IsNullOrEmpty(val))
                         {
                             texts.Add(val);
@@ -270,7 +270,7 @@ public static class GeminiGenerateContentAcquirer
                 break;
 
             case JsonValueKind.Array:
-                foreach (var item in element.EnumerateArray())
+                foreach (JsonElement item in element.EnumerateArray())
                 {
                     CollectTextFields(item, texts);
                 }

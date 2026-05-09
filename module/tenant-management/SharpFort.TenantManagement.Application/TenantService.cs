@@ -42,7 +42,7 @@ namespace SharpFort.TenantManagement.Application
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable
+            List<Tenant> entities = await _repository._DbQueryable
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name.Contains(input.Name!))
                 .WhereIF(input.StartTime is not null && input.EndTime is not null,
                     x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
@@ -56,7 +56,7 @@ namespace SharpFort.TenantManagement.Application
         /// <returns></returns>
         public async Task<List<TenantSelectOutputDto>> GetSelectAsync()
         {
-            var entites = await _repository._DbQueryable.ToListAsync();
+            List<Tenant> entites = await _repository._DbQueryable.ToListAsync();
             return [.. entites.Select(x => new TenantSelectOutputDto { Id = x.Id, Name = x.Name })];
         }
 
@@ -116,17 +116,17 @@ namespace SharpFort.TenantManagement.Application
 
         private async Task CodeFirst(IServiceProvider service)
         {
-            var moduleContainer = service.GetRequiredService<IModuleContainer>();
+            IModuleContainer moduleContainer = service.GetRequiredService<IModuleContainer>();
 
             //没有数据库，不能创工作单元，创建库，先关闭
-            using (var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: false))
+            using (IUnitOfWork uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: false))
             {
                 ISqlSugarClient db = await _repository.GetDbContextAsync();
                 //尝试创建数据库
                 db.DbMaintenance.CreateDatabase();
 
                 List<Type> types = [];
-                foreach (var module in moduleContainer.Modules)
+                foreach (IAbpModuleDescriptor module in moduleContainer.Modules)
                 {
                     types.AddRange(module.Assembly.GetTypes()
                         .Where(x => x.GetCustomAttribute<IgnoreCodeFirstAttribute>() == null)

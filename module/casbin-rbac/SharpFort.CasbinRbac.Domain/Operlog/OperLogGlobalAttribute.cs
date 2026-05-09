@@ -23,7 +23,7 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var resultContext = await next();
+            ActionExecutedContext resultContext = await next();
             //执行后
 
             //判断标签是在方法上
@@ -54,7 +54,7 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
             string location = "";
             try
             {
-                var ipTool = IpTool.Search(ip);
+                IpInfo ipTool = IpTool.Search(ip);
                 location = ipTool.Province + " " + ipTool.City;
             }
             catch
@@ -65,7 +65,7 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
 
             //日志服务插入一条操作记录即可
 
-            var logEntity = new OperationLogEntity();
+            OperationLogEntity logEntity = new OperationLogEntity();
             logEntity.OperIp = ip;
             //logEntity.OperLocation = location;
             logEntity.OperationType = operLogAttribute.OperationType;
@@ -98,7 +98,7 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
                 logEntity.RequestParam = JsonConvert.SerializeObject(context.ActionArguments);
             }
 
-            using (var uow = _unitOfWorkManager.Begin())
+            using (IUnitOfWork uow = _unitOfWorkManager.Begin())
             {
                 await _repository.InsertAsync(logEntity);
             }

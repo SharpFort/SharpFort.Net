@@ -21,7 +21,7 @@ namespace SharpFort.CodeGen.Application.Services
         public async override Task<PagedResultDto<FieldDto>> GetListAsync([FromQuery] FieldGetListInput input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable.WhereIF(input.TableId is not null, x => x.TableId == input.TableId)
+            List<Field> entities = await _repository._DbQueryable.WhereIF(input.TableId is not null, x => x.TableId == input.TableId)
                       .WhereIF(input.Name is not null, x => x.Name.Contains(input.Name!))
 
                       .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);

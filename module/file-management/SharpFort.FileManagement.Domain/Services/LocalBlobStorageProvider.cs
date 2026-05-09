@@ -20,14 +20,14 @@ namespace SharpFort.FileManagement.Domain.Services
 
         public async Task SaveAsync(string containerName, string blobName, Stream stream, Entities.FileStorageProvider? config = null)
         {
-            var dirPath = GetDirectoryPath(containerName);
+            string dirPath = GetDirectoryPath(containerName);
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
             }
 
-            var filePath = Path.Combine(dirPath, blobName);
-            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            string filePath = Path.Combine(dirPath, blobName);
+            using FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
 
             LogFileSavedToLocal(filePath);
@@ -35,7 +35,7 @@ namespace SharpFort.FileManagement.Domain.Services
 
         public Task<Stream?> GetAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
         {
-            var filePath = GetFilePath(containerName, blobName);
+            string filePath = GetFilePath(containerName, blobName);
             if (!File.Exists(filePath))
             {
                 return Task.FromResult<Stream?>(null);
@@ -47,7 +47,7 @@ namespace SharpFort.FileManagement.Domain.Services
 
         public Task DeleteAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
         {
-            var filePath = GetFilePath(containerName, blobName);
+            string filePath = GetFilePath(containerName, blobName);
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -59,13 +59,13 @@ namespace SharpFort.FileManagement.Domain.Services
         public Task<string?> GetUrlAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
         {
             // 本地文件使用相对路径作为 URL
-            var url = $"/api/app/wwwroot/{containerName}/{blobName}";
+            string url = $"/api/app/wwwroot/{containerName}/{blobName}";
             return Task.FromResult<string?>(url);
         }
 
         public Task<bool> ExistsAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
         {
-            var filePath = GetFilePath(containerName, blobName);
+            string filePath = GetFilePath(containerName, blobName);
             return Task.FromResult(File.Exists(filePath));
         }
 

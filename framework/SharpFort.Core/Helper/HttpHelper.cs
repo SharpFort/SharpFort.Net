@@ -147,17 +147,17 @@ namespace SharpFort.Core.Helper
 
             if (head is not null)
             {
-                foreach (var d in head)
+                foreach (KeyValuePair<string, string> d in head)
                 {
                     json.Headers.Add(d.Key, d.Value);
                 }
             }
 
-            var httpResponse = await Client.PostAsync(url, json);
+            HttpResponseMessage httpResponse = await Client.PostAsync(url, json);
 
             httpResponse.EnsureSuccessStatusCode();
 
-            var content = httpResponse.Content;
+            HttpContent content = httpResponse.Content;
 
             return await content.ReadAsStringAsync();
         }

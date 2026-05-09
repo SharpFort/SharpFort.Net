@@ -16,7 +16,7 @@ public static class JsonElementExtensions
     {
         JsonElement current = element;
 
-        foreach (var key in path)
+        foreach (object key in path)
         {
             switch (key)
             {
@@ -53,7 +53,7 @@ public static class JsonElementExtensions
     public static JsonElement? Get(this JsonElement element, string propertyName)
     {
         return element.ValueKind == JsonValueKind.Object &&
-            element.TryGetProperty(propertyName, out var value)
+            element.TryGetProperty(propertyName, out JsonElement value)
             ? value
             : null;
     }
@@ -123,14 +123,14 @@ public static class JsonElementExtensions
 
     public static DateTime GetDateTime(this JsonElement? element, DateTime defaultValue = default)
     {
-        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out var dt)
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out DateTime dt)
                 ? dt
                 : defaultValue;
     }
 
     public static Guid GetGuid(this JsonElement? element, Guid defaultValue = default)
     {
-        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out var guid)
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out Guid guid)
                 ? guid
                 : defaultValue;
     }
@@ -168,14 +168,14 @@ public static class JsonElementExtensions
 
     public static DateTime? GetDateTimeOrNull(this JsonElement? element)
     {
-        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out var dt)
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out DateTime dt)
                 ? dt
                 : null;
     }
 
     public static Guid? GetGuidOrNull(this JsonElement? element)
     {
-        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out var guid)
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out Guid guid)
                 ? guid
                 : null;
     }
@@ -191,7 +191,7 @@ public static class JsonElementExtensions
     {
         if (element?.ValueKind == JsonValueKind.Array)
         {
-            foreach (var item in element.Value.EnumerateArray())
+            foreach (JsonElement item in element.Value.EnumerateArray())
             {
                 yield return item;
             }
@@ -232,7 +232,7 @@ public static class JsonElementExtensions
     {
         if (element?.ValueKind == JsonValueKind.Object)
         {
-            foreach (var prop in element.Value.EnumerateObject())
+            foreach (JsonProperty prop in element.Value.EnumerateObject())
             {
                 yield return prop;
             }
@@ -334,8 +334,8 @@ public static class JsonElementExtensions
             return null;
         }
 
-        var dict = new Dictionary<string, JsonElement>();
-        foreach (var prop in element.Value.EnumerateObject())
+        Dictionary<string, JsonElement> dict = new Dictionary<string, JsonElement>();
+        foreach (JsonProperty prop in element.Value.EnumerateObject())
         {
             dict[prop.Name] = prop.Value;
         }

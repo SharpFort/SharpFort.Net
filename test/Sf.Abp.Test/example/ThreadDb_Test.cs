@@ -16,17 +16,17 @@ namespace Sf.Abp.Test.example
         {
             try
             {
-                var uowManager = GetRequiredService<IUnitOfWorkManager>();
-                var tasks = new List<Task>();
+                IUnitOfWorkManager uowManager = GetRequiredService<IUnitOfWorkManager>();
+                List<Task> tasks = new List<Task>();
                 // 创建10个任务但不立即执行
                 for (int i = 0; i < 10; i++)
                 {
-                    var task = new Task(async () =>
+                    Task task = new Task(async () =>
                     {
-                        using (var uow = uowManager.Begin())
+                        using (IUnitOfWork uow = uowManager.Begin())
                         {
-                            var rep = GetRequiredService<ISqlSugarRepository<User>>();
-                            var result = await rep.GetListAsync();
+                            ISqlSugarRepository<User> rep = GetRequiredService<ISqlSugarRepository<User>>();
+                            List<User> result = await rep.GetListAsync();
                             await uow.CompleteAsync();
                         }
                     });
@@ -34,7 +34,7 @@ namespace Sf.Abp.Test.example
                 }
 
                 // 同时启动所有任务
-                foreach (var task in tasks)
+                foreach (Task task in tasks)
                 {
                     task.Start();
                 }

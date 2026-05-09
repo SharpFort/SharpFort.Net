@@ -9,6 +9,7 @@ using SharpFort.CasbinRbac.Domain.Extensions;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
 using SharpFort.SqlSugarCore;
+using SharpFort.CasbinRbac.Domain.Shared.Model;
 
 namespace SharpFort.CasbinRbac.SqlSugarCore
 {
@@ -46,8 +47,8 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                 return;
             }
 
-            var roleInfo = CurrentUser.GetRoleInfo();
-            var expUser = Expressionable.Create<User>();
+            List<RoleTokenInfoModel>? roleInfo = CurrentUser.GetRoleInfo();
+            Expressionable<User> expUser = Expressionable.Create<User>();
 
             // 如果无角色信息，默认只能看自己
             if (roleInfo == null || roleInfo.Count == 0)
@@ -64,7 +65,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             }
 
             // 拼接 OR 条件 (取并集)
-            foreach (var role in roleInfo)
+            foreach (RoleTokenInfoModel role in roleInfo)
             {
                 switch (role.DataScope)
                 {
@@ -82,7 +83,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 
                     case DataScope.DEPT_FOLLOW:
                         // 本部门及以下
-                        var currentDeptId = CurrentUser.GetDepartmentId();
+                        Guid? currentDeptId = CurrentUser.GetDepartmentId();
                         if (currentDeptId != null)
                         {
                             // 优化：利用 Ancestors 字段进行子查询
@@ -109,8 +110,8 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             sqlSugarClient.QueryFilter.AddTableFilter(expUser.ToExpression());
 
             // 针对 Role 表的过滤 (只能看自己拥有的角色)
-            var expRole = Expressionable.Create<Role>();
-            var roleIds = roleInfo.Select(x => x.Id).ToList();
+            Expressionable<Role> expRole = Expressionable.Create<Role>();
+            List<Guid> roleIds = roleInfo.Select(x => x.Id).ToList();
             expRole.Or(r => roleIds.Contains(r.Id));
             sqlSugarClient.QueryFilter.AddTableFilter(expRole.ToExpression());
         }

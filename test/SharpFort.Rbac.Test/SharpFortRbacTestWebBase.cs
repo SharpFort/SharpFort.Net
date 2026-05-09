@@ -14,7 +14,7 @@ namespace SharpFort.Rbac.Test
             HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext!;
             ConfigureHttpContext(httpContext);
             HttpContext = httpContext;
-            var app = new ApplicationBuilder(ServiceProvider);
+            ApplicationBuilder app = new ApplicationBuilder(ServiceProvider);
             RequestDelegate httpDelegate = app.Build();
             httpDelegate.Invoke(httpContext);
         }

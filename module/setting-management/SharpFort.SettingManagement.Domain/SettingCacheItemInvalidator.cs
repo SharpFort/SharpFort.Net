@@ -11,7 +11,7 @@ public class SettingCacheItemInvalidator(IDistributedCache<SettingCacheItem> cac
 
     public virtual async Task HandleEventAsync(EntityChangedEventData<SettingAggregateRoot> eventData)
     {
-        var cacheKey = CalculateCacheKey(
+        string cacheKey = CalculateCacheKey(
             eventData.Entity.Name,
             eventData.Entity.ProviderName!,
             eventData.Entity.ProviderKey!

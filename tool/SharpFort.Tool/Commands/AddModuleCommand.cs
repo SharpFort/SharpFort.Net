@@ -12,15 +12,15 @@ namespace SharpFort.Tool.Commands
         public void CommandLineApplication(CommandLineApplication application)
         {
             application.HelpOption("-h|--help");
-            var modulePathOption = application.Option("-p|--modulePath", "模块路径", CommandOptionType.SingleValue);
-            var solutionOption = application.Option("-s|--solution", "解决方案路径", CommandOptionType.SingleValue);
-            var moduleNameArgument = application.Argument("moduleName", "模块名", (_) => { });
+            CommandOption modulePathOption = application.Option("-p|--modulePath", "模块路径", CommandOptionType.SingleValue);
+            CommandOption solutionOption = application.Option("-s|--solution", "解决方案路径", CommandOptionType.SingleValue);
+            CommandArgument moduleNameArgument = application.Argument("moduleName", "模块名", (_) => { });
             application.OnExecute(() =>
             {
-                var moduleName = moduleNameArgument.Value;
+                string moduleName = moduleNameArgument.Value;
 
                 //模块路径默认按小写规则，默认在模块路径下一层
-                var modulePath = moduleName.ToLower(CultureInfo.InvariantCulture).Replace(".", "-");
+                string modulePath = moduleName.ToLower(CultureInfo.InvariantCulture).Replace(".", "-");
                 if (modulePathOption.HasValue())
                 {
                     modulePath = modulePathOption.Value();
@@ -28,7 +28,7 @@ namespace SharpFort.Tool.Commands
 
 
                 //解决方案默认在模块文件夹上一级，也可以通过s进行指定
-                var slnPath = "../";
+                string slnPath = "../";
 
                 if (solutionOption.HasValue())
                 {
@@ -36,11 +36,11 @@ namespace SharpFort.Tool.Commands
                 }
 
                 CheckFirstSlnPath(slnPath);
-                var dotnetSlnCommandPart = new List<string>() { "Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore" };
-                var paths = dotnetSlnCommandPart.Select(x => Path.Combine(modulePath, $"{moduleName}.{x}")).ToArray();
+                List<string> dotnetSlnCommandPart = new List<string>() { "Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore" };
+                string[] paths = dotnetSlnCommandPart.Select(x => Path.Combine(modulePath, $"{moduleName}.{x}")).ToArray();
                 CheckPathExist(paths);
 
-                var cmdCommands = dotnetSlnCommandPart.Select(x => $"dotnet sln \"{slnPath}\" add \"{Path.Combine(modulePath, $"{moduleName}.{x}")}\"").ToArray();
+                string[] cmdCommands = dotnetSlnCommandPart.Select(x => $"dotnet sln \"{slnPath}\" add \"{Path.Combine(modulePath, $"{moduleName}.{x}")}\"").ToArray();
                 StartCmd(cmdCommands);
 
                 Console.WriteLine("恭喜~模块添加成功！");

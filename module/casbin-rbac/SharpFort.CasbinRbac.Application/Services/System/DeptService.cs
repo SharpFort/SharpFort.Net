@@ -30,7 +30,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         //[Route("{roleId}")]
         public async Task<List<DeptGetListOutputDto>> GetRoleIdAsync(Guid roleId)
         {
-            var entities = await _repository.GetListRoleIdAsync(roleId);
+            List<Department> entities = await _repository.GetListRoleIdAsync(roleId);
             return await MapToGetListOutputDtosAsync(entities);
         }
 
@@ -42,7 +42,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task<PagedResultDto<DeptGetListOutputDto>> GetListAsync(DeptGetListInputVo input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable
+            List<Department> entities = await _repository._DbQueryable
                 .WhereIF(!string.IsNullOrEmpty(input.DeptName), u => u.DeptName.Contains(input.DeptName!))
                 .WhereIF(input.State is not null, u => u.State == input.State)
                 .OrderBy(u => u.OrderNum, OrderByType.Asc)
@@ -57,7 +57,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task<DeptGetOutputDto> CreateAsync(DeptCreateInputVo input)
         {
             await CheckCreateInputDtoAsync(input);
-            var entity = await MapToEntityAsync(input);
+            Department entity = await MapToEntityAsync(input);
 
             // 处理 Ancestors
             string ancestors = Guid.Empty.ToString();
@@ -65,7 +65,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             if (parentId != Guid.Empty)
             {
-                var parent = await _repository.GetByIdAsync(parentId);
+                Department parent = await _repository.GetByIdAsync(parentId);
                 if (parent != null)
                 {
                     ancestors = string.IsNullOrEmpty(parent.Ancestors)
@@ -83,7 +83,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         protected override async Task CheckCreateInputDtoAsync(DeptCreateInputVo input)
         {
-            var isExist =
+            bool isExist =
                 await _repository.IsAnyAsync(x => x.DeptCode == input.DeptCode);
             if (isExist)
             {
@@ -93,7 +93,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         protected override async Task CheckUpdateInputDtoAsync(Department entity, DeptUpdateInputVo input)
         {
-            var isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
+            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
                 .AnyAsync(x => x.DeptCode == input.DeptCode);
             if (isExist)
             {

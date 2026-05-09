@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Sf.Abp.Application;
@@ -98,9 +99,9 @@ namespace Sf.Abp.Web
 
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
-            var host = context.Services.GetHostingEnvironment();
-            var service = context.Services;
+            IConfiguration configuration = context.Services.GetConfiguration();
+            IWebHostEnvironment host = context.Services.GetHostingEnvironment();
+            IServiceCollection service = context.Services;
 
             //本地开发环境，禁用作业执行
             if (host.IsDevelopment())
@@ -195,13 +196,13 @@ namespace Sf.Abp.Web
             });
 
             //配置Hangfire定时任务存储，开启redis后，优先使用redis
-            var redisConfiguration = configuration["Redis:Configuration"];
+            string? redisConfiguration = configuration["Redis:Configuration"];
             context.Services.AddHangfire(config =>
             {
-                var redisEnabled = configuration.GetSection("Redis").GetValue<bool>("IsEnabled");
+                bool redisEnabled = configuration.GetSection("Redis").GetValue<bool>("IsEnabled");
                 if (redisEnabled)
                 {
-                    var jobDb = configuration.GetSection("Redis").GetValue<int>("JobDb");
+                    int jobDb = configuration.GetSection("Redis").GetValue<int>("JobDb");
                     config.UseRedisStorage(
                         ConnectionMultiplexer.Connect(redisConfiguration),
                         new RedisStorageOptions()
@@ -224,7 +225,7 @@ namespace Sf.Abp.Web
                 _.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                 _.OnRejected = (context, _) =>
                 {
-                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
                     {
                         context.HttpContext.Response.Headers.RetryAfter =
                             ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
@@ -240,7 +241,7 @@ namespace Sf.Abp.Web
                 _.GlobalLimiter = PartitionedRateLimiter.CreateChained(
                     PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                     {
-                        var userAgent = httpContext.Request.Headers.UserAgent.ToString();
+                        string userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
                         return RateLimitPartition.GetSlidingWindowLimiter
                         (userAgent, _ =>
@@ -256,8 +257,8 @@ namespace Sf.Abp.Web
 
 
             //jwt鉴权
-            var jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
-            var refreshJwtOptions = configuration.GetSection(nameof(RefreshJwtOptions)).Get<RefreshJwtOptions>();
+            JwtOptions? jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
+            RefreshJwtOptions? refreshJwtOptions = configuration.GetSection(nameof(RefreshJwtOptions)).Get<RefreshJwtOptions>();
 
             context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -275,14 +276,14 @@ namespace Sf.Abp.Web
                         OnMessageReceived = context =>
                         {
                             //优先Query中获取，再去cookies中获取
-                            var accessToken = context.Request.Query["access_token"];
+                            StringValues accessToken = context.Request.Query["access_token"];
                             if (!string.IsNullOrEmpty(accessToken))
                             {
                                 context.Token = accessToken;
                             }
                             else
                             {
-                                if (context.Request.Cookies.TryGetValue("Token", out var cookiesToken))
+                                if (context.Request.Cookies.TryGetValue("Token", out string? cookiesToken))
                                 {
                                     context.Token = cookiesToken;
                                 }
@@ -307,14 +308,14 @@ namespace Sf.Abp.Web
                     {
                         OnMessageReceived = context =>
                         {
-                            var refresh_token = context.Request.Headers["refresh_token"];
+                            StringValues refresh_token = context.Request.Headers["refresh_token"];
                             if (!string.IsNullOrEmpty(refresh_token))
                             {
                                 context.Token = refresh_token;
                                 return Task.CompletedTask;
                             }
 
-                            var refreshToken = context.Request.Query["refresh_token"];
+                            StringValues refreshToken = context.Request.Query["refresh_token"];
                             if (!string.IsNullOrEmpty(refreshToken))
                             {
                                 context.Token = refreshToken;
@@ -337,9 +338,9 @@ namespace Sf.Abp.Web
 
         public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            var service = context.ServiceProvider;
-            var env = context.GetEnvironment();
-            var app = context.GetApplicationBuilder();
+            IServiceProvider service = context.ServiceProvider;
+            IWebHostEnvironment env = context.GetEnvironment();
+            IApplicationBuilder app = context.GetApplicationBuilder();
 
             app.UseRouting();
 

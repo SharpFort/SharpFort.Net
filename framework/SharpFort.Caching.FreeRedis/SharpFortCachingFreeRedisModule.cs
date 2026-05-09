@@ -23,7 +23,7 @@ namespace SharpFort.Caching.FreeRedis
         /// <param name="context">服务配置上下文</param>
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
+            IConfiguration configuration = context.Services.GetConfiguration();
 
             // 检查Redis是否启用
             if (!IsRedisEnabled(configuration))
@@ -42,7 +42,7 @@ namespace SharpFort.Caching.FreeRedis
         /// <returns>是否启用Redis</returns>
         private static bool IsRedisEnabled(IConfiguration configuration)
         {
-            var redisEnabled = configuration[RedisEnabledKey];
+            string? redisEnabled = configuration[RedisEnabledKey];
             return redisEnabled.IsNullOrEmpty() || bool.Parse(redisEnabled);
         }
 
@@ -53,8 +53,8 @@ namespace SharpFort.Caching.FreeRedis
         /// <param name="configuration">配置</param>
         private static void RegisterRedisServices(ServiceConfigurationContext context, IConfiguration configuration)
         {
-            var redisConfiguration = configuration[RedisConfigurationKey];
-            var redisClient = new RedisClient(redisConfiguration);
+            string? redisConfiguration = configuration[RedisConfigurationKey];
+            RedisClient redisClient = new RedisClient(redisConfiguration);
 
             context.Services.AddSingleton<IRedisClient>(redisClient);
             context.Services.Replace(ServiceDescriptor.Singleton<IDistributedCache>(

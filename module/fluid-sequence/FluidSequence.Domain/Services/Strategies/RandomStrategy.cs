@@ -19,7 +19,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
             // RAND:NUM:4
-            var parts = placeholderKey.Split(':');
+            string[] parts = placeholderKey.Split(':');
             if (parts.Length < 3)
             {
                 return placeholderKey;

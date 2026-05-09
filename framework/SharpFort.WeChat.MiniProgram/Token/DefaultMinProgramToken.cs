@@ -11,25 +11,25 @@ internal class DefaultMinProgramToken(IOptions<WeChatMiniProgramOptions> options
 
     public async Task<string> GetTokenAsync()
     {
-        var token = await this.GetAccessToken();
+        AccessTokenResponse token = await this.GetAccessToken();
         return token.access_token;
     }
     public async Task<AccessTokenResponse> GetAccessToken()
     {
-        var req = new AccessTokenRequest();
+        AccessTokenRequest req = new AccessTokenRequest();
         req.appid = _options.AppID;
         req.secret = _options.AppSecret;
         req.grant_type = "client_credential";
         using (HttpClient httpClient = new())
         {
             string queryString = req.ToQueryString();
-            var builder = new UriBuilder(Url);
+            UriBuilder builder = new UriBuilder(Url);
             builder.Query = queryString;
             HttpResponseMessage response = await httpClient.GetAsync(builder.ToString());
 
             response.EnsureSuccessStatusCode();
 
-            var responseBody = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
+            AccessTokenResponse? responseBody = await response.Content.ReadFromJsonAsync<AccessTokenResponse>();
             return responseBody;
         }
     }

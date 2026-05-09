@@ -30,19 +30,19 @@ public class AiModelService(
     {
         RefAsync<int> total = 0;
 
-        var query = _modelRepository._DbQueryable
+        ISugarQueryable<AiModel> query = _modelRepository._DbQueryable
             .Where(x => !x.IsDeleted)
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x =>
                 x.Name.Contains(input.SearchKey) || x.ModelId.Contains(input.SearchKey))
             .WhereIF(input.AiProviderId.HasValue, x => x.AiProviderId == input.AiProviderId.Value);
         // .WhereIF(input.IsPremiumOnly == true, x => x.IsPremium); // Assuming IsPremiumOnly is not in DTO or not needed yet
 
-        var entities = await query
+        List<AiModel> entities = await query
             .OrderBy(x => x.OrderNum)
             .OrderByDescending(x => x.Id)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-        var output = entities.Adapt<List<AiModelDto>>();
+        List<AiModelDto> output = entities.Adapt<List<AiModelDto>>();
         return new PagedResultDto<AiModelDto>(total, output);
     }
 
@@ -52,7 +52,7 @@ public class AiModelService(
     [HttpGet("ai-model/{id}")]
     public async Task<AiModelDto> GetAsync([FromRoute] Guid id)
     {
-        var entity = await _modelRepository.GetByIdAsync(id);
+        AiModel entity = await _modelRepository.GetByIdAsync(id);
         return entity.Adapt<AiModelDto>();
     }
 
@@ -63,7 +63,7 @@ public class AiModelService(
     public async Task<AiModelDto> CreateAsync(AiModelCreateInput input)
     {
         // 验证供应商是否存在
-        var providerExists = await _providerRepository._DbQueryable
+        bool providerExists = await _providerRepository._DbQueryable
             .Where(x => x.Id == input.AiProviderId)
             .AnyAsync();
 
@@ -72,7 +72,7 @@ public class AiModelService(
             throw new UserFriendlyException("指定的AI供应商不存在");
         }
 
-        var entity = new AiModel
+        AiModel entity = new AiModel
         {
             HandlerName = input.HandlerName,
             ModelId = input.ModelId,
@@ -102,12 +102,12 @@ public class AiModelService(
     [HttpPut("ai-model/{id}")]
     public async Task<AiModelDto> UpdateAsync([FromRoute] Guid id, AiModelUpdateInput input)
     {
-        var entity = await _modelRepository.GetByIdAsync(id) ?? throw new UserFriendlyException("模型不存在");
+        AiModel entity = await _modelRepository.GetByIdAsync(id) ?? throw new UserFriendlyException("模型不存在");
 
         // 验证供应商是否存在
         if (entity.AiProviderId != input.AiProviderId)
         {
-            var providerExists = await _providerRepository._DbQueryable
+            bool providerExists = await _providerRepository._DbQueryable
                 .Where(x => x.Id == input.AiProviderId)
                 .AnyAsync();
 

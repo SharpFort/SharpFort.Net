@@ -74,10 +74,10 @@ namespace SharpFort.SqlSugarCore
             LazyServiceProvider = lazyServiceProvider;
 
             // 异步获取租户配置
-            var tenantConfiguration = AsyncHelper.RunSync(async () => await TenantConfigurationWrapper.GetAsync());
+            TenantConfiguration? tenantConfiguration = AsyncHelper.RunSync(async () => await TenantConfigurationWrapper.GetAsync());
 
             // 构建数据库连接配置
-            var connectionConfig = BuildConnectionConfig(options =>
+            ConnectionConfig connectionConfig = BuildConnectionConfig(options =>
             {
                 options.ConnectionString = tenantConfiguration!.GetCurrentConnectionString();
                 options.DbType = GetCurrentDbType(tenantConfiguration!.GetCurrentConnectionName());
@@ -141,7 +141,7 @@ namespace SharpFort.SqlSugarCore
             Action<ISqlSugarClient>? onClientConfig = null;
 
             // 按执行顺序聚合所有依赖项的AOP处理器
-            foreach (var dependency in SqlSugarDbContextDependencies.OrderBy(x => x.ExecutionOrder))
+            foreach (ISqlSugarDbContextDependencies? dependency in SqlSugarDbContextDependencies.OrderBy(x => x.ExecutionOrder))
             {
                 onLogExecuting += dependency.OnLogExecuting;
                 onLogExecuted += dependency.OnLogExecuted;
@@ -167,7 +167,7 @@ namespace SharpFort.SqlSugarCore
         /// <returns>连接配置对象</returns>
         protected virtual ConnectionConfig BuildConnectionConfig(Action<ConnectionConfig>? configAction = null)
         {
-            var dbConnOptions = DbConnectionOptions;
+            DbConnOptions dbConnOptions = DbConnectionOptions;
 
             // 验证数据库类型配置
             if (dbConnOptions.DbType is null)
@@ -176,7 +176,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 配置读写分离
-            var slaveConfigs = new List<SlaveConnectionConfig>();
+            List<SlaveConnectionConfig> slaveConfigs = new List<SlaveConnectionConfig>();
             if (dbConnOptions.EnabledReadWrite)
             {
                 if (dbConnOptions.ReadUrl is null)
@@ -189,7 +189,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 创建连接配置
-            var connectionConfig = new ConnectionConfig
+            ConnectionConfig connectionConfig = new ConnectionConfig
             {
                 ConfigId = ConnectionStrings.DefaultConnectionStringName,
                 DbType = dbConnOptions.DbType ?? DbType.Sqlite,
@@ -239,7 +239,7 @@ namespace SharpFort.SqlSugarCore
 
                     // 聚合所有依赖项的实体服务
                     Action<PropertyInfo, EntityColumnInfo>? entityService = null;
-                    foreach (var dependency in SqlSugarDbContextDependencies.OrderBy(x => x.ExecutionOrder))
+                    foreach (ISqlSugarDbContextDependencies? dependency in SqlSugarDbContextDependencies.OrderBy(x => x.ExecutionOrder))
                     {
                         entityService += dependency.EntityService;
                     }
@@ -273,14 +273,14 @@ namespace SharpFort.SqlSugarCore
                 return null;
             }
 
-            var atIndex = name.LastIndexOf('@');
+            int atIndex = name.LastIndexOf('@');
             if (atIndex == -1 || atIndex == name.Length - 1)
             {
                 return null;
             }
 
-            var dbTypeString = name[(atIndex + 1)..];
-            return Enum.TryParse<DbType>(dbTypeString, out var dbType)
+            string dbTypeString = name[(atIndex + 1)..];
+            return Enum.TryParse<DbType>(dbTypeString, out DbType dbType)
                 ? dbType
                 : throw new ArgumentException($"不支持的数据库类型: {dbTypeString}");
         }
@@ -291,7 +291,7 @@ namespace SharpFort.SqlSugarCore
         public virtual void BackupDataBase()
         {
             const string backupDirectory = "database_backup";
-            var fileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{SqlSugarClient.Ado.Connection.Database}";
+            string fileName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{SqlSugarClient.Ado.Connection.Database}";
 
             Directory.CreateDirectory(backupDirectory);
 

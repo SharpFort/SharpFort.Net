@@ -38,19 +38,19 @@ namespace SharpFort.FluidSequence.Domain.Services
         public async Task<string> GenerateNextAsync(string ruleCode, Dictionary<string, string> context = null!)
         {
             // 查询规则，获取配置（仅用于读 ExtensionProps，不在此做状态修改）
-            var rule = await _repository.GetAsync(r => r.RuleCode == ruleCode)
+            SysSequenceRule rule = await _repository.GetAsync(r => r.RuleCode == ruleCode)
                        ?? throw new UserFriendlyException($"流水号规则 [{ruleCode}] 不存在。");
 
             // ── 路由判断：是否启用 Hi-Lo 缓冲模式 ──────────────────────────────────
             bool enableBuffer = rule.ExtensionProps != null
-                && rule.ExtensionProps.TryGetValue("EnableBuffer", out var eb)
+                && rule.ExtensionProps.TryGetValue("EnableBuffer", out object? eb)
                 && Convert.ToBoolean(eb, System.Globalization.CultureInfo.InvariantCulture);
 
             if (enableBuffer)
             {
                 // Hi-Lo 模式：从内存队列取号，队列空时原子批量预取
                 int bufferCount = 50; // 默认单次预取 50 个
-                if (rule.ExtensionProps!.TryGetValue("BufferCount", out var bc))
+                if (rule.ExtensionProps!.TryGetValue("BufferCount", out object? bc))
                 {
                     bufferCount = Math.Max(1, Convert.ToInt32(bc, System.Globalization.CultureInfo.InvariantCulture));
                 }
@@ -98,7 +98,7 @@ namespace SharpFort.FluidSequence.Domain.Services
             for (int attempt = 0; attempt < maxRetry; attempt++)
             {
                 // 每次循环都重新从 DB 读取，获取最新版本号，避免拿到脏数据
-                var rule = await _repository.GetAsync(r => r.RuleCode == ruleCode)
+                SysSequenceRule rule = await _repository.GetAsync(r => r.RuleCode == ruleCode)
                            ?? throw new UserFriendlyException($"流水号规则 [{ruleCode}] 不存在。");
 
                 // ── 问题2修复：重置与递增统一为"先重置（若需要），再递增"──
@@ -145,7 +145,7 @@ namespace SharpFort.FluidSequence.Domain.Services
                 string key = match.Groups[1].Value;
 
                 // 优先由策略链处理（时间、序列号、随机、上下文）
-                foreach (var strategy in _strategies)
+                foreach (IPlaceholderStrategy strategy in _strategies)
                 {
                     if (strategy.CanHandle(key))
                     {
@@ -154,7 +154,7 @@ namespace SharpFort.FluidSequence.Domain.Services
                 }
 
                 // 策略链未命中时，尝试从上下文字典直接读取
-                if (context != null && context.TryGetValue(key, out var ctxVal))
+                if (context != null && context.TryGetValue(key, out string? ctxVal))
                 {
                     return ctxVal;
                 }

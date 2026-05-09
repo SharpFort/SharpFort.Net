@@ -17,7 +17,7 @@ namespace SharpFort.CasbinRbac.Application
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var service = context.Services;
+            IServiceCollection service = context.Services;
 
             service.AddCaptcha(options =>
             {

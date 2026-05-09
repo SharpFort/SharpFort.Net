@@ -28,23 +28,23 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task RefreshCacheAsync()
         {
-            using var scope = _scopeFactory.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ISqlSugarRepository<RoleField>>();
-            var roleRepo = scope.ServiceProvider.GetRequiredService<ISqlSugarRepository<Role>>();
+            using IServiceScope scope = _scopeFactory.CreateScope();
+            ISqlSugarRepository<RoleField> repo = scope.ServiceProvider.GetRequiredService<ISqlSugarRepository<RoleField>>();
+            ISqlSugarRepository<Role> roleRepo = scope.ServiceProvider.GetRequiredService<ISqlSugarRepository<Role>>();
 
             // 1. Load Rules
-            var allRules = await repo.GetListAsync();
-            var newCache = new ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>>();
+            List<RoleField> allRules = await repo.GetListAsync();
+            ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>> newCache = new ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>>();
 
-            var grouped = allRules.GroupBy(x => x.RoleId);
-            foreach (var group in grouped)
+            IEnumerable<IGrouping<Guid, RoleField>> grouped = allRules.GroupBy(x => x.RoleId);
+            foreach (IGrouping<Guid, RoleField> group in grouped)
             {
-                var roleId = group.Key;
-                var resourceMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                Guid roleId = group.Key;
+                Dictionary<string, HashSet<string>> resourceMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-                foreach (var rule in group)
+                foreach (RoleField? rule in group)
                 {
-                    if (!resourceMap.TryGetValue(rule.TableName, out var fieldSet))
+                    if (!resourceMap.TryGetValue(rule.TableName, out HashSet<string>? fieldSet))
                     {
                         fieldSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                         resourceMap[rule.TableName] = fieldSet;
@@ -55,9 +55,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             // 2. Load Roles for Code Mapping
-            var allRoles = await roleRepo.GetListAsync();
-            var newRoleMap = new ConcurrentDictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
-            foreach (var role in allRoles)
+            List<Role> allRoles = await roleRepo.GetListAsync();
+            ConcurrentDictionary<string, Guid> newRoleMap = new ConcurrentDictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+            foreach (Role role in allRoles)
             {
                 if (!string.IsNullOrEmpty(role.RoleCode))
                 {
@@ -72,13 +72,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public HashSet<string> GetDenyFields(IEnumerable<Guid> roleIds, string resourceName)
         {
-            var denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (roleIds == null || !roleIds.Any())
             {
                 return denyList;
             }
 
-            foreach (var roleId in roleIds)
+            foreach (Guid roleId in roleIds)
             {
                 MergeDenyFields(denyList, roleId, resourceName);
             }
@@ -90,15 +90,15 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// </summary>
         public HashSet<string> GetDenyFieldsByCodes(IEnumerable<string> roleCodes, string resourceName)
         {
-            var denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (roleCodes == null || !roleCodes.Any())
             {
                 return denyList;
             }
 
-            foreach (var code in roleCodes)
+            foreach (string code in roleCodes)
             {
-                if (_roleCodeMap.TryGetValue(code, out var roleId))
+                if (_roleCodeMap.TryGetValue(code, out Guid roleId))
                 {
                     MergeDenyFields(denyList, roleId, resourceName);
                 }
@@ -108,11 +108,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private void MergeDenyFields(HashSet<string> denyList, Guid roleId, string resourceName)
         {
-            if (_cache.TryGetValue(roleId, out var resourceMap))
+            if (_cache.TryGetValue(roleId, out Dictionary<string, HashSet<string>>? resourceMap))
             {
-                if (resourceMap.TryGetValue(resourceName, out var fields))
+                if (resourceMap.TryGetValue(resourceName, out HashSet<string>? fields))
                 {
-                    foreach (var f in fields)
+                    foreach (string f in fields)
                     {
                         denyList.Add(f);
                     }

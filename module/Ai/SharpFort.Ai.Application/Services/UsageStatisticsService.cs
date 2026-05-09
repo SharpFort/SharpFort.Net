@@ -33,9 +33,9 @@ public class UsageStatisticsService(
     /// <returns>每日Token使用量列表</returns>
     public async Task<List<DailyTokenUsageDto>> GetLast7DaysTokenUsageAsync([FromQuery] UsageStatisticsGetInput input)
     {
-        var userId = CurrentUser.GetId();
-        var endDate = DateTime.Today;
-        var startDate = endDate.AddDays(-6); // 近7天
+        Guid userId = CurrentUser.GetId();
+        DateTime endDate = DateTime.Today;
+        DateTime startDate = endDate.AddDays(-6); // 近7天
 
         // 从Message表统计近7天的token消耗
         var dailyUsage = await _messageRepository._DbQueryable
@@ -52,10 +52,10 @@ public class UsageStatisticsService(
             .ToListAsync();
 
         // 生成完整的7天数据，包括没有使用记录的日期
-        var result = new List<DailyTokenUsageDto>();
+        List<DailyTokenUsageDto> result = new List<DailyTokenUsageDto>();
         for (int i = 0; i < 7; i++)
         {
-            var date = startDate.AddDays(i);
+            DateTime date = startDate.AddDays(i);
             var usage = dailyUsage.FirstOrDefault(x => x.Date == date);
 
             result.Add(new DailyTokenUsageDto
@@ -74,7 +74,7 @@ public class UsageStatisticsService(
     /// <returns>模型Token使用量列表</returns>
     public async Task<List<ModelTokenUsageDto>> GetModelTokenUsageAsync([FromQuery] UsageStatisticsGetInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
         // 从UsageStatistics表获取各模型的token消耗统计（按ModelId聚合，因为同一模型可能有多个TokenId的记录）
         // AiUsage: ModelId, TotalTokenCount
@@ -95,10 +95,10 @@ public class UsageStatisticsService(
         }
 
         // 计算总token数
-        var totalTokens = modelUsages.Sum(x => x.TotalTokenCount);
+        long totalTokens = modelUsages.Sum(x => x.TotalTokenCount);
 
         // 计算各模型占比
-        var result = modelUsages.Select(x => new ModelTokenUsageDto
+        List<ModelTokenUsageDto> result = modelUsages.Select(x => new ModelTokenUsageDto
         {
             Model = x.ModelId,
             Tokens = x.TotalTokenCount,
@@ -117,10 +117,10 @@ public class UsageStatisticsService(
     public async Task<List<HourlyTokenUsageDto>> GetLast24HoursTokenUsageAsync(
         [FromQuery] UsageStatisticsGetInput input)
     {
-        var userId = CurrentUser.GetId();
-        var now = DateTime.Now;
-        var startTime = now.AddHours(-23); // 滚动24小时，从23小时前到现在
-        var startHour = new DateTime(startTime.Year, startTime.Month, startTime.Day, startTime.Hour, 0, 0);
+        Guid userId = CurrentUser.GetId();
+        DateTime now = DateTime.Now;
+        DateTime startTime = now.AddHours(-23); // 滚动24小时，从23小时前到现在
+        DateTime startHour = new DateTime(startTime.Year, startTime.Month, startTime.Day, startTime.Hour, 0, 0);
 
         // 从Message表查询近24小时的数据，只选择需要的字段
         var messages = await _messageRepository._DbQueryable
@@ -153,13 +153,13 @@ public class UsageStatisticsService(
             .ToList();
 
         // 生成完整的24小时数据
-        var result = new List<HourlyTokenUsageDto>();
+        List<HourlyTokenUsageDto> result = new List<HourlyTokenUsageDto>();
         for (int i = 0; i < 24; i++)
         {
-            var hour = startHour.AddHours(i);
+            DateTime hour = startHour.AddHours(i);
             var hourData = hourlyGrouped.Where(x => x.Hour == hour).ToList();
 
-            var modelBreakdown = hourData.Select(x => new ModelTokenBreakdownDto
+            List<ModelTokenBreakdownDto> modelBreakdown = hourData.Select(x => new ModelTokenBreakdownDto
             {
                 ModelId = x.ModelId,
                 Tokens = x.Tokens
@@ -182,9 +182,9 @@ public class UsageStatisticsService(
     /// <returns>模型今日使用量列表，包含使用次数和总Token</returns>
     public async Task<List<ModelTodayUsageDto>> GetTodayModelUsageAsync([FromQuery] UsageStatisticsGetInput input)
     {
-        var userId = CurrentUser.GetId();
-        var todayStart = DateTime.Today; // 今天凌晨0点
-        var tomorrowStart = todayStart.AddDays(1);
+        Guid userId = CurrentUser.GetId();
+        DateTime todayStart = DateTime.Today; // 今天凌晨0点
+        DateTime tomorrowStart = todayStart.AddDays(1);
 
         // 从Message表查询今天的数据，只选择需要的字段
         var messages = await _messageRepository._DbQueryable
@@ -200,7 +200,7 @@ public class UsageStatisticsService(
             .ToListAsync();
 
         // 在内存中按模型分组统计
-        var modelStats = messages
+        List<ModelTodayUsageDto> modelStats = messages
             .GroupBy(x => x.ModelId)
             .Select(g => new ModelTodayUsageDto
             {
@@ -213,7 +213,7 @@ public class UsageStatisticsService(
 
         if (modelStats.Count > 0)
         {
-            var modelIds = modelStats.Select(x => x.ModelId).ToList();
+            List<string> modelIds = modelStats.Select(x => x.ModelId).ToList();
             var modelDic = await _modelManager._aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId))
                 .Distinct()
                 .Where(x => x.IsEnabled)

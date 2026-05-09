@@ -32,9 +32,9 @@ public class TokenService(
     public async Task<PagedResultDto<TokenGetListOutputDto>> GetListAsync([FromQuery] PagedAllResultRequestDto input)
     {
         RefAsync<int> total = 0;
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var tokens = await _tokenRepository._DbQueryable
+        List<Token> tokens = await _tokenRepository._DbQueryable
             .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
@@ -46,7 +46,7 @@ public class TokenService(
 
 
 
-        var result = tokens.Select(t =>
+        List<TokenGetListOutputDto> result = tokens.Select(t =>
         {
 
             return new TokenGetListOutputDto
@@ -67,8 +67,8 @@ public class TokenService(
     [HttpGet("token/select-list")]
     public async Task<List<TokenSelectListOutputDto>> GetSelectListAsync([FromQuery] bool? includeDefault = true)
     {
-        var userId = CurrentUser.GetId();
-        var tokens = await _tokenRepository._DbQueryable
+        Guid userId = CurrentUser.GetId();
+        List<TokenSelectListOutputDto> tokens = await _tokenRepository._DbQueryable
             .Where(x => x.UserId == userId)
             .OrderBy(x => x.IsDisabled)
             .OrderByDescending(x => x.CreationTime)
@@ -99,19 +99,19 @@ public class TokenService(
     [HttpPost("token")]
     public async Task<TokenGetListOutputDto> CreateAsync([FromBody] TokenCreateInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
 
 
         // 检查名称是否重复
-        var exists = await _tokenRepository._DbQueryable
+        bool exists = await _tokenRepository._DbQueryable
             .AnyAsync(x => x.UserId == userId && x.Name == input.Name);
         if (exists)
         {
             throw new UserFriendlyException($"名称【{input.Name}】已存在，请使用其他名称");
         }
 
-        var token = new Token(userId, input.Name)
+        Token token = new Token(userId, input.Name)
         {
             ExpireTime = input.ExpireTime
         };
@@ -136,13 +136,13 @@ public class TokenService(
     [HttpPut("token")]
     public async Task UpdateAsync([FromBody] TokenUpdateInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var token = await _tokenRepository._DbQueryable
+        Token token = await _tokenRepository._DbQueryable
             .FirstAsync(x => x.Id == input.Id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
 
         // 检查名称是否重复（排除自己）
-        var exists = await _tokenRepository._DbQueryable
+        bool exists = await _tokenRepository._DbQueryable
             .AnyAsync(x => x.UserId == userId && x.Name == input.Name && x.Id != input.Id);
         if (exists)
         {
@@ -161,9 +161,9 @@ public class TokenService(
     [HttpDelete("token/{id}")]
     public async Task DeleteAsync(Guid id)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var token = await _tokenRepository._DbQueryable
+        Token token = await _tokenRepository._DbQueryable
             .FirstAsync(x => x.Id == id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
         await _tokenRepository.DeleteAsync(token);
     }
@@ -174,9 +174,9 @@ public class TokenService(
     [HttpPost("token/{id}/enable")]
     public async Task EnableAsync(Guid id)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var token = await _tokenRepository._DbQueryable
+        Token token = await _tokenRepository._DbQueryable
             .FirstAsync(x => x.Id == id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
         token.Enable();
         await _tokenRepository.UpdateAsync(token);
@@ -188,9 +188,9 @@ public class TokenService(
     [HttpPost("token/{id}/disable")]
     public async Task DisableAsync(Guid id)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var token = await _tokenRepository._DbQueryable
+        Token token = await _tokenRepository._DbQueryable
             .FirstAsync(x => x.Id == id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
         token.Disable();
         await _tokenRepository.UpdateAsync(token);

@@ -33,16 +33,16 @@ public sealed class SharpFortBackgroundWorkersHangfireModule : AbpModule
     public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         // 获取后台任务管理器和所有 Hangfire 后台任务
-        var backgroundWorkerManager = context.ServiceProvider.GetRequiredService<IBackgroundWorkerManager>();
-        var workers = context.ServiceProvider.GetServices<IHangfireBackgroundWorker>();
+        IBackgroundWorkerManager backgroundWorkerManager = context.ServiceProvider.GetRequiredService<IBackgroundWorkerManager>();
+        IEnumerable<IHangfireBackgroundWorker> workers = context.ServiceProvider.GetServices<IHangfireBackgroundWorker>();
 
         // 获取配置
-        var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
+        IConfiguration configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
 
         // 检查是否启用 Redis
-        var isRedisEnabled = configuration.GetValue<bool>("Redis:IsEnabled");
+        bool isRedisEnabled = configuration.GetValue<bool>("Redis:IsEnabled");
 
-        foreach (var worker in workers)
+        foreach (IHangfireBackgroundWorker worker in workers)
         {
             // 设置时区为本地时区(上海)
             worker.TimeZone = TimeZoneInfo.Local;
@@ -55,7 +55,7 @@ public sealed class SharpFortBackgroundWorkersHangfireModule : AbpModule
             else
             {
                 // 内存模式：直接使用 Hangfire
-                var unProxyWorker = ProxyHelper.UnProxy(worker);
+                object unProxyWorker = ProxyHelper.UnProxy(worker);
 
                 // 添加或更新循环任务
                 RecurringJob.AddOrUpdate(
@@ -78,7 +78,7 @@ public sealed class SharpFortBackgroundWorkersHangfireModule : AbpModule
     public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
     {
         // 添加工作单元过滤器
-        var services = context.ServiceProvider;
+        IServiceProvider services = context.ServiceProvider;
         GlobalJobFilters.Filters.Add(services.GetRequiredService<UnitOfWorkHangfireFilter>());
     }
 }

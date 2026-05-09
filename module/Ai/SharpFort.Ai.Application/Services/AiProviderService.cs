@@ -30,13 +30,13 @@ public class AiProviderService(
     {
         RefAsync<int> total = 0;
 
-        var entities = await _providerRepository._DbQueryable
+        List<AiProvider> entities = await _providerRepository._DbQueryable
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Name.Contains(input.SearchKey))
             .OrderByDescending(x => x.OrderNum)
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-        var output = entities.Adapt<List<AiProviderDto>>();
+        List<AiProviderDto> output = entities.Adapt<List<AiProviderDto>>();
         return new PagedResultDto<AiProviderDto>(total, output);
     }
 
@@ -46,7 +46,7 @@ public class AiProviderService(
     [HttpGet("ai-provider/{id}")]
     public async Task<AiProviderDto> GetAsync([FromRoute] Guid id)
     {
-        var entity = await _providerRepository.GetByIdAsync(id);
+        AiProvider entity = await _providerRepository.GetByIdAsync(id);
         return entity.Adapt<AiProviderDto>();
     }
 
@@ -56,7 +56,7 @@ public class AiProviderService(
     [HttpPost("ai-provider")]
     public async Task<AiProviderDto> CreateAsync(AiProviderCreateInput input)
     {
-        var entity = new AiProvider
+        AiProvider entity = new AiProvider
         {
             Name = input.Name,
             Endpoint = input.Endpoint,
@@ -75,7 +75,7 @@ public class AiProviderService(
     [HttpPut("ai-provider/{id}")]
     public async Task<AiProviderDto> UpdateAsync([FromRoute] Guid id, AiProviderUpdateInput input)
     {
-        var entity = await _providerRepository.GetByIdAsync(id) ?? throw new UserFriendlyException("供应商不存在");
+        AiProvider entity = await _providerRepository.GetByIdAsync(id) ?? throw new UserFriendlyException("供应商不存在");
         entity.Name = input.Name;
         entity.Endpoint = input.Endpoint;
         entity.ExtraUrl = input.ExtraUrl;
@@ -93,7 +93,7 @@ public class AiProviderService(
     public async Task DeleteAsync([FromRoute] Guid id)
     {
         // 检查是否有关联的模型
-        var hasModels = await _modelRepository._DbQueryable
+        bool hasModels = await _modelRepository._DbQueryable
             .Where(x => x.AiProviderId == id && !x.IsDeleted)
             .AnyAsync();
 

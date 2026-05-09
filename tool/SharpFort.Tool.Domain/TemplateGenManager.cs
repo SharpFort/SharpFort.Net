@@ -24,8 +24,8 @@ namespace SharpFort.Tool.Domain
                 throw new UserFriendlyException($"临时目录路径无法找到，请检查,[{_toolOptions.TempDirPath}]路径");
             }
 
-            var id = Guid.NewGuid().ToString("N");
-            var tempFileDirPath = Path.Combine(_toolOptions.TempDirPath, $"{id}");
+            string id = Guid.NewGuid().ToString("N");
+            string tempFileDirPath = Path.Combine(_toolOptions.TempDirPath, $"{id}");
             if (!Directory.Exists(tempFileDirPath))
             {
                 Directory.CreateDirectory(tempFileDirPath);
@@ -33,14 +33,14 @@ namespace SharpFort.Tool.Domain
 
 
             //下载的模板存放文件路径
-            var downloadPath = Path.Combine(_toolOptions.TempDirPath, "download");
+            string downloadPath = Path.Combine(_toolOptions.TempDirPath, "download");
             if (!Directory.Exists(downloadPath))
             {
                 Directory.CreateDirectory(downloadPath);
             }
 
-            var downloadFilePath = Path.Combine(downloadPath, $"{id}.zip");
-            var gitSteam = await _giteeManager.DownLoadFileAsync(input.GiteeRef);
+            string downloadFilePath = Path.Combine(downloadPath, $"{id}.zip");
+            Stream gitSteam = await _giteeManager.DownLoadFileAsync(input.GiteeRef);
             using (FileStream fileStream = new(downloadFilePath, FileMode.Create, FileAccess.Write))
             {
                 await gitSteam.CopyToAsync(fileStream);
@@ -51,9 +51,9 @@ namespace SharpFort.Tool.Domain
 
 
             //注意，这里下载的zip包，其实多了一层，我们进行操作的时候，要将操作目录进一步
-            var operPath = Directory.GetDirectories(tempFileDirPath)[0];
+            string operPath = Directory.GetDirectories(tempFileDirPath)[0];
             await ReplaceContentAsync(operPath, input.ReplaceStrData);
-            var tempFilePath = Path.Combine(_toolOptions.TempDirPath, $"{id}.zip");
+            string tempFilePath = Path.Combine(_toolOptions.TempDirPath, $"{id}.zip");
             ZipFile.CreateFromDirectory(operPath, tempFilePath);
 
             //创建压缩包后删除临时目录
@@ -68,7 +68,7 @@ namespace SharpFort.Tool.Domain
         /// <returns></returns>
         public async Task<List<string>> GetAllTemplatesAsync()
         {
-            var refs = await _giteeManager.GetAllBranchAsync();
+            List<string> refs = await _giteeManager.GetAllBranchAsync();
 
             //移除主分支
             refs.Remove("master");
@@ -81,7 +81,7 @@ namespace SharpFort.Tool.Domain
         /// <returns></returns>
         private static async Task ReplaceContentAsync(string rootDirectory, Dictionary<string, string> dic)
         {
-            foreach (var dicEntry in dic)
+            foreach (KeyValuePair<string, string> dicEntry in dic)
             {
                 await ReplaceInDirectory(rootDirectory, dicEntry.Key, dicEntry.Value);
             }
@@ -90,7 +90,7 @@ namespace SharpFort.Tool.Domain
             static async Task ReplaceInDirectory(string directoryPath, string searchString, string replaceString)
             {
                 // 替换当前目录下的文件和文件夹名称
-                var newDirPath = await ReplaceInFiles(directoryPath, searchString, replaceString);
+                string newDirPath = await ReplaceInFiles(directoryPath, searchString, replaceString);
 
                 // 递归遍历子目录
                 string[] subDirectories = Directory.GetDirectories(newDirPath);

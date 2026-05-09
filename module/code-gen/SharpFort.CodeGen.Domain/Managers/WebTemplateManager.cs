@@ -24,7 +24,7 @@ namespace SharpFort.CodeGen.Domain.Managers
         public Task<List<Table>> BuildCodeToWebAsync()
         {
             List<Type> entityTypes = [];
-            foreach (var module in _moduleContainer.Modules)
+            foreach (IAbpModuleDescriptor module in _moduleContainer.Modules)
             {
                 entityTypes.AddRange(module.Assembly.GetTypes()
                     .Where(x => x.GetCustomAttribute<IgnoreCodeFirstAttribute>() == null)
@@ -32,8 +32,8 @@ namespace SharpFort.CodeGen.Domain.Managers
                     .Where(x => x.GetCustomAttribute<SplitTableAttribute>() is null));
             }
 
-            var tables = new List<Table>();
-            foreach (var entityType in entityTypes)
+            List<Table> tables = new List<Table>();
+            foreach (Type entityType in entityTypes)
             {
                 tables.Add(EntityTypeMapperToTable(entityType));
             }
@@ -43,13 +43,13 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         private static Table EntityTypeMapperToTable(Type entityType)
         {
-            var table = new Table();
+            Table table = new Table();
             table.Fields = [];
-            var sugarTable = entityType.GetCustomAttribute<SugarTable>();
+            SugarTable? sugarTable = entityType.GetCustomAttribute<SugarTable>();
 
             table.Name = sugarTable?.TableName ?? entityType.Name;
 
-            foreach (var p in entityType.GetProperties())
+            foreach (PropertyInfo p in entityType.GetProperties())
             {
                 table.Fields.Add(PropertyMapperToFiled(p));
             }
@@ -60,7 +60,7 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         private static Field PropertyMapperToFiled(PropertyInfo propertyInfo)
         {
-            var fieldEntity = new Field();
+            Field fieldEntity = new Field();
             fieldEntity.Name = propertyInfo.Name;
 
 
@@ -78,7 +78,7 @@ namespace SharpFort.CodeGen.Domain.Managers
             }
 
             //判断类型
-            var enumName = typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Where(x => x.GetCustomAttribute<DisplayAttribute>()?.Description == fieldType.Name).FirstOrDefault()?.Name;
+            string? enumName = typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Where(x => x.GetCustomAttribute<DisplayAttribute>()?.Description == fieldType.Name).FirstOrDefault()?.Name;
             if (enumName is null)
             {
                 fieldEntity.FieldType = FieldType.String;
@@ -108,7 +108,7 @@ namespace SharpFort.CodeGen.Domain.Managers
             }
 
             //判断长度
-            var colum = propertyInfo.GetCustomAttribute<SugarColumn>();
+            SugarColumn? colum = propertyInfo.GetCustomAttribute<SugarColumn>();
             if (colum is not null && colum.Length != 0)
             {
                 fieldEntity.Length = colum.Length;

@@ -23,26 +23,26 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
+            IConfiguration configuration = context.Services.GetConfiguration();
             context.Services.AddSfDbContext<SfCasbinRbacDbContext>();
             context.Services.AddTransient<SfCasbinRbacDbContext>();
 
             // 1. Adapter (Scoped)
             context.Services.AddScoped<IAdapter>(sp =>
             {
-                var dbContext = sp.GetRequiredService<ISqlSugarDbContext>();
+                ISqlSugarDbContext dbContext = sp.GetRequiredService<ISqlSugarDbContext>();
                 return new SqlSugarAdapter(dbContext.SqlSugarClient);
             });
 
             // 2. Enforcer (Scoped) - Supports CachedEnforcer based on configuration
             context.Services.AddScoped<IEnforcer>(sp =>
             {
-                var config = sp.GetRequiredService<IConfiguration>();
-                var casbinOptions = config.GetSection("Casbin").Get<CasbinOptions>() ?? new CasbinOptions();
-                var logger = sp.GetService<ILogger<SharpFortCasbinRbacSqlSugarCoreModule>>();
+                IConfiguration config = sp.GetRequiredService<IConfiguration>();
+                CasbinOptions casbinOptions = config.GetSection("Casbin").Get<CasbinOptions>() ?? new CasbinOptions();
+                ILogger<SharpFortCasbinRbacSqlSugarCoreModule>? logger = sp.GetService<ILogger<SharpFortCasbinRbacSqlSugarCoreModule>>();
 
-                var adapter = sp.GetRequiredService<IAdapter>();
-                var modelPath = Path.Combine(AppContext.BaseDirectory, "rbac_with_domains_model.conf");
+                IAdapter adapter = sp.GetRequiredService<IAdapter>();
+                string modelPath = Path.Combine(AppContext.BaseDirectory, "rbac_with_domains_model.conf");
                 if (!File.Exists(modelPath))
                 {
                     throw new FileNotFoundException($"Casbin model file not found at: {modelPath}");
@@ -51,7 +51,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                 // Create Enforcer based on configuration
                 // Note: Casbin.NET version used doesn't have CachedEnforcer class
                 // We use standard Enforcer and control policy loading strategy via configuration
-                var enforcer = new Enforcer(modelPath, adapter);
+                Enforcer enforcer = new Enforcer(modelPath, adapter);
 
                 if (casbinOptions.EnableCachedEnforcer)
                 {
@@ -79,13 +79,13 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                 {
                     try
                     {
-                        var redisEnabled = config.GetSection("Redis").GetValue<bool>("IsEnabled");
+                        bool redisEnabled = config.GetSection("Redis").GetValue<bool>("IsEnabled");
                         if (redisEnabled)
                         {
-                            var redisConn = config["Redis:Configuration"];
+                            string? redisConn = config["Redis:Configuration"];
                             if (!string.IsNullOrEmpty(redisConn))
                             {
-                                var watcher = new RedisWatcher(redisConn);
+                                RedisWatcher watcher = new RedisWatcher(redisConn);
                                 enforcer.SetWatcher(watcher);
 
                                 // Callback to handle policy updates from other instances
@@ -140,9 +140,9 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             //========================================================================
             //【方案一】原始代码 - 使用 CreateScope（会导致 SQLite 死锁）
             //========================================================================
-            using (var scope = context.ServiceProvider.CreateScope())
+            using (IServiceScope scope = context.ServiceProvider.CreateScope())
             {
-                var db = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+                SqlSugar.ISqlSugarClient db = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
                 db.CodeFirst.InitTables<CasbinRule>();
             }
 

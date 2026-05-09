@@ -2,6 +2,7 @@
 using Volo.Abp.EventBus;
 using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.CasbinRbac.Domain.Shared.Etos;
+using SharpFort.CasbinRbac.Domain.Shared.Dtos;
 
 namespace SharpFort.CasbinRbac.Domain.EventHandlers
 {
@@ -12,7 +13,7 @@ namespace SharpFort.CasbinRbac.Domain.EventHandlers
         public async Task HandleEventAsync(UserRoleMenuQueryEventArgs eventData)
         {
             //数据库查询方式
-            var result = await _userManager.GetInfoListAsync(eventData.UserIds);
+            List<UserRoleMenuDto> result = await _userManager.GetInfoListAsync(eventData.UserIds);
             eventData.Result = result;
         }
     }

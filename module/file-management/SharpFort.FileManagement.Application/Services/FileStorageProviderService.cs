@@ -32,7 +32,7 @@ namespace SharpFort.FileManagement.Application.Services
         public override async Task<PagedResultDto<FileStorageProviderGetListOutputDto>> GetListAsync(FileStorageProviderGetListInput input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable
+            List<FileStorageProvider> entities = await _repository._DbQueryable
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name.Contains(input.Name!))
                 .WhereIF(input.ProviderType.HasValue, x => x.ProviderType == input.ProviderType)
                 .WhereIF(input.IsEnabled.HasValue, x => x.IsEnabled == input.IsEnabled)
@@ -51,11 +51,11 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task SetDefaultAsync(Guid id)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("存储提供者不存在");
+            FileStorageProvider entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("存储提供者不存在");
 
             // 取消其他默认
-            var currentDefaults = await _repository.GetListAsync(x => x.IsDefault);
-            foreach (var item in currentDefaults)
+            List<FileStorageProvider> currentDefaults = await _repository.GetListAsync(x => x.IsDefault);
+            foreach (FileStorageProvider item in currentDefaults)
             {
                 item.SetDefault(false);
             }

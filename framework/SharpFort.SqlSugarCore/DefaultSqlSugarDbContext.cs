@@ -95,7 +95,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
         // 配置多租户过滤器
         if (IsMultiTenantFilterEnabled)
         {
-            var currentTenantId = CurrentTenantService.Id;
+            Guid? currentTenantId = CurrentTenantService.Id;
             sqlSugarClient.QueryFilter.AddTableFilter<IMultiTenant>(entity => entity.TenantId == currentTenantId);
         }
     }
@@ -226,7 +226,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
             case DataFilterType.DeleteByObject:
                 if (entityInfo.EntityValue is IEnumerable entityValues)
                 {
-                    foreach (var entityValue in entityValues)
+                    foreach (object? entityValue in entityValues)
                     {
                         EntityChangeEventHelperService.PublishEntityDeletedEvent(entityValue);
                     }
@@ -245,7 +245,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
         // 实体领域事件-所有操作类型
         if (entityInfo.PropertyName == nameof(IEntity<object>.Id))
         {
-            var eventReport = CreateEventReport(entityInfo.EntityValue);
+            EntityEventReport? eventReport = CreateEventReport(entityInfo.EntityValue);
             if (eventReport is not null)
             {
                 PublishEntityEvents(eventReport);
@@ -260,16 +260,16 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
     /// <returns></returns>
     protected virtual EntityEventReport? CreateEventReport(object entity)
     {
-        var eventReport = new EntityEventReport();
+        EntityEventReport eventReport = new EntityEventReport();
 
         //判断是否为领域事件-聚合根
-        var generatesDomainEventsEntity = entity as IGeneratesDomainEvents;
+        IGeneratesDomainEvents? generatesDomainEventsEntity = entity as IGeneratesDomainEvents;
         if (generatesDomainEventsEntity == null)
         {
             return eventReport;
         }
 
-        var localEvents = generatesDomainEventsEntity.GetLocalEvents()?.ToArray();
+        DomainEventRecord[]? localEvents = generatesDomainEventsEntity.GetLocalEvents()?.ToArray();
         if (localEvents != null && localEvents.Length > 0)
         {
             eventReport.DomainEvents.AddRange(
@@ -284,7 +284,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
             generatesDomainEventsEntity.ClearLocalEvents();
         }
 
-        var distributedEvents = generatesDomainEventsEntity.GetDistributedEvents()?.ToArray();
+        DomainEventRecord[]? distributedEvents = generatesDomainEventsEntity.GetDistributedEvents()?.ToArray();
         if (distributedEvents != null && distributedEvents.Length > 0)
         {
             eventReport.DistributedEvents.AddRange(
@@ -307,14 +307,14 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
     /// <param name="changeReport"></param>
     private void PublishEntityEvents(EntityEventReport changeReport)
     {
-        foreach (var localEvent in changeReport.DomainEvents)
+        foreach (DomainEventEntry localEvent in changeReport.DomainEvents)
         {
             UnitOfWorkManagerService.Current?.AddOrReplaceLocalEvent(
                 new UnitOfWorkEventRecord(localEvent.EventData.GetType(), localEvent.EventData, localEvent.EventOrder)
             );
         }
 
-        foreach (var distributedEvent in changeReport.DistributedEvents)
+        foreach (DomainEventEntry distributedEvent in changeReport.DistributedEvents)
         {
             UnitOfWorkManagerService.Current?.AddOrReplaceDistributedEvent(
                 new UnitOfWorkEventRecord(distributedEvent.EventData.GetType(), distributedEvent.EventData, distributedEvent.EventOrder)
@@ -343,7 +343,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
     {
         if (DbOptions.EnabledSqlLog)
         {
-            var sqllog = $"=========Sf-SQL耗时{SqlSugarClient.Ado.SqlExecutionTime.TotalMilliseconds}毫秒=====";
+            string sqllog = $"=========Sf-SQL耗时{SqlSugarClient.Ado.SqlExecutionTime.TotalMilliseconds}毫秒=====";
 #pragma warning disable CA1848, CA1873 // DbOptions.EnabledSqlLog 已保护此调用
             LoggerFactory.CreateLogger<SqlSugarDbContext>().LogDebug("{SqlTimingLog}", sqllog);
 #pragma warning restore CA1848, CA1873

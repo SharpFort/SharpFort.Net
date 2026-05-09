@@ -19,45 +19,45 @@ public class AuditLogInfoToAuditLogConverter(IGuidGenerator guidGenerator, IExce
 
     public virtual Task<AuditLog> ConvertAsync(AuditLogInfo auditLogInfo)
     {
-        var auditLogId = GuidGenerator.Create();
+        Guid auditLogId = GuidGenerator.Create();
 
-        var extraProperties = new ExtraPropertyDictionary();
+        ExtraPropertyDictionary extraProperties = new ExtraPropertyDictionary();
         if (auditLogInfo.ExtraProperties != null)
         {
-            foreach (var pair in auditLogInfo.ExtraProperties)
+            foreach (KeyValuePair<string, object?> pair in auditLogInfo.ExtraProperties)
             {
                 extraProperties.Add(pair.Key, pair.Value);
             }
         }
 
-        var entityChanges = auditLogInfo
+        List<EntityChange> entityChanges = auditLogInfo
                                 .EntityChanges?
                                 .Select(entityChangeInfo => new EntityChange(GuidGenerator, auditLogId, entityChangeInfo, tenantId: auditLogInfo.TenantId))
                                 .ToList()
                             ?? [];
 
-        var actions = auditLogInfo
+        List<AuditLogAction> actions = auditLogInfo
                           .Actions?
                           .Select(auditLogActionInfo => new AuditLogAction(GuidGenerator.Create(), auditLogId, auditLogActionInfo, tenantId: auditLogInfo.TenantId))
                           .ToList()
                       ?? [];
 
-        var remoteServiceErrorInfos = auditLogInfo.Exceptions?.Select(exception => ExceptionToErrorInfoConverter.Convert(exception, options =>
+        IEnumerable<RemoteServiceErrorInfo> remoteServiceErrorInfos = auditLogInfo.Exceptions?.Select(exception => ExceptionToErrorInfoConverter.Convert(exception, options =>
                                           {
                                               options.SendExceptionsDetailsToClients = ExceptionHandlingOptions.SendExceptionsDetailsToClients;
                                               options.SendStackTraceToClients = ExceptionHandlingOptions.SendStackTraceToClients;
                                           }))
                                       ?? new List<RemoteServiceErrorInfo>();
 
-        var exceptions = remoteServiceErrorInfos.Any()
+        string? exceptions = remoteServiceErrorInfos.Any()
             ? JsonSerializer.Serialize(remoteServiceErrorInfos, indented: true)
             : null;
 
-        var comments = auditLogInfo
+        string? comments = auditLogInfo
             .Comments?
             .JoinAsString(Environment.NewLine);
 
-        var auditLog = new AuditLog(
+        AuditLog auditLog = new AuditLog(
             auditLogId,
             auditLogInfo.ApplicationName ?? string.Empty,
             auditLogInfo.TenantId,

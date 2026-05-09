@@ -27,7 +27,7 @@ namespace SharpFort.FluidSequence.Application.Services
 
         public async Task<string> TestGenerateAsync(string ruleCode, Dictionary<string, string> context)
         {
-            var rule = await _repository.GetAsync(r => r.RuleCode == ruleCode);
+            SysSequenceRule rule = await _repository.GetAsync(r => r.RuleCode == ruleCode);
             return rule == null
                 ? throw new Volo.Abp.UserFriendlyException($"Rule {ruleCode} not found")
                 : _domainService.TestGenerate(rule, context);
@@ -35,8 +35,8 @@ namespace SharpFort.FluidSequence.Application.Services
 
         public Task<List<PlaceholderMetaDto>> GetPlaceholdersAsync()
         {
-            var dtos = new List<PlaceholderMetaDto>();
-            foreach (var meta in PlaceholderRegistry.Definitions)
+            List<PlaceholderMetaDto> dtos = new List<PlaceholderMetaDto>();
+            foreach (PlaceholderMeta meta in PlaceholderRegistry.Definitions)
             {
                 dtos.Add(new PlaceholderMetaDto
                 {
@@ -52,7 +52,7 @@ namespace SharpFort.FluidSequence.Application.Services
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable
+            List<SysSequenceRule> entities = await _repository._DbQueryable
                 .WhereIF(!string.IsNullOrWhiteSpace(input.RuleName), x => x.RuleName.Contains(input.RuleName!))
                 .WhereIF(!string.IsNullOrWhiteSpace(input.RuleCode), x => x.RuleCode.Contains(input.RuleCode!))
                 .ToPageListAsync(input.SkipCount / input.MaxResultCount + 1, input.MaxResultCount, total);

@@ -15,7 +15,7 @@ namespace SharpFort.Tool.Domain
             //缓存设置1分钟获取一次结果
             this.NugetResult = cache.GetOrAdd("NugetResult", () => { return InitData(); }, () =>
             {
-                var options = new DistributedCacheEntryOptions();
+                DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
                 options.AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1);
                 return options;
             })!;
@@ -50,12 +50,12 @@ namespace SharpFort.Tool.Domain
         {
             List<string> versions = [];
 
-            var versionDoc = HtmlDoc.DocumentNode.SelectNodes("//*[@id=\"version-history\"]/table/tbody");
-            var trDoc = versionDoc.First().ChildNodes.Where(x => x.Name == "tr").ToList();
+            HtmlNodeCollection versionDoc = HtmlDoc.DocumentNode.SelectNodes("//*[@id=\"version-history\"]/table/tbody");
+            List<HtmlNode> trDoc = versionDoc.First().ChildNodes.Where(x => x.Name == "tr").ToList();
 
-            foreach (var tr in trDoc)
+            foreach (HtmlNode? tr in trDoc)
             {
-                var version = tr.ChildNodes.Where(x => x.Name == "td").First().ChildNodes.Where(x => x.Name == "a")
+                string version = tr.ChildNodes.Where(x => x.Name == "td").First().ChildNodes.Where(x => x.Name == "a")
                     .First().GetAttributes("title").First().Value;
 
                 versions.Add(version);
@@ -70,10 +70,10 @@ namespace SharpFort.Tool.Domain
         /// <returns></returns>
         private long GetDownloadNumber()
         {
-            var spanDoc =
+            HtmlNodeCollection spanDoc =
                 HtmlDoc.DocumentNode.SelectNodes(
                     "//*[@id=\"skippedToContent\"]/section/div/aside/div[1]/div[2]/div[1]/span[2]");
-            var downLoadNumber = spanDoc.First().InnerText;
+            string downLoadNumber = spanDoc.First().InnerText;
             if (downLoadNumber.Contains('K'))
             {
                 downLoadNumber = downLoadNumber.TrimEnd('K');

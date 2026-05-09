@@ -47,7 +47,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public async Task<string> GetTokenByUserIdAsync(Guid userId, Action<UserRoleMenuDto>? getUserInfo = null)
         {
             //获取用户信息
-            var userInfo = await _userManager.GetInfoAsync(userId);
+            UserRoleMenuDto userInfo = await _userManager.GetInfoAsync(userId);
 
             //判断用户状态
             if (userInfo.User.State == false)
@@ -70,7 +70,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 getUserInfo(userInfo);
             }
 
-            var accessToken = CreateToken(UserInfoToClaim(userInfo));
+            string accessToken = CreateToken(UserInfoToClaim(userInfo));
             //将用户信息添加到缓存中，需要考虑的是更改了用户、角色、菜单等整个体系都需要将缓存进行刷新，看具体业务进行选择
             return accessToken;
         }
@@ -82,10 +82,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <returns></returns>
         private string CreateToken(List<KeyValuePair<string, string>> kvs)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecurityKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var claims = kvs.Select(x => new Claim(x.Key, x.Value.ToString())).ToList();
-            var token = new JwtSecurityToken(
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecurityKey));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            List<Claim> claims = kvs.Select(x => new Claim(x.Key, x.Value.ToString())).ToList();
+            JwtSecurityToken token = new JwtSecurityToken(
                issuer: _jwtOptions.Issuer,
                audience: _jwtOptions.Audience,
                claims: claims,
@@ -99,14 +99,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public string CreateRefreshToken(Guid userId)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_refreshJwtOptions.SecurityKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_refreshJwtOptions.SecurityKey));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             //添加用户id，及刷新token的标识
-            var claims = new List<Claim> {
+            List<Claim> claims = new List<Claim> {
                 new(AbpClaimTypes.UserId,userId.ToString()),
                 new(TokenTypeConst.Refresh, "true")
             };
-            var token = new JwtSecurityToken(
+            JwtSecurityToken token = new JwtSecurityToken(
                issuer: _refreshJwtOptions.Issuer,
                audience: _refreshJwtOptions.Audience,
                claims: claims,
@@ -127,7 +127,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <returns></returns>
         public async Task LoginValidationAsync(string userName, string password, Action<User>? userAction = null)
         {
-            var user = new User();
+            User user = new User();
             if (await ExistAsync(userName, o => user = o))
             {
                 if (userAction is not null)
@@ -157,7 +157,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <returns></returns>
         public async Task<bool> ExistAsync(string userName, Action<User>? userAction = null)
         {
-            var user = await _repository.GetFirstAsync(u => u.UserName == userName && u.State == true);
+            User user = await _repository.GetFirstAsync(u => u.UserName == userName && u.State == true);
             if (userAction is not null)
             {
                 userAction.Invoke(user);
@@ -173,7 +173,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public static List<KeyValuePair<string, string>> UserInfoToClaim(UserRoleMenuDto dto)
         {
-            var claims = new List<KeyValuePair<string, string>>();
+            List<KeyValuePair<string, string>> claims = new List<KeyValuePair<string, string>>();
             AddToClaim(claims, AbpClaimTypes.UserId, dto.User.Id.ToString());
             AddToClaim(claims, AbpClaimTypes.UserName, dto.User.UserName);
             if (dto.User.DepartmentId is not null)
@@ -222,7 +222,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <exception cref="UserFriendlyException"></exception>
         public async Task UpdatePasswordAsync(Guid userId, string newPassword, string oldPassword)
         {
-            var user = await _repository.GetByIdAsync(userId);
+            User user = await _repository.GetByIdAsync(userId);
 
             if (!user.VerifyPassword(oldPassword))
             {
@@ -240,7 +240,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <returns></returns>
         public async Task<bool> RestPasswordAsync(Guid userId, string password)
         {
-            var user = await _repository.GetByIdAsync(userId);
+            User user = await _repository.GetByIdAsync(userId);
             user.SetPassword(password);
             return await _repository.UpdateAsync(user);
         }
@@ -270,7 +270,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// </remarks>
         public async Task RegisterAsync(string userName, string password, long? phone, string? nick)
         {
-            var user = new User(userName, password, phone, nick);
+            User user = new User(userName, password, phone, nick);
             await _userManager.CreateAsync(user);
             await _userManager.SetDefautRoleAsync(user.Id);
         }

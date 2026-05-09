@@ -44,11 +44,11 @@ namespace SharpFort.FluidSequence.Domain.Services
         /// <param name="bufferCount">单次预取数量（来自规则的 ExtensionProps.BufferCount）</param>
         public async Task<int> NextAsync(string ruleCode, int bufferCount)
         {
-            var queue = _buffers.GetOrAdd(ruleCode, _ => new ConcurrentQueue<int>());
-            var sem = _locks.GetOrAdd(ruleCode, _ => new SemaphoreSlim(1, 1));
+            ConcurrentQueue<int> queue = _buffers.GetOrAdd(ruleCode, _ => new ConcurrentQueue<int>());
+            SemaphoreSlim sem = _locks.GetOrAdd(ruleCode, _ => new SemaphoreSlim(1, 1));
 
             // 快路径：队列非空，直接出队，无需加锁，零竞争
-            if (queue.TryDequeue(out var value))
+            if (queue.TryDequeue(out int value))
             {
                 return value;
             }
@@ -65,12 +65,12 @@ namespace SharpFort.FluidSequence.Domain.Services
 
                 // 原子推进：将 DB 中 current_value 向上推进 bufferCount 步
                 // rangeStart 是本批次的第一个号，rangeEnd 是最后一个号（均含）
-                var (rangeStart, rangeEnd) = await _repository.AtomicAdvanceAsync(ruleCode, bufferCount);
+                (int rangeStart, int rangeEnd) = await _repository.AtomicAdvanceAsync(ruleCode, bufferCount);
 
                 // 将 [rangeStart+1, rangeEnd] 批量入队（rangeStart 本次直接返回，不入队）
                 // 注意：AtomicAdvance 返回的 rangeStart = 推进前的 current_value
                 //       即数据库原本已记录到 rangeStart，[rangeStart+1, rangeEnd] 是新增的号段
-                for (var i = rangeStart + 1; i <= rangeEnd; i++)
+                for (int i = rangeStart + 1; i <= rangeEnd; i++)
                 {
                     queue.Enqueue(i);
                 }

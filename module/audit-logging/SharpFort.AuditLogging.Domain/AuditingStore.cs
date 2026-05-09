@@ -44,13 +44,13 @@ public partial class AuditingStore(
     {
         if (Logger.IsEnabled(LogLevel.Debug))
         {
-            var auditInfoJson = JsonConvert.SerializeObject(auditInfo, new JsonSerializerSettings
+            string auditInfoJson = JsonConvert.SerializeObject(auditInfo, new JsonSerializerSettings
             {
                 DateFormatString = "yyyy-MM-dd HH:mm:ss"
             });
             LogRequestTracking(auditInfoJson);
         }
-        using (var uow = UnitOfWorkManager.Begin())
+        using (IUnitOfWork uow = UnitOfWorkManager.Begin())
         {
             await AuditLogRepository.InsertAsync(await Converter.ConvertAsync(auditInfo));
             await uow.CompleteAsync();

@@ -23,7 +23,7 @@ public class SfMultiTenantConnectionStringResolver(
             return await base.ResolveAsync(connectionStringName);
         }
 
-        var tenant = await FindTenantConfigurationAsync(_currentTenant.Id.Value);
+        TenantConfiguration? tenant = await FindTenantConfigurationAsync(_currentTenant.Id.Value);
 
         if (tenant == null || tenant.ConnectionStrings.IsNullOrEmpty())
         {
@@ -31,7 +31,7 @@ public class SfMultiTenantConnectionStringResolver(
             return await base.ResolveAsync(connectionStringName);
         }
 
-        var tenantDefaultConnectionString = tenant.ConnectionStrings?.Default;
+        string? tenantDefaultConnectionString = tenant.ConnectionStrings?.Default;
 
         //Requesting default connection string...
         if (connectionStringName == null ||
@@ -44,7 +44,7 @@ public class SfMultiTenantConnectionStringResolver(
         }
 
         //Requesting specific connection string...
-        var connString = tenant.ConnectionStrings?.GetOrDefault(connectionStringName);
+        string? connString = tenant.ConnectionStrings?.GetOrDefault(connectionStringName);
         if (!connString.IsNullOrWhiteSpace())
         {
             //Found for the tenant
@@ -52,7 +52,7 @@ public class SfMultiTenantConnectionStringResolver(
         }
 
         //Fallback to the mapped database for the specific connection string
-        var database = Options.Databases.GetMappedDatabaseOrNull(connectionStringName);
+        AbpDatabaseInfo? database = Options.Databases.GetMappedDatabaseOrNull(connectionStringName);
         if (database != null && database.IsUsedByTenants)
         {
             connString = tenant.ConnectionStrings?.GetOrDefault(database.DatabaseName);
@@ -78,7 +78,7 @@ public class SfMultiTenantConnectionStringResolver(
             return base.Resolve(connectionStringName);
         }
 
-        var tenant = FindTenantConfiguration(_currentTenant.Id.Value);
+        TenantConfiguration? tenant = FindTenantConfiguration(_currentTenant.Id.Value);
 
         if (tenant == null || tenant.ConnectionStrings.IsNullOrEmpty())
         {
@@ -86,7 +86,7 @@ public class SfMultiTenantConnectionStringResolver(
             return base.Resolve(connectionStringName);
         }
 
-        var tenantDefaultConnectionString = tenant.ConnectionStrings?.Default;
+        string? tenantDefaultConnectionString = tenant.ConnectionStrings?.Default;
 
         //Requesting default connection string...
         if (connectionStringName == null ||
@@ -99,7 +99,7 @@ public class SfMultiTenantConnectionStringResolver(
         }
 
         //Requesting specific connection string...
-        var connString = tenant.ConnectionStrings?.GetOrDefault(connectionStringName);
+        string? connString = tenant.ConnectionStrings?.GetOrDefault(connectionStringName);
         if (!connString.IsNullOrWhiteSpace())
         {
             //Found for the tenant
@@ -113,14 +113,14 @@ public class SfMultiTenantConnectionStringResolver(
         }
 
         //Try to find the specific connection string for given name
-        var connStringInOptions = Options.ConnectionStrings.GetOrDefault(connectionStringName);
+        string? connStringInOptions = Options.ConnectionStrings.GetOrDefault(connectionStringName);
         if (!connStringInOptions.IsNullOrWhiteSpace())
         {
             return connStringInOptions!;
         }
 
         //Fallback to the global default connection string
-        var defaultConnectionString = Options.ConnectionStrings.Default;
+        string? defaultConnectionString = Options.ConnectionStrings.Default;
         return !defaultConnectionString.IsNullOrWhiteSpace()
             ? defaultConnectionString!
             : throw new AbpException("No connection string defined!");
@@ -128,9 +128,9 @@ public class SfMultiTenantConnectionStringResolver(
 
     protected virtual async Task<TenantConfiguration?> FindTenantConfigurationAsync(Guid tenantId)
     {
-        using (var serviceScope = _serviceProvider.CreateScope())
+        using (IServiceScope serviceScope = _serviceProvider.CreateScope())
         {
-            var tenantStore = serviceScope
+            ITenantStore tenantStore = serviceScope
                 .ServiceProvider
                 .GetRequiredService<ITenantStore>();
 
@@ -141,9 +141,9 @@ public class SfMultiTenantConnectionStringResolver(
     [Obsolete("Use FindTenantConfigurationAsync method.")]
     protected virtual TenantConfiguration? FindTenantConfiguration(Guid tenantId)
     {
-        using (var serviceScope = _serviceProvider.CreateScope())
+        using (IServiceScope serviceScope = _serviceProvider.CreateScope())
         {
-            var tenantStore = serviceScope
+            ITenantStore tenantStore = serviceScope
                 .ServiceProvider
                 .GetRequiredService<ITenantStore>();
 

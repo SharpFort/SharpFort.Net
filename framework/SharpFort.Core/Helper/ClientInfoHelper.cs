@@ -25,8 +25,8 @@ namespace SharpFort.Core.Helper
             }
 
             // 1. 解析 UserAgent (浏览器和OS)
-            var uaStr = context.GetUserAgent(); // 假设这是你的扩展方法
-            var uaParser = Parser.GetDefault();
+            string uaStr = context.GetUserAgent(); // 假设这是你的扩展方法
+            Parser uaParser = Parser.GetDefault();
             ClientInfo c;
             try
             {
@@ -43,7 +43,7 @@ namespace SharpFort.Core.Helper
             string os = c?.OS?.ToString() ?? "Unknown";
 
             // 2. 解析 IP 和 地理位置
-            var ipAddr = context.GetClientIp(); // 假设这是你的扩展方法
+            string ipAddr = context.GetClientIp(); // 假设这是你的扩展方法
             string locationStr;
 
             if (ipAddr == "127.0.0.1" || ipAddr == "::1")
@@ -54,7 +54,7 @@ namespace SharpFort.Core.Helper
             {
                 try
                 {
-                    var location = IpTool.Search(ipAddr); // 假设 IpTool 是静态工具
+                    IpInfo location = IpTool.Search(ipAddr); // 假设 IpTool 是静态工具
                     locationStr = $"{location.Province}-{location.City}";
                 }
                 catch

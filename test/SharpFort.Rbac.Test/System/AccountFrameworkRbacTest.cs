@@ -26,7 +26,7 @@ namespace SharpFort.Rbac.Test.System
         public async Task RegisterTest()
         {
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "RegisterTest", Password = "123456", Phone = 15945645645 });
-            var user = await _userRepository._DbQueryable.Where(user => user.UserName == "RegisterTest").FirstAsync();
+            User user = await _userRepository._DbQueryable.Where(user => user.UserName == "RegisterTest").FirstAsync();
             user.ShouldNotBeNull();
             user.VerifyPassword("123456").ShouldBeTrue();
         }
@@ -76,7 +76,7 @@ namespace SharpFort.Rbac.Test.System
         public async Task LoginTest()
         {
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "LoginTest", Password = "123456", Phone = 13845645645 });
-            var result = await _accountService.PostLoginAsync(new LoginInputVo { UserName = "LoginTest", Password = "123456" });
+            LoginOutputDto result = await _accountService.PostLoginAsync(new LoginInputVo { UserName = "LoginTest", Password = "123456" });
 
             result.GetType().GetProperty("Token")!.GetValue(result, null)!.ToString().ShouldNotBeNull();
             result.GetType().GetProperty("RefreshToken")!.GetValue(result, null)!.ToString().ShouldNotBeNull();
@@ -90,9 +90,9 @@ namespace SharpFort.Rbac.Test.System
         public async Task ResetPasswordTest()
         {
             await _accountService.PostRegisterAsync(new RegisterDto() { UserName = "ResetPassworldTest", Password = "123456", Phone = 15945645555 });
-            var user = await _userRepository._DbQueryable.Where(user => user.UserName == "ResetPassworldTest").FirstAsync();
+            User user = await _userRepository._DbQueryable.Where(user => user.UserName == "ResetPassworldTest").FirstAsync();
             await _accountService.RestPasswordAsync(user.Id, new RestPasswordDto { Password = "654321abc" });
-            var result = await _accountService.PostLoginAsync(new LoginInputVo { UserName = "ResetPassworldTest", Password = "654321abc" });
+            LoginOutputDto result = await _accountService.PostLoginAsync(new LoginInputVo { UserName = "ResetPassworldTest", Password = "654321abc" });
 
         }
     }

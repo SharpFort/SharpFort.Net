@@ -54,13 +54,13 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (input.DataScope == DataScope.CUSTOM)
             {
                 await _roleDeptRepository.DeleteAsync(x => x.RoleId == input.RoleId);
-                var insertEntities = (input.DepartmentIds ?? [])
+                List<RoleDepartment> insertEntities = (input.DepartmentIds ?? [])
                     .Select(x => new RoleDepartment { DepartmentId = x, RoleId = input.RoleId })
                     .ToList();
                 await _roleDeptRepository.InsertRangeAsync(insertEntities);
             }
 
-            var entity = new Role() { DataScope = input.DataScope };
+            Role entity = new Role() { DataScope = input.DataScope };
             EntityHelper.TrySetId(entity, () => input.RoleId);
             await _repository._Db.Updateable(entity).UpdateColumns(x => x.DataScope).ExecuteCommandAsync();
         }
@@ -69,7 +69,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.RoleCode),
+            List<Role> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.RoleCode),
                     x => x.RoleCode.Contains(input.RoleCode!))
                 .WhereIF(!string.IsNullOrEmpty(input.RoleName), x => x.RoleName.Contains(input.RoleName!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
@@ -84,14 +84,14 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns></returns>
         public override async Task<RoleGetOutputDto> CreateAsync(RoleCreateInputVo input)
         {
-            var isExist =
+            bool isExist =
                 await _repository.IsAnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
             if (isExist)
             {
                 throw new UserFriendlyException(RoleConst.Exist);
             }
 
-            var entity = await MapToEntityAsync(input);
+            Role entity = await MapToEntityAsync(input);
             await _repository.InsertAsync(entity);
 
             // /* 原代码注释保留 */
@@ -101,7 +101,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 修复之后使用 RoleManager 进行统一授权和Casbin分配
             await _roleManager.GiveRoleSetMenuAsync([entity.Id], input.MenuIds ?? []);
 
-            var outputDto = await MapToGetOutputDtoAsync(entity);
+            RoleGetOutputDto outputDto = await MapToGetOutputDtoAsync(entity);
 
             return outputDto;
         }
@@ -114,15 +114,15 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns></returns>
         public override async Task<RoleGetOutputDto> UpdateAsync(Guid id, RoleUpdateInputVo input)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            Role entity = await _repository.GetByIdAsync(id);
 
-            var isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id).AnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
+            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id).AnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
             if (isExist)
             {
                 throw new UserFriendlyException(RoleConst.Exist);
             }
 
-            var oldRoleCode = entity.RoleCode;
+            string oldRoleCode = entity.RoleCode;
 
             // Map 之后 entity.RoleCode 会更新为新值
             await MapToEntityAsync(input, entity);
@@ -144,7 +144,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // await _enforcer.RemoveFilteredPolicyAsync(0, entity.RoleCode);
             // await SyncCasbinRolePermissions(id, input.MenuIds, entity.RoleCode);
 
-            var dto = await MapToGetOutputDtoAsync(entity);
+            RoleGetOutputDto dto = await MapToGetOutputDtoAsync(entity);
             return dto;
         }
 
@@ -196,7 +196,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [Route("role/{id}/{state}")]
         public async Task<RoleGetOutputDto> UpdateStateAsync([FromRoute] Guid id, [FromRoute] bool state)
         {
-            var entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("角色未存在");
+            Role entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("角色未存在");
             entity.State = state;
             await _repository.UpdateAsync(entity);
             return await MapToGetOutputDtoAsync(entity);
@@ -233,7 +233,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             RoleAuthUserGetListInput input)
         {
             RefAsync<int> total = 0;
-            var output = await _userRoleRepository._DbQueryable
+            List<UserGetListOutputDto> output = await _userRoleRepository._DbQueryable
                 .LeftJoin<User>((ur, u) => ur.UserId == u.Id && ur.RoleId == roleId)
                 .Where((ur, u) => ur.RoleId == roleId)
                 .WhereIF(!string.IsNullOrEmpty(input.UserName), (ur, u) => u.UserName.Contains(input.UserName!))
@@ -247,13 +247,13 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             RoleAuthUserGetListInput input)
         {
             RefAsync<int> total = 0;
-            var entities = await _userRoleRepository._Db.Queryable<User>()
+            List<User> entities = await _userRoleRepository._Db.Queryable<User>()
                 .Where(u => SqlFunc.Subqueryable<UserRole>().Where(x => x.RoleId == roleId)
                     .Where(x => x.UserId == u.Id).NotAny())
                 .WhereIF(!string.IsNullOrEmpty(input.UserName), u => u.UserName.Contains(input.UserName!))
                 .WhereIF(input.Phone is not null, u => u.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
-            var output = entities.Adapt<List<UserGetListOutputDto>>();
+            List<UserGetListOutputDto> output = entities.Adapt<List<UserGetListOutputDto>>();
             return new PagedResultDto<UserGetListOutputDto>(total, output);
         }
 
@@ -265,14 +265,14 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns></returns>
         public async Task CreateAuthUserAsync([FromBody] RoleAuthUserCreateOrDeleteInput input)
         {
-            var userRoleEntities = input.UserIds.Select(u => new UserRole { RoleId = input.RoleId, UserId = u })
+            List<UserRole> userRoleEntities = input.UserIds.Select(u => new UserRole { RoleId = input.RoleId, UserId = u })
                 .ToList();
             await _userRoleRepository.InsertRangeAsync(userRoleEntities);
 
             // Casbin 同步：添加用户角色关联 (g) (使用 CasbinPolicyManager 双写同步机制)
-            var role = await _repository.GetByIdAsync(input.RoleId) ?? throw new UserFriendlyException("角色不存在");
-            var users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
-            foreach (var user in users)
+            Role role = await _repository.GetByIdAsync(input.RoleId) ?? throw new UserFriendlyException("角色不存在");
+            List<User> users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
+            foreach (User user in users)
             {
                 await _casbinPolicyManager.AddRoleForUserAsync(user, role);
             }
@@ -302,9 +302,9 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .ExecuteCommandAsync();
 
             // Casbin 同步：移除用户角色关联 (使用 CasbinPolicyManager 双写同步机制)
-            var role = await _repository.GetByIdAsync(input.RoleId) ?? throw new UserFriendlyException("角色不存在");
-            var users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
-            foreach (var user in users)
+            Role role = await _repository.GetByIdAsync(input.RoleId) ?? throw new UserFriendlyException("角色不存在");
+            List<User> users = await _userRepository.GetListAsync(u => input.UserIds.Contains(u.Id));
+            foreach (User user in users)
             {
                 await _casbinPolicyManager.RemoveRoleForUserAsync(user, role);
             }
@@ -323,12 +323,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         public override async Task DeleteAsync(IEnumerable<Guid> ids)
         {
-            var roles = await _repository.GetListAsync(x => ids.Contains(x.Id));
+            List<Role> roles = await _repository.GetListAsync(x => ids.Contains(x.Id));
 
             await base.DeleteAsync(ids);
 
             // 物理删除角色后，清理与该角色绑定的所有 Casbin p规则与g规则
-            foreach (var role in roles)
+            foreach (Role role in roles)
             {
                 await _casbinPolicyManager.CleanRolePoliciesAsync(role);
             }

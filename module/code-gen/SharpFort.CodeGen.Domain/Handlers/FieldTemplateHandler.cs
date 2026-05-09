@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text;
+using SharpFort.CodeGen.Domain.Entities;
 using SharpFort.CodeGen.Domain.Shared.Enums;
 
 namespace SharpFort.CodeGen.Domain.Handlers
@@ -9,7 +10,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
     {
         public HandledTemplate Invoker(string str, string path)
         {
-            var output = new HandledTemplate
+            HandledTemplate output = new HandledTemplate
             {
                 TemplateStr = str.Replace("@field", BuildFields()),
                 BuildPath = path
@@ -27,20 +28,20 @@ namespace SharpFort.CodeGen.Domain.Handlers
             StringBuilder fieldStrs = new();
 
 
-            foreach (var field in Table.Fields)
+            foreach (Field field in Table.Fields)
             {
-                var typeStr = typeof(FieldType).GetFields().FirstOrDefault(x => x.Name == field.FieldType.ToString())?.GetCustomAttribute<DisplayAttribute>()?.Name;
+                string? typeStr = typeof(FieldType).GetFields().FirstOrDefault(x => x.Name == field.FieldType.ToString())?.GetCustomAttribute<DisplayAttribute>()?.Name;
 
                 if (typeStr is null)
                 {
                     continue;
                 }
-                var nameStr = field.Name;
+                string nameStr = field.Name;
 
                 //添加备注
                 if (!string.IsNullOrEmpty(field.Description))
                 {
-                    var desStr = "/// <summary>\n" +
+                    string desStr = "/// <summary>\n" +
                                 $"///{field.Description}\n" +
                                  "/// </summary>\n";
                     fieldStrs.AppendLine(desStr);
@@ -49,7 +50,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
                 //添加长度
                 if (field.Length != 0)
                 {
-                    var lengthStr = $"[SugarColumn(Length ={field.Length})]";
+                    string lengthStr = $"[SugarColumn(Length ={field.Length})]";
                     fieldStrs.AppendLine(lengthStr);
                 }
 
@@ -61,7 +62,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
                 }
 
                 //添加字段
-                var fieldStr = $"public {typeStr}{nullStr} {nameStr} {{ get; set; }}";
+                string fieldStr = $"public {typeStr}{nullStr} {nameStr} {{ get; set; }}";
 
                 fieldStrs.AppendLine(fieldStr);
             }

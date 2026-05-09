@@ -26,8 +26,8 @@ public class AiAccountService(
     [HttpGet("account/ai")]
     public async Task<UserRoleMenuDto> GetAsync()
     {
-        var userId = CurrentUser.GetId();
-        var userAccount = await _accountService.GetAsync();
+        Guid userId = CurrentUser.GetId();
+        UserRoleMenuDto userAccount = await _accountService.GetAsync();
         return userAccount;
     }
 

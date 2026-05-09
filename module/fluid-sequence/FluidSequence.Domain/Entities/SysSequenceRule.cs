@@ -126,7 +126,7 @@ namespace SharpFort.FluidSequence.Domain.Entities
                 return false;
             }
 
-            var last = LastResetTime.Value;
+            DateTime last = LastResetTime.Value;
             switch (ResetType)
             {
                 case SequenceResetType.Daily:
@@ -139,9 +139,9 @@ namespace SharpFort.FluidSequence.Domain.Entities
                     shouldReset = last.Year != now.Year;
                     break;
                 case SequenceResetType.Weekly:
-                    var cal = CultureInfo.CurrentCulture.Calendar;
-                    var rule = CalendarWeekRule.FirstFourDayWeek; // Customize if needed
-                    var dow = DayOfWeek.Monday; // Customize if needed
+                    Calendar cal = CultureInfo.CurrentCulture.Calendar;
+                    CalendarWeekRule rule = CalendarWeekRule.FirstFourDayWeek; // Customize if needed
+                    DayOfWeek dow = DayOfWeek.Monday; // Customize if needed
                     int lastWeek = cal.GetWeekOfYear(last, rule, dow);
                     int currentWeek = cal.GetWeekOfYear(now, rule, dow);
                     shouldReset = last.Year != now.Year || lastWeek != currentWeek;

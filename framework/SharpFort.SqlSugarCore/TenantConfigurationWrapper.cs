@@ -40,14 +40,14 @@ public class TenantConfigurationWrapper(IAbpLazyServiceProvider serviceProvider)
         // 通过租户ID查找
         if (CurrentTenantService.Id.HasValue)
         {
-            var config = await TenantStoreService.FindAsync(CurrentTenantService.Id.Value);
+            TenantConfiguration? config = await TenantStoreService.FindAsync(CurrentTenantService.Id.Value);
             return config == null ? throw new InvalidOperationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}") : config;
         }
 
         // 通过租户名称查找
         if (!string.IsNullOrEmpty(CurrentTenantService.Name))
         {
-            var config = await TenantStoreService.FindAsync(CurrentTenantService.Name);
+            TenantConfiguration? config = await TenantStoreService.FindAsync(CurrentTenantService.Name);
             return config == null ? throw new InvalidOperationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}") : config;
         }
 

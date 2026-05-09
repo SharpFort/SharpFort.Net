@@ -17,35 +17,35 @@ namespace SharpFort.CasbinRbac.Domain.Utils
 
         public async Task ScanAndSyncAsync(Assembly[] assemblies)
         {
-            var controllers = assemblies.SelectMany(a => a.GetTypes())
+            List<Type> controllers = assemblies.SelectMany(a => a.GetTypes())
                 .Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract)
                 .ToList();
 
-            var newMenus = new List<Menu>();
+            List<Menu> newMenus = new List<Menu>();
 
-            foreach (var controller in controllers)
+            foreach (Type? controller in controllers)
             {
-                var routeAttr = controller.GetCustomAttribute<RouteAttribute>();
-                var controllerPath = routeAttr?.Template ?? ""; // e.g., "api/app/[controller]"
+                RouteAttribute? routeAttr = controller.GetCustomAttribute<RouteAttribute>();
+                string controllerPath = routeAttr?.Template ?? ""; // e.g., "api/app/[controller]"
 
-                var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-                foreach (var method in methods)
+                MethodInfo[] methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                foreach (MethodInfo method in methods)
                 {
                     // 提取 Http Method 和 Template
-                    var httpMethodAttr = method.GetCustomAttributes().OfType<HttpMethodAttribute>().FirstOrDefault();
+                    HttpMethodAttribute? httpMethodAttr = method.GetCustomAttributes().OfType<HttpMethodAttribute>().FirstOrDefault();
                     if (httpMethodAttr == null)
                     {
                         continue;
                     }
 
-                    var methodPath = httpMethodAttr.Template ?? "";
-                    var httpMethod = httpMethodAttr.HttpMethods.FirstOrDefault() ?? "GET";
+                    string methodPath = httpMethodAttr.Template ?? "";
+                    string httpMethod = httpMethodAttr.HttpMethods.FirstOrDefault() ?? "GET";
 
                     // 组合完整路径 (简单处理，实际可能需要更复杂的路由解析)
                     // Abp 自动路由规则比较复杂，这里仅处理显示声明 Route 的
                     // 假设 Controller Route 包含 [controller], [action] 等占位符
 
-                    var fullPath = CombinePaths(controllerPath, methodPath);
+                    string fullPath = CombinePaths(controllerPath, methodPath);
                     fullPath = ReplacePlaceholders(fullPath, controller.Name, method.Name);
 
                     // 规范化路径
@@ -55,12 +55,12 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                     }
 
                     // 检查是否已存在
-                    var exists = await _menuRepo.IsAnyAsync(m => m.ApiUrl == fullPath && m.ApiMethod == httpMethod);
+                    bool exists = await _menuRepo.IsAnyAsync(m => m.ApiUrl == fullPath && m.ApiMethod == httpMethod);
                     if (!exists)
                     {
                         // 创建新的 API 资源 (作为 Menu 存储，Type=Button/Api)
                         // 注意：这里只是为了方便管理，实际 Menu 结构可能需要调整
-                        var menu = new Menu(
+                        Menu menu = new Menu(
                             Guid.NewGuid(),
                             $"{controller.Name}.{method.Name}", // Name
                             fullPath, // Router/Url
@@ -99,7 +99,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
         private static string ReplacePlaceholders(string path, string controllerName, string actionName)
         {
             // ControllerName usually ends with "Controller"
-            var cName = controllerName.EndsWith("Controller", StringComparison.Ordinal) ? controllerName[..^10] : controllerName;
+            string cName = controllerName.EndsWith("Controller", StringComparison.Ordinal) ? controllerName[..^10] : controllerName;
 
             path = path.Replace("[controller]", cName, StringComparison.OrdinalIgnoreCase);
             path = path.Replace("[action]", actionName, StringComparison.OrdinalIgnoreCase);

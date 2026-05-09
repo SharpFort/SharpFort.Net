@@ -48,7 +48,7 @@ public class AiImageService(
     [Authorize]
     public async Task<Guid> GenerateAsync([FromBody] ImageGenerationInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
         // 黑名单校验
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
@@ -63,7 +63,7 @@ public class AiImageService(
 
 
         // 创建任务实体
-        var task = new ImageStoreTaskAggregateRoot
+        ImageStoreTaskAggregateRoot task = new ImageStoreTaskAggregateRoot
         {
             Prompt = input.Prompt,
             ReferenceImagesPrefixBase64 = input.ReferenceImagesPrefixBase64 ?? [],
@@ -93,9 +93,9 @@ public class AiImageService(
     [HttpGet("ai-image/task/{taskId}")]
     public async Task<ImageTaskOutput> GetTaskAsync([FromRoute] Guid taskId)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var task = await _imageTaskRepository.GetFirstAsync(x => x.Id == taskId && x.UserId == userId);
+        ImageStoreTaskAggregateRoot task = await _imageTaskRepository.GetFirstAsync(x => x.Id == taskId && x.UserId == userId);
         return task == null
             ? throw new UserFriendlyException("任务不存在或无权访问")
             : new ImageTaskOutput
@@ -134,11 +134,11 @@ public class AiImageService(
 
         if (base64Data.Contains(","))
         {
-            var parts = base64Data.Split(',');
+            string[] parts = base64Data.Split(',');
             if (parts.Length == 2)
             {
                 // 提取MIME类型
-                var header = parts[0];
+                string header = parts[0];
                 if (header.Contains(":") && header.Contains(";"))
                 {
                     mimeType = header.Split(':')[1].Split(';')[0];
@@ -149,7 +149,7 @@ public class AiImageService(
         }
 
         // 获取文件扩展名
-        var extension = mimeType switch
+        string extension = mimeType switch
         {
             "image/png" => ".png",
             "image/jpeg" => ".jpg",
@@ -173,8 +173,8 @@ public class AiImageService(
         // ==============================
         // ✅ 按日期创建目录（yyyyMMdd）
         // ==============================
-        var dateFolder = DateTime.Now.ToString("yyyyMMdd");
-        var uploadPath = Path.Combine(
+        string dateFolder = DateTime.Now.ToString("yyyyMMdd");
+        string uploadPath = Path.Combine(
             _webHostEnvironment.ContentRootPath,
             "wwwroot",
             "ai-images",
@@ -187,9 +187,9 @@ public class AiImageService(
         }
 
         // 保存文件
-        var fileId = _guidGenerator.Create();
-        var fileName = $"{fileId}{extension}";
-        var filePath = Path.Combine(uploadPath, fileName);
+        Guid fileId = _guidGenerator.Create();
+        string fileName = $"{fileId}{extension}";
+        string filePath = Path.Combine(uploadPath, fileName);
 
         await File.WriteAllBytesAsync(filePath, imageBytes);
 
@@ -203,10 +203,10 @@ public class AiImageService(
     [HttpGet("ai-image/my-tasks")]
     public async Task<PagedResult<ImageTaskOutput>> GetMyTaskPageAsync([FromQuery] ImageMyTaskPageInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
         RefAsync<int> total = 0;
-        var output = await _imageTaskRepository._DbQueryable
+        List<ImageTaskOutput> output = await _imageTaskRepository._DbQueryable
             .Where(x => x.UserId == userId)
             .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
             .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
@@ -241,7 +241,7 @@ public class AiImageService(
     [HttpDelete("ai-image/my-tasks")]
     public async Task DeleteMyTaskAsync([FromQuery] List<Guid> ids)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
         await _imageTaskRepository.DeleteAsync(x => ids.Contains(x.Id) && x.UserId == userId);
     }
 
@@ -253,7 +253,7 @@ public class AiImageService(
     public async Task<PagedResult<ImageTaskOutput>> GetPlazaPageAsync([FromQuery] ImagePlazaPageInput input)
     {
         RefAsync<int> total = 0;
-        var output = await _imageTaskRepository._DbQueryable
+        List<ImageTaskOutput> output = await _imageTaskRepository._DbQueryable
             .Where(x => x.PublishStatus == PublishStatus.Published)
             .Where(x => x.TaskStatus == TaskStatusEnum.Success)
             .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
@@ -300,9 +300,9 @@ public class AiImageService(
     [HttpPost("ai-image/publish")]
     public async Task PublishAsync([FromBody] PublishImageInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
-        var task = await _imageTaskRepository.GetFirstAsync(x => x.Id == input.TaskId && x.UserId == userId) ?? throw new UserFriendlyException("任务不存在或无权访问");
+        ImageStoreTaskAggregateRoot task = await _imageTaskRepository.GetFirstAsync(x => x.Id == input.TaskId && x.UserId == userId) ?? throw new UserFriendlyException("任务不存在或无权访问");
         if (task.TaskStatus != TaskStatusEnum.Success)
         {
             throw new UserFriendlyException("只有已完成的任务才能发布");
@@ -326,7 +326,7 @@ public class AiImageService(
     [AllowAnonymous]
     public async Task<List<ModelGetListOutput>> GetModelAsync()
     {
-        var output = await _aiModelRepository._DbQueryable
+        List<ModelGetListOutput> output = await _aiModelRepository._DbQueryable
             .Where(x => x.IsEnabled == true)
             .Where(x => x.ModelType == ModelType.Image)
             .Where(x => x.ModelApiType == ModelApiType.GenerateContent)

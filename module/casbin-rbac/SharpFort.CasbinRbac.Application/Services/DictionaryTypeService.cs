@@ -21,7 +21,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
 
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable.WhereIF(input.DictName is not null, x => x.DictName.Contains(input.DictName!))
+            List<DictionaryType> entities = await _repository._DbQueryable.WhereIF(input.DictName is not null, x => x.DictName.Contains(input.DictName!))
                       .WhereIF(input.DictType is not null, x => x.DictType!.Contains(input.DictType!))
                       .WhereIF(input.State is not null, x => x.State == input.State)
                       .WhereIF(input.StartTime is not null && input.EndTime is not null, x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
@@ -36,7 +36,7 @@ namespace SharpFort.CasbinRbac.Application.Services
 
         protected override async Task CheckCreateInputDtoAsync(DictionaryTypeCreateInputVo input)
         {
-            var isExist =
+            bool isExist =
                 await _repository.IsAnyAsync(x => x.DictType == input.DictType);
             if (isExist)
             {
@@ -46,7 +46,7 @@ namespace SharpFort.CasbinRbac.Application.Services
 
         protected override async Task CheckUpdateInputDtoAsync(DictionaryType entity, DictionaryTypeUpdateInputVo input)
         {
-            var isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
+            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
                 .AnyAsync(x => x.DictType == input.DictType);
             if (isExist)
             {

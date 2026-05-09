@@ -17,17 +17,17 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Adapters
         // 核心方法：加载策略
         public void LoadPolicy(IPolicyStore model)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
-            var adapter = new SqlSugarAdapter(dbContext.SqlSugarClient);
+            using IServiceScope scope = _scopeFactory.CreateScope();
+            ISqlSugarDbContext dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
+            SqlSugarAdapter adapter = new SqlSugarAdapter(dbContext.SqlSugarClient);
             adapter.LoadPolicy(model);
         }
 
         public async Task LoadPolicyAsync(IPolicyStore model)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
-            var adapter = new SqlSugarAdapter(dbContext.SqlSugarClient);
+            using IServiceScope scope = _scopeFactory.CreateScope();
+            ISqlSugarDbContext dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
+            SqlSugarAdapter adapter = new SqlSugarAdapter(dbContext.SqlSugarClient);
             await adapter.LoadPolicyAsync(model);
         }
 

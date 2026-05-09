@@ -25,20 +25,20 @@ namespace SharpFort.CasbinRbac.Domain.Extensions
         /// <returns></returns>
         public static Guid? GetDepartmentId(this ICurrentUser currentUser)
         {
-            var deptIdOrNull = currentUser.FindClaims(TokenTypeConst.DepartmentId).Select(x => x.Value).FirstOrDefault();
+            string? deptIdOrNull = currentUser.FindClaims(TokenTypeConst.DepartmentId).Select(x => x.Value).FirstOrDefault();
             return deptIdOrNull is null ? null : Guid.Parse(deptIdOrNull);
         }
 
         public static List<RoleTokenInfoModel>? GetRoleInfo(this ICurrentUser currentUser)
         {
-            var roleOrNull = currentUser.FindClaims(TokenTypeConst.RoleInfo).Select(x => x.Value).FirstOrDefault();
+            string? roleOrNull = currentUser.FindClaims(TokenTypeConst.RoleInfo).Select(x => x.Value).FirstOrDefault();
             return roleOrNull is null ? null : JsonConvert.DeserializeObject<List<RoleTokenInfoModel>>(roleOrNull);
 
         }
 
         public static bool IsRefreshToken(this ICurrentUser currentUser)
         {
-            var refreshOrNull = currentUser.FindClaims(TokenTypeConst.Refresh).Select(x => x.Value).FirstOrDefault();
+            string? refreshOrNull = currentUser.FindClaims(TokenTypeConst.Refresh).Select(x => x.Value).FirstOrDefault();
             return refreshOrNull is null ? false : bool.Parse(refreshOrNull);
         }
     }

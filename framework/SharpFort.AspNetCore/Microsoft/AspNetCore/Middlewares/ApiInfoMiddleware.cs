@@ -44,8 +44,8 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Middlewares
                 return;
             }
 
-            var contentType = context.Response.Headers["Content-Type"].ToString();
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+            string contentType = context.Response.Headers["Content-Type"].ToString();
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
             // 处理Excel文件下载
             if (contentType == "application/vnd.ms-excel")

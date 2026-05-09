@@ -87,7 +87,7 @@ namespace SharpFort.Core.Helper
         public static CPUMetrics GetCPUMetrics()
         {
             CPUMetrics cpuMetrics = new();
-            var cpudetail = GetCPUDetails();
+            CPUInfo cpudetail = GetCPUDetails();
             cpuMetrics.CoreTotal = cpudetail.Cores;
             cpuMetrics.LogicalProcessors = cpudetail.LogicalProcessors;
             cpuMetrics.CPURate = Math.Ceiling(ParseToDouble(GetCPURate()));
@@ -131,13 +131,13 @@ namespace SharpFort.Core.Helper
                 try
                 {
                     string output = ShellHelper.Bash("df -m / | awk '{print $2,$3,$4,$5,$6}'");
-                    var arr = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    string[] arr = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     if (arr.Length == 0)
                     {
                         return diskInfos;
                     }
 
-                    var rootDisk = arr[1].Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
+                    string[] rootDisk = arr[1].Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
                     if (rootDisk == null || rootDisk.Length == 0)
                     {
                         return diskInfos;
@@ -159,12 +159,12 @@ namespace SharpFort.Core.Helper
             }
             else
             {
-                var driv = DriveInfo.GetDrives();
-                foreach (var item in driv)
+                DriveInfo[] driv = DriveInfo.GetDrives();
+                foreach (DriveInfo item in driv)
                 {
                     try
                     {
-                        var obj = new DiskInfo()
+                        DiskInfo obj = new DiskInfo()
                         {
                             DiskName = item.Name,
                             TypeName = item.DriveType.ToString(),
@@ -188,7 +188,7 @@ namespace SharpFort.Core.Helper
 
         public static bool IsUnix()
         {
-            var isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             return isUnix;
         }
 
@@ -258,11 +258,11 @@ namespace SharpFort.Core.Helper
             else
             {
                 string output = ShellHelper.Cmd("wmic", "cpu get NumberOfCores,NumberOfLogicalProcessors /format:csv");
-                var lines = output.Split(NewLineSeparators, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = output.Split(NewLineSeparators, StringSplitOptions.RemoveEmptyEntries);
 
                 if (lines.Length > 1)
                 {
-                    var values = lines[1].Split(',');
+                    string[] values = lines[1].Split(',');
 
                     cores = int.Parse(values[1].Trim(), CultureInfo.InvariantCulture);
                     logicalProcessors = int.Parse(values[2].Trim(), CultureInfo.InvariantCulture);
@@ -360,16 +360,16 @@ namespace SharpFort.Core.Helper
         public static MemoryMetrics GetWindowsMetrics()
         {
             string output = ShellHelper.Cmd("wmic", "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value");
-            var metrics = new MemoryMetrics();
-            var lines = output.Trim().Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
+            MemoryMetrics metrics = new MemoryMetrics();
+            string[] lines = output.Trim().Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
 
             if (lines.Length <= 0)
             {
                 return metrics;
             }
 
-            var freeMemoryParts = lines[0].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
-            var totalMemoryParts = lines[1].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
+            string[] freeMemoryParts = lines[0].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
+            string[] totalMemoryParts = lines[1].Split('=', (char)StringSplitOptions.RemoveEmptyEntries);
 
             metrics.Total = Math.Round(double.Parse(totalMemoryParts[1], CultureInfo.InvariantCulture) / 1024, 0);
             metrics.Free = Math.Round(double.Parse(freeMemoryParts[1], CultureInfo.InvariantCulture) / 1024, 0);//m
@@ -392,11 +392,11 @@ free_mem=$(cat /proc/meminfo | grep -i ""MemFree"" | awk '{print $2}')
 # 显示提取的信息
 echo $total_mem $used_mem $free_mem
  ");
-            var metrics = new MemoryMetrics();
+            MemoryMetrics metrics = new MemoryMetrics();
 
             if (!string.IsNullOrWhiteSpace(output))
             {
-                var memory = output.Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
+                string[] memory = output.Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
                 if (memory.Length >= 2)
                 {
                     metrics.Total = Math.Round(double.Parse(memory[0], CultureInfo.InvariantCulture) / 1024, 0);

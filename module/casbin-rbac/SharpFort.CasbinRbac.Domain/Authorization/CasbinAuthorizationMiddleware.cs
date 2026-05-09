@@ -25,12 +25,12 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var path = context.Request.Path.Value;
+            string? path = context.Request.Path.Value;
 
             // 0. Check configured IgnoreUrls from appsettings.json
             if (!string.IsNullOrEmpty(path) && _options.IgnoreUrls != null && _options.IgnoreUrls.Count > 0)
             {
-                foreach (var ignoreUrl in _options.IgnoreUrls)
+                foreach (string ignoreUrl in _options.IgnoreUrls)
                 {
                     if (path.StartsWith(ignoreUrl, StringComparison.OrdinalIgnoreCase))
                     {
@@ -41,7 +41,7 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             }
 
             // 1. Whitelist / AllowAnonymous checks
-            var endpoint = context.GetEndpoint();
+            Endpoint? endpoint = context.GetEndpoint();
             if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
             {
                 await next(context);
@@ -55,10 +55,10 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
                 return;
             }
 
-            var sub = _currentUser.Id?.ToString();
+            string? sub = _currentUser.Id?.ToString();
 
             // 3. Domain (dom)
-            var dom = _currentTenant.Id?.ToString() ?? "default";
+            string dom = _currentTenant.Id?.ToString() ?? "default";
 
             // 4. Resource (obj)
             // Strictly use Request Path for RESTful RBAC
@@ -70,10 +70,10 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             // keyMatch2 is case-sensitive? 
             // Usually paths are case-insensitive in Windows but sensitive in Linux.
             // Best practice: Normalize to lowercase for comparison if the convention allows.
-            var obj = path; //.ToLower(); // Decided to keep case for now, assuming DB matches registration.
+            string? obj = path; //.ToLower(); // Decided to keep case for now, assuming DB matches registration.
 
             // 5. Action (act)
-            var act = context.Request.Method.ToUpperInvariant();
+            string act = context.Request.Method.ToUpperInvariant();
 
             // 6. Enforce
             bool allowed = await _enforcer.EnforceAsync(sub, dom, obj, act);

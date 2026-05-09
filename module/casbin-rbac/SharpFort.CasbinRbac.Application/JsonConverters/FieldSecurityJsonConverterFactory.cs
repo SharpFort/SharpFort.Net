@@ -23,10 +23,10 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
             // 获取资源名
-            var attr = typeToConvert.GetCustomAttribute<SecureResourceAttribute>();
-            var resourceName = attr!.ResourceName;
+            SecureResourceAttribute? attr = typeToConvert.GetCustomAttribute<SecureResourceAttribute>();
+            string resourceName = attr!.ResourceName;
 
-            var converterType = typeof(FieldSecurityConverter<>).MakeGenericType(typeToConvert);
+            Type converterType = typeof(FieldSecurityConverter<>).MakeGenericType(typeToConvert);
             return (JsonConverter)Activator.CreateInstance(converterType, _httpContextAccessor, resourceName)!;
         }
     }
@@ -53,7 +53,7 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
 
             // 实际上，对于输出控制，Read 很少用到 (除非是 Update 接口的入参 DTO 复用)
             // 我们暂时实现一个基于默认反序列化的逻辑 (Clone options 移除 factory)
-            var newOptions = new JsonSerializerOptions(options);
+            JsonSerializerOptions newOptions = new JsonSerializerOptions(options);
             // 必须移除当前的 Factory 否则死循环
             // 但很难找到当前 Factory 实例... 
 
@@ -73,7 +73,7 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
             }
 
             // 1. 获取当前用户
-            var httpContext = _httpContextAccessor.HttpContext;
+            HttpContext? httpContext = _httpContextAccessor.HttpContext;
             if (httpContext == null)
             {
                 // 无上下文 (如后台任务)，默认全输出 (通过默认 WriteObject 防止递归)
@@ -82,8 +82,8 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
             }
 
             // 2. 获取服务
-            var currentUser = httpContext.RequestServices.GetService<ICurrentUser>();
-            var cache = httpContext.RequestServices.GetService<IFieldPermissionCache>();
+            ICurrentUser? currentUser = httpContext.RequestServices.GetService<ICurrentUser>();
+            IFieldPermissionCache? cache = httpContext.RequestServices.GetService<IFieldPermissionCache>();
 
             HashSet<string>? denyFields = null;
 
@@ -101,7 +101,7 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
         {
             writer.WriteStartObject();
 
-            foreach (var prop in _properties)
+            foreach (PropertyInfo prop in _properties)
             {
                 // 过滤 WriteOnly
                 if (!prop.CanRead)
@@ -116,7 +116,7 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
                 }
 
                 // 获取值
-                var propVal = prop.GetValue(value);
+                object? propVal = prop.GetValue(value);
 
                 // 忽略 Null (如果设置了)
                 if (propVal == null && options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull)
@@ -126,7 +126,7 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
 
                 // 写入属性名
                 // 注意：这里需要遵循 NamingPolicy (e.g. camelCase)
-                var propName = options.PropertyNamingPolicy?.ConvertName(prop.Name) ?? prop.Name;
+                string propName = options.PropertyNamingPolicy?.ConvertName(prop.Name) ?? prop.Name;
                 writer.WritePropertyName(propName);
 
                 // 递归序列化属性值

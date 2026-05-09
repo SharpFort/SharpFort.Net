@@ -11,6 +11,7 @@ using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.SqlSugarCore.Abstractions;
+using System.Security.Claims;
 
 namespace SharpFort.CasbinRbac.Application.Services.Authentication
 {
@@ -37,9 +38,9 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         [HttpGet("auth/oauth/login/{scheme}")]
         public async Task<object> AuthOauthLoginAsync([FromRoute] string scheme, [FromQuery] string code)
         {
-            (var openId, var _) = await GetOpenIdAndNameAsync(scheme);
-            var authEntity = await _repository.GetAsync(x => x.OpenId == openId && x.AuthType == scheme) ?? throw new UserFriendlyException("第三方登录失败，请先注册后，在个人中心进行绑定该第三方后使用");
-            var accessToken = await _accountManager.GetTokenByUserIdAsync(authEntity.UserId);
+            (string? openId, string _) = await GetOpenIdAndNameAsync(scheme);
+            OpenAuth authEntity = await _repository.GetAsync(x => x.OpenId == openId && x.AuthType == scheme) ?? throw new UserFriendlyException("第三方登录失败，请先注册后，在个人中心进行绑定该第三方后使用");
+            string accessToken = await _accountManager.GetTokenByUserIdAsync(authEntity.UserId);
             return new { token = accessToken };
         }
 
@@ -54,16 +55,16 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         [Authorize]
         public async Task AuthOauthBindAsync([FromRoute] string scheme, [FromQuery] string code)
         {
-            (var openId, var name) = await GetOpenIdAndNameAsync(scheme);
-            var userId = CurrentUser.Id;
-            var authEntityAny = await _repository.IsAnyAsync(x => x.OpenId == openId && x.AuthType == scheme);
+            (string? openId, string? name) = await GetOpenIdAndNameAsync(scheme);
+            Guid? userId = CurrentUser.Id;
+            bool authEntityAny = await _repository.IsAnyAsync(x => x.OpenId == openId && x.AuthType == scheme);
             if (authEntityAny)
             {
                 throw new UserFriendlyException("绑定失败，该第三方账号已被注册");
             }
 
             // var openAuth = new OpenAuth(scheme, userId ?? Guid.Empty, openId, name);
-            var openAuth = new OpenAuth(Guid.NewGuid(), userId ?? Guid.Empty, scheme, openId, name);
+            OpenAuth openAuth = new OpenAuth(Guid.NewGuid(), userId ?? Guid.Empty, scheme, openId, name);
 
             await _repository.InsertAsync(openAuth);
         }
@@ -75,15 +76,15 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
             {
                 throw new AggregateException("HttpContext 参数为空");
             }
-            var authenticateResult = await HttpContext.AuthenticateAsync(scheme);
+            AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(scheme);
             if (!authenticateResult.Succeeded)
             {
                 throw new UserFriendlyException(authenticateResult.Failure?.Message ?? "OAuth 认证失败");
             }
 
             // authenticateResult.Succeeded 为 true 时，Principal 非 null
-            var openidClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:openid");
-            var nameClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:name");
+            Claim? openidClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:openid");
+            Claim? nameClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:name");
             return openidClaim is null
                 ? throw new UserFriendlyException("未能获取第三方 OpenId")
                 : ((string, string))(openidClaim.Value, nameClaim?.Value ?? string.Empty);
@@ -106,12 +107,12 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
 
         public async Task<AuthOutputDto?> TryGetAuthInfoAsync(string? openId, string authType, Guid? userId = null)
         {
-            var entity = await _repository._DbQueryable
+            OpenAuth entity = await _repository._DbQueryable
                 .WhereIF(openId is not null, x => x.OpenId == openId)
                 .WhereIF(userId is not null, x => x.UserId == userId)
                 .Where(x => x.AuthType == authType)
                 .FirstAsync();
-            var output = await MapToGetOutputDtoAsync(entity);
+            AuthOutputDto output = await MapToGetOutputDtoAsync(entity);
             return output;
         }
 
@@ -119,7 +120,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable
+            List<OpenAuth> entities = await _repository._DbQueryable
                 .WhereIF(input.UserId is not null, x => x.UserId == input.UserId)
                 .WhereIF(!string.IsNullOrEmpty(input.AuthType), x => x.AuthType == input.AuthType)
                 .WhereIF(!string.IsNullOrEmpty(input.OpenId), x => x.OpenId == input.OpenId)
@@ -149,7 +150,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         [RemoteService(IsEnabled = false)]
         public override async Task<AuthOutputDto> CreateAsync(AuthCreateOrUpdateInputDto input)
         {
-            var entity = await MapToEntityAsync(input);
+            OpenAuth entity = await MapToEntityAsync(input);
             //还需要一步，如果当前openid已经存在被人绑定，移除
             await _repository.DeleteAsync(x => x.AuthType == input.AuthType && x.OpenId == input.OpenId);
             await _repository.InsertAsync(entity);
@@ -159,7 +160,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         protected override async Task CheckCreateInputDtoAsync(AuthCreateOrUpdateInputDto input)
         {
             //同一个类型，一个用户只能绑定一个第三方授权
-            var isAny = await _repository._DbQueryable.Where(x => x.AuthType == input.AuthType)
+            bool isAny = await _repository._DbQueryable.Where(x => x.AuthType == input.AuthType)
                 .Where(x => x.OpenId == input.OpenId || x.UserId == input.UserId).AnyAsync();
 
             if (isAny)

@@ -6,6 +6,7 @@ using SqlSugar;
 using Volo.Abp.Domain.Services;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
+using System.Text;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
@@ -32,16 +33,16 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         [Volo.Abp.Uow.UnitOfWork(IsDisabled = true)]
         public async Task MigrateAllAsync()
         {
-            var totalSw = Stopwatch.StartNew();
+            Stopwatch totalSw = Stopwatch.StartNew();
             LogMigrationStart();
 
-            var connectionString = _roleRepo._Db.CurrentConnectionConfig.ConnectionString;
-            var dbType = _roleRepo._Db.CurrentConnectionConfig.DbType;
+            string connectionString = _roleRepo._Db.CurrentConnectionConfig.ConnectionString;
+            DbType dbType = _roleRepo._Db.CurrentConnectionConfig.DbType;
             string domain = "default";
 
             // ========== PHASE 1: READ DATA ==========
             LogReadPhaseStart();
-            var phaseSw = Stopwatch.StartNew();
+            Stopwatch phaseSw = Stopwatch.StartNew();
 
             // Use anonymous types to avoid protected setter issues
             List<(Guid Id, string RoleCode, string RoleName, bool State)> roleData;
@@ -50,7 +51,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             List<(Guid UserId, Guid RoleId)> userRoleData;
 
             // Create dedicated READ client
-            using (var readClient = new SqlSugarClient(new ConnectionConfig
+            using (SqlSugarClient readClient = new SqlSugarClient(new ConnectionConfig
             {
                 ConnectionString = connectionString,
                 DbType = dbType,
@@ -58,17 +59,17 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 InitKeyType = InitKeyType.Attribute
             }))
             {
-                var stepSw = Stopwatch.StartNew();
+                Stopwatch stepSw = Stopwatch.StartNew();
                 LogReadingRoleTable();
 
                 // Use raw SQL to avoid entity mapping issues with TenantId field
                 // We only need: id, role_code, role_name, state (no tenant_id needed)
-                var roleQuery = @"
+                string roleQuery = @"
                     SELECT id, role_code, role_name, state
                     FROM casbin_sys_role
                     WHERE is_deleted = false";
 
-                var roleRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleQuery);
+                List<dynamic> roleRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleQuery);
                 roleData = [.. roleRows.Select(r => (
                     Id: (Guid)r.id,
                     RoleCode: (string)r.role_code,
@@ -82,12 +83,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 LogReadingMenuTable();
 
                 // Use raw SQL for Menu table
-                var menuQuery = @"
+                string menuQuery = @"
                     SELECT id, menu_name, api_url, api_method, state
                     FROM casbin_sys_menu
                     WHERE is_deleted = false";
 
-                var menuRows = await readClient.Ado.SqlQueryAsync<dynamic>(menuQuery);
+                List<dynamic> menuRows = await readClient.Ado.SqlQueryAsync<dynamic>(menuQuery);
                 menuData = [.. menuRows.Select(m => (
                     Id: (Guid)m.id,
                     MenuName: (string)m.menu_name,
@@ -102,11 +103,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 LogReadingRoleMenuTable();
 
                 // Use raw SQL for RoleMenu table
-                var roleMenuQuery = @"
+                string roleMenuQuery = @"
                     SELECT role_id, menu_id
                     FROM casbin_sys_role_menu";
 
-                var roleMenuRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleMenuQuery);
+                List<dynamic> roleMenuRows = await readClient.Ado.SqlQueryAsync<dynamic>(roleMenuQuery);
                 roleMenuData = [.. roleMenuRows.Select(rm => (
                     RoleId: (Guid)rm.role_id,
                     MenuId: (Guid)rm.menu_id
@@ -118,11 +119,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 LogReadingUserRoleTable();
 
                 // Use raw SQL for UserRole table
-                var userRoleQuery = @"
+                string userRoleQuery = @"
                     SELECT user_id, role_id
                     FROM casbin_sys_user_role";
 
-                var userRoleRows = await readClient.Ado.SqlQueryAsync<dynamic>(userRoleQuery);
+                List<dynamic> userRoleRows = await readClient.Ado.SqlQueryAsync<dynamic>(userRoleQuery);
                 userRoleData = [.. userRoleRows.Select(ur => (
                     UserId: (Guid)ur.user_id,
                     RoleId: (Guid)ur.role_id
@@ -141,8 +142,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             phaseSw.Restart();
 
             // Build dictionaries for fast lookup
-            var roleDic = new Dictionary<Guid, (string RoleCode, string RoleName)>();
-            foreach (var r in roleData)
+            Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = new Dictionary<Guid, (string RoleCode, string RoleName)>();
+            foreach ((Guid Id, string RoleCode, string RoleName, bool State) r in roleData)
             {
                 if (!string.IsNullOrEmpty(r.RoleCode))
                 {
@@ -155,9 +156,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogValidRolesLoaded(roleDic.Count);
 
-            var menuDic = new Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)>();
+            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = new Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)>();
             int menuWithApiCount = 0;
-            foreach (var m in menuData)
+            foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State) m in menuData)
             {
                 menuDic[m.Id] = (m.MenuName, m.ApiUrl, m.ApiMethod);
                 if (!string.IsNullOrEmpty(m.ApiUrl))
@@ -167,22 +168,22 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogMenusLoaded(menuDic.Count, menuWithApiCount);
 
-            var rulesToInsert = new List<CasbinRule>();
+            List<CasbinRule> rulesToInsert = new List<CasbinRule>();
 
             // Build p rules (role-permission)
             LogBuildingPRules();
             int skippedMenus = 0;
             int skippedRoles = 0;
 
-            foreach (var rm in roleMenuData)
+            foreach ((Guid RoleId, Guid MenuId) rm in roleMenuData)
             {
-                if (!roleDic.TryGetValue(rm.RoleId, out var role))
+                if (!roleDic.TryGetValue(rm.RoleId, out (string RoleCode, string RoleName) role))
                 {
                     skippedRoles++;
                     continue;
                 }
 
-                if (!menuDic.TryGetValue(rm.MenuId, out var menu))
+                if (!menuDic.TryGetValue(rm.MenuId, out (string MenuName, string ApiUrl, string ApiMethod) menu))
                 {
                     skippedMenus++;
                     continue;
@@ -194,7 +195,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     continue;
                 }
 
-                var method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper(global::System.Globalization.CultureInfo.InvariantCulture);
+                string method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper(global::System.Globalization.CultureInfo.InvariantCulture);
 
                 rulesToInsert.Add(new CasbinRule
                 {
@@ -222,9 +223,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             LogBuildingGRules();
             int skippedUserRoles = 0;
 
-            foreach (var ur in userRoleData)
+            foreach ((Guid UserId, Guid RoleId) ur in userRoleData)
             {
-                if (!roleDic.TryGetValue(ur.RoleId, out var role))
+                if (!roleDic.TryGetValue(ur.RoleId, out (string RoleCode, string RoleName) role))
                 {
                     skippedUserRoles++;
                     continue;
@@ -250,13 +251,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // Log sample data for verification
             LogSamplePRulesHeader();
-            foreach (var rule in rulesToInsert.Where(r => r.PType == "p").Take(5))
+            foreach (CasbinRule? rule in rulesToInsert.Where(r => r.PType == "p").Take(5))
             {
                 LogSamplePRule(rule.V0, rule.V1, rule.V2, rule.V3);
             }
 
             LogSampleGRulesHeader();
-            foreach (var rule in rulesToInsert.Where(r => r.PType == "g").Take(5))
+            foreach (CasbinRule? rule in rulesToInsert.Where(r => r.PType == "g").Take(5))
             {
                 LogSampleGRule(rule.V0, rule.V1, rule.V2);
             }
@@ -273,7 +274,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             // Create dedicated WRITE client
-            using (var writeClient = new SqlSugarClient(new ConnectionConfig
+            using (SqlSugarClient writeClient = new SqlSugarClient(new ConnectionConfig
             {
                 ConnectionString = connectionString,
                 DbType = dbType,
@@ -294,18 +295,18 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 {
                     // Clear old data
                     LogClearingOldRules();
-                    var deletedCount = await writeClient.Deleteable<CasbinRule>().ExecuteCommandAsync();
+                    int deletedCount = await writeClient.Deleteable<CasbinRule>().ExecuteCommandAsync();
                     LogOldRulesDeleted(deletedCount);
 
                     // Insert new rules in batches
                     LogInsertingRules(rulesToInsert.Count);
-                    var batchSize = 500;
+                    int batchSize = 500;
                     int totalInserted = 0;
 
                     for (int i = 0; i < rulesToInsert.Count; i += batchSize)
                     {
-                        var batch = rulesToInsert.Skip(i).Take(batchSize).ToList();
-                        var insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
+                        List<CasbinRule> batch = rulesToInsert.Skip(i).Take(batchSize).ToList();
+                        int insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
                         totalInserted += insertedCount;
                         LogBatchInserted(i / batchSize + 1, insertedCount, totalInserted, rulesToInsert.Count);
                     }
@@ -331,8 +332,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 LogEnforcerReloaded(phaseSw.ElapsedMilliseconds);
 
                 // Verify loaded policies (use synchronous methods)
-                var loadedPolicies = _enforcer.GetPolicy().ToList();
-                var loadedGroupings = _enforcer.GetGroupingPolicy().ToList();
+                List<IEnumerable<string>> loadedPolicies = _enforcer.GetPolicy().ToList();
+                List<IEnumerable<string>> loadedGroupings = _enforcer.GetGroupingPolicy().ToList();
                 LogVerificationResult(loadedPolicies.Count, loadedGroupings.Count);
             }
             catch (Exception ex)
@@ -356,7 +357,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 return input;
             }
 
-            var result = new System.Text.StringBuilder();
+            StringBuilder result = new System.Text.StringBuilder();
             result.Append(char.ToLowerInvariant(input[0]));
 
             for (int i = 1; i < input.Length; i++)

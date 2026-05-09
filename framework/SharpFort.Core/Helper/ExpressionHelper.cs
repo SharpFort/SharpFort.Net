@@ -16,8 +16,8 @@ namespace SharpFort.Core.Helper
         /// <returns></returns>
         public static Expression<T> Compose<T>(this Expression<T> first, Expression<T> second, Func<Expression, Expression, Expression> merge)
         {
-            var parameterMap = first.Parameters.Select((f, i) => new { f, s = second.Parameters[i] }).ToDictionary(p => p.s, p => p.f);
-            var secondBody = LambdaParameteRebinder.ReplaceParameter(parameterMap, second.Body);
+            Dictionary<ParameterExpression, ParameterExpression> parameterMap = first.Parameters.Select((f, i) => new { f, s = second.Parameters[i] }).ToDictionary(p => p.s, p => p.f);
+            Expression secondBody = LambdaParameteRebinder.ReplaceParameter(parameterMap, second.Body);
             return Expression.Lambda<T>(merge(first.Body, secondBody), first.Parameters);
         }
 

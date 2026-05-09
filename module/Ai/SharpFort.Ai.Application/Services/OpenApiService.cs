@@ -45,10 +45,10 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
         CancellationToken cancellationToken)
     {
         //前面都是校验，后面才是真正的调用
-        var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
-        var userId = tokenValidation.UserId;
-        var tokenId = tokenValidation.TokenId;
+        HttpContext? httpContext = this._httpContextAccessor.HttpContext;
+        TokenValidationResult tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
+        Guid userId = tokenValidation.UserId;
+        Guid tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
 
@@ -82,11 +82,11 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
     [HttpPost("openApi/v1/images/generations")]
     public async Task ImagesGenerationsAsync([FromBody] ImageCreateRequest input, CancellationToken cancellationToken)
     {
-        var httpContext = this._httpContextAccessor.HttpContext;
+        HttpContext? httpContext = this._httpContextAccessor.HttpContext;
         Intercept(httpContext);
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
-        var userId = tokenValidation.UserId;
-        var tokenId = tokenValidation.TokenId;
+        TokenValidationResult tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
+        Guid userId = tokenValidation.UserId;
+        Guid tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
         await _aiGateWayManager.CreateImageForStatisticsAsync(httpContext, userId, null, input, tokenId);
     }
@@ -100,11 +100,11 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
     [HttpPost("openApi/v1/embeddings")]
     public async Task EmbeddingAsync([FromBody] ThorEmbeddingInput input, CancellationToken cancellationToken)
     {
-        var httpContext = this._httpContextAccessor.HttpContext;
+        HttpContext? httpContext = this._httpContextAccessor.HttpContext;
         Intercept(httpContext);
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
-        var userId = tokenValidation.UserId;
-        var tokenId = tokenValidation.TokenId;
+        TokenValidationResult tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
+        Guid userId = tokenValidation.UserId;
+        Guid tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
         await _aiGateWayManager.EmbeddingForStatisticsAsync(httpContext, userId, null, input, tokenId);
     }
@@ -117,7 +117,7 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
     [HttpGet("openApi/v1/models")]
     public async Task<ModelsListDto> ModelsAsync()
     {
-        var data = await _aiModelRepository._DbQueryable
+        List<ModelsDataDto> data = await _aiModelRepository._DbQueryable
             .Where(x => x.ModelType == ModelType.Chat)
             .OrderByDescending(x => x.OrderNum)
             .Select(x => new ModelsDataDto
@@ -146,10 +146,10 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
         CancellationToken cancellationToken)
     {
         //前面都是校验，后面才是真正的调用
-        var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
-        var userId = tokenValidation.UserId;
-        var tokenId = tokenValidation.TokenId;
+        HttpContext? httpContext = this._httpContextAccessor.HttpContext;
+        TokenValidationResult tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
+        Guid userId = tokenValidation.UserId;
+        Guid tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
 
@@ -186,10 +186,10 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
     public async Task ResponsesAsync([FromBody] OpenAiResponsesInput input, CancellationToken cancellationToken)
     {
         //前面都是校验，后面才是真正的调用
-        var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
-        var userId = tokenValidation.UserId;
-        var tokenId = tokenValidation.TokenId;
+        HttpContext? httpContext = this._httpContextAccessor.HttpContext;
+        TokenValidationResult tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
+        Guid userId = tokenValidation.UserId;
+        Guid tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
 
@@ -230,10 +230,10 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
         [FromQuery] string? alt, CancellationToken cancellationToken)
     {
         //前面都是校验，后面才是真正的调用
-        var httpContext = this._httpContextAccessor.HttpContext;
-        var tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
-        var userId = tokenValidation.UserId;
-        var tokenId = tokenValidation.TokenId;
+        HttpContext? httpContext = this._httpContextAccessor.HttpContext;
+        TokenValidationResult tokenValidation = await _tokenManager.ValidateTokenAsync(GetTokenByHttpContext(httpContext));
+        Guid userId = tokenValidation.UserId;
+        Guid tokenId = tokenValidation.TokenId;
         await _aiBlacklistManager.VerifiyAiBlacklist(userId);
 
 
@@ -304,10 +304,10 @@ public class OpenApiService(IHttpContextAccessor httpContextAccessor, ILogger<Op
         {
             try
             {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var uowManager = scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
-                var manager = scope.ServiceProvider.GetRequiredService<MessageLogManager>();
-                using var uow = uowManager.Begin(requiresNew: true);
+                using IServiceScope scope = _serviceScopeFactory.CreateScope();
+                IUnitOfWorkManager uowManager = scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
+                MessageLogManager manager = scope.ServiceProvider.GetRequiredService<MessageLogManager>();
+                using IUnitOfWork uow = uowManager.Begin(requiresNew: true);
                 await manager.CreateAsync(requestBody, apiKey, apiKeyName, modelId, apiType);
                 await uow.CompleteAsync();
             }

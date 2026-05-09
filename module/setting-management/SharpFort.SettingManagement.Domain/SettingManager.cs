@@ -45,8 +45,8 @@ public class SettingManager : ISettingManager, ISingletonDependency
     {
         Check.NotNull(providerName, nameof(providerName));
 
-        var settingDefinitions = await SettingDefinitionManager.GetAllAsync();
-        var providers = Enumerable.Reverse(Providers)
+        IReadOnlyList<SettingDefinition> settingDefinitions = await SettingDefinitionManager.GetAllAsync();
+        IEnumerable<ISettingManagementProvider> providers = Enumerable.Reverse(Providers)
             .SkipWhile(c => c.Name != providerName);
 
         if (!fallback)
@@ -54,24 +54,24 @@ public class SettingManager : ISettingManager, ISingletonDependency
             providers = providers.TakeWhile(c => c.Name == providerName);
         }
 
-        var providerList = providers.Reverse().ToList();
+        List<ISettingManagementProvider> providerList = providers.Reverse().ToList();
 
         if (providerList.Count == 0)
         {
             return [];
         }
 
-        var settingValues = new Dictionary<string, SettingValue>();
+        Dictionary<string, SettingValue> settingValues = new Dictionary<string, SettingValue>();
 
-        foreach (var setting in settingDefinitions)
+        foreach (SettingDefinition setting in settingDefinitions)
         {
             string? value = null;
 
             if (setting.IsInherited)
             {
-                foreach (var provider in providerList)
+                foreach (ISettingManagementProvider? provider in providerList)
                 {
-                    var providerValue = await provider.GetOrNullAsync(
+                    string? providerValue = await provider.GetOrNullAsync(
                         setting,
                         provider.Name == providerName ? providerKey : null
                     );
@@ -108,9 +108,9 @@ public class SettingManager : ISettingManager, ISingletonDependency
         Check.NotNull(name, nameof(name));
         Check.NotNull(providerName, nameof(providerName));
 
-        var setting = await SettingDefinitionManager.GetAsync(name);
+        SettingDefinition setting = await SettingDefinitionManager.GetAsync(name);
 
-        var providers = Enumerable
+        List<ISettingManagementProvider> providers = Enumerable
             .Reverse(Providers)
             .SkipWhile(p => p.Name != providerName)
             .ToList();
@@ -127,7 +127,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
         if (providers.Count > 1 && !forceToSet && setting.IsInherited && value != null)
         {
-            var fallbackValue = await GetOrNullInternalAsync(name, providers[1].Name, null);
+            string? fallbackValue = await GetOrNullInternalAsync(name, providers[1].Name, null);
             if (fallbackValue == value)
             {
                 //Clear the value if it's same as it's fallback value
@@ -139,14 +139,14 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
         if (value == null)
         {
-            foreach (var provider in providers)
+            foreach (ISettingManagementProvider? provider in providers)
             {
                 await provider.ClearAsync(setting, providerKey);
             }
         }
         else
         {
-            foreach (var provider in providers)
+            foreach (ISettingManagementProvider? provider in providers)
             {
                 await provider.SetAsync(setting, value, providerKey);
             }
@@ -155,8 +155,8 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
     protected virtual async Task<string?> GetOrNullInternalAsync(string name, string providerName, string? providerKey, bool fallback = true)
     {
-        var setting = await SettingDefinitionManager.GetAsync(name);
-        var providers = Enumerable
+        SettingDefinition setting = await SettingDefinitionManager.GetAsync(name);
+        IEnumerable<ISettingManagementProvider> providers = Enumerable
             .Reverse(Providers);
 
         if (providerName != null)
@@ -170,7 +170,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
         }
 
         string? value = null;
-        foreach (var provider in providers)
+        foreach (ISettingManagementProvider? provider in providers)
         {
             value = await provider.GetOrNullAsync(
                 setting,

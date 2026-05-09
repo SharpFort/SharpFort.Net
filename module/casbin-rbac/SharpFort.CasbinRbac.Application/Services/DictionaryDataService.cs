@@ -31,7 +31,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         protected override async Task CheckCreateInputDtoAsync(DictionaryCreateInputVo input)
         {
             // 防重复校验：同一字典类型下，字典值必须唯一
-            var isExist = await _repository.IsAnyAsync(x => x.DictType == input.DictType && x.DictValue == input.DictValue);
+            bool isExist = await _repository.IsAnyAsync(x => x.DictType == input.DictType && x.DictValue == input.DictValue);
             if (isExist)
             {
                 throw new UserFriendlyException($"当前字典类型下已存在值为 {input.DictValue} 的字典数据!");
@@ -52,7 +52,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         protected override async Task CheckUpdateInputDtoAsync(Dictionary entity, DictionaryUpdateInputVo input)
         {
             // 防键值冲突校验：修改时确保不会和已有的其他字典值冲突
-            var isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
+            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
                 .AnyAsync(x => x.DictType == input.DictType && x.DictValue == input.DictValue);
             if (isExist)
             {
@@ -67,7 +67,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public override async Task<PagedResultDto<DictionaryGetListOutputDto>> GetListAsync(DictionaryGetListInputVo input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable
+            List<Dictionary> entities = await _repository._DbQueryable
                 .WhereIF(input.DictType is not null, x => x.DictType == input.DictType)
                 .WhereIF(input.DictLabel is not null, x => x.DictLabel!.Contains(input.DictLabel!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
@@ -89,8 +89,8 @@ namespace SharpFort.CasbinRbac.Application.Services
         [Route("type/{dicType}")]
         public async Task<List<DictionaryGetListOutputDto>> GetDicType([FromRoute] string dicType)
         {
-            var entities = await _repository.GetListAsync(u => u.DictType == dicType && u.State == true);
-            var result = await MapToGetListOutputDtosAsync(entities);
+            List<Dictionary> entities = await _repository.GetListAsync(u => u.DictType == dicType && u.State == true);
+            List<DictionaryGetListOutputDto> result = await MapToGetListOutputDtosAsync(entities);
             return result;
         }
 

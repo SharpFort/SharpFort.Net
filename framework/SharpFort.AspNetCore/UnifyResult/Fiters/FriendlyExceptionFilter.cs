@@ -50,7 +50,7 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
         }
 
         // 解析异常信息
-        var exceptionMetadata = GetExceptionMetadata(context);
+        ExceptionMetadata exceptionMetadata = GetExceptionMetadata(context);
 
         IUnifyResultProvider unifyResult = context.GetRequiredService<IUnifyResultProvider>();
         // 执行规范化异常处理
@@ -74,10 +74,10 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
         object? originErrorCode = default;
         object? errors = default;
         object? data = default;
-        var statusCode = StatusCodes.Status500InternalServerError;
+        int statusCode = StatusCodes.Status500InternalServerError;
 
         // 判断是否是 ExceptionContext 或者 ActionExecutedContext
-        var exception = context is ExceptionContext exContext
+        Exception? exception = context is ExceptionContext exContext
             ? exContext.Exception
             : (
                 context is ActionExecutedContext edContext

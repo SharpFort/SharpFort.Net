@@ -81,15 +81,15 @@ namespace SharpFort.FileManagement.Domain.Services
             // 如果配置了自定义域名，使用自定义域名
             if (!string.IsNullOrEmpty(config.CustomDomain))
             {
-                var scheme = config.IsEnableHttps ? "https" : "http";
-                var url = $"{scheme}://{config.CustomDomain}/{containerName}/{blobName}";
+                string scheme = config.IsEnableHttps ? "https" : "http";
+                string url = $"{scheme}://{config.CustomDomain}/{containerName}/{blobName}";
                 return Task.FromResult<string?>(url);
             }
 
             // 否则使用 Endpoint 构建 URL
             if (!string.IsNullOrEmpty(config.Endpoint))
             {
-                var url = $"{config.Endpoint}/{config.BucketName}/{containerName}/{blobName}";
+                string url = $"{config.Endpoint}/{config.BucketName}/{containerName}/{blobName}";
                 return Task.FromResult<string?>(url);
             }
 

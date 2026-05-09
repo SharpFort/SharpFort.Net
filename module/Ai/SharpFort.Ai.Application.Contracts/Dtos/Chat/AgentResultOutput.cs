@@ -58,8 +58,8 @@ public static class AgentResultTypeEnumExtensions
 {
     public static string GetJsonName(this AgentResultTypeEnum value)
     {
-        var member = typeof(AgentResultTypeEnum).GetMember(value.ToString()).FirstOrDefault();
-        var attr = member?.GetCustomAttribute<JsonPropertyNameAttribute>();
+        MemberInfo? member = typeof(AgentResultTypeEnum).GetMember(value.ToString()).FirstOrDefault();
+        JsonPropertyNameAttribute? attr = member?.GetCustomAttribute<JsonPropertyNameAttribute>();
         return attr?.Name ?? value.ToString();
     }
 }

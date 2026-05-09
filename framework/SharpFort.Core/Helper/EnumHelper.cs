@@ -112,7 +112,7 @@ namespace SharpFort.Core.Helper
         public static TEnum TryParseEnumString<TEnum>(this string str, TEnum defaultValue, bool ignoreCase = true)
             where TEnum : struct, Enum
         {
-            return Enum.TryParse<TEnum>(str, ignoreCase, out var result) ? result : defaultValue;
+            return Enum.TryParse<TEnum>(str, ignoreCase, out TEnum result) ? result : defaultValue;
         }
 
         /// <summary>
@@ -149,8 +149,8 @@ namespace SharpFort.Core.Helper
         /// </example>
         public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum : Enum
         {
-            var fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
-            var descriptionAttribute = fieldInfo?.GetCustomAttribute<DescriptionAttribute>();
+            FieldInfo? fieldInfo = enumValue.GetType().GetField(enumValue.ToString());
+            DescriptionAttribute? descriptionAttribute = fieldInfo?.GetCustomAttribute<DescriptionAttribute>();
             return descriptionAttribute?.Description ?? enumValue.ToString();
         }
 

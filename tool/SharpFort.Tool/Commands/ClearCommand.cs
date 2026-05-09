@@ -14,12 +14,12 @@ namespace SharpFort.Tool.Commands
         {
             application.HelpOption("-h|--help");
             List<string> delDirBlacklist = ["obj", "bin"];
-            var pathOption = application.Option("-path", "路径", CommandOptionType.SingleValue);
+            CommandOption pathOption = application.Option("-path", "路径", CommandOptionType.SingleValue);
 
 
             application.OnExecute(() =>
             {
-                var path = "./";
+                string path = "./";
                 if (pathOption.HasValue())
                 {
                     path = pathOption.Value();

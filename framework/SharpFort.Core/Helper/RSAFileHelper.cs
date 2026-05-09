@@ -23,7 +23,7 @@ namespace SharpFort.Core.Helper
             }
 
             string key = File.ReadAllText(filePath);
-            var rsa = RSA.Create();
+            RSA rsa = RSA.Create();
             rsa.ImportFromPem(key.AsSpan());
             return rsa;
         }

@@ -14,7 +14,7 @@ namespace SharpFort.TenantManagement.Domain
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var services = context.Services;
+            IServiceCollection services = context.Services;
             services.Replace(new ServiceDescriptor(typeof(ITenantStore), typeof(SqlSugarAndConfigurationTenantStore), ServiceLifetime.Transient));
 
             services.Replace(new ServiceDescriptor(typeof(IConnectionStringResolver), typeof(SfMultiTenantConnectionStringResolver), ServiceLifetime.Transient));

@@ -4,6 +4,8 @@ using SharpFort.SqlSugarCore.Abstractions;
 using SharpFort.SqlSugarCore.Repositories;
 using SharpFort.FluidSequence.Domain.Entities;
 using SharpFort.FluidSequence.Domain.Repositories;
+using SqlSugar;
+using System.Data;
 
 namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
 {
@@ -26,11 +28,11 @@ namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
         /// </summary>
         public async Task<(int rangeStart, int rangeEnd)> AtomicAdvanceAsync(string ruleCode, int count)
         {
-            var db = await GetDbContextAsync();
+            ISqlSugarClient db = await GetDbContextAsync();
 
             // 使用 PostgreSQL 原子 UPDATE...RETURNING
             // current_value 推进 count 步后返回新值（rangeEnd），再减 count 得到旧值（rangeStart）
-            var sql = @"
+            string sql = @"
                 UPDATE sys_sequence_rule
                 SET    current_value = current_value + @count,
                        version       = version + 1
@@ -39,7 +41,7 @@ namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
                     current_value - @count AS range_start,
                     current_value          AS range_end";
 
-            var dt = await db.Ado.GetDataTableAsync(sql, new
+            DataTable dt = await db.Ado.GetDataTableAsync(sql, new
             {
                 count = count,
                 ruleCode = ruleCode
@@ -50,8 +52,8 @@ namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
                 throw new UserFriendlyException($"流水号规则 [{ruleCode}] 不存在，无法执行号段预取。");
             }
 
-            var rangeStart = Convert.ToInt32(dt.Rows[0]["range_start"]);
-            var rangeEnd = Convert.ToInt32(dt.Rows[0]["range_end"]);
+            int rangeStart = Convert.ToInt32(dt.Rows[0]["range_start"]);
+            int rangeEnd = Convert.ToInt32(dt.Rows[0]["range_end"]);
 
             return (rangeStart, rangeEnd);
         }

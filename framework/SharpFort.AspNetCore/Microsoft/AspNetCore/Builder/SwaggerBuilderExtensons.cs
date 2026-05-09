@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc.Conventions;
 
 namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
 {
@@ -22,7 +23,7 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
         {
             ArgumentNullException.ThrowIfNull(app);
 
-            var mvcOptions = app.ApplicationServices
+            AbpAspNetCoreMvcOptions mvcOptions = app.ApplicationServices
                 .GetRequiredService<IOptions<AbpAspNetCoreMvcOptions>>()
                 .Value;
 
@@ -33,8 +34,8 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
             app.UseSwaggerUI(options =>
             {
                 // 添加约定控制器的Swagger终结点
-                var conventionalSettings = mvcOptions.ConventionalControllers.ConventionalControllerSettings;
-                foreach (var setting in conventionalSettings)
+                ConventionalControllerSettingList conventionalSettings = mvcOptions.ConventionalControllers.ConventionalControllerSettings;
+                foreach (ConventionalControllerSetting setting in conventionalSettings)
                 {
                     options.SwaggerEndpoint(
                         $"/swagger/{setting.RemoteServiceName}/swagger.json",
@@ -51,7 +52,7 @@ namespace SharpFort.AspNetCore.Microsoft.AspNetCore.Builder
                 // 添加自定义Swagger配置的终结点
                 if (swaggerConfigs != null)
                 {
-                    foreach (var config in swaggerConfigs)
+                    foreach (SwaggerConfiguration config in swaggerConfigs)
                     {
                         options.SwaggerEndpoint(config.Url, config.Name);
                     }

@@ -15,13 +15,13 @@ public static class EnumExtensions
     /// <returns>Description特性值，如果没有则返回枚举名称</returns>
     public static string GetDescription(this Enum value)
     {
-        var field = value.GetType().GetField(value.ToString());
+        FieldInfo? field = value.GetType().GetField(value.ToString());
         if (field == null)
         {
             return value.ToString();
         }
 
-        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+        DescriptionAttribute? attribute = field.GetCustomAttribute<DescriptionAttribute>();
         return attribute?.Description ?? value.ToString();
     }
 }

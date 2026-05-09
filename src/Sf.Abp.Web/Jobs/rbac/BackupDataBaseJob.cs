@@ -23,7 +23,7 @@ namespace Sf.Abp.Web.Jobs.rbac
         {
             if (_options.Value.EnableDataBaseBackup)
             {
-                var logger = LoggerFactory.CreateLogger<BackupDataBaseJob>();
+                ILogger<BackupDataBaseJob> logger = LoggerFactory.CreateLogger<BackupDataBaseJob>();
                 logger.LogWarning("正在进行数据库备份");
                 _dbContext.BackupDataBase();
                 logger.LogWarning("数据库备份已完成");

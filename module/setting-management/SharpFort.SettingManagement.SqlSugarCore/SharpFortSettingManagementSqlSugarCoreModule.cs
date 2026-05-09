@@ -13,7 +13,7 @@ namespace SharpFort.SettingManagement.SqlSugarCore
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var services = context.Services;
+            IServiceCollection services = context.Services;
             services.AddTransient<ISettingRepository, SqlSugarCoreSettingRepository>();
         }
     }

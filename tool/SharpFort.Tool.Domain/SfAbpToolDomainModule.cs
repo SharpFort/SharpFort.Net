@@ -10,9 +10,9 @@ namespace SharpFort.Tool.Domain
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
+            IConfiguration configuration = context.Services.GetConfiguration();
             Configure<ToolOptions>(configuration.GetSection("ToolOptions"));
-            var toolOptions = new ToolOptions();
+            ToolOptions toolOptions = new ToolOptions();
             configuration.GetSection("ToolOptions").Bind(toolOptions);
             if (!Directory.Exists(toolOptions.TempDirPath))
             {

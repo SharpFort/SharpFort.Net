@@ -19,11 +19,11 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
 
             if (placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal))
             {
-                var paramKey = placeholderKey[6..];
-                return context.TryGetValue(paramKey, out var val1) ? val1 : "";
+                string paramKey = placeholderKey[6..];
+                return context.TryGetValue(paramKey, out string? val1) ? val1 : "";
             }
 
-            return context.TryGetValue(placeholderKey, out var val2) ? val2 : "";
+            return context.TryGetValue(placeholderKey, out string? val2) ? val2 : "";
         }
     }
 }

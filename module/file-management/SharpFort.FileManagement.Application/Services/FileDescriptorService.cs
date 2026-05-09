@@ -34,8 +34,8 @@ namespace SharpFort.FileManagement.Application.Services
             [FromQuery] Guid? directoryId = null)
         {
             // 通过 HttpContext 直接穿透获取所有的文件，避免因为前端组件上传变量名为 "file" 而非 "files" 导致的绑定失败
-            var httpContextAccessor = LazyServiceProvider.LazyGetRequiredService<IHttpContextAccessor>();
-            var formFiles = httpContextAccessor.HttpContext?.Request?.Form?.Files;
+            IHttpContextAccessor httpContextAccessor = LazyServiceProvider.LazyGetRequiredService<IHttpContextAccessor>();
+            IFormFileCollection? formFiles = httpContextAccessor.HttpContext?.Request?.Form?.Files;
             IEnumerable<IFormFile> finalFiles = formFiles != null && formFiles.Any() ? formFiles : (files ?? new FormFileCollection());
 
             if (!finalFiles.Any())
@@ -46,7 +46,7 @@ namespace SharpFort.FileManagement.Application.Services
             // 兼容前端直接将 Id 拼接在路径末尾的 REST 风格 (例如 /upload/3fa85f64...)，防止 [FromQuery] 无法绑定
             if (directoryId == null || directoryId == Guid.Empty)
             {
-                var pathSegments = httpContextAccessor.HttpContext?.Request.Path.Value?.TrimEnd('/').Split('/');
+                string[]? pathSegments = httpContextAccessor.HttpContext?.Request.Path.Value?.TrimEnd('/').Split('/');
                 if (pathSegments != null && pathSegments.Length > 0 && Guid.TryParse(pathSegments.Last(), out Guid parsedGuid))
                 {
                     directoryId = parsedGuid;
@@ -59,13 +59,13 @@ namespace SharpFort.FileManagement.Application.Services
                 directoryId = null;
             }
 
-            var entities = await _fileManager.CreateAsync(finalFiles, directoryId);
+            List<FileDescriptor> entities = await _fileManager.CreateAsync(finalFiles, directoryId);
 
             // 保存每个文件到 Blob 存储
-            var finalFilesList = finalFiles.ToList();
+            List<IFormFile> finalFilesList = finalFiles.ToList();
             for (int i = 0; i < finalFilesList.Count; i++)
             {
-                using var stream = finalFilesList[i].OpenReadStream();
+                using Stream stream = finalFilesList[i].OpenReadStream();
                 await _fileManager.SaveFileAsync(entities[i], stream);
             }
 
@@ -78,8 +78,8 @@ namespace SharpFort.FileManagement.Application.Services
         [AllowAnonymous]
         public async Task<IActionResult> DownloadAsync(Guid id, bool isThumbnail = false)
         {
-            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
-            var stream = await _fileManager.GetFileStreamAsync(file, isThumbnail);
+            FileDescriptor file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
+            Stream? stream = await _fileManager.GetFileStreamAsync(file, isThumbnail);
             return stream == null
                 ? throw new UserFriendlyException("文件内容不存在")
                 : (IActionResult)new FileStreamResult(stream, file.MimeType)
@@ -93,8 +93,8 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task<FileDescriptorGetOutputDto> GetAsync(Guid id)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id);
-            var dto = entity.Adapt<FileDescriptorGetOutputDto>();
+            FileDescriptor entity = await _repository.GetAsync(x => x.Id == id);
+            FileDescriptorGetOutputDto dto = entity.Adapt<FileDescriptorGetOutputDto>();
             dto.SizeInfo = entity.GetSizeInfo();
             return dto;
         }
@@ -105,14 +105,14 @@ namespace SharpFort.FileManagement.Application.Services
         public async Task<PagedResultDto<FileDescriptorGetListOutputDto>> GetListAsync(FileDescriptorGetListInput input)
         {
             RefAsync<int> total = 0;
-            var entities = await _repository._DbQueryable
+            List<FileDescriptor> entities = await _repository._DbQueryable
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name.Contains(input.Name!))
                 .WhereIF(input.DirectoryId.HasValue, x => x.DirectoryId == input.DirectoryId)
                 .WhereIF(input.FileType.HasValue, x => x.FileType == input.FileType)
                 .OrderByDescending(x => x.CreationTime)
                 .ToPageListAsync(input.SkipCount + 1, input.MaxResultCount, total);
 
-            var dtos = entities.Adapt<List<FileDescriptorGetListOutputDto>>();
+            List<FileDescriptorGetListOutputDto> dtos = entities.Adapt<List<FileDescriptorGetListOutputDto>>();
 
             // 填充 SizeInfo
             for (int i = 0; i < entities.Count; i++)
@@ -128,7 +128,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task DeleteAsync(Guid id)
         {
-            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
+            FileDescriptor file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             await _fileManager.DeleteFileAsync(file);
             await _repository.DeleteAsync(file);
         }
@@ -138,8 +138,8 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task DeleteManyAsync(List<Guid> ids)
         {
-            var files = await _repository.GetListAsync(x => ids.Contains(x.Id));
-            foreach (var file in files)
+            List<FileDescriptor> files = await _repository.GetListAsync(x => ids.Contains(x.Id));
+            foreach (FileDescriptor file in files)
             {
                 await _fileManager.DeleteFileAsync(file);
             }
@@ -151,7 +151,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task MoveAsync(Guid id, Guid? directoryId)
         {
-            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
+            FileDescriptor file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             file.MoveTo(directoryId);
             await _repository.UpdateAsync(file);
         }
@@ -161,7 +161,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task RenameAsync(Guid id, string newName)
         {
-            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
+            FileDescriptor file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             file.Rename(newName);
             await _repository.UpdateAsync(file);
         }
@@ -171,7 +171,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task<FileVerifyResultDto> VerifyHashAsync(VerifyHashInput input)
         {
-            var existingFile = await _repository._DbQueryable
+            FileDescriptor existingFile = await _repository._DbQueryable
                 .Where(x => x.Hash == input.Hash)
                 .OrderByDescending(x => x.CreationTime)
                 .FirstAsync();
@@ -192,13 +192,13 @@ namespace SharpFort.FileManagement.Application.Services
         [Volo.Abp.Uow.UnitOfWork]
         public async Task<FileDescriptorGetOutputDto> QuickUploadAsync(QuickUploadInput input)
         {
-            var existingFile = await _repository._DbQueryable
+            FileDescriptor existingFile = await _repository._DbQueryable
                 .Where(x => x.Hash == input.Hash)
                 .OrderByDescending(x => x.CreationTime)
                 .FirstAsync() ?? throw new UserFriendlyException("文件不存在，无法秒传");
 
             // 创建新记录，指向现有物理文件
-            var newFile = FileDescriptor.CreateForQuickUpload(
+            FileDescriptor newFile = FileDescriptor.CreateForQuickUpload(
                 GuidGenerator.Create(),
                 existingFile,
                 input.FileName,
@@ -208,7 +208,7 @@ namespace SharpFort.FileManagement.Application.Services
 
             await _repository.InsertAsync(newFile);
 
-            var dto = newFile.Adapt<FileDescriptorGetOutputDto>();
+            FileDescriptorGetOutputDto dto = newFile.Adapt<FileDescriptorGetOutputDto>();
             dto.SizeInfo = newFile.GetSizeInfo();
             return dto;
         }

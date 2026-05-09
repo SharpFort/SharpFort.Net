@@ -20,7 +20,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
     public async Task<Code2SessionResponse> Code2SessionAsync(Code2SessionInput input)
     {
         string url = "https://api.weixin.qq.com/sns/jscode2session";
-        var req = new Code2SessionRequest();
+        Code2SessionRequest req = new Code2SessionRequest();
         req.js_code = input.js_code;
         req.secret = _options.AppSecret;
         req.appid = _options.AppID;
@@ -28,10 +28,10 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
         using (HttpClient httpClient = new())
         {
             string queryString = req.ToQueryString();
-            var builder = new UriBuilder(url);
+            UriBuilder builder = new UriBuilder(url);
             builder.Query = queryString;
             HttpResponseMessage response = await httpClient.GetAsync(builder.ToString());
-            var responseBody = await response.Content.ReadFromJsonAsync<Code2SessionResponse>();
+            Code2SessionResponse? responseBody = await response.Content.ReadFromJsonAsync<Code2SessionResponse>();
 
             responseBody.ValidateSuccess();
 
@@ -47,9 +47,9 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
     /// <param name="input"></param>
     public async Task SendSubscribeNoticeAsync(SubscribeNoticeInput input)
     {
-        var token = await _weChatToken.GetTokenAsync();
+        string token = await _weChatToken.GetTokenAsync();
         string url = $"https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token={token}";
-        var req = new SubscribeNoticeRequest
+        SubscribeNoticeRequest req = new SubscribeNoticeRequest
         {
             touser = input.touser,
             template_id = input.template_id,
@@ -61,9 +61,9 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
 
         using (HttpClient httpClient = new())
         {
-            var body = new StringContent(JsonConvert.SerializeObject(req));
+            StringContent body = new StringContent(JsonConvert.SerializeObject(req));
             HttpResponseMessage response = await httpClient.PostAsync(url, body);
-            var responseBody = await response.Content.ReadFromJsonAsync<SubscribeNoticeResponse>();
+            SubscribeNoticeResponse? responseBody = await response.Content.ReadFromJsonAsync<SubscribeNoticeResponse>();
             responseBody.ValidateSuccess();
         }
     }

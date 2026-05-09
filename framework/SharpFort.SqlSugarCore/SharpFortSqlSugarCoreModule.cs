@@ -26,8 +26,8 @@ namespace SharpFort.SqlSugarCore
     {
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var services = context.Services;
-            var configuration = services.GetConfiguration();
+            IServiceCollection services = context.Services;
+            IConfiguration configuration = services.GetConfiguration();
 
             // 配置数据库连接选项
             ConfigureDbOptions(services, configuration);
@@ -43,10 +43,10 @@ namespace SharpFort.SqlSugarCore
 
         private void ConfigureDbOptions(IServiceCollection services, IConfiguration configuration)
         {
-            var section = configuration.GetSection("DbConnOptions");
+            IConfigurationSection section = configuration.GetSection("DbConnOptions");
             Configure<DbConnOptions>(section);
 
-            var dbConnOptions = new DbConnOptions();
+            DbConnOptions dbConnOptions = new DbConnOptions();
             section.Bind(dbConnOptions);
 
             // 配置默认连接字符串
@@ -61,11 +61,11 @@ namespace SharpFort.SqlSugarCore
 
         private void ConfigureGuidGenerator(IServiceCollection services)
         {
-            var dbConnOptions = services.GetConfiguration()
+            DbConnOptions? dbConnOptions = services.GetConfiguration()
                 .GetSection("DbConnOptions")
                 .Get<DbConnOptions>();
 
-            var guidType = GetSequentialGuidType(dbConnOptions?.DbType);
+            SequentialGuidType guidType = GetSequentialGuidType(dbConnOptions?.DbType);
             Configure<AbpSequentialGuidGeneratorOptions>(options =>
             {
                 options.DefaultSequentialGuidType = guidType;
@@ -88,10 +88,10 @@ namespace SharpFort.SqlSugarCore
         {
             Configure<AbpDefaultTenantStoreOptions>(options =>
             {
-                var tenants = options.Tenants.ToList();
+                List<TenantConfiguration> tenants = options.Tenants.ToList();
 
                 // 规范化租户名称
-                foreach (var tenant in tenants)
+                foreach (TenantConfiguration? tenant in tenants)
                 {
                     tenant.NormalizedName = tenant.Name.Contains('@')
                             ? tenant.Name[..tenant.Name.LastIndexOf('@')]
@@ -150,7 +150,7 @@ namespace SharpFort.SqlSugarCore
 
         private static void LogConfiguration(ILogger logger, DbConnOptions options)
         {
-            var logMessage = new StringBuilder()
+            string logMessage = new StringBuilder()
                 .AppendLine()
                 .AppendLine("==========Sf-SQL配置:==========")
                 .Append("数据库连接字符串：").AppendLine(options.Url)
@@ -197,7 +197,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 获取需要创建表的实体类型
-            var entityTypes = moduleContainer.Modules
+            List<Type> entityTypes = moduleContainer.Modules
                 .SelectMany(m => m.Assembly.GetTypes())
                 .Where(t => t.GetCustomAttribute<IgnoreCodeFirstAttribute>() == null
                     && t.GetCustomAttribute<SugarTable>() != null
@@ -212,7 +212,7 @@ namespace SharpFort.SqlSugarCore
 
         private static async Task InitializeSeedData(IServiceProvider serviceProvider)
         {
-            var dataSeeder = serviceProvider.GetRequiredService<IDataSeeder>();
+            IDataSeeder dataSeeder = serviceProvider.GetRequiredService<IDataSeeder>();
             await dataSeeder.SeedAsync();
         }
     }

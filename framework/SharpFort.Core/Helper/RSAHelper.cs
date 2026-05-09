@@ -83,7 +83,7 @@ namespace SharpFort.Core.Helper
         {
             byte[] dataBytes = _encoding.GetBytes(data);
 
-            var signatureBytes = _privateKeyRsaProvider!.SignData(dataBytes, _hashAlgorithmName, RSASignaturePadding.Pkcs1);
+            byte[] signatureBytes = _privateKeyRsaProvider!.SignData(dataBytes, _hashAlgorithmName, RSASignaturePadding.Pkcs1);
 
             return Convert.ToBase64String(signatureBytes);
         }
@@ -103,7 +103,7 @@ namespace SharpFort.Core.Helper
             byte[] dataBytes = _encoding.GetBytes(data);
             byte[] signBytes = Convert.FromBase64String(sign);
 
-            var verify = _publicKeyRsaProvider!.VerifyData(dataBytes, signBytes, _hashAlgorithmName, RSASignaturePadding.Pkcs1);
+            bool verify = _publicKeyRsaProvider!.VerifyData(dataBytes, signBytes, _hashAlgorithmName, RSASignaturePadding.Pkcs1);
 
             return verify;
         }
@@ -143,7 +143,7 @@ namespace SharpFort.Core.Helper
             {
                 throw new InvalidOperationException("_privateKeyRsaProvider is null");
             }
-            var bufferSize = _privateKeyRsaProvider.KeySize / 8;
+            int bufferSize = _privateKeyRsaProvider.KeySize / 8;
             byte[] buffer = new byte[bufferSize];//待解密块  
             using (MemoryStream msInput = new(Convert.FromBase64String(cipherText)))
             {
@@ -201,7 +201,7 @@ namespace SharpFort.Core.Helper
             {
                 throw new InvalidOperationException("_publicKeyRsaProvider is null");
             }
-            var bufferSize = _publicKeyRsaProvider.KeySize / 8 - 11;
+            int bufferSize = _publicKeyRsaProvider.KeySize / 8 - 11;
             byte[] buffer = new byte[bufferSize];//待加密块
 
             using (MemoryStream msInput = new(_encoding.GetBytes(text)))
@@ -230,10 +230,10 @@ namespace SharpFort.Core.Helper
         /// <returns></returns>
         private static RSA CreateRsaProviderFromPrivateKey(string privateKey)
         {
-            var privateKeyBits = Convert.FromBase64String(privateKey);
+            byte[] privateKeyBits = Convert.FromBase64String(privateKey);
 
-            var rsa = RSA.Create();
-            var rsaParameters = new RSAParameters();
+            RSA rsa = RSA.Create();
+            RSAParameters rsaParameters = new RSAParameters();
 
             using (BinaryReader binr = new(new MemoryStream(privateKeyBits)))
             {
@@ -293,7 +293,7 @@ namespace SharpFort.Core.Helper
             byte[] seqOid = { 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00 };
             byte[] seq = new byte[15];
 
-            var x509Key = Convert.FromBase64String(publicKeyString);
+            byte[] x509Key = Convert.FromBase64String(publicKeyString);
 
             // ---------  Set up stream to read the asn.1 encoded SubjectPublicKeyInfo blob  ------
             using (MemoryStream mem = new(x509Key))
@@ -396,7 +396,7 @@ namespace SharpFort.Core.Helper
                     byte[] exponent = binr.ReadBytes(expbytes);
 
                     // ------- create RSACryptoServiceProvider instance and initialize with public key -----
-                    var rsa = RSA.Create();
+                    RSA rsa = RSA.Create();
                     RSAParameters rsaKeyInfo = new()
                     {
                         Modulus = modulus,
@@ -433,8 +433,8 @@ namespace SharpFort.Core.Helper
             else
                 if (bt == 0x82)
                 {
-                    var highbyte = binr.ReadByte();
-                    var lowbyte = binr.ReadByte();
+                    byte highbyte = binr.ReadByte();
+                    byte lowbyte = binr.ReadByte();
                     byte[] modint = { lowbyte, highbyte, 0x00, 0x00 };
                     count = BitConverter.ToInt32(modint, 0);
                 }

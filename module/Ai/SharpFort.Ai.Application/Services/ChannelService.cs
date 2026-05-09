@@ -34,13 +34,13 @@ public class ChannelService(
     {
         RefAsync<int> total = 0;
 
-        var entities = await _appRepository._DbQueryable
+        List<AiProvider> entities = await _appRepository._DbQueryable
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Name.Contains(input.SearchKey))
             .OrderByDescending(x => x.OrderNum)
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-        var output = entities.Adapt<List<AiAppDto>>();
+        List<AiAppDto> output = entities.Adapt<List<AiAppDto>>();
         return new PagedResultDto<AiAppDto>(total, output);
     }
 
@@ -50,7 +50,7 @@ public class ChannelService(
     [HttpGet("channel/app/{id}")]
     public async Task<AiAppDto> GetAppByIdAsync([FromRoute] Guid id)
     {
-        var entity = await _appRepository.GetByIdAsync(id);
+        AiProvider entity = await _appRepository.GetByIdAsync(id);
         return entity.Adapt<AiAppDto>();
     }
 
@@ -59,7 +59,7 @@ public class ChannelService(
     /// </summary>
     public async Task<AiAppDto> CreateAppAsync(AiAppCreateInput input)
     {
-        var entity = new AiProvider
+        AiProvider entity = new AiProvider
         {
             Name = input.Name,
             Endpoint = input.Endpoint,
@@ -77,7 +77,7 @@ public class ChannelService(
     /// </summary>
     public async Task<AiAppDto> UpdateAppAsync(AiAppUpdateInput input)
     {
-        var entity = await _appRepository.GetByIdAsync(input.Id);
+        AiProvider entity = await _appRepository.GetByIdAsync(input.Id);
 
         entity.Name = input.Name;
         entity.Endpoint = input.Endpoint;
@@ -96,7 +96,7 @@ public class ChannelService(
     public async Task DeleteAppAsync([FromRoute] Guid id)
     {
         // 检查是否有关联的模型
-        var hasModels = await _modelRepository._DbQueryable
+        bool hasModels = await _modelRepository._DbQueryable
             .Where(x => x.AiProviderId == id && !x.IsDeleted)
             .AnyAsync();
 
@@ -120,19 +120,19 @@ public class ChannelService(
     {
         RefAsync<int> total = 0;
 
-        var query = _modelRepository._DbQueryable
+        ISugarQueryable<AiModel> query = _modelRepository._DbQueryable
             .Where(x => !x.IsDeleted)
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x =>
                 x.Name.Contains(input.SearchKey) || x.ModelId.Contains(input.SearchKey))
             .WhereIF(input.AiAppId.HasValue, x => x.AiProviderId == input.AiAppId.Value);
 
 
-        var entities = await query
+        List<AiModel> entities = await query
             .OrderBy(x => x.OrderNum)
             .OrderByDescending(x => x.Id)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-        var output = entities.Adapt<List<AiModelDto>>();
+        List<AiModelDto> output = entities.Adapt<List<AiModelDto>>();
         return new PagedResultDto<AiModelDto>(total, output);
     }
 
@@ -142,7 +142,7 @@ public class ChannelService(
     [HttpGet("channel/model/{id}")]
     public async Task<AiModelDto> GetModelByIdAsync([FromRoute] Guid id)
     {
-        var entity = await _modelRepository.GetByIdAsync(id);
+        AiModel entity = await _modelRepository.GetByIdAsync(id);
         return entity.Adapt<AiModelDto>();
     }
 
@@ -152,7 +152,7 @@ public class ChannelService(
     public async Task<AiModelDto> CreateModelAsync(AiModelCreateInput input)
     {
         // 验证应用是否存在
-        var appExists = await _appRepository._DbQueryable
+        bool appExists = await _appRepository._DbQueryable
             .Where(x => x.Id == input.AiAppId)
             .AnyAsync();
 
@@ -161,7 +161,7 @@ public class ChannelService(
             throw new Volo.Abp.UserFriendlyException("指定的AI应用不存在");
         }
 
-        var entity = new AiModel
+        AiModel entity = new AiModel
         {
             HandlerName = input.HandlerName,
             ModelId = input.ModelId,
@@ -189,12 +189,12 @@ public class ChannelService(
     /// </summary>
     public async Task<AiModelDto> UpdateModelAsync(AiModelUpdateInput input)
     {
-        var entity = await _modelRepository.GetByIdAsync(input.Id);
+        AiModel entity = await _modelRepository.GetByIdAsync(input.Id);
 
         // 验证应用是否存在
         if (entity.AiProviderId != input.AiAppId)
         {
-            var appExists = await _appRepository._DbQueryable
+            bool appExists = await _appRepository._DbQueryable
                 .Where(x => x.Id == input.AiAppId)
                 .AnyAsync();
 
@@ -241,7 +241,7 @@ public class ChannelService(
     [HttpGet("channel/app-shortcut")]
     public async Task<List<AiAppShortcutDto>> GetAppShortcutListAsync()
     {
-        var entities = await _appShortcutRepository._DbQueryable
+        List<AiAppShortcutAggregateRoot> entities = await _appShortcutRepository._DbQueryable
             .OrderBy(x => x.OrderNum)
             .OrderByDescending(x => x.CreationTime)
             .ToListAsync();

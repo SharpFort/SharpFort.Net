@@ -69,7 +69,7 @@ namespace SharpFort.Ddd.Application
         /// </summary>
         public override async Task<TGetOutputDto> UpdateAsync(TKey id, TUpdateInput input)
         {
-            var result = await base.UpdateAsync(id, input);
+            TGetOutputDto result = await base.UpdateAsync(id, input);
             await EntityCache.RemoveAsync(GenerateCacheKey(id));
             return result;
         }
@@ -121,7 +121,7 @@ namespace SharpFort.Ddd.Application
             await base.DeleteAsync(ids);
 
             // 批量清除缓存
-            var tasks = ids.Select(id =>
+            IEnumerable<Task> tasks = ids.Select(id =>
                 EntityCache.RemoveAsync(GenerateCacheKey(id)));
             await Task.WhenAll(tasks);
         }

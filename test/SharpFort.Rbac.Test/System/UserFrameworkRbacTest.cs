@@ -7,6 +7,7 @@ using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
 using SharpFort.SqlSugarCore.Abstractions;
+using Volo.Abp.Application.Dtos;
 
 namespace SharpFort.Rbac.Test.System
 {
@@ -27,7 +28,7 @@ namespace SharpFort.Rbac.Test.System
         [Fact]
         public async Task GetUserTest()
         {
-            var user = await _userService.GetListAsync(new UserGetListInputVo { UserName = UserConst.Admin });
+            PagedResultDto<UserGetListOutputDto> user = await _userService.GetListAsync(new UserGetListInputVo { UserName = UserConst.Admin });
             user.ShouldNotBeNull();
         }
 
@@ -40,7 +41,7 @@ namespace SharpFort.Rbac.Test.System
         public async Task CreateUserTest()
         {
             await _userService.CreateAsync(new UserCreateInputVo { UserName = "CreateUserTest", Password = "654321" });
-            var user = await _userService.GetListAsync(new UserGetListInputVo { UserName = "CreateUserTest" });
+            PagedResultDto<UserGetListOutputDto> user = await _userService.GetListAsync(new UserGetListInputVo { UserName = "CreateUserTest" });
             user.ShouldNotBeNull();
         }
 
@@ -51,9 +52,9 @@ namespace SharpFort.Rbac.Test.System
         [Fact]
         public async Task UpdateUserTest()
         {
-            var createdUser = await _userService.CreateAsync(new UserCreateInputVo { Nick = "nickTest", Gender = Gender.Female, UserName = "UpdateUserTest", Password = "654321" });
+            UserGetOutputDto createdUser = await _userService.CreateAsync(new UserCreateInputVo { Nick = "nickTest", Gender = Gender.Female, UserName = "UpdateUserTest", Password = "654321" });
             await _userService.UpdateAsync(createdUser.Id, new UserUpdateInputVo { Nick = "nickTest2", Gender = Gender.Female, UserName = "UpdateUserTest", Password = "123456888abc" });
-            var user = await _repository._DbQueryable.Where(user => user.UserName == "UpdateUserTest").FirstAsync();
+            User user = await _repository._DbQueryable.Where(user => user.UserName == "UpdateUserTest").FirstAsync();
             user.ShouldNotBeNull();
             user.Nick.ShouldBe("nickTest2");
             user.Gender.ShouldBe(Gender.Female);
@@ -68,13 +69,13 @@ namespace SharpFort.Rbac.Test.System
         [Fact]
         public async Task DeleteUserTest()
         {
-            var createdUser = await _userService.CreateAsync(new UserCreateInputVo { UserName = "DeleteUserTest", Password = "123456" });
+            UserGetOutputDto createdUser = await _userService.CreateAsync(new UserCreateInputVo { UserName = "DeleteUserTest", Password = "123456" });
 
-            var user1 = await _repository._DbQueryable.Where(user => user.UserName == "DeleteUserTest").FirstAsync();
+            User user1 = await _repository._DbQueryable.Where(user => user.UserName == "DeleteUserTest").FirstAsync();
             user1.ShouldNotBeNull();
 
             await _userService.DeleteAsync(new List<Guid> { createdUser.Id });
-            var user2 = await _repository._DbQueryable.Where(user => user.UserName == "DeleteUserTest").FirstAsync();
+            User user2 = await _repository._DbQueryable.Where(user => user.UserName == "DeleteUserTest").FirstAsync();
             user2.ShouldBeNull();
         }
     }

@@ -26,8 +26,8 @@ namespace SharpFort.CodeGen.Application.Services
         public async Task PostWebBuildCodeAsync(List<Guid> ids)
         {
             //获取全部表
-            var tables = await _tableRepository._DbQueryable.Where(x => ids.Contains(x.Id)).Includes(x => x.Fields).ToListAsync();
-            foreach (var table in tables)
+            List<Table> tables = await _tableRepository._DbQueryable.Where(x => ids.Contains(x.Id)).Includes(x => x.Fields).ToListAsync();
+            foreach (Table table in tables)
             {
                 await _codeFileManager.BuildWebToCodeAsync(table);
             }
@@ -51,7 +51,7 @@ namespace SharpFort.CodeGen.Application.Services
         [UnitOfWork]
         public async Task PostCodeBuildWebAsync()
         {
-            var tables = await _webTemplateManager.BuildCodeToWebAsync();
+            List<Table> tables = await _webTemplateManager.BuildCodeToWebAsync();
             //覆盖数据库，将聚合根保存到数据库
             _tableRepository._Db.DbMaintenance.TruncateTable<Table>();
             _tableRepository._Db.DbMaintenance.TruncateTable<Field>();

@@ -30,8 +30,8 @@ namespace SharpFort.CasbinRbac.Application.SignalRHubs
             {
                 return Task.CompletedTask;
             }
-            var name = CurrentUser.UserName;
-            var loginUser = ClientInfoHelper.GetClientInfo(_httpContext);
+            string? name = CurrentUser.UserName;
+            ClientInfoHelper.ClientResult? loginUser = ClientInfoHelper.GetClientInfo(_httpContext);
             //var loginUser = ClientInfoHelper.GetClientInfo(httpContext);
 
             OnlineUserModel user = new(Context.ConnectionId)
@@ -51,7 +51,7 @@ namespace SharpFort.CasbinRbac.Application.SignalRHubs
                 ClientUsersDic.RemoveAll(u => u.Value.UserId == CurrentUser.Id);
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                     LogUserConnected(timestamp, name ?? "Unknown", Context.ConnectionId, ClientUsersDic.Count);
                 }
             }

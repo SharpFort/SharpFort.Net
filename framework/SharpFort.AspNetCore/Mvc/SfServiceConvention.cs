@@ -37,7 +37,7 @@ namespace SharpFort.AspNetCore.Mvc
             RemoveEmptySelectors(action.Selectors);
 
             // 检查远程服务特性
-            var remoteServiceAttr = ReflectionHelper
+            RemoteServiceAttribute? remoteServiceAttr = ReflectionHelper
                 .GetSingleAttributeOrDefault<RemoteServiceAttribute>(action.ActionMethod);
             if (remoteServiceAttr != null && !remoteServiceAttr.IsEnabledFor(action.ActionMethod))
             {
@@ -64,10 +64,10 @@ namespace SharpFort.AspNetCore.Mvc
             ActionModel action,
             ConventionalControllerSetting? configuration)
         {
-            foreach (var selector in action.Selectors)
+            foreach (SelectorModel selector in action.Selectors)
             {
                 // 获取HTTP方法约束
-                var httpMethod = GetOrCreateHttpMethod(selector, action, configuration);
+                string httpMethod = GetOrCreateHttpMethod(selector, action, configuration);
 
                 // 处理路由模板
                 ConfigureRouteTemplate(selector, rootPath, controllerName, action, httpMethod, configuration);
@@ -124,7 +124,7 @@ namespace SharpFort.AspNetCore.Mvc
         /// </summary>
         private static void NormalizeAttributeRouteTemplate(SelectorModel selector, string rootPath)
         {
-            var template = selector.AttributeRouteModel!.Template;
+            string? template = selector.AttributeRouteModel!.Template;
             if (!template!.StartsWith('/'))
             {
                 selector.AttributeRouteModel.Template = $"{rootPath}/{template}";

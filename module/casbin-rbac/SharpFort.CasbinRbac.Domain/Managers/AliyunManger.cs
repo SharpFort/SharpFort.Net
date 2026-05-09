@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Volo.Abp.Domain.Services;
 using SharpFort.CasbinRbac.Domain.Shared.Options;
+using AlibabaCloud.SDK.Dysmsapi20170525.Models;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
@@ -37,7 +38,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             try
             {
-                var _aliyunClient = CreateClient();
+                Client _aliyunClient = CreateClient();
                 AlibabaCloud.SDK.Dysmsapi20170525.Models.SendSmsRequest sendSmsRequest = new()
                 {
                     PhoneNumbers = phoneNumbers,
@@ -46,7 +47,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     TemplateParam = System.Text.Json.JsonSerializer.Serialize(new { code })
                 };
 
-                var response = await _aliyunClient.SendSmsAsync(sendSmsRequest);
+                SendSmsResponse response = await _aliyunClient.SendSmsAsync(sendSmsRequest);
             }
 
             catch (Exception _error)

@@ -127,15 +127,15 @@ namespace Sf.Abp.Application.Services
         {
             //DDD需要提前定义
             //默认来说，不提供修改操作，配置应该独立
-            var enableOrNull = await _settingProvider.GetOrNullAsync("DDD");
+            string? enableOrNull = await _settingProvider.GetOrNullAsync("DDD");
 
             //如果要进行修改，可使用yi.framework下的ISettingManager
             await _settingManager.SetGlobalAsync("DDD", "false");
 
-            var enableOrNull2 = await _settingManager.GetOrNullGlobalAsync("DDD");
+            string enableOrNull2 = await _settingManager.GetOrNullGlobalAsync("DDD");
 
             //当然，他的独特地方，是支持来自多个模块，例如配置文件？
-            var result = await _settingManager.GetOrNullConfigurationAsync("Test");
+            string result = await _settingManager.GetOrNullConfigurationAsync("Test");
 
 
             return result ?? string.Empty;
@@ -159,7 +159,7 @@ namespace Sf.Abp.Application.Services
         /// <returns></returns>
         public async Task<string> GetDistributedLockAsync()
         {
-            var number = 0;
+            int number = 0;
             await Parallel.ForAsync(0, 100, async (i, cancellationToken) =>
             {
                 await using (await DistributedLock.AcquireLockAsync("MyLockName"))
@@ -168,7 +168,7 @@ namespace Sf.Abp.Application.Services
                     number += 1;
                 }
             });
-            var number2 = 0;
+            int number2 = 0;
             await Parallel.ForAsync(0, 100, async (i, cancellationToken) =>
             {
                 //执行1秒

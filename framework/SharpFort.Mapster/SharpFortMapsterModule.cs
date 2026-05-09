@@ -20,7 +20,7 @@ namespace SharpFort.Mapster
         /// <param name="context">服务配置上下文</param>
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var services = context.Services;
+            IServiceCollection services = context.Services;
 
             // 注册Mapster相关服务
             services.AddTransient<IAutoObjectMappingProvider, MapsterAutoObjectMappingProvider>();

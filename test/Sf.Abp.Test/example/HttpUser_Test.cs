@@ -9,7 +9,7 @@ namespace Sf.Abp.Test.example
         [Fact]
         public void Http_Test()
         {
-            var httpContext = GetRequiredService<IHttpContextAccessor>();
+            IHttpContextAccessor httpContext = GetRequiredService<IHttpContextAccessor>();
             httpContext.HttpContext.Request.Path.ToString().ShouldBe("/test");
         }
     }

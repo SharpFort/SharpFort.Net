@@ -12,7 +12,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Repositories
     {
         public async Task<List<Guid>> GetChildListAsync(Guid deptId)
         {
-            var entities = await _DbQueryable.ToChildListAsync(x => x.ParentId, deptId);
+            List<Department> entities = await _DbQueryable.ToChildListAsync(x => x.ParentId, deptId);
             return [.. entities.Select(x => x.Id)];
         }
         public async Task<List<Department>> GetListRoleIdAsync(Guid roleId)

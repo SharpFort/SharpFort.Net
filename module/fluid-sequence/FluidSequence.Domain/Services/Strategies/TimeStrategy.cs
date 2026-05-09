@@ -14,7 +14,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
         {
-            var now = DateTime.Now;
+            DateTime now = DateTime.Now;
             switch (placeholderKey)
             {
                 case "yyyy": return now.ToString("yyyy", CultureInfo.InvariantCulture);
@@ -31,7 +31,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
                     return $"Q{q}";
                 case "FY":
                     int startMonth = 1;
-                    if (rule.ExtensionProps != null && rule.ExtensionProps.TryGetValue("FiscalYearStartMonth", out var startMonthObj))
+                    if (rule.ExtensionProps != null && rule.ExtensionProps.TryGetValue("FiscalYearStartMonth", out object? startMonthObj))
                     {
                         startMonth = Convert.ToInt32(startMonthObj, CultureInfo.InvariantCulture);
                     }

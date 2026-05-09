@@ -32,7 +32,7 @@ public class ModelConst
             return string.Empty;
         }
 
-        var prefix = GetModelPrefix(modelId);
+        string? prefix = GetModelPrefix(modelId);
         return prefix != null ? modelId[prefix.Length..] : modelId;
     }
 

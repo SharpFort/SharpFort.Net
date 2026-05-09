@@ -48,7 +48,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.ConfigKey),
+            List<Config> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.ConfigKey),
                     x => x.ConfigKey.Contains(input.ConfigKey!))
                 .WhereIF(!string.IsNullOrEmpty(input.ConfigName), x => x.ConfigName!.Contains(input.ConfigName!))
                 .WhereIF(input.StartTime is not null && input.EndTime is not null,
@@ -59,7 +59,7 @@ namespace SharpFort.CasbinRbac.Application.Services
 
         protected override async Task CheckCreateInputDtoAsync(ConfigCreateInputVo input)
         {
-            var isExist =
+            bool isExist =
                 await _repository.IsAnyAsync(x => x.ConfigKey == input.ConfigKey);
             if (isExist)
             {
@@ -69,7 +69,7 @@ namespace SharpFort.CasbinRbac.Application.Services
 
         protected override async Task CheckUpdateInputDtoAsync(Config entity, ConfigUpdateInputVo input)
         {
-            var isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
+            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
                 .AnyAsync(x => x.ConfigKey == input.ConfigKey);
             if (isExist)
             {

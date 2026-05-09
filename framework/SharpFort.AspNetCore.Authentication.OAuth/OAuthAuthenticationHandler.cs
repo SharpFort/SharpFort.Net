@@ -30,8 +30,8 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
         /// <returns></returns>
         private AuthenticationTicket TicketConver(List<Claim> claims)
         {
-            var claimsIdentity = new ClaimsIdentity(claims.ToArray(), AuthenticationSchemeNmae);
-            var principal = new ClaimsPrincipal(claimsIdentity);
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims.ToArray(), AuthenticationSchemeNmae);
+            ClaimsPrincipal principal = new ClaimsPrincipal(claimsIdentity);
             return new AuthenticationTicket(principal, AuthenticationSchemeNmae);
         }
 
@@ -39,18 +39,18 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
         {
             httpMethod ??= HttpMethod.Get;
 
-            var queryUrl = QueryHelpers.AddQueryString(url, query);
-            var response = httpMethod == HttpMethod.Get
+            string queryUrl = QueryHelpers.AddQueryString(url, query);
+            HttpResponseMessage response = httpMethod == HttpMethod.Get
                 ? await HttpClient.GetAsync(queryUrl)
                 : await HttpClient.PostAsync(queryUrl, null);
 
-            var content = await response.Content.ReadAsStringAsync();
+            string content = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException($"授权服务器请求错误,请求地址:{queryUrl},错误信息：{content}");
             }
             VerifyErrResponse(content);
-            var model = Newtonsoft.Json.JsonConvert.DeserializeObject<THttpModel>(content);
+            THttpModel? model = Newtonsoft.Json.JsonConvert.DeserializeObject<THttpModel>(content);
             return model!;
         }
 
@@ -68,7 +68,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
             {
                 return AuthenticateResult.Fail("回调未包含code参数");
             }
-            var code = Context.Request.Query["code"].ToString();
+            string code = Context.Request.Query["code"].ToString();
 
             List<Claim> authTicket;
             try
@@ -79,7 +79,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
             {
                 return AuthenticateResult.Fail(ex.Message ?? "未知错误");
             }
-            var result = AuthenticateResult.Success(TicketConver(authTicket));
+            AuthenticateResult result = AuthenticateResult.Success(TicketConver(authTicket));
             return result;
         }
     }

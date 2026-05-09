@@ -16,7 +16,7 @@ namespace SharpFort.AspNetCore
         /// </summary>
         public override void PostConfigureServices(ServiceConfigurationContext context)
         {
-            var services = context.Services;
+            IServiceCollection services = context.Services;
 
             // 替换默认的WebClientInfoProvider为支持代理的实现
             services.Replace(new ServiceDescriptor(

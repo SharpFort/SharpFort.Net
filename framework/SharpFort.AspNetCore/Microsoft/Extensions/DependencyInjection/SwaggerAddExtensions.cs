@@ -8,6 +8,7 @@ using System.Text.Json.Nodes; // 处理 Enum 必须用到
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Conventions;
+using System.Reflection;
 
 namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
 {
@@ -28,10 +29,10 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
             Action<SwaggerGenOptions>? setupAction = null)
         {
             // 获取MVC配置选项
-            var mvcOptions = services.GetPreConfigureActions<AbpAspNetCoreMvcOptions>().Configure();
+            AbpAspNetCoreMvcOptions mvcOptions = services.GetPreConfigureActions<AbpAspNetCoreMvcOptions>().Configure();
 
             // 获取并去重远程服务名称
-            var remoteServiceSettings = mvcOptions.ConventionalControllers
+            IEnumerable<ConventionalControllerSetting> remoteServiceSettings = mvcOptions.ConventionalControllers
                 .ConventionalControllerSettings
                 .DistinctBy(x => x.RemoteServiceName);
 
@@ -71,7 +72,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
             SwaggerGenOptions options,
             IEnumerable<ConventionalControllerSetting> settings)
         {
-            foreach (var setting in settings.OrderBy(x => x.RemoteServiceName))
+            foreach (ConventionalControllerSetting? setting in settings.OrderBy(x => x.RemoteServiceName))
             {
                 if (!options.SwaggerGeneratorOptions.SwaggerDocs.ContainsKey(setting.RemoteServiceName))
                 {
@@ -95,7 +96,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
             {
                 if (apiDesc.ActionDescriptor is ControllerActionDescriptor controllerDesc)
                 {
-                    var matchedSetting = settings
+                    ConventionalControllerSetting? matchedSetting = settings
                         .FirstOrDefault(x => x.Assembly == controllerDesc.ControllerTypeInfo.Assembly);
                     return matchedSetting?.RemoteServiceName == docName;
                 }
@@ -108,10 +109,10 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// </summary>
         private static void IncludeXmlComments<TProgram>(SwaggerGenOptions options)
         {
-            var basePath = Path.GetDirectoryName(typeof(TProgram).Assembly.Location);
+            string? basePath = Path.GetDirectoryName(typeof(TProgram).Assembly.Location);
             if (basePath is not null)
             {
-                foreach (var xmlFile in Directory.GetFiles(basePath, "*.xml"))
+                foreach (string xmlFile in Directory.GetFiles(basePath, "*.xml"))
                 {
                     options.IncludeXmlComments(xmlFile, true);
                 }
@@ -174,12 +175,12 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
             openApiSchema.Type = JsonSchemaType.String;
             openApiSchema.Format = null;
 
-            var enumDescriptions = new StringBuilder();
-            foreach (var enumName in Enum.GetNames(context.Type))
+            StringBuilder enumDescriptions = new StringBuilder();
+            foreach (string enumName in Enum.GetNames(context.Type))
             {
-                var enumValue = (Enum)Enum.Parse(context.Type, enumName);
-                var description = GetEnumDescription(enumValue);
-                var enumIntValue = Convert.ToInt64(enumValue, CultureInfo.InvariantCulture);
+                Enum enumValue = (Enum)Enum.Parse(context.Type, enumName);
+                string? description = GetEnumDescription(enumValue);
+                long enumIntValue = Convert.ToInt64(enumValue, CultureInfo.InvariantCulture);
 
                 openApiSchema.Enum.Add(JsonValue.Create(enumName));
                 enumDescriptions.AppendLine(CultureInfo.InvariantCulture,
@@ -193,8 +194,8 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
         /// </summary>
         private static string? GetEnumDescription(Enum value)
         {
-            var fieldInfo = value.GetType().GetField(value.ToString()!);
-            var attributes = (DescriptionAttribute[])fieldInfo!.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            FieldInfo? fieldInfo = value.GetType().GetField(value.ToString()!);
+            DescriptionAttribute[] attributes = (DescriptionAttribute[])fieldInfo!.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : null;
         }
     }

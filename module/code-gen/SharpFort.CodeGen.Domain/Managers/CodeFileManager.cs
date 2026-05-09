@@ -16,15 +16,15 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         public async Task BuildWebToCodeAsync(Table tableEntity)
         {
-            var templates = await _repository.GetListAsync();
-            foreach (var template in templates)
+            List<Template> templates = await _repository.GetListAsync();
+            foreach (Template template in templates)
             {
-                var handledTempalte = new HandledTemplate
+                HandledTemplate handledTempalte = new HandledTemplate
                 {
                     TemplateStr = template.Content,
                     BuildPath = template.BuildPath
                 };
-                foreach (var templateHandler in _templateHandlers)
+                foreach (ITemplateHandler templateHandler in _templateHandlers)
                 {
                     templateHandler.SetTable(tableEntity);
                     handledTempalte = templateHandler.Invoker(handledTempalte.TemplateStr, handledTempalte.BuildPath);
@@ -37,7 +37,7 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         private static async Task BuildToFileAsync(HandledTemplate handledTemplate)
         {
-            var dir = Path.GetDirectoryName(handledTemplate.BuildPath);
+            string? dir = Path.GetDirectoryName(handledTemplate.BuildPath);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);

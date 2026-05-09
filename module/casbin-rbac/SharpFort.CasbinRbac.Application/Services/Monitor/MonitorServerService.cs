@@ -25,7 +25,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         {
             return await Task.Run(() =>
             {
-                var dto = new MonitorServerInfoDto();
+                MonitorServerInfoDto dto = new MonitorServerInfoDto();
 
                 // PERFORMANCE FIX: Never call RefreshAll() in a request loop! It queries BIOS, Motherboard, Batteries, etc., and blocks the thread.
                 // Create a scoped instance and ONLY refresh what we specifically need (Memory and CPU are fast).
@@ -34,9 +34,9 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 hardwareInfo.RefreshCPUList();
 
                 // sys info (Use native Environment.TickCount64 for cross-platform uptime in milliseconds)
-                var sysRunTimeMs = Environment.TickCount64;
-                var sysRunTime = DateTimeHelper.FormatTime(sysRunTimeMs);
-                var serverIp = _httpContextAccessor.HttpContext?.Connection?.LocalIpAddress?.MapToIPv4()?.ToString() + ":" + _httpContextAccessor.HttpContext?.Connection?.LocalPort;
+                long sysRunTimeMs = Environment.TickCount64;
+                string sysRunTime = DateTimeHelper.FormatTime(sysRunTimeMs);
+                string? serverIp = _httpContextAccessor.HttpContext?.Connection?.LocalIpAddress?.MapToIPv4()?.ToString() + ":" + _httpContextAccessor.HttpContext?.Connection?.LocalPort;
                 dto.Sys = new SysInfoDto
                 {
                     ComputerName = Environment.MachineName,
@@ -47,8 +47,8 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 };
 
                 // app info
-                var currentProcess = Process.GetCurrentProcess();
-                var programStartTime = currentProcess.StartTime;
+                Process currentProcess = Process.GetCurrentProcess();
+                DateTime programStartTime = currentProcess.StartTime;
                 string programRunTime = DateTimeHelper.FormatTime((long)(DateTime.Now - programStartTime).TotalMilliseconds);
                 string appRAM = ((double)currentProcess.WorkingSet64 / 1048576).ToString("N2", global::System.Globalization.CultureInfo.InvariantCulture) + " MB";
 
@@ -65,7 +65,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 };
 
                 // cpu info (Hardware.Info handles the cross-platform cpu usage without wmic/top)
-                var hardwareCpu = hardwareInfo.CpuList.FirstOrDefault();
+                CPU? hardwareCpu = hardwareInfo.CpuList.FirstOrDefault();
                 double cpuPercent = hardwareCpu?.PercentProcessorTime ?? 0;
                 dto.Cpu = new CpuInfoDto
                 {
@@ -77,9 +77,9 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 };
 
                 // memory info
-                var totalPhysMem = hardwareInfo.MemoryStatus.TotalPhysical;
-                var availPhysMem = hardwareInfo.MemoryStatus.AvailablePhysical;
-                var usedPhysMem = totalPhysMem - availPhysMem;
+                ulong totalPhysMem = hardwareInfo.MemoryStatus.TotalPhysical;
+                ulong availPhysMem = hardwareInfo.MemoryStatus.AvailablePhysical;
+                ulong usedPhysMem = totalPhysMem - availPhysMem;
                 dto.Memory = new MemoryInfoDto
                 {
                     TotalRAM = totalPhysMem > 0 ? Math.Round(totalPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
@@ -91,7 +91,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 // disk info (Use native .NET DriveInfo for absolute cross-platform reliability instead of wmic/df)
                 try
                 {
-                    foreach (var drive in global::System.IO.DriveInfo.GetDrives().Where(d => d.IsReady))
+                    foreach (DriveInfo? drive in global::System.IO.DriveInfo.GetDrives().Where(d => d.IsReady))
                     {
                         long totalSizeGb = drive.TotalSize / 1024 / 1024 / 1024;
                         long freeSpaceGb = drive.AvailableFreeSpace / 1024 / 1024 / 1024;

@@ -2,6 +2,7 @@
 using Volo.Abp.Caching;
 using SharpFort.Core;
 using SharpFort.WeChat.MiniProgram.Token;
+using Microsoft.Extensions.Configuration;
 
 namespace SharpFort.WeChat.MiniProgram;
 
@@ -11,8 +12,8 @@ public class SharpFortWeChatMiniProgramModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        var services = context.Services;
-        var configuration = context.Services.GetConfiguration();
+        IServiceCollection services = context.Services;
+        IConfiguration configuration = context.Services.GetConfiguration();
         Configure<WeChatMiniProgramOptions>(configuration.GetSection("WeChatMiniProgram"));
         services.AddSingleton<IMiniProgramToken, CacheMiniProgramToken>();
     }

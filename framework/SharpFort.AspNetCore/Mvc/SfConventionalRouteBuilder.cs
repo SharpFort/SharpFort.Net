@@ -37,10 +37,10 @@ namespace SharpFort.AspNetCore.Mvc
             ConventionalControllerSetting? configuration)
         {
             // 获取API路由前缀
-            var apiRoutePrefix = GetApiRoutePrefix(action, configuration);
+            string apiRoutePrefix = GetApiRoutePrefix(action, configuration);
 
             // 规范化控制器名称
-            var normalizedControllerName = NormalizeUrlControllerName(
+            string normalizedControllerName = NormalizeUrlControllerName(
                 rootPath,
                 controllerName,
                 action,
@@ -48,7 +48,7 @@ namespace SharpFort.AspNetCore.Mvc
                 configuration);
 
             // 构建基础URL
-            var url = $"{rootPath}/{NormalizeControllerNameCase(normalizedControllerName, configuration)}";
+            string url = $"{rootPath}/{NormalizeControllerNameCase(normalizedControllerName, configuration)}";
 
             // 处理ID参数路由
             url = BuildIdParameterRoute(url, action, configuration!);
@@ -67,7 +67,7 @@ namespace SharpFort.AspNetCore.Mvc
             ActionModel action,
             ConventionalControllerSetting configuration)
         {
-            var idParameter = action.Parameters.FirstOrDefault(p => p.ParameterName == "id");
+            ParameterModel? idParameter = action.Parameters.FirstOrDefault(p => p.ParameterName == "id");
             if (idParameter == null)
             {
                 return baseUrl;
@@ -80,10 +80,10 @@ namespace SharpFort.AspNetCore.Mvc
             }
 
             // 处理复杂类型ID
-            var properties = idParameter.ParameterType
+            PropertyInfo[] properties = idParameter.ParameterType
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-            foreach (var property in properties)
+            foreach (PropertyInfo property in properties)
             {
                 baseUrl += $"/{{{NormalizeIdPropertyNameCase(property, configuration)}}}";
             }
@@ -102,7 +102,7 @@ namespace SharpFort.AspNetCore.Mvc
             string httpMethod,
             ConventionalControllerSetting configuration)
         {
-            var actionNameInUrl = NormalizeUrlActionName(
+            string actionNameInUrl = NormalizeUrlActionName(
                 rootPath,
                 controllerName,
                 action,
@@ -117,7 +117,7 @@ namespace SharpFort.AspNetCore.Mvc
             baseUrl += $"/{NormalizeActionNameCase(actionNameInUrl, configuration)}";
 
             // 处理次要ID参数
-            var secondaryIds = action.Parameters
+            List<ParameterModel> secondaryIds = action.Parameters
                 .Where(p => p.ParameterName.EndsWith("Id", StringComparison.Ordinal))
                 .ToList();
 

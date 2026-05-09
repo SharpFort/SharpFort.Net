@@ -25,8 +25,8 @@ public class MessageService(ISqlSugarRepository<ChatMessage> repository) : Appli
     public async Task<PagedResultDto<MessageDto>> GetListAsync([FromQuery] MessageGetListInput input)
     {
         RefAsync<int> total = 0;
-        var userId = CurrentUser.GetId();
-        var entities = await _repository._DbQueryable
+        Guid userId = CurrentUser.GetId();
+        List<ChatMessage> entities = await _repository._DbQueryable
             .Where(x => x.SessionId == input.SessionId)
             .Where(x => x.UserId == userId)
             .Where(x => !x.IsHidden)
@@ -42,10 +42,10 @@ public class MessageService(ISqlSugarRepository<ChatMessage> repository) : Appli
     [Authorize]
     public async Task DeleteAsync([FromQuery] MessageDeleteInput input)
     {
-        var userId = CurrentUser.GetId();
+        Guid userId = CurrentUser.GetId();
 
         // 获取要删除的消息
-        var messages = await _repository._DbQueryable
+        List<ChatMessage> messages = await _repository._DbQueryable
             .Where(x => input.Ids.Contains(x.Id))
             .Where(x => x.UserId == userId)
             .ToListAsync();
@@ -56,15 +56,15 @@ public class MessageService(ISqlSugarRepository<ChatMessage> repository) : Appli
         }
 
         // 标记当前消息为隐藏
-        var idsToHide = messages.Select(x => x.Id).ToList();
+        List<Guid> idsToHide = messages.Select(x => x.Id).ToList();
 
         // 如果需要删除后续消息
         if (input.IsDeleteSubsequent)
         {
-            foreach (var message in messages)
+            foreach (ChatMessage message in messages)
             {
                 // 获取同一会话中时间大于当前消息的所有消息Id
-                var subsequentIds = await _repository._DbQueryable
+                List<Guid> subsequentIds = await _repository._DbQueryable
                     .Where(x => x.SessionId == message.SessionId)
                     .Where(x => x.UserId == userId)
                     .Where(x => x.CreationTime > message.CreationTime)

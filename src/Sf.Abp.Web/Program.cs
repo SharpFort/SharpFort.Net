@@ -32,14 +32,14 @@ try
      """);
     Log.Information("Sf框架-Abp.vNext，启动！");
 
-    var builder = WebApplication.CreateBuilder(args);
+    WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
     Log.Information($"当前主机启动环境-【{builder.Environment.EnvironmentName}】");
     Log.Information($"当前主机启动地址-【{builder.Configuration["App:SelfUrl"]}】");
     builder.WebHost.UseUrls(builder.Configuration["App:SelfUrl"]);
     builder.Host.UseAutofac();
     builder.Host.UseSerilog();
     await builder.Services.AddApplicationAsync<SfAbpWebModule>();
-    var app = builder.Build();
+    WebApplication app = builder.Build();
     await app.InitializeApplicationAsync();
     await app.RunAsync();
 }

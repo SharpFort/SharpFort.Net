@@ -22,18 +22,18 @@ public static class WeChatMiniProgramExtensions
 
     internal static string ToQueryString<T>(this T obj)
     {
-        var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        var queryParams = new List<string>();
+        PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        List<string> queryParams = new List<string>();
 
-        foreach (var prop in properties)
+        foreach (PropertyInfo prop in properties)
         {
-            var value = prop.GetValue(obj, null);
+            object? value = prop.GetValue(obj, null);
             if (value != null)
             {
                 // 处理集合
                 if (value is IEnumerable<object> enumerable)
                 {
-                    foreach (var item in enumerable)
+                    foreach (object item in enumerable)
                     {
                         queryParams.Add($"{HttpUtility.UrlEncode(prop.Name)}={HttpUtility.UrlEncode(item.ToString())}");
                     }

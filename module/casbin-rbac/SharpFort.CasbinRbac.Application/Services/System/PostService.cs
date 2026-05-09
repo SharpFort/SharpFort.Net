@@ -22,7 +22,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.PostName),
+            List<Position> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.PostName),
                     x => x.PostName.Contains(input.PostName!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
                 .OrderByDescending(x => x.OrderNum)
@@ -32,7 +32,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         protected override async Task CheckCreateInputDtoAsync(PostCreateInputVo input)
         {
-            var isExist =
+            bool isExist =
                 await _repository.IsAnyAsync(x => x.PostCode == input.PostCode);
             if (isExist)
             {
@@ -42,7 +42,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         protected override async Task CheckUpdateInputDtoAsync(Position entity, PostUpdateInputVo input)
         {
-            var isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
+            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id)
                 .AnyAsync(x => x.PostCode == input.PostCode);
             if (isExist)
             {

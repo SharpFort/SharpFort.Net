@@ -23,7 +23,7 @@ public class SessionService(ISqlSugarRepository<ChatSession, Guid> repository, I
     [Authorize]
     public override async Task<SessionDto> CreateAsync(SessionCreateAndUpdateInput input)
     {
-        var entity = await MapToEntityAsync(input);
+        ChatSession entity = await MapToEntityAsync(input);
         entity.UserId = CurrentUser.GetId();
         await _repository.InsertAsync(entity);
         return entity.Adapt<SessionDto>();
@@ -74,8 +74,8 @@ public class SessionService(ISqlSugarRepository<ChatSession, Guid> repository, I
     public override async Task<PagedResultDto<SessionDto>> GetListAsync(SessionGetListInput input)
     {
         RefAsync<int> total = 0;
-        var userId = CurrentUser.GetId();
-        var entities = await _repository._DbQueryable
+        Guid userId = CurrentUser.GetId();
+        List<ChatSession> entities = await _repository._DbQueryable
             .Where(x => x.UserId == userId)
             .WhereIF(input.SessionType.HasValue, x => x.SessionType == input.SessionType!.Value)
             .OrderByDescending(x => x.Id)

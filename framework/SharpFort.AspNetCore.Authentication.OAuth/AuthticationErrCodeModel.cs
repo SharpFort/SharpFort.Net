@@ -12,7 +12,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
         public static void VerifyErrResponse(string content)
         {
 
-            var model = Newtonsoft.Json.JsonConvert.DeserializeObject<AuthticationErrCodeModel>(content);
+            AuthticationErrCodeModel? model = Newtonsoft.Json.JsonConvert.DeserializeObject<AuthticationErrCodeModel>(content);
             if (model?.error != null)
             {
 

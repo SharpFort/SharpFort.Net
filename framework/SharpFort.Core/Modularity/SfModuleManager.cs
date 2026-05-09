@@ -34,13 +34,13 @@ public partial class SfModuleManager(
     {
         LogModuleInitStart();
 
-        var moduleCount = 0;
-        var stopwatch = new Stopwatch();
-        var totalTime = 0L;
+        int moduleCount = 0;
+        Stopwatch stopwatch = new Stopwatch();
+        long totalTime = 0L;
 
-        foreach (var contributor in _lifecycleContributors)
+        foreach (IModuleLifecycleContributor contributor in _lifecycleContributors)
         {
-            foreach (var module in _moduleContainer.Modules)
+            foreach (IAbpModuleDescriptor module in _moduleContainer.Modules)
             {
                 try
                 {
@@ -54,7 +54,7 @@ public partial class SfModuleManager(
                     // 仅记录耗时超过1ms的模块
                     if (stopwatch.ElapsedMilliseconds > 1 && _logger.IsEnabled(LogLevel.Debug))
                     {
-                        var moduleName = module.Assembly.GetName().Name ?? "Unknown";
+                        string moduleName = module.Assembly.GetName().Name ?? "Unknown";
                         LogModuleLoaded(stopwatch.ElapsedMilliseconds, moduleName);
                     }
                 }

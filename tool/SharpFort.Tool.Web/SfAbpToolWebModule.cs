@@ -30,9 +30,9 @@ namespace SharpFort.Tool.Web
         private const string DefaultCorsPolicyName = "Default";
         public override Task ConfigureServicesAsync(ServiceConfigurationContext context)
         {
-            var configuration = context.Services.GetConfiguration();
-            var host = context.Services.GetHostingEnvironment();
-            var service = context.Services;
+            IConfiguration configuration = context.Services.GetConfiguration();
+            IWebHostEnvironment host = context.Services.GetHostingEnvironment();
+            IServiceCollection service = context.Services;
 
             //动态Api
             Configure<AbpAspNetCoreMvcOptions>(options =>
@@ -92,7 +92,7 @@ namespace SharpFort.Tool.Web
                 _.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                 _.OnRejected = (context, _) =>
                 {
-                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
                     {
                         context.HttpContext.Response.Headers.RetryAfter =
                             ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
@@ -107,7 +107,7 @@ namespace SharpFort.Tool.Web
                 _.GlobalLimiter = PartitionedRateLimiter.CreateChained(
                    PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                    {
-                       var userAgent = httpContext.Request.Headers.UserAgent.ToString();
+                       string userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
                        return RateLimitPartition.GetSlidingWindowLimiter
                        (userAgent, _ =>
@@ -129,9 +129,9 @@ namespace SharpFort.Tool.Web
 
         public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            var service = context.ServiceProvider;
-            var env = context.GetEnvironment();
-            var app = context.GetApplicationBuilder();
+            IServiceProvider service = context.ServiceProvider;
+            IWebHostEnvironment env = context.GetEnvironment();
+            IApplicationBuilder app = context.GetApplicationBuilder();
 
             app.UseRouting();
 

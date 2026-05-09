@@ -90,7 +90,7 @@ namespace SharpFort.Ddd.Application
             await CheckUpdatePolicyAsync();
 
             // 获取并验证实体
-            var entity = await GetEntityByIdAsync(id);
+            TEntity entity = await GetEntityByIdAsync(id);
 
             // 检查更新输入
             await CheckUpdateInputDtoAsync(entity, input);
@@ -124,7 +124,7 @@ namespace SharpFort.Ddd.Application
             await CheckCreateInputDtoAsync(input);
 
             // 映射到实体
-            var entity = await MapToEntityAsync(input);
+            TEntity entity = await MapToEntityAsync(input);
 
             // 设置租户ID
             TryToSetTenantId(entity);
@@ -169,8 +169,8 @@ namespace SharpFort.Ddd.Application
             }
 
             // 获取总数并映射结果
-            var totalCount = await Repository.GetCountAsync();
-            var dtos = await MapToGetListOutputDtosAsync(entities);
+            long totalCount = await Repository.GetCountAsync();
+            List<TGetListOutputDto> dtos = await MapToGetListOutputDtosAsync(entities);
 
             return new PagedResultDto<TGetListOutputDto>(totalCount, dtos);
         }
@@ -185,8 +185,8 @@ namespace SharpFort.Ddd.Application
             List<TEntity> entities = await Repository.GetListAsync();
 
             // 获取总数并映射结果
-            var totalCount = entities.Count;
-            var dtos = await MapToGetListOutputDtosAsync(entities);
+            int totalCount = entities.Count;
+            List<TGetListOutputDto> dtos = await MapToGetListOutputDtosAsync(entities);
 
             return new PagedResultDto<TGetListOutputDto>(totalCount, dtos);
         }
@@ -225,7 +225,7 @@ namespace SharpFort.Ddd.Application
             }
 
             // 获取数据
-            var output = await GetListAsync(input);
+            PagedResultDto<TGetListOutputDto> output = await GetListAsync(input);
 
             // 确保临时目录存在
             if (!Directory.Exists(TempFilePath))
@@ -234,8 +234,8 @@ namespace SharpFort.Ddd.Application
             }
 
             // 生成文件名和路径
-            var fileName = GenerateExcelFileName();
-            var filePath = Path.Combine(TempFilePath, fileName);
+            string fileName = GenerateExcelFileName();
+            string filePath = Path.Combine(TempFilePath, fileName);
 
             // 保存Excel文件
             await MiniExcel.SaveAsAsync(filePath, output.Items);

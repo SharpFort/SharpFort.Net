@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using MyCSharp.HttpUserAgentParser.Providers;
 using Volo.Abp.AspNetCore.WebClientInfo;
 
@@ -29,16 +30,16 @@ public partial class RealIpHttpContextWebClientInfoProvider(
     {
         try
         {
-            var httpContext = HttpContextAccessor.HttpContext;
+            HttpContext? httpContext = HttpContextAccessor.HttpContext;
             if (httpContext == null)
             {
                 return null;
             }
 
-            var headers = httpContext.Request?.Headers;
-            if (headers != null && headers.TryGetValue(XForwardedForHeader, out var forwardedValues))
+            IHeaderDictionary? headers = httpContext.Request?.Headers;
+            if (headers != null && headers.TryGetValue(XForwardedForHeader, out StringValues forwardedValues))
             {
-                var forwardedIp = forwardedValues.FirstOrDefault();
+                string? forwardedIp = forwardedValues.FirstOrDefault();
                 if (!string.IsNullOrEmpty(forwardedIp))
                 {
                     httpContext.Connection.RemoteIpAddress = IPAddress.Parse(forwardedIp);

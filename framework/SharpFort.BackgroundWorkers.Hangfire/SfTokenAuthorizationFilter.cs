@@ -52,8 +52,8 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
     /// <returns>是否通过授权</returns>
     public bool Authorize(DashboardContext context)
     {
-        var httpContext = context.GetHttpContext();
-        var currentUser = _serviceProvider.GetRequiredService<ICurrentUser>();
+        HttpContext httpContext = context.GetHttpContext();
+        ICurrentUser currentUser = _serviceProvider.GetRequiredService<ICurrentUser>();
 
         if (!currentUser.IsAuthenticated)
         {
@@ -62,10 +62,10 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
         }
 
         // 如果验证通过，设置 cookie
-        var authorization = httpContext.Request.Headers.Authorization.ToString();
+        string authorization = httpContext.Request.Headers.Authorization.ToString();
         if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith(BearerPrefix))
         {
-            var token = authorization[BearerPrefix.Length..];
+            string token = authorization[BearerPrefix.Length..];
             SetTokenCookie(httpContext, token);
         }
 
@@ -82,7 +82,7 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
         httpContext.Response.StatusCode = 401;
         httpContext.Response.ContentType = HtmlContentType;
 
-        var html = @"
+        string html = @"
             <html>
             <head>
                 <title>Hangfire Dashboard Authorization</title>
@@ -125,7 +125,7 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
     /// <param name="token">令牌值</param>
     private void SetTokenCookie(HttpContext httpContext, string token)
     {
-        var cookieOptions = new CookieOptions
+        CookieOptions cookieOptions = new CookieOptions
         {
             Expires = DateTimeOffset.Now.Add(_tokenExpiration),
             HttpOnly = true,

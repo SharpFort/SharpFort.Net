@@ -61,7 +61,7 @@ namespace SharpFort.FileManagement.Domain.Entities
             DirectoryId = directoryId;
 
             // BlobName 使用 ID + 扩展名，避免文件名冲突
-            var extension = Path.GetExtension(name);
+            string extension = Path.GetExtension(name);
             BlobName = id.ToString() + extension;
 
             // 自动推断文件类型
@@ -232,9 +232,9 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// </summary>
         public async Task ComputeAndSetHashAsync(Stream stream)
         {
-            var position = stream.Position;
-            using var sha256 = SHA256.Create();
-            var hashBytes = await sha256.ComputeHashAsync(stream);
+            long position = stream.Position;
+            using SHA256 sha256 = SHA256.Create();
+            byte[] hashBytes = await sha256.ComputeHashAsync(stream);
             Hash = Convert.ToHexString(hashBytes).ToLowerInvariant();
             stream.Position = position;
         }
@@ -267,8 +267,8 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// </summary>
         public static string GetMimeType(string fileName)
         {
-            var provider = new FileExtensionContentTypeProvider();
-            return provider.TryGetContentType(fileName, out var contentType) ? contentType : "application/octet-stream";
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            return provider.TryGetContentType(fileName, out string? contentType) ? contentType : "application/octet-stream";
         }
 
         /// <summary>

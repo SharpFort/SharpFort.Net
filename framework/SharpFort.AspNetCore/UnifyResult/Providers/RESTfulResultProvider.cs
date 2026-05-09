@@ -42,7 +42,7 @@ public class RESTfulResultProvider : IUnifyResultProvider, ITransientDependency
         // 篡改响应状态码
         if (unifyResultSettings.AdaptStatusCodes != null && unifyResultSettings.AdaptStatusCodes.Length > 0)
         {
-            var adaptStatusCode = unifyResultSettings.AdaptStatusCodes.FirstOrDefault(u => u[0] == statusCode);
+            int[]? adaptStatusCode = unifyResultSettings.AdaptStatusCodes.FirstOrDefault(u => u[0] == statusCode);
             if (adaptStatusCode != null && adaptStatusCode.Length > 0 && adaptStatusCode[0] > 0)
             {
                 context.Response.StatusCode = adaptStatusCode[1];

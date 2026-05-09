@@ -19,7 +19,7 @@ namespace SharpFort.Core.Helper
                         action(model);
                     }
                     result.Add(model);
-                    var item = model as ITreeModel<T>;
+                    ITreeModel<T>? item = model as ITreeModel<T>;
                     List<T> children = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == item!.Id)];
                     if (children.Count > 0)
                     {
@@ -34,7 +34,7 @@ namespace SharpFort.Core.Helper
 
         private static void SetTreeChildren<T>(IList<T> list, IList<T> children, T model, Action<T> action = null!)
         {
-            var mm = model as ITreeModel<T>;
+            ITreeModel<T>? mm = model as ITreeModel<T>;
             mm!.Children = [];
             foreach (T item in children)
             {
@@ -43,7 +43,7 @@ namespace SharpFort.Core.Helper
                     action(item);
                 }
                 mm.Children.Add(item);
-                var _item = item as ITreeModel<T>;
+                ITreeModel<T>? _item = item as ITreeModel<T>;
                 List<T> _children = [.. list.Where(m => (m as ITreeModel<T>)!.ParentId == _item!.Id)];
                 if (_children.Count > 0)
                 {

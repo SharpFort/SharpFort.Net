@@ -251,11 +251,11 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                 .Where(m => m.MenuType != MenuType.Component)
                 .Where(m => m.MenuSource == MenuSource.Ruoyi)];
             List<Vue3RouterDto> routers = [];
-            foreach (var m in menus)
+            foreach (Menu m in menus)
             {
-                var r = new Vue3RouterDto();
+                Vue3RouterDto r = new Vue3RouterDto();
                 r.OrderNum = m.OrderNum;
-                var routerName = m.Router?.Split("/").LastOrDefault();
+                string? routerName = m.Router?.Split("/").LastOrDefault();
                 r.Id = m.Id;
                 r.ParentId = m.ParentId;
 
@@ -316,7 +316,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         public static List<Vue3PureRouterDto> Vue3PureRouterBuild(this List<Menu> menus)
         {
             //pure的菜单为树形
-            var allRouters = menus
+            List<Vue3PureRouterDto> allRouters = menus
                 .Where(m => m.State)
                 .Where(m => m.MenuType != MenuType.Component)
                 .Where(m => m.MenuSource == MenuSource.Pure)
@@ -341,17 +341,17 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                 .ToList();
 
 
-            var routerDic = allRouters.GroupBy(x => x.ParentId).ToDictionary(x => x.Key, y => y.ToList());
+            Dictionary<Guid, List<Vue3PureRouterDto>> routerDic = allRouters.GroupBy(x => x.ParentId).ToDictionary(x => x.Key, y => y.ToList());
             //根路由
-            if (!routerDic.TryGetValue(Guid.Empty, out var rootRouters))
+            if (!routerDic.TryGetValue(Guid.Empty, out List<Vue3PureRouterDto>? rootRouters))
             {
                 return [];
             }
             Stack<Vue3PureRouterDto> stack = new(rootRouters);
             while (stack.Count > 0)
             {
-                var currentRouter = stack.Pop();
-                if (routerDic.TryGetValue(currentRouter.Id, out var items))
+                Vue3PureRouterDto currentRouter = stack.Pop();
+                if (routerDic.TryGetValue(currentRouter.Id, out List<Vue3PureRouterDto>? items))
                 {
                     currentRouter.Children = items;
                     items?.ForEach(x => stack.Push(x));

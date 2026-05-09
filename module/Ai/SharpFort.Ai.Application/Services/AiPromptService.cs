@@ -26,12 +26,12 @@ public class AiPromptService(ISqlSugarRepository<AiPrompt> repository) : Applica
     {
         RefAsync<int> total = 0;
 
-        var entities = await _repository._DbQueryable
+        List<AiPrompt> entities = await _repository._DbQueryable
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Code.Contains(input.SearchKey) || x.Content.Contains(input.SearchKey) || x.Description.Contains(input.SearchKey))
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-        var output = entities.Adapt<List<AiPromptDto>>();
+        List<AiPromptDto> output = entities.Adapt<List<AiPromptDto>>();
         return new PagedResultDto<AiPromptDto>(total, output);
     }
 
@@ -41,7 +41,7 @@ public class AiPromptService(ISqlSugarRepository<AiPrompt> repository) : Applica
     [HttpGet("ai-prompt/{id}")]
     public async Task<AiPromptDto> GetAsync([FromRoute] Guid id)
     {
-        var entity = await _repository.GetByIdAsync(id);
+        AiPrompt entity = await _repository.GetByIdAsync(id);
         return entity.Adapt<AiPromptDto>();
     }
 
@@ -51,7 +51,7 @@ public class AiPromptService(ISqlSugarRepository<AiPrompt> repository) : Applica
     [HttpPost("ai-prompt")]
     public async Task<AiPromptDto> CreateAsync(AiPromptCreateInput input)
     {
-        var entity = input.Adapt<AiPrompt>();
+        AiPrompt entity = input.Adapt<AiPrompt>();
         await _repository.InsertAsync(entity);
         return entity.Adapt<AiPromptDto>();
     }
@@ -62,7 +62,7 @@ public class AiPromptService(ISqlSugarRepository<AiPrompt> repository) : Applica
     [HttpPut("ai-prompt/{id}")]
     public async Task<AiPromptDto> UpdateAsync([FromRoute] Guid id, AiPromptUpdateInput input)
     {
-        var entity = await _repository.GetByIdAsync(id);
+        AiPrompt entity = await _repository.GetByIdAsync(id);
         input.Adapt(entity);
         await _repository.UpdateAsync(entity);
         return entity.Adapt<AiPromptDto>();

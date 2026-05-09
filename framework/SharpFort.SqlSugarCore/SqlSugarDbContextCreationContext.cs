@@ -40,7 +40,7 @@ public class SqlSugarDbContextCreationContext(
     /// </summary>
     public static IDisposable Use(SqlSugarDbContextCreationContext context)
     {
-        var previousContext = Current;
+        SqlSugarDbContextCreationContext previousContext = Current;
         CurrentContextHolder.Value = context;
         return new DisposeAction(() => CurrentContextHolder.Value = previousContext);
     }

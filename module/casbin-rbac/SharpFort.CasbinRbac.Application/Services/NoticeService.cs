@@ -29,7 +29,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             RefAsync<int> total = 0;
 
-            var entities = await _repository._DbQueryable.WhereIF(input.NoticeType is not null, x => x.NoticeType == input.NoticeType)
+            List<Notice> entities = await _repository._DbQueryable.WhereIF(input.NoticeType is not null, x => x.NoticeType == input.NoticeType)
                           .WhereIF(!string.IsNullOrEmpty(input.Title), x => x.Title!.Contains(input.Title!))
                           .WhereIF(!string.IsNullOrEmpty(input.Content), x => x.Content!.Contains(input.Content!))
                           .WhereIF(input.State is not null, x => x.State == input.State)
@@ -45,12 +45,12 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <returns>通知下拉框数据列表</returns>
         public override async Task<PagedResultDto<NoticeGetListOutputDto>> GetSelectDataListAsync(string? keywords = null)
         {
-            var entities = await _repository._DbQueryable
+            List<Notice> entities = await _repository._DbQueryable
                           .WhereIF(!string.IsNullOrEmpty(keywords), x => x.Title!.Contains(keywords!) || x.Content!.Contains(keywords!))
                           .ToListAsync();
 
-            var totalCount = entities.Count;
-            var dtos = await MapToGetListOutputDtosAsync(entities);
+            int totalCount = entities.Count;
+            List<NoticeGetListOutputDto> dtos = await MapToGetListOutputDtosAsync(entities);
 
             return new PagedResultDto<NoticeGetListOutputDto>(totalCount, dtos);
         }
@@ -62,7 +62,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         [HttpPost("notice/online/{id}")]
         public async Task SendOnlineAsync([FromRoute] Guid id)
         {
-            var entity = await _repository._DbQueryable.FirstAsync(x => x.Id == id);
+            Notice entity = await _repository._DbQueryable.FirstAsync(x => x.Id == id);
             await _hubContext.Clients.All.SendAsync("ReceiveNotice", entity.NoticeType.ToString(), entity.Title, entity.Content);
         }
         /// <summary>

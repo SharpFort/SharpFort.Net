@@ -20,7 +20,7 @@ namespace SharpFort.Tool
         {
             Application.HelpOption("-h|--help");
             Application.VersionOption("-v|--versions", Assembly.GetExecutingAssembly().GetName().Version!.ToString());
-            foreach (var command in _commands)
+            foreach (ICommand command in _commands)
             {
                 CommandLineApplication childrenCommandLineApplication = new(true)
                 {

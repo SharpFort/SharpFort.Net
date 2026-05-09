@@ -47,7 +47,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         /// </summary>
         public virtual async Task<ISqlSugarClient> GetDbContextAsync()
         {
-            var dbContext = await _dbContextProvider.GetDbContextAsync();
+            ISqlSugarDbContext dbContext = await _dbContextProvider.GetDbContextAsync();
             return dbContext.SqlSugarClient;
         }
 
@@ -56,7 +56,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         /// </summary>
         public virtual async Task<SimpleClient<TEntity>> GetDbSimpleClientAsync()
         {
-            var dbContext = await GetDbContextAsync();
+            ISqlSugarClient dbContext = await GetDbContextAsync();
             return new SimpleClient<TEntity>(dbContext);
         }
 
@@ -262,7 +262,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         {
             if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
             {
-                var entity = await GetByIdAsync(id);
+                dynamic entity = await GetByIdAsync(id);
                 //反射赋值
                 ReflexHelper.SetModelValue(nameof(ISoftDelete.IsDeleted), true, entity);
                 return await UpdateAsync(entity);
@@ -277,8 +277,8 @@ namespace SharpFort.SqlSugarCore.Repositories
         {
             if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
             {
-                var simpleClient = (await GetDbSimpleClientAsync());
-                var entities = await simpleClient.AsQueryable().In(ids).ToListAsync();
+                SimpleClient<TEntity> simpleClient = (await GetDbSimpleClientAsync());
+                List<TEntity> entities = await simpleClient.AsQueryable().In(ids).ToListAsync();
                 if (entities.Count == 0)
                 {
                     return false;

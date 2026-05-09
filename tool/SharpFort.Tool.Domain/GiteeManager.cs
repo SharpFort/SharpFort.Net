@@ -19,8 +19,8 @@ public class GiteeManager(IConfiguration configuration, IHttpClientFactory httpC
     /// <returns></returns>
     public async Task<bool> IsExsitBranchAsync(string branch)
     {
-        using var client = _httpClientFactory.CreateClient();
-        var response =
+        using HttpClient client = _httpClientFactory.CreateClient();
+        HttpResponseMessage response =
             await client.GetAsync(
                 $"{GiteeHost}/repos/{Owner}/{Repo}/branches/{branch}?access_token={_accessToken}");
         return response.StatusCode != HttpStatusCode.NotFound;
@@ -32,12 +32,12 @@ public class GiteeManager(IConfiguration configuration, IHttpClientFactory httpC
     /// <returns></returns>
     public async Task<List<string>> GetAllBranchAsync()
     {
-        using var client = _httpClientFactory.CreateClient();
-        var response =
+        using HttpClient client = _httpClientFactory.CreateClient();
+        HttpResponseMessage response =
             await client.GetAsync(
                 $"{GiteeHost}/repos/{Owner}/{Repo}/branches?access_token={_accessToken}&sort=name&direction=asc&page=1&per_page=100");
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync();
+        string result = await response.Content.ReadAsStringAsync();
         JArray jsonArray = JArray.Parse(result);
         // 创建一个列表来存储名字
         List<string> names = [];
@@ -63,8 +63,8 @@ public class GiteeManager(IConfiguration configuration, IHttpClientFactory httpC
     /// <returns></returns>
     public async Task<Stream> DownLoadFileAsync(string branch)
     {
-        using var client = _httpClientFactory.CreateClient();
-        var response =
+        using HttpClient client = _httpClientFactory.CreateClient();
+        HttpResponseMessage response =
             await client.GetAsync(
                 $"{GiteeHost}/repos/{Owner}/{Repo}/zipball?access_token={_accessToken}&ref={branch}");
         response.EnsureSuccessStatusCode();

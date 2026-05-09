@@ -28,11 +28,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             await _roleMenuRepository.DeleteAsync(u => roleIds.Contains(u.RoleId));
 
             // 遍历角色
-            foreach (var roleId in roleIds)
+            foreach (Guid roleId in roleIds)
             {
                 // 添加新的关系
                 List<RoleMenu> roleMenus = [];
-                foreach (var menu in menuIds)
+                foreach (Guid menu in menuIds)
                 {
                     roleMenus.Add(new RoleMenu() { RoleId = roleId, MenuId = menu });
                 }
@@ -42,11 +42,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 2. Casbin 策略同步
             // 获取所有涉及的角色实体和菜单实体
-            var roles = await _repository.GetListAsync(r => roleIds.Contains(r.Id));
+            List<Role> roles = await _repository.GetListAsync(r => roleIds.Contains(r.Id));
             // 获取选中的菜单实体（包含 ApiUrl）
-            var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id));
+            List<Menu> menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id));
 
-            foreach (var role in roles)
+            foreach (Role role in roles)
             {
                 // 同步该角色的所有 API 权限
                 await _casbinPolicyManager.SetRolePermissionsAsync(role, menus);

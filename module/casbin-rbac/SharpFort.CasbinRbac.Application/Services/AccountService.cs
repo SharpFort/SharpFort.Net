@@ -104,10 +104,10 @@ namespace SharpFort.CasbinRbac.Application.Services
         [RemoteService(isEnabled: false)]
         public async Task<LoginOutputDto> PostLoginAsync(Guid userId)
         {
-            var userInfo = new UserRoleMenuDto();
+            UserRoleMenuDto userInfo = new UserRoleMenuDto();
             //获取token
-            var accessToken = await _accountManager.GetTokenByUserIdAsync(userId, (info) => userInfo = info);
-            var refreshToken = _accountManager.CreateRefreshToken(userId);
+            string accessToken = await _accountManager.GetTokenByUserIdAsync(userId, (info) => userInfo = info);
+            string refreshToken = _accountManager.CreateRefreshToken(userId);
 
             //这里抛出一个登录的事件,也可以在全部流程走完，在应用层组装
             if (_httpContextAccessor.HttpContext is not null)
@@ -119,10 +119,10 @@ namespace SharpFort.CasbinRbac.Application.Services
                 //await LocalEventBus.PublishAsync(loginEto);
 
                 // 1. 使用工具类获取客户端信息
-                var clientInfo = ClientInfoHelper.GetClientInfo(_httpContextAccessor.HttpContext);
+                ClientInfoHelper.ClientResult clientInfo = ClientInfoHelper.GetClientInfo(_httpContextAccessor.HttpContext);
 
                 // 2. 直接创建 Event 对象 (不要再 New LoginLog 了)
-                var loginEto = new LoginEventArgs
+                LoginEventArgs loginEto = new LoginEventArgs
                 {
                     UserId = userInfo.User.Id,
                     UserName = userInfo.User.UserName,
@@ -147,9 +147,9 @@ namespace SharpFort.CasbinRbac.Application.Services
         [Authorize(AuthenticationSchemes = TokenTypeConst.Refresh)]
         public async Task<object> PostRefreshAsync([FromQuery] string refreshToken)
         {
-            var userId = CurrentUser.Id!.Value;
-            var accessToken = await _accountManager.GetTokenByUserIdAsync(userId);
-            var newRefreshToken = _accountManager.CreateRefreshToken(userId);
+            Guid userId = CurrentUser.Id!.Value;
+            string accessToken = await _accountManager.GetTokenByUserIdAsync(userId);
+            string newRefreshToken = _accountManager.CreateRefreshToken(userId);
             return new { Token = accessToken, RefreshToken = newRefreshToken };
         }
 
@@ -160,9 +160,9 @@ namespace SharpFort.CasbinRbac.Application.Services
         [AllowAnonymous]
         public async Task<CaptchaImageDto> GetCaptchaImageAsync()
         {
-            var uuid = _guidGenerator.Create();
-            var captcha = _captcha.Generate(uuid.ToString());
-            var enableCaptcha = _rbacOptions.EnableCaptcha;
+            Guid uuid = _guidGenerator.Create();
+            CaptchaData captcha = _captcha.Generate(uuid.ToString());
+            bool enableCaptcha = _rbacOptions.EnableCaptcha;
             return new CaptchaImageDto { Img = captcha.Bytes, Uuid = uuid, IsEnableCaptcha = enableCaptcha };
         }
 
@@ -172,7 +172,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <param name="phone"></param>
         private static async Task ValidationPhone(string phone)
         {
-            var res = Regex.IsMatch(phone, @"^\d{11}$");
+            bool res = Regex.IsMatch(phone, @"^\d{11}$");
             if (res == false)
             {
                 throw new UserFriendlyException("手机号码格式错误！请检查");
@@ -234,7 +234,7 @@ namespace SharpFort.CasbinRbac.Application.Services
                 throw new UserFriendlyException("该手机号已被注册！");
             }
 
-            var value = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, input.Phone));
+            CaptchaPhoneCacheItem? value = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, input.Phone));
 
             //防止暴刷
             if (value is not null)
@@ -245,8 +245,8 @@ namespace SharpFort.CasbinRbac.Application.Services
             //生成一个4位数的验证码
             //发送短信，同时生成uuid
             ////key： 电话号码  value:验证码+uuid  
-            var code = Guid.NewGuid().ToString()[..4];
-            var uuid = Guid.NewGuid();
+            string code = Guid.NewGuid().ToString()[..4];
+            Guid uuid = Guid.NewGuid();
             await _aliyunManger.SendSmsAsync(input.Phone, code);
 
             await _phoneCache.SetAsync(new CaptchaPhoneCacheKey(validationPhoneType, input.Phone),
@@ -264,7 +264,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task ValidationPhoneCaptchaAsync(PhoneValidationType validationPhoneType, long phone,
             string code)
         {
-            var item = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, phone.ToString(CultureInfo.InvariantCulture)));
+            CaptchaPhoneCacheItem? item = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, phone.ToString(CultureInfo.InvariantCulture)));
             if (item is not null && item.Code.Equals($"{code}", StringComparison.Ordinal))
             {
                 //成功，需要清空
@@ -286,7 +286,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             //校验验证码，根据电话号码获取 value，比对验证码已经uuid
             await ValidationPhoneCaptchaAsync(PhoneValidationType.RetrievePassword, input.Phone, input.Code!);
 
-            var entity = await _userRepository.GetFirstAsync(x => x.Phone == input.Phone) ?? throw new UserFriendlyException("该手机号码未注册");
+            User entity = await _userRepository.GetFirstAsync(x => x.Phone == input.Phone) ?? throw new UserFriendlyException("该手机号码未注册");
             await _accountManager.RestPasswordAsync(entity.Id, input.Password);
 
             return entity.UserName;
@@ -348,7 +348,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task<UserRoleMenuDto> GetAsync()
         {
             //通过鉴权jwt获取到用户的id
-            var userId = _currentUser.Id ?? throw new UserFriendlyException("用户未登录");
+            Guid userId = _currentUser.Id ?? throw new UserFriendlyException("用户未登录");
 
             //此处优先从缓存中获取
             var output = await _userManager.GetInfoAsync(userId.Value);
@@ -358,7 +358,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         [RemoteService(isEnabled: false)]
         public async Task<UserRoleMenuDto?> GetAsync(string? userName, long? phone)
         {
-            var user = await _userRepository._DbQueryable
+            User? user = await _userRepository._DbQueryable
                 .WhereIF(userName is not null, x => x.UserName == userName)
                 .WhereIF(phone is not null, x => x.Phone == phone)
                 .Where(x => x.State)  // CA1862: bool direct comparison
@@ -376,7 +376,7 @@ namespace SharpFort.CasbinRbac.Application.Services
                 throw new UserFriendlyException($"该用户名不存在或已禁用-{userName}");
             }
 
-            var output = await _userManager.GetInfoAsync(user.Id);
+            UserRoleMenuDto output = await _userManager.GetInfoAsync(user.Id);
             return output;
         }
 
@@ -389,14 +389,14 @@ namespace SharpFort.CasbinRbac.Application.Services
         [Route("account/Vue3Router/{routerType?}")]
         public async Task<object?> GetVue3Router([FromRoute] string? routerType)
         {
-            var userId = _currentUser.Id;
+            Guid? userId = _currentUser.Id;
             if (_currentUser.Id is null)
             {
                 throw new AbpAuthorizationException("用户未登录");
             }
 
-            var data = await _userManager.GetInfoAsync(userId!.Value);
-            var menus = data.Menus.ToList();
+            UserRoleMenuDto data = await _userManager.GetInfoAsync(userId!.Value);
+            List<MenuDto> menus = data.Menus.ToList();
 
             //为超级管理员直接给全部路由
             if (UserConst.Admin.Equals(data.User.UserName, StringComparison.Ordinal))
@@ -428,7 +428,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task<bool> PostLogout()
         {
             //通过鉴权jwt获取到用户的id
-            var userId = _currentUser.Id;
+            Guid? userId = _currentUser.Id;
             if (userId is null)
             {
                 return false;
@@ -489,7 +489,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             Guid userId = input.UserId == null ? _currentUser.GetId() : input.UserId.Value;
 
-            var entity = await _userRepository.GetByIdAsync(userId);
+            User entity = await _userRepository.GetByIdAsync(userId);
 
             if (entity.Icon == input.Icon)
             {

@@ -73,7 +73,7 @@ namespace SharpFort.Core.Helper
 #pragma warning disable CA5351 // MD5 用于非安全性哈希（兼容性需求）
                     byte[] s = MD5.HashData(Encoding.UTF8.GetBytes(password));
 #pragma warning restore CA5351
-                    foreach (var item in s)
+                    foreach (byte item in s)
                     {
                         pwd = string.Concat(pwd, item.ToString("X2", CultureInfo.InvariantCulture));
                     }
@@ -106,7 +106,7 @@ namespace SharpFort.Core.Helper
         static readonly char[] padding = { '=' };
         public static string ToUrlBase64String(byte[] inArray)
         {
-            var str = Convert.ToBase64String(inArray);
+            string str = Convert.ToBase64String(inArray);
             str = str.TrimEnd(padding).Replace('+', '-').Replace('/', '_');
 
             return str;

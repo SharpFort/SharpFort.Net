@@ -21,10 +21,10 @@ namespace SharpFort.Tool.Application
             moduleCreateInputDto.SetNameReplace();
 
             //模块类型，就是分支小写
-            var input = moduleCreateInputDto.Adapt<TemplateGenCreateDto>();
+            TemplateGenCreateDto input = moduleCreateInputDto.Adapt<TemplateGenCreateDto>();
             input.SetTemplateGiteeRef(moduleCreateInputDto.ModuleSoure);
 
-            var filePath = await _templateGenManager.CreateTemplateAsync(input);
+            string filePath = await _templateGenManager.CreateTemplateAsync(input);
 
             ////考虑从路径中获取
             //var fileContentType = MimeHelper.GetMimeMapping(Path.GetFileName(filePath));

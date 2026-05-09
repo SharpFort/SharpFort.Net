@@ -37,14 +37,14 @@ namespace SharpFort.Rbac.Test
 
         public override async Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            var services = context.ServiceProvider;
+            IServiceProvider services = context.ServiceProvider;
 
             #region 给默认角色设置一些权限，防止注册后无权限禁止登录
-            var roleManager = services.GetRequiredService<RoleManager>();
-            var roleRep = services.GetRequiredService<ISqlSugarRepository<Role>>();
-            var menuRep = services.GetRequiredService<ISqlSugarRepository<Menu>>();
-            var defaultRoleEntity = await roleRep._DbQueryable.Where(x => x.RoleCode == UserConst.DefaultRoleCode).FirstAsync();
-            var menuIds = await menuRep._DbQueryable.Where(x => x.PermissionCode!.Contains("user")).Select(x => x.Id).ToListAsync();
+            RoleManager roleManager = services.GetRequiredService<RoleManager>();
+            ISqlSugarRepository<Role> roleRep = services.GetRequiredService<ISqlSugarRepository<Role>>();
+            ISqlSugarRepository<Menu> menuRep = services.GetRequiredService<ISqlSugarRepository<Menu>>();
+            Role defaultRoleEntity = await roleRep._DbQueryable.Where(x => x.RoleCode == UserConst.DefaultRoleCode).FirstAsync();
+            List<Guid> menuIds = await menuRep._DbQueryable.Where(x => x.PermissionCode!.Contains("user")).Select(x => x.Id).ToListAsync();
             await roleManager.GiveRoleSetMenuAsync([defaultRoleEntity!.Id], menuIds);
             #endregion
         }

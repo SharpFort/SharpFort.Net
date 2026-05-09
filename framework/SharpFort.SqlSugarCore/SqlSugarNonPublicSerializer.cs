@@ -15,7 +15,7 @@ public class NonPublicPropertiesResolver : DefaultContractResolver
     /// <returns></returns>
     protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
     {
-        var prop = base.CreateProperty(member, memberSerialization);
+        JsonProperty prop = base.CreateProperty(member, memberSerialization);
         if (member is PropertyInfo pi)
         {
             prop.Readable = (pi.GetMethod != null);
@@ -57,7 +57,7 @@ public class SqlSugarNonPublicSerializer : ISerializeService
             // 动态创建一个 JsonSerializer 实例
             Type? serializerType = typeof(T).Assembly.GetType("System.Text.Json.JsonSerializer");
 
-            var methods = serializerType!
+            MethodInfo methods = serializerType!
                 .GetMethods().Where(it => it.Name == "Deserialize")
                 .Where(it => it.GetParameters().Any(z => z.ParameterType == typeof(string))).First();
 
@@ -66,7 +66,7 @@ public class SqlSugarNonPublicSerializer : ISerializeService
                 .Invoke(null, new object[] { value, null! });
             return json!;
         }
-        var jSetting = new JsonSerializerSettings
+        JsonSerializerSettings jSetting = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new NonPublicPropertiesResolver() //替换默认解析器使能支持protect

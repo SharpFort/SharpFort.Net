@@ -17,16 +17,16 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var refreshToken = context.Request.Headers["refresh_token"].ToString();
+            string refreshToken = context.Request.Headers["refresh_token"].ToString();
             if (!string.IsNullOrEmpty(refreshToken))
             {
-                var authResult = await context.AuthenticateAsync(TokenTypeConst.Refresh);
+                AuthenticateResult authResult = await context.AuthenticateAsync(TokenTypeConst.Refresh);
                 if (authResult.Succeeded)
                 {
                     // authResult.Principal 在 Succeeded == true 时非 null，FindFirst 在 JWT 标准 claim 中也非 null
-                    var userId = Guid.Parse(authResult.Principal!.FindFirst(AbpClaimTypes.UserId)!.Value);
-                    var access_Token = await _accountManager.GetTokenByUserIdAsync(userId);
-                    var refresh_Token = _accountManager.CreateRefreshToken(userId);
+                    Guid userId = Guid.Parse(authResult.Principal!.FindFirst(AbpClaimTypes.UserId)!.Value);
+                    string access_Token = await _accountManager.GetTokenByUserIdAsync(userId);
+                    string refresh_Token = _accountManager.CreateRefreshToken(userId);
                     context.Response.Headers["access_token"] = access_Token;
                     context.Response.Headers["refresh_token"] = refresh_Token;
                     context.Request.Headers["Authorization"] = "Bearer " + access_Token;
