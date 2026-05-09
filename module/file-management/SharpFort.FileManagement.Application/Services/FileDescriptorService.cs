@@ -78,12 +78,7 @@ namespace SharpFort.FileManagement.Application.Services
         [AllowAnonymous]
         public async Task<IActionResult> DownloadAsync(Guid id, bool isThumbnail = false)
         {
-            var file = await _repository.GetAsync(x => x.Id == id);
-            if (file == null)
-            {
-                throw new UserFriendlyException("文件不存在");
-            }
-
+            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             var stream = await _fileManager.GetFileStreamAsync(file, isThumbnail);
             return stream == null
                 ? throw new UserFriendlyException("文件内容不存在")
@@ -133,12 +128,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task DeleteAsync(Guid id)
         {
-            var file = await _repository.GetAsync(x => x.Id == id);
-            if (file == null)
-            {
-                throw new UserFriendlyException("文件不存在");
-            }
-
+            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             await _fileManager.DeleteFileAsync(file);
             await _repository.DeleteAsync(file);
         }
@@ -161,12 +151,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task MoveAsync(Guid id, Guid? directoryId)
         {
-            var file = await _repository.GetAsync(x => x.Id == id);
-            if (file == null)
-            {
-                throw new UserFriendlyException("文件不存在");
-            }
-
+            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             file.MoveTo(directoryId);
             await _repository.UpdateAsync(file);
         }
@@ -176,12 +161,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task RenameAsync(Guid id, string newName)
         {
-            var file = await _repository.GetAsync(x => x.Id == id);
-            if (file == null)
-            {
-                throw new UserFriendlyException("文件不存在");
-            }
-
+            var file = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("文件不存在");
             file.Rename(newName);
             await _repository.UpdateAsync(file);
         }
@@ -215,12 +195,7 @@ namespace SharpFort.FileManagement.Application.Services
             var existingFile = await _repository._DbQueryable
                 .Where(x => x.Hash == input.Hash)
                 .OrderByDescending(x => x.CreationTime)
-                .FirstAsync();
-
-            if (existingFile == null)
-            {
-                throw new UserFriendlyException("文件不存在，无法秒传");
-            }
+                .FirstAsync() ?? throw new UserFriendlyException("文件不存在，无法秒传");
 
             // 创建新记录，指向现有物理文件
             var newFile = FileDescriptor.CreateForQuickUpload(

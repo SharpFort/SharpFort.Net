@@ -75,12 +75,7 @@ public class AiProviderService(
     [HttpPut("ai-provider/{id}")]
     public async Task<AiProviderDto> UpdateAsync([FromRoute] Guid id, AiProviderUpdateInput input)
     {
-        var entity = await _providerRepository.GetByIdAsync(id);
-        if (entity == null)
-        {
-            throw new UserFriendlyException("供应商不存在");
-        }
-
+        var entity = await _providerRepository.GetByIdAsync(id) ?? throw new UserFriendlyException("供应商不存在");
         entity.Name = input.Name;
         entity.Endpoint = input.Endpoint;
         entity.ExtraUrl = input.ExtraUrl;

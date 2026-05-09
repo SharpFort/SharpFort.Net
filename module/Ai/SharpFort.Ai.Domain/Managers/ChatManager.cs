@@ -106,11 +106,7 @@ public class ChatManager(ILoggerFactory loggerFactory,
 
         //线程根据sessionId数据库中获取
         var agentStore =
-            await _agentStoreRepository.GetFirstAsync(x => x.SessionId == sessionId);
-        if (agentStore is null)
-        {
-            agentStore = new AgentStore(sessionId);
-        }
+            await _agentStoreRepository.GetFirstAsync(x => x.SessionId == sessionId) ?? new AgentStore(sessionId);
 
         //获取当前线程
         AgentThread currentThread;

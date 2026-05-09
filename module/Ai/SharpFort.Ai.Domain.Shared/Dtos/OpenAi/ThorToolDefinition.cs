@@ -24,9 +24,12 @@ public class ThorToolDefinition
     /// </summary>
     /// <param name="function"></param>
     /// <returns></returns>
-    public static ThorToolDefinition CreateFunctionTool(ThorToolFunctionDefinition function) => new()
+    public static ThorToolDefinition CreateFunctionTool(ThorToolFunctionDefinition function)
     {
-        Type = ThorToolTypeConst.Function,
-        Function = function
-    };
+        return new()
+        {
+            Type = ThorToolTypeConst.Function,
+            Function = function
+        };
+    }
 }

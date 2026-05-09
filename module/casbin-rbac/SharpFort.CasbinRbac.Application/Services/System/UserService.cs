@@ -261,12 +261,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("更新用户状态", OperationType.Update)]
         public async Task<UserGetOutputDto> UpdateStateAsync([FromRoute] Guid id, [FromRoute] bool state)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity is null)
-            {
-                throw new UserFriendlyException("用户未存在");
-            }
-
+            var entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("用户未存在");
             entity.State = state;
             await _repository.UpdateAsync(entity);
             return await MapToGetOutputDtoAsync(entity);

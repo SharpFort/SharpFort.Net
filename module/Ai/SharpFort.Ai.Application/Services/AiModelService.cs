@@ -102,11 +102,7 @@ public class AiModelService(
     [HttpPut("ai-model/{id}")]
     public async Task<AiModelDto> UpdateAsync([FromRoute] Guid id, AiModelUpdateInput input)
     {
-        var entity = await _modelRepository.GetByIdAsync(id);
-        if (entity == null)
-        {
-            throw new UserFriendlyException("模型不存在");
-        }
+        var entity = await _modelRepository.GetByIdAsync(id) ?? throw new UserFriendlyException("模型不存在");
 
         // 验证供应商是否存在
         if (entity.AiProviderId != input.AiProviderId)

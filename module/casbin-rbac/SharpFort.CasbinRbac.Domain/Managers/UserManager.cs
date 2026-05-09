@@ -175,11 +175,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                async () =>
                {
                    var user = await _userRepository.GetUserAllInfoAsync(userId);
-                   var data = EntityMapToDto(user);
-                   if (data is null)
-                   {
-                       throw new AbpAuthorizationException();
-                   }
+                   var data = EntityMapToDto(user) ?? throw new AbpAuthorizationException();
                    output = data;
                    return new UserInfoCacheItem(data);
                },

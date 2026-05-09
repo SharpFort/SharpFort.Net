@@ -73,78 +73,112 @@ public static class JsonElementExtensions
     /// 链式安全获取对象属性
     /// </summary>
     public static JsonElement? Get(this JsonElement? element, string propertyName)
-        => element?.Get(propertyName);
+    {
+        return element?.Get(propertyName);
+    }
 
     /// <summary>
     /// 链式安全获取数组元素
     /// </summary>
     public static JsonElement? Get(this JsonElement? element, int index)
-        => element?.Get(index);
+    {
+        return element?.Get(index);
+    }
 
     #endregion
 
     #region 取值方法（带默认值）
 
     public static string? GetString(this JsonElement? element, string? defaultValue = null)
-        => element?.ValueKind == JsonValueKind.String ? element.Value.GetString() : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.String ? element.Value.GetString() : defaultValue;
+    }
 
     public static int GetInt(this JsonElement? element, int defaultValue = 0)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt32() : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt32() : defaultValue;
+    }
 
     public static long GetLong(this JsonElement? element, long defaultValue = 0)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt64() : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt64() : defaultValue;
+    }
 
     public static double GetDouble(this JsonElement? element, double defaultValue = 0)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetDouble() : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetDouble() : defaultValue;
+    }
 
     public static decimal GetDecimal(this JsonElement? element, decimal defaultValue = 0)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetDecimal() : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetDecimal() : defaultValue;
+    }
 
     public static bool GetBool(this JsonElement? element, bool defaultValue = false)
-        => element?.ValueKind is JsonValueKind.True or JsonValueKind.False
-            ? element.Value.GetBoolean()
-            : defaultValue;
+    {
+        return element?.ValueKind is JsonValueKind.True or JsonValueKind.False
+                ? element.Value.GetBoolean()
+                : defaultValue;
+    }
 
     public static DateTime GetDateTime(this JsonElement? element, DateTime defaultValue = default)
-        => element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out var dt)
-            ? dt
-            : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out var dt)
+                ? dt
+                : defaultValue;
+    }
 
     public static Guid GetGuid(this JsonElement? element, Guid defaultValue = default)
-        => element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out var guid)
-            ? guid
-            : defaultValue;
+    {
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out var guid)
+                ? guid
+                : defaultValue;
+    }
 
     #endregion
 
     #region 可空取值方法
 
     public static int? GetIntOrNull(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt32() : null;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt32() : null;
+    }
 
     public static long? GetLongOrNull(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt64() : null;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetInt64() : null;
+    }
 
     public static double? GetDoubleOrNull(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetDouble() : null;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetDouble() : null;
+    }
 
     public static decimal? GetDecimalOrNull(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Number ? element.Value.GetDecimal() : null;
+    {
+        return element?.ValueKind == JsonValueKind.Number ? element.Value.GetDecimal() : null;
+    }
 
     public static bool? GetBoolOrNull(this JsonElement? element)
-        => element?.ValueKind is JsonValueKind.True or JsonValueKind.False
-            ? element.Value.GetBoolean()
-            : null;
+    {
+        return element?.ValueKind is JsonValueKind.True or JsonValueKind.False
+                ? element.Value.GetBoolean()
+                : null;
+    }
 
     public static DateTime? GetDateTimeOrNull(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out var dt)
-            ? dt
-            : null;
+    {
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetDateTime(out var dt)
+                ? dt
+                : null;
+    }
 
     public static Guid? GetGuidOrNull(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out var guid)
-            ? guid
-            : null;
+    {
+        return element?.ValueKind == JsonValueKind.String && element.Value.TryGetGuid(out var guid)
+                ? guid
+                : null;
+    }
 
     #endregion
 
@@ -168,18 +202,24 @@ public static class JsonElementExtensions
     /// 获取数组长度
     /// </summary>
     public static int GetArrayLength(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Array ? element.Value.GetArrayLength() : 0;
+    {
+        return element?.ValueKind == JsonValueKind.Array ? element.Value.GetArrayLength() : 0;
+    }
 
     /// <summary>
     /// 数组转 List
     /// </summary>
     public static List<string?> ToStringList(this JsonElement? element)
-        => [.. element.GetArray().Select(e => e.GetString())];
+    {
+        return [.. element.GetArray().Select(e => e.GetString())];
+    }
 
     public static List<int> ToIntList(this JsonElement? element)
-        => [.. element.GetArray()
+    {
+        return [.. element.GetArray()
             .Where(e => e.ValueKind == JsonValueKind.Number)
             .Select(e => e.GetInt32())];
+    }
 
     #endregion
 
@@ -203,42 +243,62 @@ public static class JsonElementExtensions
     /// 获取所有属性名
     /// </summary>
     public static IEnumerable<string> GetPropertyNames(this JsonElement? element)
-        => element.GetProperties().Select(p => p.Name);
+    {
+        return element.GetProperties().Select(p => p.Name);
+    }
 
     /// <summary>
     /// 判断是否包含某属性
     /// </summary>
     public static bool HasProperty(this JsonElement? element, string propertyName)
-        => element?.ValueKind == JsonValueKind.Object &&
-           element.Value.TryGetProperty(propertyName, out _);
+    {
+        return element?.ValueKind == JsonValueKind.Object &&
+               element.Value.TryGetProperty(propertyName, out _);
+    }
 
     #endregion
 
     #region 类型判断
 
     public static bool IsNull(this JsonElement? element)
-        => element == null || element.Value.ValueKind == JsonValueKind.Null;
+    {
+        return element == null || element.Value.ValueKind == JsonValueKind.Null;
+    }
 
     public static bool IsNullOrUndefined(this JsonElement? element)
-        => element == null || element.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined;
+    {
+        return element == null || element.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined;
+    }
 
     public static bool IsObject(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Object;
+    {
+        return element?.ValueKind == JsonValueKind.Object;
+    }
 
     public static bool IsArray(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Array;
+    {
+        return element?.ValueKind == JsonValueKind.Array;
+    }
 
     public static bool IsString(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.String;
+    {
+        return element?.ValueKind == JsonValueKind.String;
+    }
 
     public static bool IsNumber(this JsonElement? element)
-        => element?.ValueKind == JsonValueKind.Number;
+    {
+        return element?.ValueKind == JsonValueKind.Number;
+    }
 
     public static bool IsBool(this JsonElement? element)
-        => element?.ValueKind is JsonValueKind.True or JsonValueKind.False;
+    {
+        return element?.ValueKind is JsonValueKind.True or JsonValueKind.False;
+    }
 
     public static bool Exists(this JsonElement? element)
-        => element != null && element.Value.ValueKind != JsonValueKind.Undefined;
+    {
+        return element != null && element.Value.ValueKind != JsonValueKind.Undefined;
+    }
 
     #endregion
 
@@ -248,13 +308,17 @@ public static class JsonElementExtensions
     /// 反序列化为指定类型
     /// </summary>
     public static T? Deserialize<T>(this JsonElement? element, JsonSerializerOptions? options = null)
-        => element.HasValue ? element.Value.Deserialize<T>(options) : default;
+    {
+        return element.HasValue ? element.Value.Deserialize<T>(options) : default;
+    }
 
     /// <summary>
     /// 反序列化为指定类型，带默认值
     /// </summary>
     public static T Deserialize<T>(this JsonElement? element, T defaultValue, JsonSerializerOptions? options = null)
-        => element.HasValue ? element.Value.Deserialize<T>(options) ?? defaultValue : defaultValue;
+    {
+        return element.HasValue ? element.Value.Deserialize<T>(options) ?? defaultValue : defaultValue;
+    }
 
     #endregion
 
@@ -287,7 +351,9 @@ public static class JsonElementExtensions
     /// 获取原始 JSON 字符串
     /// </summary>
     public static string? GetRawText(this JsonElement? element)
-        => element?.GetRawText();
+    {
+        return element?.GetRawText();
+    }
 
     #endregion
 }

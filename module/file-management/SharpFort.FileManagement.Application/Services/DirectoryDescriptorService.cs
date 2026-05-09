@@ -64,11 +64,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task<DirectoryDescriptorGetOutputDto> UpdateAsync(Guid id, DirectoryDescriptorUpdateInput input)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id);
-            if (entity == null)
-            {
-                throw new UserFriendlyException("目录不存在");
-            }
+            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
 
             // 检查同级目录下是否重名
             var exists = await _repository.IsAnyAsync(x =>
@@ -89,11 +85,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task DeleteAsync(Guid id)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id);
-            if (entity == null)
-            {
-                throw new UserFriendlyException("目录不存在");
-            }
+            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
 
             // 检查是否有子目录
             var hasChildren = await _repository.IsAnyAsync(x => x.ParentId == id);
@@ -117,12 +109,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task MoveAsync(Guid id, Guid? newParentId)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id);
-            if (entity == null)
-            {
-                throw new UserFriendlyException("目录不存在");
-            }
-
+            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("目录不存在");
             entity.MoveTo(newParentId);
             await _repository.UpdateAsync(entity);
         }

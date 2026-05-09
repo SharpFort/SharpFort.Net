@@ -38,13 +38,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         public async Task<object> AuthOauthLoginAsync([FromRoute] string scheme, [FromQuery] string code)
         {
             (var openId, var _) = await GetOpenIdAndNameAsync(scheme);
-            var authEntity = await _repository.GetAsync(x => x.OpenId == openId && x.AuthType == scheme);
-
-            if (authEntity is null)
-            {
-                throw new UserFriendlyException("第三方登录失败，请先注册后，在个人中心进行绑定该第三方后使用");
-            }
-
+            var authEntity = await _repository.GetAsync(x => x.OpenId == openId && x.AuthType == scheme) ?? throw new UserFriendlyException("第三方登录失败，请先注册后，在个人中心进行绑定该第三方后使用");
             var accessToken = await _accountManager.GetTokenByUserIdAsync(authEntity.UserId);
             return new { token = accessToken };
         }

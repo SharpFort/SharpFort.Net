@@ -47,7 +47,8 @@
       "Bash(Out-File -FilePath build_baseline.txt -Encoding utf8)",
       "Bash(Select-Object -First 5)",
       "PowerShell(dotnet format analyzers *)",
-      "PowerShell(git checkout *)"
+      "PowerShell(git checkout *)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

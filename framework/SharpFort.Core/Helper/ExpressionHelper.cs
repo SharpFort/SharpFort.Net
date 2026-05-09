@@ -26,14 +26,20 @@ namespace SharpFort.Core.Helper
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> False<T>() => f => false;
+        public static Expression<Func<T, bool>> False<T>()
+        {
+            return f => false;
+        }
 
         /// <summary>
         /// Expression表达式树lambda参数拼接-true
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> True<T>() => f => true;
+        public static Expression<Func<T, bool>> True<T>()
+        {
+            return f => true;
+        }
 
         /// <summary>
         /// Expression表达式树lambda参数拼接--and
@@ -42,7 +48,10 @@ namespace SharpFort.Core.Helper
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second) => first.Compose(second, Expression.And);
+        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
+        {
+            return first.Compose(second, Expression.And);
+        }
 
         /// <summary>
         /// Expression表达式树lambda参数拼接--or
@@ -51,7 +60,10 @@ namespace SharpFort.Core.Helper
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second) => first.Compose(second, Expression.Or);
+        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
+        {
+            return first.Compose(second, Expression.Or);
+        }
     }
 
     /// <summary>

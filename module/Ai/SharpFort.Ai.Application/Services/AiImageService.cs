@@ -302,12 +302,7 @@ public class AiImageService(
     {
         var userId = CurrentUser.GetId();
 
-        var task = await _imageTaskRepository.GetFirstAsync(x => x.Id == input.TaskId && x.UserId == userId);
-        if (task == null)
-        {
-            throw new UserFriendlyException("任务不存在或无权访问");
-        }
-
+        var task = await _imageTaskRepository.GetFirstAsync(x => x.Id == input.TaskId && x.UserId == userId) ?? throw new UserFriendlyException("任务不存在或无权访问");
         if (task.TaskStatus != TaskStatusEnum.Success)
         {
             throw new UserFriendlyException("只有已完成的任务才能发布");

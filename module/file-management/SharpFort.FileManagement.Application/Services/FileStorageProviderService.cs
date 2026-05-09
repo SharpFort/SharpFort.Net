@@ -51,11 +51,7 @@ namespace SharpFort.FileManagement.Application.Services
         /// </summary>
         public async Task SetDefaultAsync(Guid id)
         {
-            var entity = await _repository.GetAsync(x => x.Id == id);
-            if (entity == null)
-            {
-                throw new UserFriendlyException("存储提供者不存在");
-            }
+            var entity = await _repository.GetAsync(x => x.Id == id) ?? throw new UserFriendlyException("存储提供者不存在");
 
             // 取消其他默认
             var currentDefaults = await _repository.GetListAsync(x => x.IsDefault);

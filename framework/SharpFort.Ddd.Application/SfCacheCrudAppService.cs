@@ -59,8 +59,10 @@ namespace SharpFort.Ddd.Application
         /// <summary>
         /// 获取缓存键
         /// </summary>
-        protected virtual string GenerateCacheKey(TKey id) =>
-            $"{typeof(TEntity).Name}:{CurrentTenant.Id ?? Guid.Empty}:{id}";
+        protected virtual string GenerateCacheKey(TKey id)
+        {
+            return $"{typeof(TEntity).Name}:{CurrentTenant.Id ?? Guid.Empty}:{id}";
+        }
 
         /// <summary>
         /// 更新实体并清除缓存

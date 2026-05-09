@@ -30,17 +30,11 @@ public class SfTenantConfigurationProvider(
         if (resolveResult.TenantIdOrName != null)
         {
             //根据租户信息获取租户
-            tenant = await FindTenantAsync(resolveResult.TenantIdOrName);
-
-            if (tenant == null)
-            {
-                throw new BusinessException(
+            tenant = await FindTenantAsync(resolveResult.TenantIdOrName) ?? throw new BusinessException(
                     code: "Volo.AbpIo.MultiTenancy:010001",
                     message: StringLocalizer["TenantNotFoundMessage"],
                     details: StringLocalizer["TenantNotFoundDetails", resolveResult.TenantIdOrName]
                 );
-            }
-
             if (!tenant.IsActive)
             {
                 throw new BusinessException(

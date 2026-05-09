@@ -23,8 +23,16 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         #region Helper Methods
 
-        private static string GetUserSubject(Guid userId) => userId.ToString();
-        private static string GetRoleSubject(string roleCode) => roleCode;
+        private static string GetUserSubject(Guid userId)
+        {
+            return userId.ToString();
+        }
+
+        private static string GetRoleSubject(string roleCode)
+        {
+            return roleCode;
+        }
+
         private string GetTenantDomain(Guid? tenantId)
         {
             var finalTenantId = tenantId ?? _currentTenant.Id;

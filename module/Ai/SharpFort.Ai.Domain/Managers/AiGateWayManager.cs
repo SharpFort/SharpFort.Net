@@ -85,11 +85,7 @@ public class AiGateWayManager : DomainService
                     AppExtraUrl = app.ExtraUrl,
                     ModelType = model.ModelType
                 })
-            .FirstAsync();
-        if (aiModelDescribe is null)
-        {
-            throw new UserFriendlyException($"【{modelId}】模型当前版本【{modelApiType}】格式不支持");
-        }
+            .FirstAsync() ?? throw new UserFriendlyException($"【{modelId}】模型当前版本【{modelApiType}】格式不支持");
 
         // ✅ 统一处理模型前缀（网关层模型规范化）
         aiModelDescribe.ModelId = ModelConst.RemoveModelPrefix(aiModelDescribe.ModelId);

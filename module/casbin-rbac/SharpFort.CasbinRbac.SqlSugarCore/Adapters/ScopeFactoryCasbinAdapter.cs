@@ -32,32 +32,88 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Adapters
         }
 
         // IEpochAdapter (Empty implementation or delegate if stateful - but here state is ephemeral)
-        public void SavePolicy(IPolicyStore model) => throw new NotSupportedException("AutoSave is disabled");
-        public Task SavePolicyAsync(IPolicyStore model) => throw new NotSupportedException("AutoSave is disabled");
+        public void SavePolicy(IPolicyStore model)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public Task SavePolicyAsync(IPolicyStore model)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
         // ISingleAdapter
-        public void AddPolicy(string section, string policyType, IPolicyValues rule) => throw new NotSupportedException("AutoSave is disabled");
-        public Task AddPolicyAsync(string section, string policyType, IPolicyValues rule) => throw new NotSupportedException("AutoSave is disabled");
+        public void AddPolicy(string section, string policyType, IPolicyValues rule)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
-        public void RemovePolicy(string section, string policyType, IPolicyValues rule) => throw new NotSupportedException("AutoSave is disabled");
-        public Task RemovePolicyAsync(string section, string policyType, IPolicyValues rule) => throw new NotSupportedException("AutoSave is disabled");
+        public Task AddPolicyAsync(string section, string policyType, IPolicyValues rule)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
-        public void UpdatePolicy(string section, string policyType, IPolicyValues oldRule, IPolicyValues newRule) => throw new NotSupportedException("AutoSave is disabled");
-        public Task UpdatePolicyAsync(string section, string policyType, IPolicyValues oldRules, IPolicyValues newRules) => throw new NotSupportedException("AutoSave is disabled");
+        public void RemovePolicy(string section, string policyType, IPolicyValues rule)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public Task RemovePolicyAsync(string section, string policyType, IPolicyValues rule)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public void UpdatePolicy(string section, string policyType, IPolicyValues oldRule, IPolicyValues newRule)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public Task UpdatePolicyAsync(string section, string policyType, IPolicyValues oldRules, IPolicyValues newRules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
         // IBatchAdapter
-        public void AddPolicies(string section, string policyType, IReadOnlyList<IPolicyValues> rules) => throw new NotSupportedException("AutoSave is disabled");
-        public Task AddPoliciesAsync(string section, string policyType, IReadOnlyList<IPolicyValues> rules) => throw new NotSupportedException("AutoSave is disabled");
+        public void AddPolicies(string section, string policyType, IReadOnlyList<IPolicyValues> rules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
-        public void RemovePolicies(string section, string policyType, IReadOnlyList<IPolicyValues> rules) => throw new NotSupportedException("AutoSave is disabled");
-        public Task RemovePoliciesAsync(string section, string policyType, IReadOnlyList<IPolicyValues> rules) => throw new NotSupportedException("AutoSave is disabled");
+        public Task AddPoliciesAsync(string section, string policyType, IReadOnlyList<IPolicyValues> rules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
-        public void UpdatePolicies(string section, string policyType, IReadOnlyList<IPolicyValues> oldRules, IReadOnlyList<IPolicyValues> newRules) => throw new NotSupportedException("AutoSave is disabled");
-        public Task UpdatePoliciesAsync(string section, string policyType, IReadOnlyList<IPolicyValues> oldRules, IReadOnlyList<IPolicyValues> newRules) => throw new NotSupportedException("AutoSave is disabled");
+        public void RemovePolicies(string section, string policyType, IReadOnlyList<IPolicyValues> rules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public Task RemovePoliciesAsync(string section, string policyType, IReadOnlyList<IPolicyValues> rules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public void UpdatePolicies(string section, string policyType, IReadOnlyList<IPolicyValues> oldRules, IReadOnlyList<IPolicyValues> newRules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public Task UpdatePoliciesAsync(string section, string policyType, IReadOnlyList<IPolicyValues> oldRules, IReadOnlyList<IPolicyValues> newRules)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
 
         // IFilteredAdapter (Optional but good to match interface if inherited)
         // Note: IAdapter might not inherit IFilteredAdapter by default, but error log showed RemoveFilteredPolicy
-        public void RemoveFilteredPolicy(string section, string policyType, int fieldIndex, IPolicyValues fieldValues) => throw new NotSupportedException("AutoSave is disabled");
-        public Task RemoveFilteredPolicyAsync(string section, string policyType, int fieldIndex, IPolicyValues fieldValues) => throw new NotSupportedException("AutoSave is disabled");
+        public void RemoveFilteredPolicy(string section, string policyType, int fieldIndex, IPolicyValues fieldValues)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
+
+        public Task RemoveFilteredPolicyAsync(string section, string policyType, int fieldIndex, IPolicyValues fieldValues)
+        {
+            throw new NotSupportedException("AutoSave is disabled");
+        }
     }
 }

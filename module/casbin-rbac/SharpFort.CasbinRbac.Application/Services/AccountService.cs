@@ -286,12 +286,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             //校验验证码，根据电话号码获取 value，比对验证码已经uuid
             await ValidationPhoneCaptchaAsync(PhoneValidationType.RetrievePassword, input.Phone, input.Code!);
 
-            var entity = await _userRepository.GetFirstAsync(x => x.Phone == input.Phone);
-            if (entity is null)
-            {
-                throw new UserFriendlyException("该手机号码未注册");
-            }
-
+            var entity = await _userRepository.GetFirstAsync(x => x.Phone == input.Phone) ?? throw new UserFriendlyException("该手机号码未注册");
             await _accountManager.RestPasswordAsync(entity.Id, input.Password);
 
             return entity.UserName;
@@ -353,11 +348,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         public async Task<UserRoleMenuDto> GetAsync()
         {
             //通过鉴权jwt获取到用户的id
-            var userId = _currentUser.Id;
-            if (userId is null)
-            {
-                throw new UserFriendlyException("用户未登录");
-            }
+            var userId = _currentUser.Id ?? throw new UserFriendlyException("用户未登录");
 
             //此处优先从缓存中获取
             var output = await _userManager.GetInfoAsync(userId.Value);

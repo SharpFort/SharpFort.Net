@@ -14,7 +14,10 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 {
     public class SfCasbinRbacDbContext(IAbpLazyServiceProvider lazyServiceProvider) : SqlSugarDbContext(lazyServiceProvider)
     {
-        public ISqlSugarClient GetSqlSugarClient() => SqlSugarClient;
+        public ISqlSugarClient GetSqlSugarClient()
+        {
+            return SqlSugarClient;
+        }
 
         protected IDataFilter DataFilter => LazyServiceProvider.LazyGetRequiredService<IDataFilter>();
         protected ICurrentUser CurrentUser => LazyServiceProvider.GetRequiredService<ICurrentUser>();

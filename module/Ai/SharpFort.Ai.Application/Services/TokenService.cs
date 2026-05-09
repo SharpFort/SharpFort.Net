@@ -139,12 +139,7 @@ public class TokenService(
         var userId = CurrentUser.GetId();
 
         var token = await _tokenRepository._DbQueryable
-            .FirstAsync(x => x.Id == input.Id && x.UserId == userId);
-
-        if (token is null)
-        {
-            throw new UserFriendlyException("Token不存在或无权限操作");
-        }
+            .FirstAsync(x => x.Id == input.Id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
 
         // 检查名称是否重复（排除自己）
         var exists = await _tokenRepository._DbQueryable
@@ -169,13 +164,7 @@ public class TokenService(
         var userId = CurrentUser.GetId();
 
         var token = await _tokenRepository._DbQueryable
-            .FirstAsync(x => x.Id == id && x.UserId == userId);
-
-        if (token is null)
-        {
-            throw new UserFriendlyException("Token不存在或无权限操作");
-        }
-
+            .FirstAsync(x => x.Id == id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
         await _tokenRepository.DeleteAsync(token);
     }
 
@@ -188,13 +177,7 @@ public class TokenService(
         var userId = CurrentUser.GetId();
 
         var token = await _tokenRepository._DbQueryable
-            .FirstAsync(x => x.Id == id && x.UserId == userId);
-
-        if (token is null)
-        {
-            throw new UserFriendlyException("Token不存在或无权限操作");
-        }
-
+            .FirstAsync(x => x.Id == id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
         token.Enable();
         await _tokenRepository.UpdateAsync(token);
     }
@@ -208,13 +191,7 @@ public class TokenService(
         var userId = CurrentUser.GetId();
 
         var token = await _tokenRepository._DbQueryable
-            .FirstAsync(x => x.Id == id && x.UserId == userId);
-
-        if (token is null)
-        {
-            throw new UserFriendlyException("Token不存在或无权限操作");
-        }
-
+            .FirstAsync(x => x.Id == id && x.UserId == userId) ?? throw new UserFriendlyException("Token不存在或无权限操作");
         token.Disable();
         await _tokenRepository.UpdateAsync(token);
     }

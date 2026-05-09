@@ -23,12 +23,7 @@ public class ImageGenerationJob(
 
     public override async Task ExecuteAsync(ImageGenerationJobArgs args)
     {
-        var task = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == args.TaskId);
-        if (task is null)
-        {
-            throw new UserFriendlyException($"{args.TaskId} 图片生成任务不存在");
-        }
-
+        var task = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == args.TaskId) ?? throw new UserFriendlyException($"{args.TaskId} 图片生成任务不存在");
         _logger.LogInformation("开始执行图片生成任务，TaskId: {TaskId}, ModelId: {ModelId}, UserId: {UserId}",
             task.Id, task.ModelId, task.UserId);
         try

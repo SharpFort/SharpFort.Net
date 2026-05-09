@@ -50,12 +50,8 @@ namespace SharpFort.SqlSugarCore.Uow
             var connectionString = tenantConfiguration.GetCurrentConnectionString();
             var dbContextKey = $"{this.GetType().Name}_{connectionString}";
 
-            var unitOfWork = _unitOfWorkManager.Current;
-            if (unitOfWork == null)
-            {
-                throw new AbpException(
+            var unitOfWork = _unitOfWorkManager.Current ?? throw new AbpException(
                     "DbContext 只能在工作单元内工作，当前DbContext没有工作单元，如需创建新线程并发操作，请手动创建工作单元");
-            }
 
             // 尝试从当前工作单元获取数据库API
             var databaseApi = unitOfWork.FindDatabaseApi(dbContextKey);
