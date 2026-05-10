@@ -51,7 +51,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             List<(Guid UserId, Guid RoleId)> userRoleData;
 
             // Create dedicated READ client
-            using (SqlSugarClient readClient = new SqlSugarClient(new ConnectionConfig
+            using (SqlSugarClient readClient = new(new ConnectionConfig
             {
                 ConnectionString = connectionString,
                 DbType = dbType,
@@ -142,7 +142,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             phaseSw.Restart();
 
             // Build dictionaries for fast lookup
-            Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = new Dictionary<Guid, (string RoleCode, string RoleName)>();
+            Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = new();
             foreach ((Guid Id, string RoleCode, string RoleName, bool State) r in roleData)
             {
                 if (!string.IsNullOrEmpty(r.RoleCode))
@@ -156,7 +156,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogValidRolesLoaded(roleDic.Count);
 
-            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = new Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)>();
+            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = new();
             int menuWithApiCount = 0;
             foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State) m in menuData)
             {
@@ -168,7 +168,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogMenusLoaded(menuDic.Count, menuWithApiCount);
 
-            List<CasbinRule> rulesToInsert = new List<CasbinRule>();
+            List<CasbinRule> rulesToInsert = new();
 
             // Build p rules (role-permission)
             LogBuildingPRules();
@@ -274,7 +274,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
 
             // Create dedicated WRITE client
-            using (SqlSugarClient writeClient = new SqlSugarClient(new ConnectionConfig
+            using (SqlSugarClient writeClient = new(new ConnectionConfig
             {
                 ConnectionString = connectionString,
                 DbType = dbType,
@@ -357,7 +357,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 return input;
             }
 
-            StringBuilder result = new System.Text.StringBuilder();
+            StringBuilder result = new();
             result.Append(char.ToLowerInvariant(input[0]));
 
             for (int i = 1; i < input.Length; i++)

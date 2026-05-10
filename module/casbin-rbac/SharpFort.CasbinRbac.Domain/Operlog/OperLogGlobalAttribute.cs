@@ -65,7 +65,7 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
 
             //日志服务插入一条操作记录即可
 
-            OperationLogEntity logEntity = new OperationLogEntity();
+            OperationLogEntity logEntity = new();
             logEntity.OperIp = ip;
             //logEntity.OperLocation = location;
             logEntity.OperationType = operLogAttribute.OperationType;

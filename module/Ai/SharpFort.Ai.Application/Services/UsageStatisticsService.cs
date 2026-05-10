@@ -52,7 +52,7 @@ public class UsageStatisticsService(
             .ToListAsync();
 
         // 生成完整的7天数据，包括没有使用记录的日期
-        List<DailyTokenUsageDto> result = new List<DailyTokenUsageDto>();
+        List<DailyTokenUsageDto> result = new();
         for (int i = 0; i < 7; i++)
         {
             DateTime date = startDate.AddDays(i);
@@ -120,7 +120,7 @@ public class UsageStatisticsService(
         Guid userId = CurrentUser.GetId();
         DateTime now = DateTime.Now;
         DateTime startTime = now.AddHours(-23); // 滚动24小时，从23小时前到现在
-        DateTime startHour = new DateTime(startTime.Year, startTime.Month, startTime.Day, startTime.Hour, 0, 0);
+        DateTime startHour = new(startTime.Year, startTime.Month, startTime.Day, startTime.Hour, 0, 0);
 
         // 从Message表查询近24小时的数据，只选择需要的字段
         var messages = await _messageRepository._DbQueryable
@@ -153,7 +153,7 @@ public class UsageStatisticsService(
             .ToList();
 
         // 生成完整的24小时数据
-        List<HourlyTokenUsageDto> result = new List<HourlyTokenUsageDto>();
+        List<HourlyTokenUsageDto> result = new();
         for (int i = 0; i < 24; i++)
         {
             DateTime hour = startHour.AddHours(i);

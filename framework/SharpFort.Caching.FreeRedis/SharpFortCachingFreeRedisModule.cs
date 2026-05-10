@@ -54,7 +54,7 @@ namespace SharpFort.Caching.FreeRedis
         private static void RegisterRedisServices(ServiceConfigurationContext context, IConfiguration configuration)
         {
             string? redisConfiguration = configuration[RedisConfigurationKey];
-            RedisClient redisClient = new RedisClient(redisConfiguration);
+            RedisClient redisClient = new(redisConfiguration);
 
             context.Services.AddSingleton<IRedisClient>(redisClient);
             context.Services.Replace(ServiceDescriptor.Singleton<IDistributedCache>(

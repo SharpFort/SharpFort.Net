@@ -34,13 +34,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 1. Load Rules
             List<RoleField> allRules = await repo.GetListAsync();
-            ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>> newCache = new ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>>();
+            ConcurrentDictionary<Guid, Dictionary<string, HashSet<string>>> newCache = new();
 
             IEnumerable<IGrouping<Guid, RoleField>> grouped = allRules.GroupBy(x => x.RoleId);
             foreach (IGrouping<Guid, RoleField> group in grouped)
             {
                 Guid roleId = group.Key;
-                Dictionary<string, HashSet<string>> resourceMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, HashSet<string>> resourceMap = new(StringComparer.OrdinalIgnoreCase);
 
                 foreach (RoleField? rule in group)
                 {
@@ -56,7 +56,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 2. Load Roles for Code Mapping
             List<Role> allRoles = await roleRepo.GetListAsync();
-            ConcurrentDictionary<string, Guid> newRoleMap = new ConcurrentDictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+            ConcurrentDictionary<string, Guid> newRoleMap = new(StringComparer.OrdinalIgnoreCase);
             foreach (Role role in allRoles)
             {
                 if (!string.IsNullOrEmpty(role.RoleCode))
@@ -72,7 +72,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public HashSet<string> GetDenyFields(IEnumerable<Guid> roleIds, string resourceName)
         {
-            HashSet<string> denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> denyList = new(StringComparer.OrdinalIgnoreCase);
             if (roleIds == null || !roleIds.Any())
             {
                 return denyList;
@@ -90,7 +90,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// </summary>
         public HashSet<string> GetDenyFieldsByCodes(IEnumerable<string> roleCodes, string resourceName)
         {
-            HashSet<string> denyList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> denyList = new(StringComparer.OrdinalIgnoreCase);
             if (roleCodes == null || !roleCodes.Any())
             {
                 return denyList;

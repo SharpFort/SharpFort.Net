@@ -27,7 +27,7 @@ namespace SharpFort.FileManagement.Domain.Services
             }
 
             string filePath = Path.Combine(dirPath, blobName);
-            using FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            using FileStream fileStream = new(filePath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
 
             LogFileSavedToLocal(filePath);

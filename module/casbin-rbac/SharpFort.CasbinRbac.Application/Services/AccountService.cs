@@ -104,7 +104,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         [RemoteService(isEnabled: false)]
         public async Task<LoginOutputDto> PostLoginAsync(Guid userId)
         {
-            UserRoleMenuDto userInfo = new UserRoleMenuDto();
+            UserRoleMenuDto userInfo = new();
             //获取token
             string accessToken = await _accountManager.GetTokenByUserIdAsync(userId, (info) => userInfo = info);
             string refreshToken = _accountManager.CreateRefreshToken(userId);
@@ -122,7 +122,7 @@ namespace SharpFort.CasbinRbac.Application.Services
                 ClientInfoHelper.ClientResult clientInfo = ClientInfoHelper.GetClientInfo(_httpContextAccessor.HttpContext);
 
                 // 2. 直接创建 Event 对象 (不要再 New LoginLog 了)
-                LoginEventArgs loginEto = new LoginEventArgs
+                LoginEventArgs loginEto = new()
                 {
                     UserId = userInfo.User.Id,
                     UserName = userInfo.User.UserName,

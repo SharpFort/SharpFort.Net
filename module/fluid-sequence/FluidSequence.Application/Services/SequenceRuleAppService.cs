@@ -35,7 +35,7 @@ namespace SharpFort.FluidSequence.Application.Services
 
         public Task<List<PlaceholderMetaDto>> GetPlaceholdersAsync()
         {
-            List<PlaceholderMetaDto> dtos = new List<PlaceholderMetaDto>();
+            List<PlaceholderMetaDto> dtos = new();
             foreach (PlaceholderMeta meta in PlaceholderRegistry.Definitions)
             {
                 dtos.Add(new PlaceholderMetaDto

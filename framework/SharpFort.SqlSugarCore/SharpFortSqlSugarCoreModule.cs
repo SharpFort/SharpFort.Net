@@ -46,7 +46,7 @@ namespace SharpFort.SqlSugarCore
             IConfigurationSection section = configuration.GetSection("DbConnOptions");
             Configure<DbConnOptions>(section);
 
-            DbConnOptions dbConnOptions = new DbConnOptions();
+            DbConnOptions dbConnOptions = new();
             section.Bind(dbConnOptions);
 
             // 配置默认连接字符串

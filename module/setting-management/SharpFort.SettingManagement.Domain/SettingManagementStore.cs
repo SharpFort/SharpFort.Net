@@ -85,7 +85,7 @@ public class SettingManagementStore(
         Dictionary<string, string> settingsDictionary = (await SettingRepository.GetListAsync(providerName, providerKey))
             .ToDictionary(s => s.Name, s => s.Value);
 
-        List<KeyValuePair<string, SettingCacheItem>> cacheItems = new List<KeyValuePair<string, SettingCacheItem>>();
+        List<KeyValuePair<string, SettingCacheItem>> cacheItems = new();
 
         foreach (SettingDefinition settingDefinition in settingDefinitions)
         {
@@ -112,7 +112,7 @@ public class SettingManagementStore(
     {
         Check.NotNullOrEmpty(names, nameof(names));
 
-        List<SettingValue> result = new List<SettingValue>();
+        List<SettingValue> result = new();
 
         if (names.Length == 1)
         {
@@ -145,7 +145,7 @@ public class SettingManagementStore(
 
         List<KeyValuePair<string, SettingCacheItem>> newCacheItems = await SetCacheItemsAsync(providerName, providerKey, notCacheKeys);
 
-        List<KeyValuePair<string, SettingCacheItem>> result = new List<KeyValuePair<string, SettingCacheItem>>();
+        List<KeyValuePair<string, SettingCacheItem>> result = new();
         foreach (string? key in cacheKeys)
         {
             KeyValuePair<string, SettingCacheItem> item = newCacheItems.FirstOrDefault(x => x.Key == key);
@@ -172,7 +172,7 @@ public class SettingManagementStore(
         Dictionary<string, string> settingsDictionary = (await SettingRepository.GetListAsync([.. notCacheKeys.Select(GetSettingNameFormCacheKeyOrNull)], providerName, providerKey))
             .ToDictionary(s => s.Name, s => s.Value);
 
-        List<KeyValuePair<string, SettingCacheItem>> cacheItems = new List<KeyValuePair<string, SettingCacheItem>>();
+        List<KeyValuePair<string, SettingCacheItem>> cacheItems = new();
 
         foreach (SettingDefinition? settingDefinition in settingDefinitions)
         {

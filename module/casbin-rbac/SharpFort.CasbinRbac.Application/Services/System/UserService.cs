@@ -102,7 +102,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 }
             }
 
-            PagedResultDto<UserGetListOutputDto> result = new PagedResultDto<UserGetListOutputDto>();
+            PagedResultDto<UserGetListOutputDto> result = new();
             result.Items = outPut;
             result.TotalCount = total;
             return result;

@@ -111,7 +111,7 @@ public class TokenService(
             throw new UserFriendlyException($"名称【{input.Name}】已存在，请使用其他名称");
         }
 
-        Token token = new Token(userId, input.Name)
+        Token token = new(userId, input.Name)
         {
             ExpireTime = input.ExpireTime
         };

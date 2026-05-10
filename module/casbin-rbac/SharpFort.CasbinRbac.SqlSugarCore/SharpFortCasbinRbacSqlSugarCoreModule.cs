@@ -51,7 +51,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                 // Create Enforcer based on configuration
                 // Note: Casbin.NET version used doesn't have CachedEnforcer class
                 // We use standard Enforcer and control policy loading strategy via configuration
-                Enforcer enforcer = new Enforcer(modelPath, adapter);
+                Enforcer enforcer = new(modelPath, adapter);
 
                 if (casbinOptions.EnableCachedEnforcer)
                 {
@@ -85,7 +85,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                             string? redisConn = config["Redis:Configuration"];
                             if (!string.IsNullOrEmpty(redisConn))
                             {
-                                RedisWatcher watcher = new RedisWatcher(redisConn);
+                                RedisWatcher watcher = new(redisConn);
                                 enforcer.SetWatcher(watcher);
 
                                 // Callback to handle policy updates from other instances

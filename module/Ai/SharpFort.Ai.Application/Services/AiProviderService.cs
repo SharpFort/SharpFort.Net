@@ -56,7 +56,7 @@ public class AiProviderService(
     [HttpPost("ai-provider")]
     public async Task<AiProviderDto> CreateAsync(AiProviderCreateInput input)
     {
-        AiProvider entity = new AiProvider
+        AiProvider entity = new()
         {
             Name = input.Name,
             Endpoint = input.Endpoint,

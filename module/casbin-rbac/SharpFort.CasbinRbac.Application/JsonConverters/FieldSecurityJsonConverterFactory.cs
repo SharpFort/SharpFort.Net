@@ -53,7 +53,7 @@ namespace SharpFort.CasbinRbac.Application.JsonConverters
 
             // 实际上，对于输出控制，Read 很少用到 (除非是 Update 接口的入参 DTO 复用)
             // 我们暂时实现一个基于默认反序列化的逻辑 (Clone options 移除 factory)
-            JsonSerializerOptions newOptions = new JsonSerializerOptions(options);
+            JsonSerializerOptions newOptions = new(options);
             // 必须移除当前的 Factory 否则死循环
             // 但很难找到当前 Factory 实例... 
 

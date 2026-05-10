@@ -25,7 +25,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         {
             return await Task.Run(() =>
             {
-                MonitorServerInfoDto dto = new MonitorServerInfoDto();
+                MonitorServerInfoDto dto = new();
 
                 // PERFORMANCE FIX: Never call RefreshAll() in a request loop! It queries BIOS, Motherboard, Batteries, etc., and blocks the thread.
                 // Create a scoped instance and ONLY refresh what we specifically need (Memory and CPU are fast).

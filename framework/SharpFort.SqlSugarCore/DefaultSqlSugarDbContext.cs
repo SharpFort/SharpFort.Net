@@ -260,7 +260,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
     /// <returns></returns>
     protected virtual EntityEventReport? CreateEventReport(object entity)
     {
-        EntityEventReport eventReport = new EntityEventReport();
+        EntityEventReport eventReport = new();
 
         //判断是否为领域事件-聚合根
         IGeneratesDomainEvents? generatesDomainEventsEntity = entity as IGeneratesDomainEvents;

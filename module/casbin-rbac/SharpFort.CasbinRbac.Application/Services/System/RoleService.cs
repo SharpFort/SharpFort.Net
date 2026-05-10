@@ -60,7 +60,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 await _roleDeptRepository.InsertRangeAsync(insertEntities);
             }
 
-            Role entity = new Role() { DataScope = input.DataScope };
+            Role entity = new() { DataScope = input.DataScope };
             EntityHelper.TrySetId(entity, () => input.RoleId);
             await _repository._Db.Updateable(entity).UpdateColumns(x => x.DataScope).ExecuteCommandAsync();
         }

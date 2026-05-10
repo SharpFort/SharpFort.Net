@@ -35,7 +35,7 @@ public partial class SfModuleManager(
         LogModuleInitStart();
 
         int moduleCount = 0;
-        Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch = new();
         long totalTime = 0L;
 
         foreach (IModuleLifecycleContributor contributor in _lifecycleContributors)

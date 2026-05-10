@@ -70,7 +70,7 @@ public class SystemUsageStatisticsService(
         var modelStatDict = modelStats.ToDictionary(x => x.ModelId, x => x);
 
         // 3. 构建结果列表,使用去重后的模型列表
-        List<ModelTokenStatisticsDto> result = new List<ModelTokenStatisticsDto>();
+        List<ModelTokenStatisticsDto> result = new();
         foreach (AiModel? model in distinctModels)
         {
             modelStatDict.TryGetValue(model.ModelId, out var stat);

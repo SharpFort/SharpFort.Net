@@ -217,7 +217,7 @@ public static class GeminiGenerateContentAcquirer
     /// </summary>
     private static string FindMarkdownImageInResponse(JsonElement element)
     {
-        List<string> allTexts = new List<string>();
+        List<string> allTexts = new();
         CollectTextFields(element, allTexts);
 
         // 从最后一个 text 开始查找

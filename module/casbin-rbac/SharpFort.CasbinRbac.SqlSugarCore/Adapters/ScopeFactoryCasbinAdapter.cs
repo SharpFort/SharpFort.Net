@@ -19,7 +19,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Adapters
         {
             using IServiceScope scope = _scopeFactory.CreateScope();
             ISqlSugarDbContext dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
-            SqlSugarAdapter adapter = new SqlSugarAdapter(dbContext.SqlSugarClient);
+            SqlSugarAdapter adapter = new(dbContext.SqlSugarClient);
             adapter.LoadPolicy(model);
         }
 
@@ -27,7 +27,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Adapters
         {
             using IServiceScope scope = _scopeFactory.CreateScope();
             ISqlSugarDbContext dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
-            SqlSugarAdapter adapter = new SqlSugarAdapter(dbContext.SqlSugarClient);
+            SqlSugarAdapter adapter = new(dbContext.SqlSugarClient);
             await adapter.LoadPolicyAsync(model);
         }
 

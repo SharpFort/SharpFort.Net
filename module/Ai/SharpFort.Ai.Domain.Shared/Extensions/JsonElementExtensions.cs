@@ -334,7 +334,7 @@ public static class JsonElementExtensions
             return null;
         }
 
-        Dictionary<string, JsonElement> dict = new Dictionary<string, JsonElement>();
+        Dictionary<string, JsonElement> dict = new();
         foreach (JsonProperty prop in element.Value.EnumerateObject())
         {
             dict[prop.Name] = prop.Value;

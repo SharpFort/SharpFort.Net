@@ -175,7 +175,7 @@ namespace SharpFort.AspNetCore.Microsoft.Extensions.DependencyInjection
             openApiSchema.Type = JsonSchemaType.String;
             openApiSchema.Format = null;
 
-            StringBuilder enumDescriptions = new StringBuilder();
+            StringBuilder enumDescriptions = new();
             foreach (string enumName in Enum.GetNames(context.Type))
             {
                 Enum enumValue = (Enum)Enum.Parse(context.Type, enumName);

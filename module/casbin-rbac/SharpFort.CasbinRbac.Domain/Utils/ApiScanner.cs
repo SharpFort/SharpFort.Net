@@ -21,7 +21,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                 .Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract)
                 .ToList();
 
-            List<Menu> newMenus = new List<Menu>();
+            List<Menu> newMenus = new();
 
             foreach (Type? controller in controllers)
             {
@@ -60,7 +60,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                     {
                         // 创建新的 API 资源 (作为 Menu 存储，Type=Button/Api)
                         // 注意：这里只是为了方便管理，实际 Menu 结构可能需要调整
-                        Menu menu = new Menu(
+                        Menu menu = new(
                             Guid.NewGuid(),
                             $"{controller.Name}.{method.Name}", // Name
                             fullPath, // Router/Url

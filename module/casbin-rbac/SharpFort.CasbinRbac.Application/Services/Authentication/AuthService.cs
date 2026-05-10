@@ -64,7 +64,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
             }
 
             // var openAuth = new OpenAuth(scheme, userId ?? Guid.Empty, openId, name);
-            OpenAuth openAuth = new OpenAuth(Guid.NewGuid(), userId ?? Guid.Empty, scheme, openId, name);
+            OpenAuth openAuth = new(Guid.NewGuid(), userId ?? Guid.Empty, scheme, openId, name);
 
             await _repository.InsertAsync(openAuth);
         }

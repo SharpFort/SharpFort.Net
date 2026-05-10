@@ -66,7 +66,7 @@ public class SqlSugarNonPublicSerializer : ISerializeService
                 .Invoke(null, new object[] { value, null! });
             return json!;
         }
-        JsonSerializerSettings jSetting = new JsonSerializerSettings
+        JsonSerializerSettings jSetting = new()
         {
             NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new NonPublicPropertiesResolver() //替换默认解析器使能支持protect

@@ -76,7 +76,7 @@ namespace SharpFort.SqlSugarCore.Uow
             string connectionStringName,
             string connectionString)
         {
-            SqlSugarDbContextCreationContext creationContext = new SqlSugarDbContextCreationContext(connectionStringName, connectionString);
+            SqlSugarDbContextCreationContext creationContext = new(connectionStringName, connectionString);
             using (SqlSugarDbContextCreationContext.Use(creationContext))
             {
                 return await CreateDbContextAsync(unitOfWork);
@@ -104,7 +104,7 @@ namespace SharpFort.SqlSugarCore.Uow
             if (activeTransaction == null)
             {
                 TDbContext dbContext = unitOfWork.ServiceProvider.GetRequiredService<TDbContext>();
-                SqlSugarTransactionApi transaction = new SqlSugarTransactionApi(dbContext);
+                SqlSugarTransactionApi transaction = new(dbContext);
                 unitOfWork.AddTransactionApi(transactionApiKey, transaction);
 
                 await dbContext.SqlSugarClient.Ado.BeginTranAsync();

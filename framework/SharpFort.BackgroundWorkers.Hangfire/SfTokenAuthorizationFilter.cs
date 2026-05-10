@@ -125,7 +125,7 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
     /// <param name="token">令牌值</param>
     private void SetTokenCookie(HttpContext httpContext, string token)
     {
-        CookieOptions cookieOptions = new CookieOptions
+        CookieOptions cookieOptions = new()
         {
             Expires = DateTimeOffset.Now.Add(_tokenExpiration),
             HttpOnly = true,

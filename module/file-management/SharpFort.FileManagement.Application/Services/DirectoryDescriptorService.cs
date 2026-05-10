@@ -35,7 +35,7 @@ namespace SharpFort.FileManagement.Application.Services
                 throw new UserFriendlyException("同级目录下已存在同名目录");
             }
 
-            DirectoryDescriptor entity = new DirectoryDescriptor(_guidGenerator.Create(), input.Name, input.ParentId);
+            DirectoryDescriptor entity = new(_guidGenerator.Create(), input.Name, input.ParentId);
             await _repository.InsertAsync(entity);
 
             return entity.Adapt<DirectoryDescriptorGetOutputDto>();

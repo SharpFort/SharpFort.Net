@@ -15,7 +15,7 @@ namespace SharpFort.Tool.Domain
             //缓存设置1分钟获取一次结果
             this.NugetResult = cache.GetOrAdd("NugetResult", () => { return InitData(); }, () =>
             {
-                DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
+                DistributedCacheEntryOptions options = new();
                 options.AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1);
                 return options;
             })!;

@@ -52,7 +52,7 @@ namespace SharpFort.Core.Helper
         public static string Bash(string command)
         {
             string escapedArgs = command.Replace("\"", "\\\"");
-            Process process = new Process()
+            Process process = new()
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -91,7 +91,7 @@ namespace SharpFort.Core.Helper
         {
             string output = string.Empty;
 
-            ProcessStartInfo info = new ProcessStartInfo();
+            ProcessStartInfo info = new();
             info.FileName = fileName;
             info.Arguments = args;
             info.RedirectStandardOutput = true;

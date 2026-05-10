@@ -164,7 +164,7 @@ namespace SharpFort.Core.Helper
                 {
                     try
                     {
-                        DiskInfo obj = new DiskInfo()
+                        DiskInfo obj = new()
                         {
                             DiskName = item.Name,
                             TypeName = item.DriveType.ToString(),
@@ -360,7 +360,7 @@ namespace SharpFort.Core.Helper
         public static MemoryMetrics GetWindowsMetrics()
         {
             string output = ShellHelper.Cmd("wmic", "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value");
-            MemoryMetrics metrics = new MemoryMetrics();
+            MemoryMetrics metrics = new();
             string[] lines = output.Trim().Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
 
             if (lines.Length <= 0)
@@ -392,7 +392,7 @@ free_mem=$(cat /proc/meminfo | grep -i ""MemFree"" | awk '{print $2}')
 # 显示提取的信息
 echo $total_mem $used_mem $free_mem
  ");
-            MemoryMetrics metrics = new MemoryMetrics();
+            MemoryMetrics metrics = new();
 
             if (!string.IsNullOrWhiteSpace(output))
             {

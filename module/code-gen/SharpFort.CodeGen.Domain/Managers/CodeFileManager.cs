@@ -19,7 +19,7 @@ namespace SharpFort.CodeGen.Domain.Managers
             List<Template> templates = await _repository.GetListAsync();
             foreach (Template template in templates)
             {
-                HandledTemplate handledTempalte = new HandledTemplate
+                HandledTemplate handledTempalte = new()
                 {
                     TemplateStr = template.Content,
                     BuildPath = template.BuildPath

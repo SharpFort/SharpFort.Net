@@ -75,7 +75,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 1. 持久化
             // g rule: V0=sub(User), V1=role(Role), V2=domain
-            CasbinRule rule = new CasbinRule
+            CasbinRule rule = new()
             {
                 PType = "g",
                 V0 = sub,
@@ -160,8 +160,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 删除该角色在该域下的所有权限 (p, roleSub, domain, ?, ?)
             await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain).ExecuteCommandAsync();
 
-            List<string[]> newPolicies = new List<string[]>();
-            List<CasbinRule> newRules = new List<CasbinRule>();
+            List<string[]> newPolicies = new();
+            List<CasbinRule> newRules = new();
 
             foreach (Menu menu in menus)
             {

@@ -61,7 +61,7 @@ public class SettingManager : ISettingManager, ISingletonDependency
             return [];
         }
 
-        Dictionary<string, SettingValue> settingValues = new Dictionary<string, SettingValue>();
+        Dictionary<string, SettingValue> settingValues = new();
 
         foreach (SettingDefinition setting in settingDefinitions)
         {

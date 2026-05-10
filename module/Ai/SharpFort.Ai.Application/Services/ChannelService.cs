@@ -59,7 +59,7 @@ public class ChannelService(
     /// </summary>
     public async Task<AiAppDto> CreateAppAsync(AiAppCreateInput input)
     {
-        AiProvider entity = new AiProvider
+        AiProvider entity = new()
         {
             Name = input.Name,
             Endpoint = input.Endpoint,
@@ -161,7 +161,7 @@ public class ChannelService(
             throw new Volo.Abp.UserFriendlyException("指定的AI应用不存在");
         }
 
-        AiModel entity = new AiModel
+        AiModel entity = new()
         {
             HandlerName = input.HandlerName,
             ModelId = input.ModelId,

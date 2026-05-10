@@ -12,7 +12,7 @@ namespace SharpFort.Tool.Domain
         {
             IConfiguration configuration = context.Services.GetConfiguration();
             Configure<ToolOptions>(configuration.GetSection("ToolOptions"));
-            ToolOptions toolOptions = new ToolOptions();
+            ToolOptions toolOptions = new();
             configuration.GetSection("ToolOptions").Bind(toolOptions);
             if (!Directory.Exists(toolOptions.TempDirPath))
             {

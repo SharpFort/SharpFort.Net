@@ -84,14 +84,14 @@ namespace SharpFort.TenantManagement.Domain
         protected virtual async Task<TenantCacheItem> SetCacheAsync(string cacheKey, [CanBeNull] Tenant? tenant)
         {
             TenantConfiguration? tenantConfiguration = tenant != null ? MapToConfiguration(tenant) : null;
-            TenantCacheItem cacheItem = new TenantCacheItem(tenantConfiguration!);
+            TenantCacheItem cacheItem = new(tenantConfiguration!);
             await Cache.SetAsync(cacheKey, cacheItem, considerUow: true);
             return cacheItem;
         }
 
         private static TenantConfiguration MapToConfiguration(Tenant Tenant)
         {
-            TenantConfiguration tenantConfiguration = new TenantConfiguration();
+            TenantConfiguration tenantConfiguration = new();
             tenantConfiguration.Id = Tenant.Id;
             tenantConfiguration.Name = Tenant.Name;
             tenantConfiguration.ConnectionStrings = MaptoString(Tenant.TenantConnectionString);
@@ -101,7 +101,7 @@ namespace SharpFort.TenantManagement.Domain
 
         private static ConnectionStrings? MaptoString(string tenantConnectionString)
         {
-            ConnectionStrings connectionStrings = new ConnectionStrings
+            ConnectionStrings connectionStrings = new()
             {
                 [ConnectionStrings.DefaultConnectionStringName] = tenantConnectionString
             };

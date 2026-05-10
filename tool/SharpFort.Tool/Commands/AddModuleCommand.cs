@@ -36,7 +36,7 @@ namespace SharpFort.Tool.Commands
                 }
 
                 CheckFirstSlnPath(slnPath);
-                List<string> dotnetSlnCommandPart = new List<string>() { "Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore" };
+                List<string> dotnetSlnCommandPart = new() { "Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore" };
                 string[] paths = dotnetSlnCommandPart.Select(x => Path.Combine(modulePath, $"{moduleName}.{x}")).ToArray();
                 CheckPathExist(paths);
 

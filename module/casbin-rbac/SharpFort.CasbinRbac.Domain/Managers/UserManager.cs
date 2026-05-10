@@ -67,7 +67,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 2. Casbin 同步逻辑
             List<User> users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
-            List<Role> roles = new List<Role>();
+            List<Role> roles = new();
             if (roleIds is not null && roleIds.Count > 0)
             {
                 roles = await _roleRepository.GetListAsync(r => roleIds.Contains(r.Id));
@@ -201,7 +201,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private static UserRoleMenuDto EntityMapToDto(User user)
         {
-            UserRoleMenuDto userRoleMenu = new UserRoleMenuDto();
+            UserRoleMenuDto userRoleMenu = new();
             if (user is null)
             {
                 throw new UserFriendlyException($"数据错误，查询用户不存在，请重新登录");

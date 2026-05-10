@@ -176,7 +176,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 配置读写分离
-            List<SlaveConnectionConfig> slaveConfigs = new List<SlaveConnectionConfig>();
+            List<SlaveConnectionConfig> slaveConfigs = new();
             if (dbConnOptions.EnabledReadWrite)
             {
                 if (dbConnOptions.ReadUrl is null)
@@ -189,7 +189,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 创建连接配置
-            ConnectionConfig connectionConfig = new ConnectionConfig
+            ConnectionConfig connectionConfig = new()
             {
                 ConfigId = ConnectionStrings.DefaultConnectionStringName,
                 DbType = dbConnOptions.DbType ?? DbType.Sqlite,

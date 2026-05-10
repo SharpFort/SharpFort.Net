@@ -233,7 +233,7 @@ namespace SharpFort.Core.Helper
             byte[] privateKeyBits = Convert.FromBase64String(privateKey);
 
             RSA rsa = RSA.Create();
-            RSAParameters rsaParameters = new RSAParameters();
+            RSAParameters rsaParameters = new();
 
             using (BinaryReader binr = new(new MemoryStream(privateKeyBits)))
             {

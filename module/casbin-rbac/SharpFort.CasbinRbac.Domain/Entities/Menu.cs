@@ -253,7 +253,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             List<Vue3RouterDto> routers = [];
             foreach (Menu m in menus)
             {
-                Vue3RouterDto r = new Vue3RouterDto();
+                Vue3RouterDto r = new();
                 r.OrderNum = m.OrderNum;
                 string? routerName = m.Router?.Split("/").LastOrDefault();
                 r.Id = m.Id;

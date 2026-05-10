@@ -72,7 +72,7 @@ public class AiModelService(
             throw new UserFriendlyException("指定的AI供应商不存在");
         }
 
-        AiModel entity = new AiModel
+        AiModel entity = new()
         {
             HandlerName = input.HandlerName,
             ModelId = input.ModelId,

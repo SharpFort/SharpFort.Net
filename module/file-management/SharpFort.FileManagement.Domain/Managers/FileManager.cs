@@ -47,11 +47,11 @@ namespace SharpFort.FileManagement.Domain.Managers
             FileStorageProvider? defaultProvider = await GetDefaultProviderAsync();
             string providerName = defaultProvider?.ProviderType.ToString() ?? "Local";
 
-            List<FileDescriptor> entities = new List<FileDescriptor>();
+            List<FileDescriptor> entities = new();
             foreach (IFormFile file in files)
             {
                 string mimeType = FileDescriptor.GetMimeType(file.FileName);
-                FileDescriptor entity = new FileDescriptor(
+                FileDescriptor entity = new(
                     _guidGenerator.Create(),
                     file.FileName,
                     mimeType,

@@ -29,7 +29,7 @@ public class ImageGenerationJob(
         try
         {
             // 构建 Gemini API 请求对象
-            List<object> parts = new List<object>
+            List<object> parts = new()
             {
                 new { text = task.Prompt }
             };

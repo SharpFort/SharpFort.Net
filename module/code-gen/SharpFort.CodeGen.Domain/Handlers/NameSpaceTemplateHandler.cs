@@ -4,7 +4,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
     {
         public HandledTemplate Invoker(string str, string path)
         {
-            HandledTemplate output = new HandledTemplate
+            HandledTemplate output = new()
             {
                 TemplateStr = str.Replace("@namespace", ""),
                 BuildPath = path

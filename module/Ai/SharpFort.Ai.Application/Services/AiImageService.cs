@@ -63,7 +63,7 @@ public class AiImageService(
 
 
         // 创建任务实体
-        ImageStoreTaskAggregateRoot task = new ImageStoreTaskAggregateRoot
+        ImageStoreTaskAggregateRoot task = new()
         {
             Prompt = input.Prompt,
             ReferenceImagesPrefixBase64 = input.ReferenceImagesPrefixBase64 ?? [],

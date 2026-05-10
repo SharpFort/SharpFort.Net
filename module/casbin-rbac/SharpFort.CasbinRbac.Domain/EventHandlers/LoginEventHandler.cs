@@ -22,7 +22,7 @@ namespace SharpFort.CasbinRbac.Domain.EventHandlers
         {
             LogUserLogin(eventData.UserId, eventData.UserName);
 
-            LoginLog loginLogEntity = new LoginLog(
+            LoginLog loginLogEntity = new(
                 id: _guidGenerator.Create(),
                 loginUser: eventData.UserName,
                 logMsg: eventData.UserName + "登录系统",

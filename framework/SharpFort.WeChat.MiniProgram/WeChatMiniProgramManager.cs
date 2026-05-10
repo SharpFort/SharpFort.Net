@@ -20,7 +20,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
     public async Task<Code2SessionResponse> Code2SessionAsync(Code2SessionInput input)
     {
         string url = "https://api.weixin.qq.com/sns/jscode2session";
-        Code2SessionRequest req = new Code2SessionRequest();
+        Code2SessionRequest req = new();
         req.js_code = input.js_code;
         req.secret = _options.AppSecret;
         req.appid = _options.AppID;
@@ -28,7 +28,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
         using (HttpClient httpClient = new())
         {
             string queryString = req.ToQueryString();
-            UriBuilder builder = new UriBuilder(url);
+            UriBuilder builder = new(url);
             builder.Query = queryString;
             HttpResponseMessage response = await httpClient.GetAsync(builder.ToString());
             Code2SessionResponse? responseBody = await response.Content.ReadFromJsonAsync<Code2SessionResponse>();
@@ -49,7 +49,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
     {
         string token = await _weChatToken.GetTokenAsync();
         string url = $"https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token={token}";
-        SubscribeNoticeRequest req = new SubscribeNoticeRequest
+        SubscribeNoticeRequest req = new()
         {
             touser = input.touser,
             template_id = input.template_id,
@@ -61,7 +61,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
 
         using (HttpClient httpClient = new())
         {
-            StringContent body = new StringContent(JsonConvert.SerializeObject(req));
+            StringContent body = new(JsonConvert.SerializeObject(req));
             HttpResponseMessage response = await httpClient.PostAsync(url, body);
             SubscribeNoticeResponse? responseBody = await response.Content.ReadFromJsonAsync<SubscribeNoticeResponse>();
             responseBody.ValidateSuccess();

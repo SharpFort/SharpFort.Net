@@ -32,7 +32,7 @@ namespace SharpFort.CodeGen.Domain.Managers
                     .Where(x => x.GetCustomAttribute<SplitTableAttribute>() is null));
             }
 
-            List<Table> tables = new List<Table>();
+            List<Table> tables = new();
             foreach (Type entityType in entityTypes)
             {
                 tables.Add(EntityTypeMapperToTable(entityType));
@@ -43,7 +43,7 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         private static Table EntityTypeMapperToTable(Type entityType)
         {
-            Table table = new Table();
+            Table table = new();
             table.Fields = [];
             SugarTable? sugarTable = entityType.GetCustomAttribute<SugarTable>();
 
@@ -60,7 +60,7 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         private static Field PropertyMapperToFiled(PropertyInfo propertyInfo)
         {
-            Field fieldEntity = new Field();
+            Field fieldEntity = new();
             fieldEntity.Name = propertyInfo.Name;
 
 

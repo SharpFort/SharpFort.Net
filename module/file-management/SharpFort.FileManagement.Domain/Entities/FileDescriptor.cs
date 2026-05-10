@@ -267,7 +267,7 @@ namespace SharpFort.FileManagement.Domain.Entities
         /// </summary>
         public static string GetMimeType(string fileName)
         {
-            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+            FileExtensionContentTypeProvider provider = new();
             return provider.TryGetContentType(fileName, out string? contentType) ? contentType : "application/octet-stream";
         }
 
