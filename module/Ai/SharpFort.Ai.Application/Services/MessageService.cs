@@ -56,7 +56,7 @@ public class MessageService(ISqlSugarRepository<ChatMessage> repository) : Appli
         }
 
         // 标记当前消息为隐藏
-        List<Guid> idsToHide = messages.Select(x => x.Id).ToList();
+        List<Guid> idsToHide = [.. messages.Select(x => x.Id)];
 
         // 如果需要删除后续消息
         if (input.IsDeleteSubsequent)

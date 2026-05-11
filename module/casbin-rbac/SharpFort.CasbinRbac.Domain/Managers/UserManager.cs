@@ -67,7 +67,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 2. Casbin 同步逻辑
             List<User> users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
-            List<Role> roles = new();
+            List<Role> roles = [];
             if (roleIds is not null && roleIds.Count > 0)
             {
                 roles = await _roleRepository.GetListAsync(r => roleIds.Contains(r.Id));
@@ -141,7 +141,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         private static void ValidateUserName(User input)
         {
-            if (input.UserName == UserConst.Admin || input.UserName == UserConst.TenantAdmin)
+            if (input.UserName is UserConst.Admin or UserConst.TenantAdmin)
             {
                 throw new UserFriendlyException("用户名无效注册！");
             }

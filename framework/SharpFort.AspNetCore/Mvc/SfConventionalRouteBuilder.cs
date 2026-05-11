@@ -117,9 +117,7 @@ namespace SharpFort.AspNetCore.Mvc
             baseUrl += $"/{NormalizeActionNameCase(actionNameInUrl, configuration)}";
 
             // 处理次要ID参数
-            List<ParameterModel> secondaryIds = action.Parameters
-                .Where(p => p.ParameterName.EndsWith("Id", StringComparison.Ordinal))
-                .ToList();
+            List<ParameterModel> secondaryIds = [.. action.Parameters.Where(p => p.ParameterName.EndsWith("Id", StringComparison.Ordinal))];
 
             if (secondaryIds.Count == 1)
             {

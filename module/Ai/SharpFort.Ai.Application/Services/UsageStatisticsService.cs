@@ -52,7 +52,7 @@ public class UsageStatisticsService(
             .ToListAsync();
 
         // 生成完整的7天数据，包括没有使用记录的日期
-        List<DailyTokenUsageDto> result = new();
+        List<DailyTokenUsageDto> result = [];
         for (int i = 0; i < 7; i++)
         {
             DateTime date = startDate.AddDays(i);
@@ -98,12 +98,12 @@ public class UsageStatisticsService(
         long totalTokens = modelUsages.Sum(x => x.TotalTokenCount);
 
         // 计算各模型占比
-        List<ModelTokenUsageDto> result = modelUsages.Select(x => new ModelTokenUsageDto
+        List<ModelTokenUsageDto> result = [.. modelUsages.Select(x => new ModelTokenUsageDto
         {
             Model = x.ModelId,
             Tokens = x.TotalTokenCount,
             Percentage = totalTokens > 0 ? Math.Round((decimal)x.TotalTokenCount / totalTokens * 100, 2) : 0
-        }).OrderByDescending(x => x.Tokens).ToList();
+        }).OrderByDescending(x => x.Tokens)];
 
         return result;
     }
@@ -153,17 +153,17 @@ public class UsageStatisticsService(
             .ToList();
 
         // 生成完整的24小时数据
-        List<HourlyTokenUsageDto> result = new();
+        List<HourlyTokenUsageDto> result = [];
         for (int i = 0; i < 24; i++)
         {
             DateTime hour = startHour.AddHours(i);
             var hourData = hourlyGrouped.Where(x => x.Hour == hour).ToList();
 
-            List<ModelTokenBreakdownDto> modelBreakdown = hourData.Select(x => new ModelTokenBreakdownDto
+            List<ModelTokenBreakdownDto> modelBreakdown = [.. hourData.Select(x => new ModelTokenBreakdownDto
             {
                 ModelId = x.ModelId,
                 Tokens = x.Tokens
-            }).ToList();
+            })];
 
             result.Add(new HourlyTokenUsageDto
             {
@@ -200,7 +200,7 @@ public class UsageStatisticsService(
             .ToListAsync();
 
         // 在内存中按模型分组统计
-        List<ModelTodayUsageDto> modelStats = messages
+        List<ModelTodayUsageDto> modelStats = [.. messages
             .GroupBy(x => x.ModelId)
             .Select(g => new ModelTodayUsageDto
             {
@@ -208,12 +208,11 @@ public class UsageStatisticsService(
                 UsageCount = g.Count(),
                 TotalTokens = g.Sum(x => x.TotalTokenCount)
             })
-            .OrderByDescending(x => x.TotalTokens)
-            .ToList();
+            .OrderByDescending(x => x.TotalTokens)];
 
         if (modelStats.Count > 0)
         {
-            List<string> modelIds = modelStats.Select(x => x.ModelId).ToList();
+            List<string> modelIds = [.. modelStats.Select(x => x.ModelId)];
             var modelDic = await _modelManager._aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId))
                 .Distinct()
                 .Where(x => x.IsEnabled)

@@ -56,10 +56,10 @@ namespace SharpFort.Core.Helper
 
         public interface ITreeModel<T>
         {
-            public Guid Id { get; set; }
-            public Guid ParentId { get; set; }
-            public int OrderNum { get; set; }
-            public List<T>? Children { get; set; }
+            Guid Id { get; set; }
+            Guid ParentId { get; set; }
+            int OrderNum { get; set; }
+            List<T>? Children { get; set; }
         }
     }
 }

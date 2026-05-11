@@ -13,7 +13,7 @@ public interface IOpenAiResponseService
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public IAsyncEnumerable<(string, JsonElement?)> ResponsesStreamAsync(AiModelDescribe aiModelDescribe,
+    IAsyncEnumerable<(string, JsonElement?)> ResponsesStreamAsync(AiModelDescribe aiModelDescribe,
         OpenAiResponsesInput input,
         CancellationToken cancellationToken);
 
@@ -24,7 +24,7 @@ public interface IOpenAiResponseService
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<OpenAiResponsesOutput> ResponsesAsync(AiModelDescribe aiModelDescribe,
+    Task<OpenAiResponsesOutput> ResponsesAsync(AiModelDescribe aiModelDescribe,
         OpenAiResponsesInput input,
         CancellationToken cancellationToken);
 }

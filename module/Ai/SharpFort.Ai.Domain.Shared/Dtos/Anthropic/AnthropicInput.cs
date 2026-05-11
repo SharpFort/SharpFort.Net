@@ -66,7 +66,7 @@ public sealed class AnthropicInput
                 throw new ValidationException("System 和 Systems 字段不能同时有值");
             }
 
-            return System is not null ? System : Systems!;
+            return System is not null ? System : Systems;
         }
         set
         {

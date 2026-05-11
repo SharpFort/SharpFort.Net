@@ -1,5 +1,4 @@
-// 属性名来自 Anthropic API JSON 字段
-#pragma warning disable CA1707
+// 属性名均使用 [JsonPropertyName] 和 PascalCase，满足 CA1707 指导原则
 using System.Text.Json.Serialization;
 
 namespace SharpFort.Ai.Domain.Shared.Dtos.Anthropic;
@@ -74,19 +73,19 @@ public class AnthropicChatCompletionDtoContentBlock
 
 public class AnthropicChatCompletionDto
 {
-    public string id { get; set; } = null!;
+    [JsonPropertyName("id")] public string Id { get; set; } = null!;
 
-    public string type { get; set; } = null!;
+    [JsonPropertyName("type")] public string Type { get; set; } = null!;
 
-    public string role { get; set; } = null!;
+    [JsonPropertyName("role")] public string Role { get; set; } = null!;
 
-    public AnthropicChatCompletionDtoContent[] content { get; set; } = null!;
+    [JsonPropertyName("content")] public AnthropicChatCompletionDtoContent[] Content { get; set; } = null!;
 
-    public string model { get; set; } = null!;
+    [JsonPropertyName("model")] public string Model { get; set; } = null!;
 
-    public string stop_reason { get; set; } = null!;
+    [JsonPropertyName("stop_reason")] public string StopReason { get; set; } = null!;
 
-    public object stop_sequence { get; set; } = null!;
+    [JsonPropertyName("stop_sequence")] public object StopSequence { get; set; } = null!;
 
     public AnthropicCompletionDtoUsage? Usage { get; set; }
 
@@ -94,21 +93,21 @@ public class AnthropicChatCompletionDto
 
 public class AnthropicChatCompletionDtoContent
 {
-    public string type { get; set; } = null!;
+    [JsonPropertyName("type")] public string Type { get; set; } = null!;
 
-    public string? text { get; set; }
+    [JsonPropertyName("text")] public string? Text { get; set; }
 
-    public string? id { get; set; }
+    [JsonPropertyName("id")] public string? Id { get; set; }
 
-    public string? name { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; set; }
 
-    public object? input { get; set; }
+    [JsonPropertyName("input")] public object? Input { get; set; }
 
     [JsonPropertyName("thinking")] public string? Thinking { get; set; }
 
     [JsonPropertyName("partial_json")] public string? PartialJson { get; set; }
 
-    public string? signature { get; set; }
+    [JsonPropertyName("signature")] public string? Signature { get; set; }
 
 }
 

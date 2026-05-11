@@ -61,7 +61,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
             statusCodeResult.StatusCode != null)
         {
             // 小于 200 或者 大于 299 都不是成功值，直接跳过
-            if (statusCodeResult.StatusCode.Value < 200 || statusCodeResult.StatusCode.Value > 299)
+            if (statusCodeResult.StatusCode.Value is < 200 or > 299)
             {
                 // 处理规范化结果
                 if (!CheckStatusCodeNonUnify(context.HttpContext, out IUnifyResultProvider? unifyRes))
@@ -154,7 +154,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         (string? message, string? firstErrorMessage, string? firstErrorProperty) = (default, default, default);
 
         // 判断是否是集合类型
-        if (errors is IEnumerable && errors is not string)
+        if (errors is IEnumerable and not string)
         {
             // 如果是模型验证字典类型
             if (errors is ModelStateDictionary modelState)
@@ -235,15 +235,15 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         if (isDataResult)
         {
             data = result switch
-        {
-            // 处理内容结果
-            ContentResult content => content.Content!,
-            // 处理对象结果
-            ObjectResult obj => obj.Value!,
-            // 处理 JSON 对象
-            JsonResult json => json.Value!,
-            _ => null!,
-        };
+            {
+                // 处理内容结果
+                ContentResult content => content.Content!,
+                // 处理对象结果
+                ObjectResult obj => obj.Value!,
+                // 处理 JSON 对象
+                JsonResult json => json.Value!,
+                _ => null!,
+            };
         }
 
         return isDataResult;

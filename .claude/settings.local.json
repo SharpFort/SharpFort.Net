@@ -54,7 +54,12 @@
       "PowerShell(dotnet sln *)",
       "Bash(Get-ChildItem \"E:\\\\Projects\\\\skills\" -Directory)",
       "Bash(Select-Object Name)",
-      "PowerShell(robocopy *)"
+      "PowerShell(robocopy *)",
+      "Bash(Select-String -Pattern \"CS8604\")",
+      "Bash(Select-Object -Last 5)",
+      "Bash(Select-String \"CS8618\")",
+      "Bash(cat)",
+      "Bash(cp \"/tmp/test_ca1822.cs\" \"E:/Projects/SharpFort.Net/framework/SharpFort.Core/Test_ca1822.cs\")"
     ],
     "deny": [],
     "ask": []

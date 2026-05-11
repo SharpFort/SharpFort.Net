@@ -63,7 +63,7 @@ public class SqlSugarNonPublicSerializer : ISerializeService
 
             // 调用 SerializeObject 方法序列化对象
             T? json = (T?)methods.MakeGenericMethod(typeof(T))
-                .Invoke(null, new object[] { value, null! });
+                .Invoke(null, [value, null!]);
             return json!;
         }
         JsonSerializerSettings jSetting = new()

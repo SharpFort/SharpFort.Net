@@ -54,14 +54,14 @@ public class SettingManager : ISettingManager, ISingletonDependency
             providers = providers.TakeWhile(c => c.Name == providerName);
         }
 
-        List<ISettingManagementProvider> providerList = providers.Reverse().ToList();
+        List<ISettingManagementProvider> providerList = [.. providers.Reverse()];
 
         if (providerList.Count == 0)
         {
             return [];
         }
 
-        Dictionary<string, SettingValue> settingValues = new();
+        Dictionary<string, SettingValue> settingValues = [];
 
         foreach (SettingDefinition setting in settingDefinitions)
         {
@@ -110,10 +110,9 @@ public class SettingManager : ISettingManager, ISingletonDependency
 
         SettingDefinition setting = await SettingDefinitionManager.GetAsync(name);
 
-        List<ISettingManagementProvider> providers = Enumerable
+        List<ISettingManagementProvider> providers = [.. Enumerable
             .Reverse(Providers)
-            .SkipWhile(p => p.Name != providerName)
-            .ToList();
+            .SkipWhile(p => p.Name != providerName)];
 
         if (providers.Count == 0)
         {

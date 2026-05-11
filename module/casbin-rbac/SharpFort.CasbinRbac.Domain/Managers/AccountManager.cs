@@ -84,7 +84,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         {
             SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_jwtOptions.SecurityKey));
             SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
-            List<Claim> claims = kvs.Select(x => new Claim(x.Key, x.Value.ToString())).ToList();
+            List<Claim> claims = [.. kvs.Select(x => new Claim(x.Key, x.Value.ToString()))];
             JwtSecurityToken token = new(
                issuer: _jwtOptions.Issuer,
                audience: _jwtOptions.Audience,
@@ -102,11 +102,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_refreshJwtOptions.SecurityKey));
             SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
             //添加用户id，及刷新token的标识
-            List<Claim> claims = new()
-            {
+            List<Claim> claims =
+            [
                 new(AbpClaimTypes.UserId,userId.ToString()),
                 new(TokenTypeConst.Refresh, "true")
-            };
+            ];
             JwtSecurityToken token = new(
                issuer: _refreshJwtOptions.Issuer,
                audience: _refreshJwtOptions.Audience,
@@ -174,7 +174,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public static List<KeyValuePair<string, string>> UserInfoToClaim(UserRoleMenuDto dto)
         {
-            List<KeyValuePair<string, string>> claims = new();
+            List<KeyValuePair<string, string>> claims = [];
             AddToClaim(claims, AbpClaimTypes.UserId, dto.User.Id.ToString());
             AddToClaim(claims, AbpClaimTypes.UserName, dto.User.UserName);
             if (dto.User.DepartmentId is not null)

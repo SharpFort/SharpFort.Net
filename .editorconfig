@@ -35,6 +35,9 @@ dotnet_diagnostic.IDE0071.severity = suggestion
 dotnet_diagnostic.IDE0160.severity = suggestion
 # IDE0058: "expression value is never used" — legitimate side-effect calls (StringBuilder.Append, Headers.TryAdd, etc.)
 dotnet_diagnostic.IDE0058.severity = suggestion
+# IDE0052: "private member can be removed" — aggressively flags DI-injected readonly fields reserved for future use
+# and framework-required fields accessed via base class or reflection. Removing them breaks constructor signatures and DI.
+dotnet_diagnostic.IDE0052.severity = suggestion
 # IDE0046: "if statement can be simplified" — converts if-return to ternary; skip because:
 #   (1) if-throw guards are legitimate business logic (DTO validation), ternary throw is unnatural
 #   (2) if-return followed by already-ternary return creates nested ternary (hard to read)
@@ -53,3 +56,7 @@ dotnet_diagnostic.IDE1006.severity = suggestion
 # Types: PascalCase
 # Parameters: camelCase
 # Using .NET built-in defaults — no explicit rules needed unless customizing.
+
+# ── Code Quality Rules ──────────────────────────────────────────────────────
+# CA1822: member does not access instance data and can be marked static
+dotnet_diagnostic.CA1822.severity = warning

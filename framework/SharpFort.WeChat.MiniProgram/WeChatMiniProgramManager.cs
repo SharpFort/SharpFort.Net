@@ -20,20 +20,24 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
     public async Task<Code2SessionResponse> Code2SessionAsync(Code2SessionInput input)
     {
         string url = "https://api.weixin.qq.com/sns/jscode2session";
-        Code2SessionRequest req = new();
-        req.js_code = input.js_code;
-        req.secret = _options.AppSecret;
-        req.appid = _options.AppID;
+        Code2SessionRequest req = new()
+        {
+            js_code = input.js_code,
+            secret = _options.AppSecret,
+            appid = _options.AppID
+        };
 
         using (HttpClient httpClient = new())
         {
             string queryString = req.ToQueryString();
-            UriBuilder builder = new(url);
-            builder.Query = queryString;
+            UriBuilder builder = new(url)
+            {
+                Query = queryString
+            };
             HttpResponseMessage response = await httpClient.GetAsync(builder.ToString());
             Code2SessionResponse? responseBody = await response.Content.ReadFromJsonAsync<Code2SessionResponse>();
 
-            responseBody.ValidateSuccess();
+            responseBody!.ValidateSuccess();
 
             return responseBody;
         }
@@ -64,7 +68,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
             StringContent body = new(JsonConvert.SerializeObject(req));
             HttpResponseMessage response = await httpClient.PostAsync(url, body);
             SubscribeNoticeResponse? responseBody = await response.Content.ReadFromJsonAsync<SubscribeNoticeResponse>();
-            responseBody.ValidateSuccess();
+            responseBody!.ValidateSuccess();
         }
     }
 }

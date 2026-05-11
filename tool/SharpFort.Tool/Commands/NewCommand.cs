@@ -81,11 +81,11 @@ namespace SharpFort.Tool.Commands
                 if (templateType == "module")
                 {
                     //代表模块生成
-                    fileByteArray = (_templateGenService.CreateModuleAsync(new TemplateGenCreateInputDto
+                    fileByteArray = _templateGenService.CreateModuleAsync(new TemplateGenCreateInputDto
                     {
                         Name = moduleNameArgument.Value,
                         ModuleSoure = soure
-                    }).Result);
+                    }).Result;
                 }
                 else
                 {

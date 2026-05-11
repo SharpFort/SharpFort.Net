@@ -62,7 +62,7 @@ public class ThorChatMessage
             //     throw new ValidationException("Messages 中 Content 和 Contents 字段不能同时有值");
             // }
 
-            return Content is not null ? Content : Contents!;
+            return Content is not null ? Content : Contents;
         }
         set
         {

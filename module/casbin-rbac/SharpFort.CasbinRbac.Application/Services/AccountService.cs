@@ -396,7 +396,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             }
 
             UserRoleMenuDto data = await _userManager.GetInfoAsync(userId!.Value);
-            List<MenuDto> menus = data.Menus.ToList();
+            List<MenuDto> menus = [.. data.Menus];
 
             //为超级管理员直接给全部路由
             if (UserConst.Admin.Equals(data.User.UserName, StringComparison.Ordinal))
@@ -405,7 +405,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             }
 
             object? output = null;
-            if (routerType is null || routerType == "ruoyi")
+            if (routerType is null or "ruoyi")
             {
                 //将后端菜单转换成前端路由，组件级别需要过滤
                 output =

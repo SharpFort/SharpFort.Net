@@ -117,13 +117,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 批量插入新关联
             if (roles.Count > 0)
             {
-                List<CasbinRule> newRules = roles.Select(r => new CasbinRule
+                List<CasbinRule> newRules = [.. roles.Select(r => new CasbinRule
                 {
                     PType = "g",
                     V0 = sub,
                     V1 = GetRoleSubject(r.RoleCode),
                     V2 = domain
-                }).ToList();
+                })];
                 await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
             }
 
@@ -138,11 +138,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 插入新数据
             if (roles.Count > 0)
             {
-                List<string[]> policies = roles.Select(r => new[] {
+                List<string[]> policies = [.. roles.Select(r => new[] {
                     sub,
                     GetRoleSubject(r.RoleCode),
                     domain
-                }).ToList();
+                })];
 
                 await _enforcer.AddGroupingPoliciesAsync(policies);
             }
@@ -160,8 +160,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // 删除该角色在该域下的所有权限 (p, roleSub, domain, ?, ?)
             await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain).ExecuteCommandAsync();
 
-            List<string[]> newPolicies = new();
-            List<CasbinRule> newRules = new();
+            List<string[]> newPolicies = [];
+            List<CasbinRule> newRules = [];
 
             foreach (Menu menu in menus)
             {
@@ -173,12 +173,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 string methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
 
                 // 内存对象
-                newPolicies.Add(new[] {
+                newPolicies.Add([
                     roleSub,
                     domain,
                     menu.ApiUrl,
                     methods
-                });
+                ]);
 
                 // 数据库对象
                 newRules.Add(new CasbinRule

@@ -14,8 +14,8 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
         {
 
             //获取 accessToken
-            List<KeyValuePair<string, string?>> tokenQueryKv = new()
-            {
+            List<KeyValuePair<string, string?>> tokenQueryKv =
+            [
                 new("grant_type","authorization_code"),
                 new("client_id",Options.ClientId),
                 new("client_secret",Options.ClientSecret),
@@ -23,18 +23,18 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.QQ
                 new("fmt","json"),
                 new("need_openid","1"),
                 new("code",code)
-            };
+            ];
             QQAuthticationcationTokenResponse tokenModel = await SendHttpRequestAsync<QQAuthticationcationTokenResponse>(QQAuthenticationDefaults.TokenEndpoint, tokenQueryKv);
 
 
 
             //获取 userInfo
-            List<KeyValuePair<string, string?>> userInfoQueryKv = new()
-            {
+            List<KeyValuePair<string, string?>> userInfoQueryKv =
+            [
                 new("access_token",tokenModel.access_token),
                 new("oauth_consumer_key",Options.ClientId),
                 new("openid",tokenModel.openid),
-            };
+            ];
 
             QQAuthticationcationUserInfoResponse userInfoMdoel = await SendHttpRequestAsync<QQAuthticationcationUserInfoResponse>(QQAuthenticationDefaults.UserInformationEndpoint, userInfoQueryKv);
 

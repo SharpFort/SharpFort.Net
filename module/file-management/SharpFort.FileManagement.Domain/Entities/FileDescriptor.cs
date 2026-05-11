@@ -247,19 +247,19 @@ namespace SharpFort.FileManagement.Domain.Entities
             return string.IsNullOrEmpty(extension)
                 ? FileType.File
                 : extension.ToLowerInvariant() switch
-            {
-                ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" or ".svg" or ".ico" or ".avif"
-                    => FileType.Image,
-                ".mp4" or ".avi" or ".mov" or ".wmv" or ".flv" or ".mkv" or ".webm"
-                    => FileType.Video,
-                ".mp3" or ".wav" or ".flac" or ".aac" or ".ogg" or ".wma"
-                    => FileType.Audio,
-                ".pdf" or ".doc" or ".docx" or ".xls" or ".xlsx" or ".ppt" or ".pptx" or ".txt" or ".csv" or ".md"
-                    => FileType.Document,
-                ".zip" or ".rar" or ".7z" or ".tar" or ".gz" or ".bz2"
-                    => FileType.Archive,
-                _ => FileType.File
-            };
+                {
+                    ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" or ".svg" or ".ico" or ".avif"
+                        => FileType.Image,
+                    ".mp4" or ".avi" or ".mov" or ".wmv" or ".flv" or ".mkv" or ".webm"
+                        => FileType.Video,
+                    ".mp3" or ".wav" or ".flac" or ".aac" or ".ogg" or ".wma"
+                        => FileType.Audio,
+                    ".pdf" or ".doc" or ".docx" or ".xls" or ".xlsx" or ".ppt" or ".pptx" or ".txt" or ".csv" or ".md"
+                        => FileType.Document,
+                    ".zip" or ".rar" or ".7z" or ".tar" or ".gz" or ".bz2"
+                        => FileType.Archive,
+                    _ => FileType.File
+                };
         }
 
         /// <summary>

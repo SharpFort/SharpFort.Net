@@ -193,7 +193,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// [Navigate] 用于递归加载树
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(ParentId))]
-        public List<Menu> Children { get; set; } = null!;
+        public List<Menu> Children { get; set; } = [];
 
         #endregion
 
@@ -253,15 +253,17 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             List<Vue3RouterDto> routers = [];
             foreach (Menu m in menus)
             {
-                Vue3RouterDto r = new();
-                r.OrderNum = m.OrderNum;
+                Vue3RouterDto r = new()
+                {
+                    OrderNum = m.OrderNum
+                };
                 string? routerName = m.Router?.Split("/").LastOrDefault();
                 r.Id = m.Id;
                 r.ParentId = m.ParentId;
 
                 //开头大写
                 r.Name = string.Concat(routerName?.First().ToString().ToUpperInvariant(), routerName.AsSpan(1));
-                r.Path = m.Router!;
+                r.Path = m.Router;
                 r.Hidden = !m.IsShow;
 
 
@@ -285,19 +287,19 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                 {
                     r.Redirect = "noRedirect";
                     r.AlwaysShow = true;
-                    r.Component = m.Component!;
+                    r.Component = m.Component;
                     r.AlwaysShow = false;
                 }
 
                 r.Meta = new Meta
                 {
-                    Title = m.MenuName!,
-                    Icon = m.MenuIcon!,
+                    Title = m.MenuName,
+                    Icon = m.MenuIcon,
                     NoCache = !m.IsCache
                 };
                 if (m.IsLink)
                 {
-                    r.Meta.link = m.Router!;
+                    r.Meta.link = m.Router;
                     r.AlwaysShow = false;
                 }
 
@@ -316,7 +318,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         public static List<Vue3PureRouterDto> Vue3PureRouterBuild(this List<Menu> menus)
         {
             //pure的菜单为树形
-            List<Vue3PureRouterDto> allRouters = menus
+            List<Vue3PureRouterDto> allRouters = [.. menus
                 .Where(m => m.State)
                 .Where(m => m.MenuType != MenuType.Component)
                 .Where(m => m.MenuSource == MenuSource.Pure)
@@ -337,8 +339,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                     Children = null,
                     Id = m.Id,
                     ParentId = m.ParentId
-                })
-                .ToList();
+                })];
 
 
             Dictionary<Guid, List<Vue3PureRouterDto>> routerDic = allRouters.GroupBy(x => x.ParentId).ToDictionary(x => x.Key, y => y.ToList());

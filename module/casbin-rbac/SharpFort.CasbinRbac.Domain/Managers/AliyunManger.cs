@@ -20,9 +20,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 AccessKeyId = Options.AccessKeyId,
                 // 必填，您的 AccessKey Secret
                 AccessKeySecret = Options.AccessKeySecret,
+                // 访问的域名
+                Endpoint = "dysmsapi.aliyuncs.com"
             };
-            // 访问的域名
-            config.Endpoint = "dysmsapi.aliyuncs.com";
             return new Client(config);
         }
 

@@ -1,4 +1,4 @@
-﻿using Medallion.Threading;
+using Medallion.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
 using Volo.Abp.DistributedLocking;
@@ -115,9 +115,9 @@ namespace Sf.Abp.Application.Services
         }
 
 
-        public ISettingProvider _settingProvider { get; set; }
+        public ISettingProvider SettingProvider { get; set; } = null!;
 
-        public ISettingManager _settingManager { get; set; }
+        public ISettingManager SettingManager { get; set; } = null!;
 
         /// <summary>
         /// 系统配置模块
@@ -127,15 +127,15 @@ namespace Sf.Abp.Application.Services
         {
             //DDD需要提前定义
             //默认来说，不提供修改操作，配置应该独立
-            string? enableOrNull = await _settingProvider.GetOrNullAsync("DDD");
+            string? enableOrNull = await SettingProvider.GetOrNullAsync("DDD");
 
             //如果要进行修改，可使用yi.framework下的ISettingManager
-            await _settingManager.SetGlobalAsync("DDD", "false");
+            await SettingManager.SetGlobalAsync("DDD", "false");
 
-            string enableOrNull2 = await _settingManager.GetOrNullGlobalAsync("DDD");
+            string enableOrNull2 = await SettingManager.GetOrNullGlobalAsync("DDD");
 
             //当然，他的独特地方，是支持来自多个模块，例如配置文件？
-            string result = await _settingManager.GetOrNullConfigurationAsync("Test");
+            string result = await SettingManager.GetOrNullConfigurationAsync("Test");
 
 
             return result ?? string.Empty;
@@ -177,7 +177,7 @@ namespace Sf.Abp.Application.Services
             return $"加锁结果：{number},不加锁结果：{number2}";
         }
 
-        public ICurrentTenant CurrentTenant { get; set; }
+        public ICurrentTenant CurrentTenant { get; set; } = null!;
 
     }
 }

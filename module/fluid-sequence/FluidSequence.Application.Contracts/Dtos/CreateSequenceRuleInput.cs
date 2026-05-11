@@ -7,15 +7,15 @@ namespace SharpFort.FluidSequence.Application.Contracts.Dtos
     {
         [Required]
         [MaxLength(50)]
-        public string RuleName { get; set; }
+        public required string RuleName { get; set; }
 
         [Required]
         [MaxLength(50)]
-        public string RuleCode { get; set; }
+        public required string RuleCode { get; set; }
 
         [Required]
         [MaxLength(100)]
-        public string Template { get; set; }
+        public required string Template { get; set; }
 
         public int Step { get; set; } = 1;
         public int SeqLength { get; set; } = 6;

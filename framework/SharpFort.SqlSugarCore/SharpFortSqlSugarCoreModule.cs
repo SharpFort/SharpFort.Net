@@ -88,7 +88,7 @@ namespace SharpFort.SqlSugarCore
         {
             Configure<AbpDefaultTenantStoreOptions>(options =>
             {
-                List<TenantConfiguration> tenants = options.Tenants.ToList();
+                List<TenantConfiguration> tenants = [.. options.Tenants];
 
                 // 规范化租户名称
                 foreach (TenantConfiguration? tenant in tenants)
@@ -197,12 +197,11 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 获取需要创建表的实体类型
-            List<Type> entityTypes = moduleContainer.Modules
+            List<Type> entityTypes = [.. moduleContainer.Modules
                 .SelectMany(m => m.Assembly.GetTypes())
                 .Where(t => t.GetCustomAttribute<IgnoreCodeFirstAttribute>() == null
                     && t.GetCustomAttribute<SugarTable>() != null
-                    && t.GetCustomAttribute<SplitTableAttribute>() == null)
-                .ToList();
+                    && t.GetCustomAttribute<SplitTableAttribute>() == null)];
 
             if (entityTypes.Count > 0)
             {

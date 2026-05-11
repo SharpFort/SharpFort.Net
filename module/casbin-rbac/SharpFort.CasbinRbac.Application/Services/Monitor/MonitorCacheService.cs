@@ -41,7 +41,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
             VerifyRedisCacheEnable();
             string[] keys = RedisClient.Keys(CacheKeyPrefix + "*");
             List<string> result = GroupedKeys([.. keys]);
-            List<MonitorCacheNameGetListOutputDto> output = result.Select(x => new MonitorCacheNameGetListOutputDto { CacheName = x }).ToList();
+            List<MonitorCacheNameGetListOutputDto> output = [.. result.Select(x => new MonitorCacheNameGetListOutputDto { CacheName = x })];
             return output;
         }
 

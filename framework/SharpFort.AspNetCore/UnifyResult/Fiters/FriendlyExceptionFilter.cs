@@ -57,7 +57,7 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
         context.Result = unifyResult.OnException(context, exceptionMetadata);
 
         // 记录拦截日志
-        LogException(context.Exception!, context.Exception!.Message);
+        LogException(context.Exception, context.Exception.Message);
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "{Message}")]

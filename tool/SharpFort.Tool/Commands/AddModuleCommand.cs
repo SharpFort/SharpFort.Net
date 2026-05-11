@@ -36,11 +36,11 @@ namespace SharpFort.Tool.Commands
                 }
 
                 CheckFirstSlnPath(slnPath);
-                List<string> dotnetSlnCommandPart = new() { "Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore" };
-                string[] paths = dotnetSlnCommandPart.Select(x => Path.Combine(modulePath, $"{moduleName}.{x}")).ToArray();
+                List<string> dotnetSlnCommandPart = ["Application", "Application.Contracts", "Domain", "Domain.Shared", "SqlSugarCore"];
+                string[] paths = [.. dotnetSlnCommandPart.Select(x => Path.Combine(modulePath, $"{moduleName}.{x}"))];
                 CheckPathExist(paths);
 
-                string[] cmdCommands = dotnetSlnCommandPart.Select(x => $"dotnet sln \"{slnPath}\" add \"{Path.Combine(modulePath, $"{moduleName}.{x}")}\"").ToArray();
+                string[] cmdCommands = [.. dotnetSlnCommandPart.Select(x => $"dotnet sln \"{slnPath}\" add \"{Path.Combine(modulePath, $"{moduleName}.{x}")}\"")];
                 StartCmd(cmdCommands);
 
                 Console.WriteLine("恭喜~模块添加成功！");

@@ -83,8 +83,8 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
             }
 
             // authenticateResult.Succeeded 为 true 时，Principal 非 null
-            Claim? openidClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:openid");
-            Claim? nameClaim = authenticateResult.Principal!.Claims.FirstOrDefault(x => x.Type == "urn:name");
+            Claim? openidClaim = authenticateResult.Principal.Claims.FirstOrDefault(x => x.Type == "urn:openid");
+            Claim? nameClaim = authenticateResult.Principal.Claims.FirstOrDefault(x => x.Type == "urn:name");
             return openidClaim is null
                 ? throw new UserFriendlyException("未能获取第三方 OpenId")
                 : ((string, string))(openidClaim.Value, nameClaim?.Value ?? string.Empty);

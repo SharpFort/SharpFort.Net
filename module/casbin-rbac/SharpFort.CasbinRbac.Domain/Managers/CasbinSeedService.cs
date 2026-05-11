@@ -142,7 +142,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             phaseSw.Restart();
 
             // Build dictionaries for fast lookup
-            Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = new();
+            Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = [];
             foreach ((Guid Id, string RoleCode, string RoleName, bool State) r in roleData)
             {
                 if (!string.IsNullOrEmpty(r.RoleCode))
@@ -156,7 +156,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogValidRolesLoaded(roleDic.Count);
 
-            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = new();
+            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = [];
             int menuWithApiCount = 0;
             foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State) m in menuData)
             {
@@ -168,7 +168,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogMenusLoaded(menuDic.Count, menuWithApiCount);
 
-            List<CasbinRule> rulesToInsert = new();
+            List<CasbinRule> rulesToInsert = [];
 
             // Build p rules (role-permission)
             LogBuildingPRules();
@@ -305,7 +305,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
                     for (int i = 0; i < rulesToInsert.Count; i += batchSize)
                     {
-                        List<CasbinRule> batch = rulesToInsert.Skip(i).Take(batchSize).ToList();
+                        List<CasbinRule> batch = [.. rulesToInsert.Skip(i).Take(batchSize)];
                         int insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
                         totalInserted += insertedCount;
                         LogBatchInserted(i / batchSize + 1, insertedCount, totalInserted, rulesToInsert.Count);
@@ -332,8 +332,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 LogEnforcerReloaded(phaseSw.ElapsedMilliseconds);
 
                 // Verify loaded policies (use synchronous methods)
-                List<IEnumerable<string>> loadedPolicies = _enforcer.GetPolicy().ToList();
-                List<IEnumerable<string>> loadedGroupings = _enforcer.GetGroupingPolicy().ToList();
+                List<IEnumerable<string>> loadedPolicies = [.. _enforcer.GetPolicy()];
+                List<IEnumerable<string>> loadedGroupings = [.. _enforcer.GetGroupingPolicy()];
                 LogVerificationResult(loadedPolicies.Count, loadedGroupings.Count);
             }
             catch (Exception ex)

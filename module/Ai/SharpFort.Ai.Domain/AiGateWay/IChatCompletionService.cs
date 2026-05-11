@@ -12,7 +12,7 @@ public interface IChatCompletionService
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public IAsyncEnumerable<ThorChatCompletionsResponse> CompleteChatStreamAsync(AiModelDescribe aiModelDescribe,
+    IAsyncEnumerable<ThorChatCompletionsResponse> CompleteChatStreamAsync(AiModelDescribe aiModelDescribe,
         ThorChatCompletionsRequest input,
         CancellationToken cancellationToken);
 
@@ -23,7 +23,7 @@ public interface IChatCompletionService
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<ThorChatCompletionsResponse> CompleteChatAsync(AiModelDescribe aiModelDescribe,
+    Task<ThorChatCompletionsResponse> CompleteChatAsync(AiModelDescribe aiModelDescribe,
         ThorChatCompletionsRequest input,
         CancellationToken cancellationToken);
 }

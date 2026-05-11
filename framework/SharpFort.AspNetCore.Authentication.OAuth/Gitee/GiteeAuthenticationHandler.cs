@@ -14,21 +14,21 @@ namespace SharpFort.AspNetCore.Authentication.OAuth.Gitee
         protected override async Task<List<Claim>> GetAuthTicketAsync(string code)
         {
             //获取 accessToken
-            List<KeyValuePair<string, string?>> tokenQueryKv = new()
-            {
+            List<KeyValuePair<string, string?>> tokenQueryKv =
+            [
                 new("grant_type","authorization_code"),
                 new("client_id",Options.ClientId),
                 new("client_secret",Options.ClientSecret),
                 new("redirect_uri",Options.RedirectUri),
                 new("code",code)
-            };
+            ];
             GiteeAuthticationcationTokenResponse tokenModel = await SendHttpRequestAsync<GiteeAuthticationcationTokenResponse>(GiteeAuthenticationDefaults.TokenEndpoint, tokenQueryKv, HttpMethod.Post);
 
             //获取 userInfo
-            List<KeyValuePair<string, string?>> userInfoQueryKv = new()
-            {
+            List<KeyValuePair<string, string?>> userInfoQueryKv =
+            [
                 new("access_token",tokenModel.access_token),
-            };
+            ];
             GiteeAuthticationcationUserInfoResponse userInfoMdoel = await SendHttpRequestAsync<GiteeAuthticationcationUserInfoResponse>(GiteeAuthenticationDefaults.UserInformationEndpoint, userInfoQueryKv);
 
             List<Claim> claims =

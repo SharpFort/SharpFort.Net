@@ -103,7 +103,7 @@ namespace SharpFort.Core.Helper
     public class ConvertEx
 #pragma warning restore CA1711
     {
-        static readonly char[] padding = { '=' };
+        private static readonly char[] padding = ['='];
         public static string ToUrlBase64String(byte[] inArray)
         {
             string str = Convert.ToBase64String(inArray);

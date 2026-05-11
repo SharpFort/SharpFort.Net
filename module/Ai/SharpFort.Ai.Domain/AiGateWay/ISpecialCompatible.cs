@@ -5,6 +5,6 @@ namespace SharpFort.Ai.Domain.AiGateWay;
 
 public interface ISpecialCompatible
 {
-    public void Compatible(ThorChatCompletionsRequest request);
-    public void AnthropicCompatible(AnthropicInput request);
+    void Compatible(ThorChatCompletionsRequest request);
+    void AnthropicCompatible(AnthropicInput request);
 }

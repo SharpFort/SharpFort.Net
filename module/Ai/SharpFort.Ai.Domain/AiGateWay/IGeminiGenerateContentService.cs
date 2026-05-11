@@ -12,7 +12,7 @@ public interface IGeminiGenerateContentService
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public IAsyncEnumerable<JsonElement?> GenerateContentStreamAsync(AiModelDescribe aiModelDescribe,
+    IAsyncEnumerable<JsonElement?> GenerateContentStreamAsync(AiModelDescribe aiModelDescribe,
         JsonElement input,
         CancellationToken cancellationToken);
 
@@ -23,7 +23,7 @@ public interface IGeminiGenerateContentService
     /// <param name="input"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<JsonElement> GenerateContentAsync(AiModelDescribe aiModelDescribe,
+    Task<JsonElement> GenerateContentAsync(AiModelDescribe aiModelDescribe,
         JsonElement input,
         CancellationToken cancellationToken);
 }

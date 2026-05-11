@@ -62,7 +62,7 @@ namespace SharpFort.FileManagement.Application.Services
             List<FileDescriptor> entities = await _fileManager.CreateAsync(finalFiles, directoryId);
 
             // 保存每个文件到 Blob 存储
-            List<IFormFile> finalFilesList = finalFiles.ToList();
+            List<IFormFile> finalFilesList = [.. finalFiles];
             for (int i = 0; i < finalFilesList.Count; i++)
             {
                 using Stream stream = finalFilesList[i].OpenReadStream();
@@ -83,9 +83,9 @@ namespace SharpFort.FileManagement.Application.Services
             return stream == null
                 ? throw new UserFriendlyException("文件内容不存在")
                 : (IActionResult)new FileStreamResult(stream, file.MimeType)
-            {
-                FileDownloadName = file.Name
-            };
+                {
+                    FileDownloadName = file.Name
+                };
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
     {
         public bool CanHandle(string placeholderKey)
         {
-            return placeholderKey == "SEQ" || placeholderKey == "SEQ36";
+            return placeholderKey is "SEQ" or "SEQ36";
         }
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)

@@ -46,7 +46,7 @@ public class TokenService(
 
 
 
-        List<TokenGetListOutputDto> result = tokens.Select(t =>
+        List<TokenGetListOutputDto> result = [.. tokens.Select(t =>
         {
 
             return new TokenGetListOutputDto
@@ -59,7 +59,7 @@ public class TokenService(
                 IsEnableLog = t.IsEnableLog,
                 CreationTime = t.CreationTime
             };
-        }).ToList();
+        })];
 
         return new PagedResultDto<TokenGetListOutputDto>(total, result);
     }

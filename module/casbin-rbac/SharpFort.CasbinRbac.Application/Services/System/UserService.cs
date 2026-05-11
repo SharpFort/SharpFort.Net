@@ -82,7 +82,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 .Select((user, dept) => new UserGetListOutputDto(), true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-            List<Guid> userIds = outPut.Select(x => x.Id).ToList();
+            List<Guid> userIds = [.. outPut.Select(x => x.Id)];
             if (userIds.Count > 0)
             {
                 List<User> usersWithRelations = await _repository._DbQueryable
@@ -102,9 +102,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 }
             }
 
-            PagedResultDto<UserGetListOutputDto> result = new();
-            result.Items = outPut;
-            result.TotalCount = total;
+            PagedResultDto<UserGetListOutputDto> result = new()
+            {
+                Items = outPut,
+                TotalCount = total
+            };
             return result;
         }
 
@@ -160,9 +162,9 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             // 查询实际的 RoleCode
             List<Role> roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
-            List<string> roleCodes = roles.Select(r => r.RoleCode).ToList();
+            List<string> roleCodes = [.. roles.Select(r => r.RoleCode)];
 
-            List<string[]> policies = roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain }).ToList();
+            List<string[]> policies = [.. roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain })];
 
             // 必须禁用 AutoSave 并手动 Save，因为在外层事务中
             // 已在 DI 中全局禁用 AutoSave
@@ -202,7 +204,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("更新用户", OperationType.Update)]
         public async override Task<UserGetOutputDto> UpdateAsync(Guid id, UserUpdateInputVo input)
         {
-            if (input.UserName == UserConst.Admin || input.UserName == UserConst.TenantAdmin)
+            if (input.UserName is UserConst.Admin or UserConst.TenantAdmin)
             {
                 throw new UserFriendlyException(UserConst.Name_Not_Allowed);
             }
@@ -288,7 +290,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             PagedResultDto<UserGetListOutputDto> listResult = await GetListAsync(input);
 
             // 2. 将数据映射为专用的导出 DTO，处理“性别”、“角色”、“岗位”等字段的展示格式
-            List<UserExportOutputDto> exportData = listResult.Items.Select(x => new UserExportOutputDto
+            List<UserExportOutputDto> exportData = [.. listResult.Items.Select(x => new UserExportOutputDto
             {
                 UserName = x.UserName,
                 Name = x.Name,
@@ -308,7 +310,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 State = x.State ? "启用" : "禁用",
                 Remark = x.Remark,
                 CreationTime = x.CreationTime
-            }).ToList();
+            })];
 
             // 3. 生成 Excel 文件
             string tempPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "temp");

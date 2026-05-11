@@ -46,12 +46,11 @@ public class SystemUsageStatisticsService(
         }
 
         // 按ModelId去重,保留第一个模型的名称
-        List<AiModel> distinctModels = models
+        List<AiModel> distinctModels = [.. models
             .GroupBy(x => x.ModelId)
-            .Select(g => g.First())
-            .ToList();
+            .Select(g => g.First())];
 
-        List<string> modelIds = distinctModels.Select(x => x.ModelId).ToList();
+        List<string> modelIds = [.. distinctModels.Select(x => x.ModelId)];
 
         // 2. 查询指定日期内各模型的Token使用统计
         var modelStats = await _messageRepository._DbQueryable
@@ -70,7 +69,7 @@ public class SystemUsageStatisticsService(
         var modelStatDict = modelStats.ToDictionary(x => x.ModelId, x => x);
 
         // 3. 构建结果列表,使用去重后的模型列表
-        List<ModelTokenStatisticsDto> result = new();
+        List<ModelTokenStatisticsDto> result = [];
         foreach (AiModel? model in distinctModels)
         {
             modelStatDict.TryGetValue(model.ModelId, out var stat);

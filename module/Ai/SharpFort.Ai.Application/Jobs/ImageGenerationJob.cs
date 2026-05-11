@@ -29,10 +29,10 @@ public class ImageGenerationJob(
         try
         {
             // 构建 Gemini API 请求对象
-            List<object> parts = new()
-            {
+            List<object> parts =
+            [
                 new { text = task.Prompt }
-            };
+            ];
 
             // 添加参考图（如果有）
             foreach (string prefixBase64 in task.ReferenceImagesPrefixBase64)

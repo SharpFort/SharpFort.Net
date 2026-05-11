@@ -15,8 +15,10 @@ namespace SharpFort.Tool.Domain
             //缓存设置1分钟获取一次结果
             this.NugetResult = cache.GetOrAdd("NugetResult", () => { return InitData(); }, () =>
             {
-                DistributedCacheEntryOptions options = new();
-                options.AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1);
+                DistributedCacheEntryOptions options = new()
+                {
+                    AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(1)
+                };
                 return options;
             })!;
         }
@@ -51,7 +53,7 @@ namespace SharpFort.Tool.Domain
             List<string> versions = [];
 
             HtmlNodeCollection versionDoc = HtmlDoc.DocumentNode.SelectNodes("//*[@id=\"version-history\"]/table/tbody");
-            List<HtmlNode> trDoc = versionDoc.First().ChildNodes.Where(x => x.Name == "tr").ToList();
+            List<HtmlNode> trDoc = [.. versionDoc.First().ChildNodes.Where(x => x.Name == "tr")];
 
             foreach (HtmlNode? tr in trDoc)
             {

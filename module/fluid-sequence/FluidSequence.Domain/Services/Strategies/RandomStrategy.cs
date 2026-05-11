@@ -32,8 +32,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
             }
 
             char[] buffer = new char[len];
-            string source = "";
-
+            string source;
             switch (type)
             {
                 case "NUM": source = "0123456789"; break;

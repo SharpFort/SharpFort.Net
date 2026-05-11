@@ -54,9 +54,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (input.DataScope == DataScope.CUSTOM)
             {
                 await _roleDeptRepository.DeleteAsync(x => x.RoleId == input.RoleId);
-                List<RoleDepartment> insertEntities = (input.DepartmentIds ?? [])
-                    .Select(x => new RoleDepartment { DepartmentId = x, RoleId = input.RoleId })
-                    .ToList();
+                List<RoleDepartment> insertEntities = [.. (input.DepartmentIds ?? []).Select(x => new RoleDepartment { DepartmentId = x, RoleId = input.RoleId })];
                 await _roleDeptRepository.InsertRangeAsync(insertEntities);
             }
 
@@ -265,8 +263,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns></returns>
         public async Task CreateAuthUserAsync([FromBody] RoleAuthUserCreateOrDeleteInput input)
         {
-            List<UserRole> userRoleEntities = input.UserIds.Select(u => new UserRole { RoleId = input.RoleId, UserId = u })
-                .ToList();
+            List<UserRole> userRoleEntities = [.. input.UserIds.Select(u => new UserRole { RoleId = input.RoleId, UserId = u })];
             await _userRoleRepository.InsertRangeAsync(userRoleEntities);
 
             // Casbin 同步：添加用户角色关联 (g) (使用 CasbinPolicyManager 双写同步机制)

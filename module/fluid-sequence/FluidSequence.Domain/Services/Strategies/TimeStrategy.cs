@@ -7,9 +7,9 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
     {
         public bool CanHandle(string placeholderKey)
         {
-            return placeholderKey == "yyyy" || placeholderKey == "yy" || placeholderKey == "MM" || placeholderKey == "dd"
-                || placeholderKey == "HH" || placeholderKey == "mm" || placeholderKey == "ss"
-                || placeholderKey == "ww" || placeholderKey == "QQ" || placeholderKey == "FY";
+            return placeholderKey is "yyyy" or "yy" or "MM" or "dd"
+                or "HH" or "mm" or "ss"
+                or "ww" or "QQ" or "FY";
         }
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
@@ -27,7 +27,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
                 case "ww":
                     return ISOWeek.GetWeekOfYear(now).ToString("D2", CultureInfo.InvariantCulture);
                 case "QQ":
-                    int q = (now.Month - 1) / 3 + 1;
+                    int q = ((now.Month - 1) / 3) + 1;
                     return $"Q{q}";
                 case "FY":
                     int startMonth = 1;

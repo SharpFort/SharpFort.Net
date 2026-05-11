@@ -31,7 +31,7 @@ public class AnthropicMessageInput
             {
                 return "_"; // 兼容客户端空值问题
             }
-            return Contents!;
+            return Contents;
         }
         set
         {

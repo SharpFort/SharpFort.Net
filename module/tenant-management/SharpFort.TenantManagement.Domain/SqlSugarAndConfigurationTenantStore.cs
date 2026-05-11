@@ -91,11 +91,13 @@ namespace SharpFort.TenantManagement.Domain
 
         private static TenantConfiguration MapToConfiguration(Tenant Tenant)
         {
-            TenantConfiguration tenantConfiguration = new();
-            tenantConfiguration.Id = Tenant.Id;
-            tenantConfiguration.Name = Tenant.Name;
-            tenantConfiguration.ConnectionStrings = MaptoString(Tenant.TenantConnectionString);
-            tenantConfiguration.IsActive = true;
+            TenantConfiguration tenantConfiguration = new()
+            {
+                Id = Tenant.Id,
+                Name = Tenant.Name,
+                ConnectionStrings = MaptoString(Tenant.TenantConnectionString),
+                IsActive = true
+            };
             return tenantConfiguration;
         }
 

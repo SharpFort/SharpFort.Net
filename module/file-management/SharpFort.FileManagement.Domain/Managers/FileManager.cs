@@ -47,7 +47,7 @@ namespace SharpFort.FileManagement.Domain.Managers
             FileStorageProvider? defaultProvider = await GetDefaultProviderAsync();
             string providerName = defaultProvider?.ProviderType.ToString() ?? "Local";
 
-            List<FileDescriptor> entities = new();
+            List<FileDescriptor> entities = [];
             foreach (IFormFile file in files)
             {
                 string mimeType = FileDescriptor.GetMimeType(file.FileName);
@@ -194,7 +194,7 @@ namespace SharpFort.FileManagement.Domain.Managers
             IBlobStorageProvider? provider = _blobProviders.FirstOrDefault(x => x.ProviderName == providerName);
             if (provider == null)
             {
-                LogProviderNotFound(LoggerFactory.CreateLogger<FileManager>(), providerName!);
+                LogProviderNotFound(LoggerFactory.CreateLogger<FileManager>(), providerName);
                 return _blobProviders.First(x => x.ProviderName == "Local");
             }
 

@@ -52,7 +52,7 @@ public record EmbeddingCreateResponse : ThorBaseResponse
                         {
                             if (str.ValueKind == JsonValueKind.Array)
                             {
-                                float[] floats = str.EnumerateArray().Select(element => element.GetSingle()).ToArray();
+                                float[] floats = [.. str.EnumerateArray().Select(element => element.GetSingle())];
 
                                 embeddingResponse.Embedding = ConvertFloatArrayToBase64(floats);
                             }

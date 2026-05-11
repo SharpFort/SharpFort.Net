@@ -510,7 +510,7 @@ public class AiGateWayManager : DomainService
         ThorUsageResponse tokenUsage = new()
         {
             InputTokens = (currentUsage?.InputTokens ?? 0) + (currentUsage?.CacheCreationInputTokens ?? 0) + (currentUsage?.CacheReadInputTokens ?? 0),
-            OutputTokens = (currentUsage?.OutputTokens ?? 0),
+            OutputTokens = currentUsage?.OutputTokens ?? 0,
             TotalTokens = (currentUsage?.InputTokens ?? 0) + (currentUsage?.CacheCreationInputTokens ?? 0) + (currentUsage?.CacheReadInputTokens ?? 0) + (currentUsage?.OutputTokens ?? 0)
         };
 

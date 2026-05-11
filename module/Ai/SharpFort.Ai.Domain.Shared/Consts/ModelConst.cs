@@ -19,7 +19,7 @@ public class ModelConst
         return string.IsNullOrEmpty(modelId)
             ? null
             : ModelPrefixesToRemove.FirstOrDefault(prefix =>
-            modelId!.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+            modelId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

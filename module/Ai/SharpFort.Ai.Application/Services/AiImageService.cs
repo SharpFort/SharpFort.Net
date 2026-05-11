@@ -99,19 +99,19 @@ public class AiImageService(
         return task == null
             ? throw new UserFriendlyException("任务不存在或无权访问")
             : new ImageTaskOutput
-        {
-            Id = task.Id,
-            Prompt = task.Prompt,
-            // ReferenceImagesBase64 = task.ReferenceImagesBase64,
-            // ReferenceImagesUrl = task.ReferenceImagesUrl,
-            // StoreBase64 = task.StoreBase64,
-            StoreUrl = task.StoreUrl,
-            TaskStatusEnum = task.TaskStatus,
-            PublishStatus = task.PublishStatus,
-            Categories = task.Categories,
-            CreationTime = task.CreationTime,
-            ErrorInfo = task.ErrorInfo,
-        };
+            {
+                Id = task.Id,
+                Prompt = task.Prompt,
+                // ReferenceImagesBase64 = task.ReferenceImagesBase64,
+                // ReferenceImagesUrl = task.ReferenceImagesUrl,
+                // StoreBase64 = task.StoreBase64,
+                StoreUrl = task.StoreUrl,
+                TaskStatusEnum = task.TaskStatus,
+                PublishStatus = task.PublishStatus,
+                Categories = task.Categories,
+                CreationTime = task.CreationTime,
+                ErrorInfo = task.ErrorInfo,
+            };
     }
 
     /// <summary>

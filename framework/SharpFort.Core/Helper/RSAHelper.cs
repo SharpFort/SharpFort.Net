@@ -201,7 +201,7 @@ namespace SharpFort.Core.Helper
             {
                 throw new InvalidOperationException("_publicKeyRsaProvider is null");
             }
-            int bufferSize = _publicKeyRsaProvider.KeySize / 8 - 11;
+            int bufferSize = (_publicKeyRsaProvider.KeySize / 8) - 11;
             byte[] buffer = new byte[bufferSize];//待加密块
 
             using (MemoryStream msInput = new(_encoding.GetBytes(text)))
@@ -290,7 +290,7 @@ namespace SharpFort.Core.Helper
         public static RSA? CreateRsaProviderFromPublicKey(string publicKeyString)
         {
             // encoded OID sequence for  PKCS #1 rsaEncryption szOID_RSA_RSA = "1.2.840.113549.1.1.1"
-            byte[] seqOid = { 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00 };
+            byte[] seqOid = [0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00];
             byte[] seq = new byte[15];
 
             byte[] x509Key = Convert.FromBase64String(publicKeyString);
@@ -375,7 +375,7 @@ namespace SharpFort.Core.Helper
                         return null;
                     }
 
-                    byte[] modint = { lowbyte, highbyte, 0x00, 0x00 };   //reverse byte order since asn.1 key uses big endian order
+                    byte[] modint = [lowbyte, highbyte, 0x00, 0x00];   //reverse byte order since asn.1 key uses big endian order
                     int modsize = BitConverter.ToInt32(modint, 0);
 
                     int firstbyte = binr.PeekChar();
@@ -435,7 +435,7 @@ namespace SharpFort.Core.Helper
                 {
                     byte highbyte = binr.ReadByte();
                     byte lowbyte = binr.ReadByte();
-                    byte[] modint = { lowbyte, highbyte, 0x00, 0x00 };
+                    byte[] modint = [lowbyte, highbyte, 0x00, 0x00];
                     count = BitConverter.ToInt32(modint, 0);
                 }
                 else

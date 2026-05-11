@@ -18,7 +18,7 @@ public static class GeminiGenerateContentAcquirer
             return string.Empty;
         }
 
-        List<JsonElement> contentsArray = contents.Value.EnumerateArray().ToList();
+        List<JsonElement> contentsArray = [.. contents.Value.EnumerateArray()];
         if (contentsArray.Count == 0)
         {
             return string.Empty;
@@ -31,7 +31,7 @@ public static class GeminiGenerateContentAcquirer
             return string.Empty;
         }
 
-        List<JsonElement> partsArray = parts.Value.EnumerateArray().ToList();
+        List<JsonElement> partsArray = [.. parts.Value.EnumerateArray()];
         if (partsArray.Count == 0)
         {
             return string.Empty;
@@ -54,7 +54,7 @@ public static class GeminiGenerateContentAcquirer
             return string.Empty;
         }
 
-        List<JsonElement> candidatesArray = candidates.Value.EnumerateArray().ToList();
+        List<JsonElement> candidatesArray = [.. candidates.Value.EnumerateArray()];
         if (candidatesArray.Count == 0)
         {
             return string.Empty;
@@ -217,7 +217,7 @@ public static class GeminiGenerateContentAcquirer
     /// </summary>
     private static string FindMarkdownImageInResponse(JsonElement element)
     {
-        List<string> allTexts = new();
+        List<string> allTexts = [];
         CollectTextFields(element, allTexts);
 
         // 从最后一个 text 开始查找

@@ -31,4 +31,4 @@ public class MetaPureRouterDto
     public bool? KeepAlive { get; set; }
 
     public bool? showLink { get; set; }
-}
+}

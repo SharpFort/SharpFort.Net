@@ -34,8 +34,8 @@ public class SfMultiTenantConnectionStringResolver(
         string? tenantDefaultConnectionString = tenant.ConnectionStrings?.Default;
 
         //Requesting default connection string...
-        if (connectionStringName == null ||
-            connectionStringName == ConnectionStrings.DefaultConnectionStringName)
+        if (connectionStringName is null or
+            ConnectionStrings.DefaultConnectionStringName)
         {
             //Return tenant's default or global default
             return !tenantDefaultConnectionString.IsNullOrWhiteSpace()
@@ -89,8 +89,8 @@ public class SfMultiTenantConnectionStringResolver(
         string? tenantDefaultConnectionString = tenant.ConnectionStrings?.Default;
 
         //Requesting default connection string...
-        if (connectionStringName == null ||
-            connectionStringName == ConnectionStrings.DefaultConnectionStringName)
+        if (connectionStringName is null or
+            ConnectionStrings.DefaultConnectionStringName)
         {
             //Return tenant's default or global default
             return !tenantDefaultConnectionString.IsNullOrWhiteSpace()

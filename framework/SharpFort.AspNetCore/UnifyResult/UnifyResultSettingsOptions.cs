@@ -44,7 +44,7 @@ public sealed class UnifyResultSettingsOptions
     /// <param name="configuration"></param>
     public static void PostConfigure(UnifyResultSettingsOptions options, IConfiguration configuration)
     {
-        options.Return200StatusCodes ??= new[] { 401, 403 };
+        options.Return200StatusCodes ??= [401, 403];
         options.SupportMvcController ??= false;
     }
 }

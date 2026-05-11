@@ -65,15 +65,17 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
 
             //日志服务插入一条操作记录即可
 
-            OperationLogEntity logEntity = new();
-            logEntity.OperIp = ip;
-            //logEntity.OperLocation = location;
-            logEntity.OperationType = operLogAttribute.OperationType;
-            logEntity.Title = operLogAttribute.Title;
-            logEntity.RequestMethod = resultContext.HttpContext.Request.Method;
-            logEntity.Method = resultContext.HttpContext.Request.Path.Value;
-            logEntity.OperLocation = location;
-            logEntity.OperUser = _currentUser.UserName;
+            OperationLogEntity logEntity = new()
+            {
+                OperIp = ip,
+                //logEntity.OperLocation = location;
+                OperationType = operLogAttribute.OperationType,
+                Title = operLogAttribute.Title,
+                RequestMethod = resultContext.HttpContext.Request.Method,
+                Method = resultContext.HttpContext.Request.Path.Value,
+                OperLocation = location,
+                OperUser = _currentUser.UserName
+            };
             if (operLogAttribute.IsSaveResponseData)
             {
                 if (resultContext.Result is ContentResult result && result.ContentType == "application/json")

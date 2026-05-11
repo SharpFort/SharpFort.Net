@@ -25,12 +25,12 @@ namespace SharpFort.Core.Helper
                 {
                     // get the last piece from the current byte, shift it to the right
                     // and increment the byte counter
-                    index = (byte)(bytes[currentByte++] >> hi - 5);
+                    index = (byte)(bytes[currentByte++] >> (hi - 5));
                     if (currentByte != bytes.Length)
                     {
                         // if we are not at the end, get the first piece from
                         // the next byte, clear it and shift it to the left
-                        index = (byte)((byte)(bytes[currentByte] << 16 - hi) >> 3 | index);
+                        index = (byte)(((byte)(bytes[currentByte] << (16 - hi)) >> 3) | index);
                     }
 
                     hi -= 3;
@@ -44,7 +44,7 @@ namespace SharpFort.Core.Helper
                 {
 
                     // simply get the stuff from the current byte
-                    index = (byte)((byte)(bytes[currentByte] << 8 - hi) >> 3);
+                    index = (byte)((byte)(bytes[currentByte] << (8 - hi)) >> 3);
                     hi += 5;
                 }
 
@@ -77,11 +77,11 @@ namespace SharpFort.Core.Helper
 
             if (str.Length < 3)
             {
-                bytes[0] = (byte)(ValidChars.IndexOf(str[0]) | ValidChars.IndexOf(str[1]) << 5);
+                bytes[0] = (byte)(ValidChars.IndexOf(str[0]) | (ValidChars.IndexOf(str[1]) << 5));
                 return bytes;
             }
 
-            bit_buffer = ValidChars.IndexOf(str[0]) | ValidChars.IndexOf(str[1]) << 5;
+            bit_buffer = ValidChars.IndexOf(str[0]) | (ValidChars.IndexOf(str[1]) << 5);
             bits_in_buffer = 10;
             currentCharIndex = 2;
             for (int i = 0; i < bytes.Length; i++)

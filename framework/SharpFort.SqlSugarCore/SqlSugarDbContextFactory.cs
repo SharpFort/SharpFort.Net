@@ -176,7 +176,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             // 配置读写分离
-            List<SlaveConnectionConfig> slaveConfigs = new();
+            List<SlaveConnectionConfig> slaveConfigs = [];
             if (dbConnOptions.EnabledReadWrite)
             {
                 if (dbConnOptions.ReadUrl is null)

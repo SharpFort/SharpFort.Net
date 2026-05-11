@@ -31,12 +31,14 @@ namespace SharpFort.CasbinRbac.Domain.EventHandlers
                 browser: eventData.Browser,
                 os: eventData.Os,
                 creatorId: eventData.UserId
-            );
-            loginLogEntity.CreatorId = eventData.UserId;
+            )
+            {
+                CreatorId = eventData.UserId
+            };
             await _loginLogRepository.InsertAsync(loginLogEntity);
         }
 
         [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "用户【{UserId}:{UserName}】登入系统")]
-        private static partial void LogUserLogin(Guid userId, string userName);
+        private partial void LogUserLogin(Guid userId, string userName);
     }
 }

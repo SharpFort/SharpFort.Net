@@ -24,40 +24,40 @@ public sealed class ClaudiaChatCompletionsService(
             return [];
         }
 
-        if (completionDto.content.Any(x => x.type.Equals("thinking", StringComparison.OrdinalIgnoreCase)))
+        if (completionDto.Content.Any(x => x.Type.Equals("thinking", StringComparison.OrdinalIgnoreCase)))
         {
             // 将推理字段合并到返回对象去
-            chatMessage.ReasoningContent = completionDto.content
-                .First(x => x.type.Equals("thinking", StringComparison.OrdinalIgnoreCase)).Thinking;
+            chatMessage.ReasoningContent = completionDto.Content
+                .First(x => x.Type.Equals("thinking", StringComparison.OrdinalIgnoreCase)).Thinking;
 
-            chatMessage.Role = completionDto.role;
-            chatMessage.Content = completionDto.content
-                .First(x => x.type.Equals("text", StringComparison.OrdinalIgnoreCase)).text;
+            chatMessage.Role = completionDto.Role;
+            chatMessage.Content = completionDto.Content
+                .First(x => x.Type.Equals("text", StringComparison.OrdinalIgnoreCase)).Text;
         }
         else
         {
-            chatMessage.Role = completionDto.role;
-            chatMessage.Content = completionDto.content
-                .FirstOrDefault()?.text;
+            chatMessage.Role = completionDto.Role;
+            chatMessage.Content = completionDto.Content
+                .FirstOrDefault()?.Text;
         }
 
         response.Delta = chatMessage;
         response.Message = chatMessage;
 
-        if (completionDto.content.Any(x => x.type.Equals("tool_use", StringComparison.OrdinalIgnoreCase)))
+        if (completionDto.Content.Any(x => x.Type.Equals("tool_use", StringComparison.OrdinalIgnoreCase)))
         {
-            AnthropicChatCompletionDtoContent toolUse = completionDto.content
-                .First(x => x.type.Equals("tool_use", StringComparison.OrdinalIgnoreCase));
+            AnthropicChatCompletionDtoContent toolUse = completionDto.Content
+                .First(x => x.Type.Equals("tool_use", StringComparison.OrdinalIgnoreCase));
 
             chatMessage.ToolCalls =
             [
                 new()
                 {
-                    Id = toolUse.id,
+                    Id = toolUse.Id,
                     Function = new ThorChatMessageFunction()
                     {
-                        Name = toolUse.name,
-                        Arguments = JsonSerializer.Serialize(toolUse.input,
+                        Name = toolUse.Name,
+                        Arguments = JsonSerializer.Serialize(toolUse.Input,
                             ThorJsonSerializer.DefaultOptions),
                     },
                     Index = 0,
@@ -465,7 +465,7 @@ public sealed class ClaudiaChatCompletionsService(
                             }
                         ],
                         Model = input.Model,
-                        Id = result?.Message?.id ?? string.Empty,
+                        Id = result?.Message?.Id ?? string.Empty,
                         Usage = new ThorUsageResponse()
                         {
                             CompletionTokens = result?.Message?.Usage?.OutputTokens,
@@ -522,7 +522,7 @@ public sealed class ClaudiaChatCompletionsService(
                             }
                         ],
                         Model = input.Model,
-                        Id = result?.Message?.id ?? string.Empty,
+                        Id = result?.Message?.Id ?? string.Empty,
                         Usage = new ThorUsageResponse()
                         {
                             CompletionTokens = result?.Message?.Usage?.OutputTokens,
@@ -715,7 +715,7 @@ public sealed class ClaudiaChatCompletionsService(
             {
                 Choices = chat,
                 Model = input.Model,
-                Id = result.Message.id,
+                Id = result.Message.Id,
                 Usage = new ThorUsageResponse()
                 {
                     InputTokens = result.Message.Usage?.InputTokens + result.Message.Usage?.CacheCreationInputTokens +
@@ -857,7 +857,7 @@ public sealed class ClaudiaChatCompletionsService(
         {
             Choices = CreateResponse(value!),
             Model = input.Model,
-            Id = value!.id,
+            Id = value!.Id,
             Usage = new ThorUsageResponse()
             {
                 CompletionTokens = value.Usage!.OutputTokens,

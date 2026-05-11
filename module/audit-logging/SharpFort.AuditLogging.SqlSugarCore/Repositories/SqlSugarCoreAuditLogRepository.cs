@@ -138,7 +138,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
             .WhereIF(applicationName != null, auditLog => auditLog.ApplicationName == applicationName)
             .WhereIF(clientIpAddress != null, auditLog => auditLog.ClientIpAddress != null && auditLog.ClientIpAddress == clientIpAddress)
             .WhereIF(correlationId != null, auditLog => auditLog.CorrelationId == correlationId)
-            .WhereIF(httpStatusCode != null && httpStatusCode > 0, auditLog => auditLog.HttpStatusCode == nHttpStatusCode)
+            .WhereIF(httpStatusCode is not null and > 0, auditLog => auditLog.HttpStatusCode == nHttpStatusCode)
             .WhereIF(maxExecutionDuration != null && maxExecutionDuration.Value > 0, auditLog => auditLog.ExecutionDuration <= maxExecutionDuration)
             .WhereIF(minExecutionDuration != null && minExecutionDuration.Value > 0, auditLog => auditLog.ExecutionDuration >= minExecutionDuration);
     }

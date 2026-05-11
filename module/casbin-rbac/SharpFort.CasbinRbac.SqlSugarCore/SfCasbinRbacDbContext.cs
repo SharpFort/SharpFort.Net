@@ -111,7 +111,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 
             // 针对 Role 表的过滤 (只能看自己拥有的角色)
             Expressionable<Role> expRole = Expressionable.Create<Role>();
-            List<Guid> roleIds = roleInfo.Select(x => x.Id).ToList();
+            List<Guid> roleIds = [.. roleInfo.Select(x => x.Id)];
             expRole.Or(r => roleIds.Contains(r.Id));
             sqlSugarClient.QueryFilter.AddTableFilter(expRole.ToExpression());
         }

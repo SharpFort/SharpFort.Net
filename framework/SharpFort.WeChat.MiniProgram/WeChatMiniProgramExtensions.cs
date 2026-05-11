@@ -23,7 +23,7 @@ public static class WeChatMiniProgramExtensions
     internal static string ToQueryString<T>(this T obj)
     {
         PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        List<string> queryParams = new();
+        List<string> queryParams = [];
 
         foreach (PropertyInfo prop in properties)
         {

@@ -21,7 +21,7 @@ public class AuditLogInfoToAuditLogConverter(IGuidGenerator guidGenerator, IExce
     {
         Guid auditLogId = GuidGenerator.Create();
 
-        ExtraPropertyDictionary extraProperties = new();
+        ExtraPropertyDictionary extraProperties = [];
         if (auditLogInfo.ExtraProperties != null)
         {
             foreach (KeyValuePair<string, object?> pair in auditLogInfo.ExtraProperties)

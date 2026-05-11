@@ -91,10 +91,12 @@ namespace SharpFort.Core.Helper
         {
             string output = string.Empty;
 
-            ProcessStartInfo info = new();
-            info.FileName = fileName;
-            info.Arguments = args;
-            info.RedirectStandardOutput = true;
+            ProcessStartInfo info = new()
+            {
+                FileName = fileName,
+                Arguments = args,
+                RedirectStandardOutput = true
+            };
 
             using (Process? process = Process.Start(info))
             {

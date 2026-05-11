@@ -74,12 +74,12 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate, bool autoSave = false, CancellationToken cancellationToken = default)
         {
-            await this.DeleteAsync(predicate);
+            await DeleteAsync(predicate);
         }
 
         public virtual async Task DeleteDirectAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            await this.DeleteAsync(predicate);
+            await DeleteAsync(predicate);
         }
 
         public IQueryable<TEntity> WithDetails()
@@ -277,7 +277,7 @@ namespace SharpFort.SqlSugarCore.Repositories
         {
             if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
             {
-                SimpleClient<TEntity> simpleClient = (await GetDbSimpleClientAsync());
+                SimpleClient<TEntity> simpleClient = await GetDbSimpleClientAsync();
                 List<TEntity> entities = await simpleClient.AsQueryable().In(ids).ToListAsync();
                 if (entities.Count == 0)
                 {

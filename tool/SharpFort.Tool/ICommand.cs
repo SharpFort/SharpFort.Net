@@ -5,9 +5,9 @@ namespace SharpFort.Tool
 {
     public interface ICommand : ISingletonDependency
     {
-        public string Command { get; }
+        string Command { get; }
 
-        public string? Description { get; }
+        string? Description { get; }
         void CommandLineApplication(CommandLineApplication application);
 
     }

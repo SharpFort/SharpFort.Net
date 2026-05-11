@@ -46,7 +46,7 @@ namespace SharpFort.Core.Helper
             string ipAddr = context.GetClientIp(); // 假设这是你的扩展方法
             string locationStr;
 
-            if (ipAddr == "127.0.0.1" || ipAddr == "::1")
+            if (ipAddr is "127.0.0.1" or "::1")
             {
                 locationStr = "本地-本机";
             }

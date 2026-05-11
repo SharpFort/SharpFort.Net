@@ -17,11 +17,9 @@ namespace SharpFort.CasbinRbac.Domain.Utils
 
         public async Task ScanAndSyncAsync(Assembly[] assemblies)
         {
-            List<Type> controllers = assemblies.SelectMany(a => a.GetTypes())
-                .Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract)
-                .ToList();
+            List<Type> controllers = [.. assemblies.SelectMany(a => a.GetTypes()).Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract)];
 
-            List<Menu> newMenus = new();
+            List<Menu> newMenus = [];
 
             foreach (Type? controller in controllers)
             {
@@ -72,8 +70,10 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                             fullPath, // ApiUrl
                             httpMethod, // ApiMethod
                             999 // OrderNum
-                        );
-                        menu.IsShow = false; // API 资源不显示在菜单栏
+                        )
+                        {
+                            IsShow = false // API 资源不显示在菜单栏
+                        };
 
                         newMenus.Add(menu);
                     }

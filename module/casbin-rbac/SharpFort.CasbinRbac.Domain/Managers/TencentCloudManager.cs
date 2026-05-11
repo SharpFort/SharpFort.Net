@@ -27,8 +27,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 // 实例化一个client选项，可选的，没有特殊需求可以跳过
                 ClientProfile clientProfile = new();
                 // 实例化一个http选项，可选的，没有特殊需求可以跳过
-                HttpProfile httpProfile = new();
-                httpProfile.Endpoint = ("sms.tencentcloudapi.com");
+                HttpProfile httpProfile = new()
+                {
+                    Endpoint = ("sms.tencentcloudapi.com")
+                };
                 clientProfile.HttpProfile = httpProfile;
 
                 // 实例化要请求产品的client对象,clientProfile是可选的
