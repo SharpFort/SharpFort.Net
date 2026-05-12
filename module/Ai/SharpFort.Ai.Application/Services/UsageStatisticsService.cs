@@ -19,13 +19,13 @@ public class UsageStatisticsService(
     ISqlSugarRepository<ChatMessage> messageRepository,
     ISqlSugarRepository<AiUsage> usageStatisticsRepository,
     ISqlSugarRepository<Token> tokenRepository,
-    ModelManager modelManager) : ApplicationService, IUsageStatisticsService
+    ISqlSugarRepository<AiModel> aiModelRepository) : ApplicationService, IUsageStatisticsService
 {
     private readonly ISqlSugarRepository<ChatMessage> _messageRepository = messageRepository;
     private readonly ISqlSugarRepository<AiUsage> _usageStatisticsRepository = usageStatisticsRepository;
     // private readonly ISqlSugarRepository<PremiumPackageAggregateRoot> _premiumPackageRepository;
     private readonly ISqlSugarRepository<Token> _tokenRepository = tokenRepository;
-    private readonly ModelManager _modelManager = modelManager;
+    private readonly ISqlSugarRepository<AiModel> _aiModelRepository = aiModelRepository;
 
     /// <summary>
     /// 获取当前用户近7天的Token消耗统计
@@ -213,7 +213,7 @@ public class UsageStatisticsService(
         if (modelStats.Count > 0)
         {
             List<string> modelIds = [.. modelStats.Select(x => x.ModelId)];
-            var modelDic = await _modelManager._aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId))
+            var modelDic = await _aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId))
                 .Distinct()
                 .Where(x => x.IsEnabled)
                 .ToDictionaryAsync<string>(x => x.ModelId, y => y.IconUrl);

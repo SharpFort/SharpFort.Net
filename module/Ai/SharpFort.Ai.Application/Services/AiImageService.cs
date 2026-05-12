@@ -11,6 +11,7 @@ using SharpFort.Ai.Application.Contracts.Dtos;
 using SharpFort.Ai.Application.Jobs;
 using SharpFort.Ai.Domain.Entities;
 using SharpFort.Ai.Domain.Managers;
+using SharpFort.Ai.Domain.Managers;
 using SharpFort.Ai.Domain.Shared.Enums;
 using SharpFort.SqlSugarCore.Abstractions;
 
@@ -107,8 +108,6 @@ public class AiImageService(
                 // StoreBase64 = task.StoreBase64,
                 StoreUrl = task.StoreUrl,
                 TaskStatusEnum = task.TaskStatus,
-                PublishStatus = task.PublishStatus,
-                Categories = task.Categories,
                 CreationTime = task.CreationTime,
                 ErrorInfo = task.ErrorInfo,
             };
@@ -210,7 +209,6 @@ public class AiImageService(
             .Where(x => x.UserId == userId)
             .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
             .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
-            .WhereIF(input.PublishStatus is not null, x => x.PublishStatus == input.PublishStatus)
             .WhereIF(input.StartTime is not null && input.EndTime is not null,
                 x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
             .OrderByDescending(x => x.CreationTime)
@@ -220,13 +218,10 @@ public class AiImageService(
                 Prompt = x.Prompt,
                 StoreUrl = x.StoreUrl,
                 TaskStatusEnum = x.TaskStatus,
-                PublishStatus = x.PublishStatus,
-                Categories = x.Categories,
                 CreationTime = x.CreationTime,
                 ErrorInfo = x.ErrorInfo,
                 UserName = x.UserName,
-                UserId = x.UserId,
-                IsAnonymous = x.IsAnonymous
+                UserId = x.UserId
             })
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
@@ -245,78 +240,7 @@ public class AiImageService(
         await _imageTaskRepository.DeleteAsync(x => ids.Contains(x.Id) && x.UserId == userId);
     }
 
-    /// <summary>
-    /// 分页查询图片广场（已发布的图片）
-    /// </summary>
-    [HttpGet("ai-image/plaza")]
-    [AllowAnonymous]
-    public async Task<PagedResult<ImageTaskOutput>> GetPlazaPageAsync([FromQuery] ImagePlazaPageInput input)
-    {
-        RefAsync<int> total = 0;
-        List<ImageTaskOutput> output = await _imageTaskRepository._DbQueryable
-            .Where(x => x.PublishStatus == PublishStatus.Published)
-            .Where(x => x.TaskStatus == TaskStatusEnum.Success)
-            .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
-            .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
-            .WhereIF(!string.IsNullOrWhiteSpace(input.Categories),
-                x => SqlFunc.JsonLike(x.Categories, input.Categories))
-            .WhereIF(!string.IsNullOrWhiteSpace(input.UserName), x => x.UserName.Contains(input.UserName))
-            .WhereIF(input.StartTime is not null && input.EndTime is not null,
-                x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
-            .OrderByDescending(x => x.CreationTime)
-            .Select(x => new ImageTaskOutput
-            {
-                Id = x.Id,
-                Prompt = x.Prompt,
-                IsAnonymous = x.IsAnonymous,
-                StoreUrl = x.StoreUrl,
-                TaskStatusEnum = x.TaskStatus,
-                PublishStatus = x.PublishStatus,
-                Categories = x.Categories,
-                CreationTime = x.CreationTime,
-                ErrorInfo = null,
-                UserName = x.UserName,
-                UserId = x.UserId,
-            })
-            .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
-        ;
 
-
-        output.ForEach(x =>
-        {
-            if (x.IsAnonymous)
-            {
-                x.UserName = null;
-                x.UserId = null;
-            }
-        });
-
-        return new PagedResult<ImageTaskOutput>(total, output);
-    }
-
-    /// <summary>
-    /// 发布图片到广场
-    /// </summary>
-    [HttpPost("ai-image/publish")]
-    public async Task PublishAsync([FromBody] PublishImageInput input)
-    {
-        Guid userId = CurrentUser.GetId();
-
-        ImageStoreTaskAggregateRoot task = await _imageTaskRepository.GetFirstAsync(x => x.Id == input.TaskId && x.UserId == userId) ?? throw new UserFriendlyException("任务不存在或无权访问");
-        if (task.TaskStatus != TaskStatusEnum.Success)
-        {
-            throw new UserFriendlyException("只有已完成的任务才能发布");
-        }
-
-        if (task.PublishStatus == PublishStatus.Published)
-        {
-            throw new UserFriendlyException("该任务已发布");
-        }
-
-        //设置发布
-        task.SetPublish(input.IsAnonymous, input.Categories);
-        await _imageTaskRepository.UpdateAsync(task);
-    }
 
     /// <summary>
     /// 获取图片模型列表

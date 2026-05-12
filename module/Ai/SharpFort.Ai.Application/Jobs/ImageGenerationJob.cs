@@ -98,13 +98,13 @@ public class ImageGenerationJob(
         string mimeType = "image/png";
         string base64Data = prefixBase64;
 
-        if (prefixBase64.Contains(","))
+        if (prefixBase64.Contains(','))
         {
             string[] parts = prefixBase64.Split(',');
             if (parts.Length == 2)
             {
                 string header = parts[0];
-                if (header.Contains(":") && header.Contains(";"))
+                if (header.Contains(':') && header.Contains(';'))
                 {
                     mimeType = header.Split(':')[1].Split(';')[0];
                 }

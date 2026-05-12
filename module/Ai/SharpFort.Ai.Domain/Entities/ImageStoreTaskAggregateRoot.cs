@@ -1,4 +1,4 @@
-﻿using SqlSugar;
+using SqlSugar;
 using Volo.Abp.Domain.Entities.Auditing;
 using SharpFort.Ai.Domain.Shared.Enums;
 
@@ -58,22 +58,6 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
     public string? ErrorInfo { get; set; }
 
     /// <summary>
-    /// 发布状态
-    /// </summary>
-    public PublishStatus PublishStatus { get; set; } = PublishStatus.Unpublished;
-
-    /// <summary>
-    /// 分类标签
-    /// </summary>
-    [SugarColumn(IsJson = true)]
-    public List<string> Categories { get; set; } = [];
-
-    /// <summary>
-    /// 是否匿名
-    /// </summary>
-    public bool IsAnonymous { get; set; }
-
-    /// <summary>
     /// 密钥id
     /// </summary>
     public Guid? TokenId { get; set; }
@@ -88,17 +72,6 @@ public class ImageStoreTaskAggregateRoot : FullAuditedAggregateRoot<Guid>
         StoreUrl = storeUrl;
     }
 
-    /// <summary>
-    /// 设置发布
-    /// </summary>
-    /// <param name="isAnonymous"></param>
-    /// <param name="categories"></param>
-    public void SetPublish(bool isAnonymous, List<string> categories)
-    {
-        this.PublishStatus = PublishStatus.Published;
-        this.IsAnonymous = isAnonymous;
-        this.Categories = categories;
-    }
 
 
 }

@@ -226,16 +226,14 @@ public class ThorChatCompletionsRequest
                     ToolChoice = jsonElement.Deserialize<ThorToolChoice>();
                 }
             }
-            else if (value is string text)
-            {
-                ToolChoice = new ThorToolChoice
-                {
-                    Type = text
-                };
-            }
             else
             {
-                ToolChoice = (ThorToolChoice)value!;
+                ToolChoice = value is string text
+                    ? new ThorToolChoice
+                    {
+                        Type = text
+                    }
+                    : (ThorToolChoice)value!;
             }
         }
     }

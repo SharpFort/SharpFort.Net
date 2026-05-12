@@ -63,19 +63,19 @@ public record ThorChatCompletionsResponse
 
     public void SupplementalMultiplier(decimal multiplier)
     {
-        if (this.Usage is not null)
+        if (Usage is not null)
         {
-            this.Usage.InputTokens =
-                (int)Math.Round((this.Usage.InputTokens ?? 0) * multiplier);
-            this.Usage.OutputTokens =
-                (int)Math.Round((this.Usage.OutputTokens ?? 0) * multiplier);
-            this.Usage.CompletionTokens =
-                (int)Math.Round((this.Usage.CompletionTokens ?? 0) * multiplier);
-            this.Usage.PromptTokens =
-                (int)Math.Round((this.Usage.PromptTokens ?? 0) * multiplier);
+            Usage.InputTokens =
+                (int)Math.Round((Usage.InputTokens ?? 0) * multiplier);
+            Usage.OutputTokens =
+                (int)Math.Round((Usage.OutputTokens ?? 0) * multiplier);
+            Usage.CompletionTokens =
+                (int)Math.Round((Usage.CompletionTokens ?? 0) * multiplier);
+            Usage.PromptTokens =
+                (int)Math.Round((Usage.PromptTokens ?? 0) * multiplier);
 
-            this.Usage.TotalTokens =
-                (int)Math.Round((this.Usage.TotalTokens ?? 0) * multiplier);
+            Usage.TotalTokens =
+                (int)Math.Round((Usage.TotalTokens ?? 0) * multiplier);
         }
     }
 }

@@ -9,6 +9,7 @@ using SharpFort.Ai.Domain.Shared.Attributes;
 namespace SharpFort.Ai.Domain.Mcp;
 
 [SfAgentTool]
+[Obsolete("Planned for removal. Assess if Agent infrastructure is needed.")]
 public class HttpRequestTool(
     IHttpClientFactory httpClientFactory,
     ILogger<HttpRequestTool> logger) : ISingletonDependency

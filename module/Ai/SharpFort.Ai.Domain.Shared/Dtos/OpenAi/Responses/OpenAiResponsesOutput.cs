@@ -57,13 +57,13 @@ public class OpenAiResponsesOutput
 
     public void SupplementalMultiplier(decimal multiplier)
     {
-        if (this.Usage is not null)
+        if (Usage is not null)
         {
-            this.Usage.InputTokens =
-                (int)Math.Round((this.Usage?.InputTokens ?? 0) * multiplier);
+            Usage.InputTokens =
+                (int)Math.Round((Usage?.InputTokens ?? 0) * multiplier);
 
-            this.Usage!.OutputTokens =
-                (int)Math.Round((this.Usage?.OutputTokens ?? 0) * multiplier);
+            Usage!.OutputTokens =
+                (int)Math.Round((Usage?.OutputTokens ?? 0) * multiplier);
         }
     }
 }

@@ -18,8 +18,4 @@ public class ImageMyTaskPageInput : PagedAllResultRequestDto
     /// </summary>
     public TaskStatusEnum? TaskStatusEnum { get; set; }
 
-    /// <summary>
-    /// 发布状态
-    /// </summary>
-    public PublishStatus? PublishStatus { get; set; }
 }

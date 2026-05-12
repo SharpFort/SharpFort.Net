@@ -412,13 +412,9 @@ public class AiGateWayManager : DomainService
                     throw new FormatException("Input，输入格式错误，非string或Array类型");
                 }
             }
-            else if (input.Input is string strInput)
-            {
-                embeddingCreateRequest.Input = strInput;
-            }
             else
             {
-                throw new FormatException("Input，输入格式错误，未找到类型");
+                embeddingCreateRequest.Input = input.Input is string strInput ? strInput : throw new FormatException("Input，输入格式错误，未找到类型");
             }
 
 

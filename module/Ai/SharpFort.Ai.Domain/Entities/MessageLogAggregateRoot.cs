@@ -5,6 +5,7 @@ using SharpFort.Ai.Domain.Shared.Enums;
 namespace SharpFort.Ai.Domain.Entities;
 
 [SugarTable("Ai_Message_Log")]
+[Obsolete("API raw request auditing. Replaced by quota system. Planned for removal.")]
 public class MessageLogAggregateRoot : Entity<Guid>
 {
     /// <summary>

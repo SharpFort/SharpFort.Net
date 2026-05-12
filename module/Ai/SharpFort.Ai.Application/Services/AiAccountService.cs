@@ -11,6 +11,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
 
+[Obsolete("Simple forwarding service. Planned for removal.")]
 public class AiAccountService(
     IAccountService accountService,
     ISqlSugarRepository<ChatMessage> messageRepository) : ApplicationService

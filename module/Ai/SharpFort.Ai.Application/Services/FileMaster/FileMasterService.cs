@@ -50,14 +50,7 @@ public class FileMasterService(IHttpContextAccessor httpContextAccessor, AiGateW
     public async Task ChatCompletionsAsync([FromBody] ThorChatCompletionsRequest input,
         CancellationToken cancellationToken)
     {
-        if (CurrentUser.IsAuthenticated)
-        {
-            input.Model = "gpt-5-chat";
-        }
-        else
-        {
-            input.Model = "gpt-5-chat";
-        }
+        input.Model = CurrentUser.IsAuthenticated ? "gpt-5-chat" : "gpt-5-chat";
 
         Guid? userId = CurrentUser.IsAuthenticated ? CurrentUser.GetId() : null;
         if (userId is not null)

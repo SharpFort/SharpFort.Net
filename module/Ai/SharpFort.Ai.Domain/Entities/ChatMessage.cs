@@ -47,7 +47,7 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
                         : 0;
 
 
-            this.TokenUsage = new TokenUsageValueObject
+            TokenUsage = new TokenUsageValueObject
             {
                 OutputTokenCount = outputTokenCount,
                 InputTokenCount = inputTokenCount,
@@ -56,7 +56,7 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
         }
         else
         {
-            this.TokenUsage = new TokenUsageValueObject
+            TokenUsage = new TokenUsageValueObject
             {
                 OutputTokenCount = 0,
                 InputTokenCount = 0,
@@ -64,7 +64,7 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
             };
         }
 
-        this.MessageType = sessionId is null ? MessageType.Api : MessageType.Web;
+        MessageType = sessionId is null ? MessageType.Api : MessageType.Web;
     }
 
     public Guid? UserId { get; set; }

@@ -38,6 +38,6 @@ public class AgentStore : FullAuditedAggregateRoot<Guid>
     /// </summary>
     public void SetStore(string store)
     {
-        this.Store = store;
+        Store = store;
     }
 }

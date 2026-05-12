@@ -18,11 +18,6 @@ public class ImageTaskOutput
     public string Prompt { get; set; } = string.Empty;
 
     /// <summary>
-    /// 是否匿名
-    /// </summary>
-    public bool IsAnonymous { get; set; }
-
-    /// <summary>
     /// 生成图片URL
     /// </summary>
     public string? StoreUrl { get; set; }
@@ -31,16 +26,6 @@ public class ImageTaskOutput
     /// 任务状态
     /// </summary>
     public TaskStatusEnum TaskStatusEnum { get; set; }
-
-    /// <summary>
-    /// 发布状态
-    /// </summary>
-    public PublishStatus PublishStatus { get; set; }
-
-    /// <summary>
-    /// 分类标签
-    /// </summary>
-    public List<string> Categories { get; set; } = [];
 
     /// <summary>
     /// 创建时间

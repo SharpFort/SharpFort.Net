@@ -251,25 +251,17 @@ public static class HttpClientExtensions
     private static async Task<TResponse> HandleResponseContent<TResponse>(this HttpResponseMessage response,
         CancellationToken cancellationToken) where TResponse : ThorBaseResponse, new()
     {
-        TResponse result;
-
-        if (!response.Content.Headers.ContentType?.MediaType?.Equals("application/json",
-                StringComparison.OrdinalIgnoreCase) ?? true)
-        {
-            result = new()
+        TResponse result = !response.Content.Headers.ContentType?.MediaType?.Equals("application/json",
+                StringComparison.OrdinalIgnoreCase) ?? true
+            ? new()
             {
                 Error = new()
                 {
                     MessageObject = await response.Content.ReadAsStringAsync(cancellationToken)
                 }
-            };
-        }
-        else
-        {
-            result = await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken) ??
+            }
+            : await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken) ??
                      throw new InvalidOperationException();
-        }
-
         return result;
     }
 }
