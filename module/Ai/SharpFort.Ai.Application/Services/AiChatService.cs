@@ -44,7 +44,7 @@ public class AiChatService(IHttpContextAccessor httpContextAccessor,
     public async Task<List<AiModelDto>> GetModelListAsync()
     {
         List<AiModel> entities = await _aiModelRepository._DbQueryable
-            .Where(x => x.IsEnabled == true)
+            .Where(x => x.IsEnabled)
             .Where(x => x.ModelType == ModelType.Chat)
             .OrderByDescending(x => x.OrderNum)
             .ToListAsync();
@@ -75,7 +75,7 @@ public class AiChatService(IHttpContextAccessor httpContextAccessor,
         // 从请求体中提取模型ID（如果未从URL传入）
         if (string.IsNullOrEmpty(modelId))
         {
-            modelId = ExtractModelIdFromRequest(apiType, input);
+            modelId = ExtractModelIdFromRequest(input);
         }
 
         // 除了免费模型，其他的模型都要校验
@@ -102,7 +102,7 @@ public class AiChatService(IHttpContextAccessor httpContextAccessor,
     /// <summary>
     /// 从请求体中提取模型ID
     /// </summary>
-    private string ExtractModelIdFromRequest(ModelApiType apiType, JsonElement input)
+    private static string ExtractModelIdFromRequest(JsonElement input)
     {
         try
         {

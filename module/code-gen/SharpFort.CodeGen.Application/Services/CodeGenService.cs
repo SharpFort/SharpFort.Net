@@ -75,6 +75,7 @@ namespace SharpFort.CodeGen.Application.Services
         /// </summary>
         /// <returns></returns>
         [HttpPost("code-gen/dir/{**path}")]
+#pragma warning disable CA1822 // ABP requires instance methods for AutoAPI
         public async Task PostDir([FromRoute] string path)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -91,5 +92,6 @@ namespace SharpFort.CodeGen.Application.Services
 
             await Task.CompletedTask;
         }
+#pragma warning restore CA1822
     }
 }

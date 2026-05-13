@@ -36,7 +36,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
                 {
                     continue;
                 }
-                string nameStr = field.Name;
+                string nameStr = field.Name!;
 
                 //添加备注
                 if (!string.IsNullOrEmpty(field.Description))
@@ -56,7 +56,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
 
                 //添加可空类型
                 string nullStr = "";
-                if (field.IsRequired == false)
+                if (!field.IsRequired)
                 {
                     nullStr = "?";
                 }

@@ -89,7 +89,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         [Route("type/{dicType}")]
         public async Task<List<DictionaryGetListOutputDto>> GetDicType([FromRoute] string dicType)
         {
-            List<Dictionary> entities = await _repository.GetListAsync(u => u.DictType == dicType && u.State == true);
+            List<Dictionary> entities = await _repository.GetListAsync(u => u.DictType == dicType && u.State);
             List<DictionaryGetListOutputDto> result = await MapToGetListOutputDtosAsync(entities);
             return result;
         }
@@ -118,7 +118,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// </summary>
         /// <param name="input">查询条件</param>
         /// <returns>Excel文件流</returns>
-        public override Task<Microsoft.AspNetCore.Mvc.IActionResult> GetExportExcelAsync(DictionaryGetListInputVo input)
+        public override Task<IActionResult> GetExportExcelAsync(DictionaryGetListInputVo input)
         {
             return base.GetExportExcelAsync(input);
         }

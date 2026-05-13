@@ -14,7 +14,7 @@ namespace SharpFort.Tool.Domain
         public async Task<string> CreateTemplateAsync(TemplateGenCreateDto input)
         {
             //这里判断gitee上是否有这个分支
-            if (!await _giteeManager.IsExsitBranchAsync(input.GiteeRef))
+            if (!await _giteeManager.IsExsitBranchAsync(input.GiteeRef!))
             {
                 throw new UserFriendlyException($"Gitee分支未找到{input.GiteeRef}，请检查,[{input.GiteeRef}]分支是否存在");
             }

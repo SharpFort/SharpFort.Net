@@ -43,8 +43,8 @@ namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
 
             DataTable dt = await db.Ado.GetDataTableAsync(sql, new
             {
-                count = count,
-                ruleCode = ruleCode
+                count,
+                ruleCode
             });
 
             if (dt.Rows.Count == 0)

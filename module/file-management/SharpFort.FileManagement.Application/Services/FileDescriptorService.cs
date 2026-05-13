@@ -82,7 +82,7 @@ namespace SharpFort.FileManagement.Application.Services
             Stream? stream = await _fileManager.GetFileStreamAsync(file, isThumbnail);
             return stream == null
                 ? throw new UserFriendlyException("文件内容不存在")
-                : (IActionResult)new FileStreamResult(stream, file.MimeType)
+                : (IActionResult)new FileStreamResult(stream, file.MimeType!)
                 {
                     FileDownloadName = file.Name
                 };
@@ -106,7 +106,7 @@ namespace SharpFort.FileManagement.Application.Services
         {
             RefAsync<int> total = 0;
             List<FileDescriptor> entities = await _repository._DbQueryable
-                .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name.Contains(input.Name!))
+                .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name!.Contains(input.Name!))
                 .WhereIF(input.DirectoryId.HasValue, x => x.DirectoryId == input.DirectoryId)
                 .WhereIF(input.FileType.HasValue, x => x.FileType == input.FileType)
                 .OrderByDescending(x => x.CreationTime)

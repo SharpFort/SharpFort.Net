@@ -24,7 +24,7 @@ public class Token : FullAuditedAggregateRoot<Guid>
     /// Token密钥
     /// </summary>
     [SugarColumn(ColumnName = "Token")]
-    public string TokenKey { get; set; } = null!;
+    public string? TokenKey { get; set; } = null;
 
     /// <summary>
     /// 用户Id
@@ -35,7 +35,7 @@ public class Token : FullAuditedAggregateRoot<Guid>
     /// 名称
     /// </summary>
     [SugarColumn(Length = 100)]
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; } = null;
 
     /// <summary>
     /// 过期时间（空为永不过期）

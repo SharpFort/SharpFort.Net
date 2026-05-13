@@ -39,10 +39,7 @@ namespace SharpFort.Ddd.Application.Contracts
         /// </summary>
         public override string? Sorting
         {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(OrderByColumn) ? $"{OrderByColumn} {(IsAscending ? "ASC" : "DESC")}" : _sorting;
-            }
+            get => !string.IsNullOrWhiteSpace(OrderByColumn) ? $"{OrderByColumn} {(IsAscending ? "ASC" : "DESC")}" : _sorting;
             set => _sorting = value;
         }
     }

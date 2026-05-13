@@ -33,8 +33,8 @@ public class AiModelService(
         ISugarQueryable<AiModel> query = _modelRepository._DbQueryable
             .Where(x => !x.IsDeleted)
             .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x =>
-                x.Name.Contains(input.SearchKey) || x.ModelId.Contains(input.SearchKey))
-            .WhereIF(input.AiProviderId.HasValue, x => x.AiProviderId == input.AiProviderId.Value);
+                x.Name!.Contains(input.SearchKey!) || x.ModelId!.Contains(input.SearchKey!))
+            .WhereIF(input.AiProviderId.HasValue, x => x.AiProviderId == input.AiProviderId!.Value);
         // .WhereIF(input.IsPremiumOnly == true, x => x.IsPremium); // Assuming IsPremiumOnly is not in DTO or not needed yet
 
         List<AiModel> entities = await query

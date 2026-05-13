@@ -37,7 +37,9 @@ namespace SharpFort.AspNetCore.Mvc
             ConventionalControllerSetting? configuration)
         {
             // 获取API路由前缀
+#pragma warning disable IDE0059 // Route prefix extracted for potential future use
             string apiRoutePrefix = GetApiRoutePrefix(action, configuration);
+#pragma warning restore IDE0059
 
             // 规范化控制器名称
             string normalizedControllerName = NormalizeUrlControllerName(

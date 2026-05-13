@@ -5,7 +5,7 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Table
 {
     public class TableDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
+        public new Guid Id { get; set; }
         /// <summary>
         /// 表名
         /// </summary>

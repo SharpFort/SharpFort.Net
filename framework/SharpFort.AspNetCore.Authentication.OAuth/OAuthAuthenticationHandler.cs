@@ -30,7 +30,7 @@ namespace SharpFort.AspNetCore.Authentication.OAuth
         /// <returns></returns>
         private AuthenticationTicket TicketConver(List<Claim> claims)
         {
-            ClaimsIdentity claimsIdentity = new(claims.ToArray(), AuthenticationSchemeNmae);
+            ClaimsIdentity claimsIdentity = new([.. claims], AuthenticationSchemeNmae);
             ClaimsPrincipal principal = new(claimsIdentity);
             return new AuthenticationTicket(principal, AuthenticationSchemeNmae);
         }

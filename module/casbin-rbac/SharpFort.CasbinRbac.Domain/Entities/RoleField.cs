@@ -29,12 +29,12 @@ public class RoleField : CreationAuditedEntity<Guid>
     /// 表名 (数据库表名，�?sys_user)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string TableName { get; set; } = null!;
+    public string? TableName { get; set; } = null;
 
     /// <summary>
     /// 字段�?(数据库列名，�?phone)
     /// </summary>
     [SugarColumn(Length = 64)]
-    public string FieldName { get; set; } = null!;
+    public string? FieldName { get; set; } = null;
 }
 

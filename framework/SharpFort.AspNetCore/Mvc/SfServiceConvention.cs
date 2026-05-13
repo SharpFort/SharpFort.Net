@@ -139,7 +139,7 @@ namespace SharpFort.AspNetCore.Mvc
             if (!selector.ActionConstraints.OfType<HttpMethodActionConstraint>().Any())
             {
                 selector.ActionConstraints.Add(
-                    new HttpMethodActionConstraint(new[] { httpMethod }));
+                    new HttpMethodActionConstraint([httpMethod]));
             }
         }
     }

@@ -18,11 +18,11 @@ namespace SharpFort.CodeGen.Application.Services
     {
         private readonly ISqlSugarRepository<Field, Guid> _repository = repository;
 
-        public async override Task<PagedResultDto<FieldDto>> GetListAsync([FromQuery] FieldGetListInput input)
+        public override async Task<PagedResultDto<FieldDto>> GetListAsync([FromQuery] FieldGetListInput input)
         {
             RefAsync<int> total = 0;
             List<Field> entities = await _repository._DbQueryable.WhereIF(input.TableId is not null, x => x.TableId == input.TableId)
-                      .WhereIF(input.Name is not null, x => x.Name.Contains(input.Name!))
+                      .WhereIF(input.Name is not null, x => x.Name!.Contains(input.Name!))
 
                       .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 

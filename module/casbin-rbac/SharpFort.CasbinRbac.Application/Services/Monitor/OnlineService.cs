@@ -35,8 +35,8 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 dataWhere = dataWhere.Where((u) => u.UserName!.Contains(online.UserName));
             }
 
-            return Task.FromResult(new PagedResultDto<OnlineUserModel>()
-            { TotalCount = data.Count, Items = dataWhere.ToList() });
+            return Task.FromResult(new PagedResultDto<OnlineUserModel>
+            { TotalCount = data.Count, Items = [.. dataWhere] });
         }
 
 

@@ -35,12 +35,6 @@ namespace SharpFort.SqlSugarCore
             LazyServiceProvider.LazyGetRequiredService<TenantConfigurationWrapper>();
 
         /// <summary>
-        /// 当前租户信息
-        /// </summary>
-        private ICurrentTenant CurrentTenant =>
-            LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
-
-        /// <summary>
         /// 数据库连接配置选项
         /// </summary>
         private DbConnOptions DbConnectionOptions =>

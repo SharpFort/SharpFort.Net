@@ -33,11 +33,10 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
             }
 
             //查找标签，获取标签对象
-            OperLogAttribute? operLogAttribute = controllerActionDescriptor.MethodInfo
-                .GetCustomAttributes(inherit: true)
-                .FirstOrDefault(a => a.GetType().Equals(typeof(OperLogAttribute))) as OperLogAttribute;
             //空对象直接返回
-            if (operLogAttribute is null)
+            if (controllerActionDescriptor.MethodInfo
+                .GetCustomAttributes(inherit: true)
+                .FirstOrDefault(a => a.GetType().Equals(typeof(OperLogAttribute))) is not OperLogAttribute operLogAttribute)
             {
                 return;
             }

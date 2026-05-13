@@ -13,7 +13,7 @@ public class TemplateService(ISqlSugarRepository<Template, Guid> repository) : S
 {
     private readonly ISqlSugarRepository<Template, Guid> _repository = repository;
 
-    public async override Task<PagedResultDto<TemplateDto>> GetListAsync([FromQuery] TemplateGetListInput input)
+    public override async Task<PagedResultDto<TemplateDto>> GetListAsync([FromQuery] TemplateGetListInput input)
     {
         RefAsync<int> total = 0;
         List<Template> entities = await _repository._DbQueryable.WhereIF(input.Name is not null, x => x.Name == input.Name)

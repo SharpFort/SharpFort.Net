@@ -43,7 +43,7 @@ public class GiteeManager(IConfiguration configuration, IHttpClientFactory httpC
         List<string> names = [];
 
         // 遍历每个对象，获取 name 字段
-        foreach (JObject obj in jsonArray)
+        foreach (JObject obj in jsonArray.Cast<JObject>())
         {
             // 获取 name 字段的值
             string? name = obj["name"]?.ToString();

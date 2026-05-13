@@ -8,7 +8,7 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Etos
 
         public UserRoleMenuQueryEventArgs(params Guid[] userIds)
         {
-            UserIds.AddRange(userIds.ToList());
+            UserIds.AddRange([.. userIds]);
         }
         public List<Guid> UserIds { get; set; } = [];
 

@@ -21,12 +21,12 @@ namespace Sf.Abp.Test
                    /*application= */
                    service.AddApplicationAsync<SfAbpTestModule>().Wait();
                })
-               .ConfigureAppConfiguration(this.ConfigureAppConfiguration)
+               .ConfigureAppConfiguration(ConfigureAppConfiguration)
                .Build();
 
-            this.ServiceProvider = host.Services;
-            this.TestServiceScope = ServiceProvider.CreateScope();
-            this.Logger = (ILogger)this.ServiceProvider.GetRequiredService(typeof(ILogger<>).MakeGenericType(this.GetType()));
+            ServiceProvider = host.Services;
+            TestServiceScope = ServiceProvider.CreateScope();
+            Logger = (ILogger)ServiceProvider.GetRequiredService(typeof(ILogger<>).MakeGenericType(GetType()));
 
             host.InitializeAsync().Wait();
         }

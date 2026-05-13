@@ -54,7 +54,7 @@ namespace SharpFort.CasbinRbac.Application
             context.Services.AddTransient<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Mvc.JsonOptions>, JsonOptionsSetup>();
         }
 
-        public async override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
+        public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
         }
     }

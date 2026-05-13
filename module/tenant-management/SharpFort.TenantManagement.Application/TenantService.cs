@@ -109,7 +109,7 @@ namespace SharpFort.TenantManagement.Application
             await CurrentUnitOfWork!.SaveChangesAsync();
             using (CurrentTenant.Change(id))
             {
-                await CodeFirst(this.LazyServiceProvider);
+                await CodeFirst(LazyServiceProvider);
                 await _dataSeeder.SeedAsync(id);
             }
         }

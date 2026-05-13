@@ -21,8 +21,8 @@ namespace SharpFort.CodeGen.Domain.Managers
             {
                 HandledTemplate handledTempalte = new()
                 {
-                    TemplateStr = template.Content,
-                    BuildPath = template.BuildPath
+                    TemplateStr = template.Content!,
+                    BuildPath = template.BuildPath!
                 };
                 foreach (ITemplateHandler templateHandler in _templateHandlers)
                 {

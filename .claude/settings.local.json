@@ -59,7 +59,18 @@
       "Bash(Select-Object -Last 5)",
       "Bash(Select-String \"CS8618\")",
       "Bash(cat)",
-      "Bash(cp \"/tmp/test_ca1822.cs\" \"E:/Projects/SharpFort.Net/framework/SharpFort.Core/Test_ca1822.cs\")"
+      "Bash(cp \"/tmp/test_ca1822.cs\" \"E:/Projects/SharpFort.Net/framework/SharpFort.Core/Test_ca1822.cs\")",
+      "PowerShell(dotnet format style *)",
+      "PowerShell(dotnet --version)",
+      "Bash(git *)",
+      "PowerShell(dotnet format Sf.Abp.sln analyzers --diagnostics $diagnostics --no-restore 2>&1)",
+      "PowerShell($diagnostics = \"IDE0005 IDE0100 IDE0200 IDE0031 IDE0075 IDE0047 IDE0048 IDE0008 IDE0290 IDE0019\")",
+      "PowerShell(dotnet format Sf.Abp.sln analyzers --diagnostics $batch1 --no-restore 2>&1)",
+      "PowerShell($batch1 = \"IDE0005 IDE0028 IDE0055 IDE0036 IDE0031 IDE0290 IDE0037 IDE0019 IDE0018 IDE0025 IDE0054 IDE0075 IDE0029 IDE0027 IDE0066 IDE0220 IDE0200 IDE0047 IDE0048 IDE0042 IDE0100 IDE0120 IDE0340 IDE0045 IDE0034\")",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh search *)",
+      "PowerShell(gh search *)"
     ],
     "deny": [],
     "ask": []

@@ -39,7 +39,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             try
             {
                 Client _aliyunClient = CreateClient();
-                AlibabaCloud.SDK.Dysmsapi20170525.Models.SendSmsRequest sendSmsRequest = new()
+                SendSmsRequest sendSmsRequest = new()
                 {
                     PhoneNumbers = phoneNumbers,
                     SignName = Options.Sms.SignName,

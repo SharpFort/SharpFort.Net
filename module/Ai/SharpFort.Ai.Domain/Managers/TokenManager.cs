@@ -50,7 +50,6 @@ public class TokenManager(
     /// 验证Token并返回用户Id和TokenId
     /// </summary>
     /// <param name="tokenOrId">Token密钥或者TokenId</param>
-    /// <param name="tokenOrId">Token密钥或者TokenId</param>
     /// <returns>Token验证结果</returns>
     public async Task<TokenValidationResult> ValidateTokenAsync(object tokenOrId)
     {

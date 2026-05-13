@@ -150,7 +150,7 @@ namespace SharpFort.SqlSugarCore.Repositories
 
         public virtual async Task<long> GetCountAsync(CancellationToken cancellationToken = default)
         {
-            return await this.CountAsync(_ => true);
+            return await CountAsync(_ => true);
         }
 
         public virtual async Task<List<TEntity>> GetPagedListAsync(int skipCount, int maxResultCount, string sorting, bool includeDetails = false, CancellationToken cancellationToken = default)

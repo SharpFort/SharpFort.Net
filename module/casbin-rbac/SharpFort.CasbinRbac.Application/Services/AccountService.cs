@@ -144,8 +144,10 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// </summary>
         /// <param name="refreshToken"></param>
         /// <returns></returns>
+#pragma warning disable IDE0060 // refreshToken is handled by authentication middleware
         [Authorize(AuthenticationSchemes = TokenTypeConst.Refresh)]
         public async Task<object> PostRefreshAsync([FromQuery] string refreshToken)
+#pragma warning restore IDE0060
         {
             Guid userId = CurrentUser.Id!.Value;
             string accessToken = await _accountManager.GetTokenByUserIdAsync(userId);
@@ -173,7 +175,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         private static async Task ValidationPhone(string phone)
         {
             bool res = Regex.IsMatch(phone, @"^\d{11}$");
-            if (res == false)
+            if (!res)
             {
                 throw new UserFriendlyException("手机号码格式错误！请检查");
             }
@@ -289,7 +291,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             User entity = await _userRepository.GetFirstAsync(x => x.Phone == input.Phone) ?? throw new UserFriendlyException("该手机号码未注册");
             await _accountManager.RestPasswordAsync(entity.Id, input.Password);
 
-            return entity.UserName;
+            return entity.UserName!;
         }
 
 
@@ -302,7 +304,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         [UnitOfWork]
         public async Task PostRegisterAsync(RegisterDto input)
         {
-            if (_rbacOptions.EnableRegister == false)
+            if (!_rbacOptions.EnableRegister)
             {
                 throw new UserFriendlyException("该系统暂未开放注册功能");
             }
@@ -351,7 +353,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             Guid userId = _currentUser.Id ?? throw new UserFriendlyException("用户未登录");
 
             //此处优先从缓存中获取
-            var output = await _userManager.GetInfoAsync(userId.Value);
+            UserRoleMenuDto output = await _userManager.GetInfoAsync(userId);
             return output;
         }
 
@@ -371,7 +373,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             }
 
             //注意用户名大小写数据库不敏感问题
-            if (userName is not null && !user.UserName.Equals(userName, StringComparison.Ordinal))
+            if (userName is not null && !user.UserName!.Equals(userName, StringComparison.Ordinal))
             {
                 throw new UserFriendlyException($"该用户名不存在或已禁用-{userName}");
             }

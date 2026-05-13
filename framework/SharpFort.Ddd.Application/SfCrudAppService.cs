@@ -246,7 +246,7 @@ namespace SharpFort.Ddd.Application
         /// <summary>
         /// 生成Excel文件名
         /// </summary>
-        private string GenerateExcelFileName()
+        private static string GenerateExcelFileName()
         {
             return $"{typeof(TEntity).Name}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{Guid.NewGuid()}.xlsx";
         }

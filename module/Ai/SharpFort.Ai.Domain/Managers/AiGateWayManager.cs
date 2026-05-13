@@ -370,8 +370,10 @@ public class AiGateWayManager : DomainService
     /// <param name="tokenId">Token Id（Web端传null或Guid.Empty）</param>
     /// <exception cref="Exception"></exception>
     /// <exception cref="BusinessException"></exception>
+#pragma warning disable IDE0060 // sessionId is reserved for future use (comment-out code below)
     public async Task EmbeddingForStatisticsAsync(HttpContext context, Guid? userId, Guid? sessionId,
         ThorEmbeddingInput input, Guid? tokenId = null)
+#pragma warning restore IDE0060
     {
         try
         {
@@ -1098,23 +1100,14 @@ public class AiGateWayManager : DomainService
 
         StreamProcessResult? processResult = null;
 
-        switch (apiType)
+        processResult = apiType switch
         {
-            case ModelApiType.Completions:
-                processResult = await ProcessCompletionsStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
-                break;
-            case ModelApiType.Messages:
-                processResult = await ProcessAnthropicStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
-                break;
-            case ModelApiType.Responses:
-                processResult = await ProcessOpenAiResponsesStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
-                break;
-            case ModelApiType.GenerateContent:
-                processResult = await ProcessGeminiStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken);
-                break;
-            default:
-                throw new UserFriendlyException($"不支持的API类型: {apiType}");
-        }
+            ModelApiType.Completions => await ProcessCompletionsStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken),
+            ModelApiType.Messages => await ProcessAnthropicStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken),
+            ModelApiType.Responses => await ProcessOpenAiResponsesStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken),
+            ModelApiType.GenerateContent => await ProcessGeminiStreamAsync(messageQueue, requestBody, modelDescribe, userId, cancellationToken),
+            _ => throw new UserFriendlyException($"不支持的API类型: {apiType}"),
+        };
 
 
         // 统一的统计处理

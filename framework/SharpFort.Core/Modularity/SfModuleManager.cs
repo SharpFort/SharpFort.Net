@@ -20,10 +20,9 @@ public partial class SfModuleManager(
     IServiceProvider serviceProvider) : ModuleManager(moduleContainer, logger, options, serviceProvider), IModuleManager, ISingletonDependency
 {
     private readonly IModuleContainer _moduleContainer = moduleContainer;
-    private readonly IEnumerable<IModuleLifecycleContributor> _lifecycleContributors = options.Value.Contributors
+    private readonly IEnumerable<IModuleLifecycleContributor> _lifecycleContributors = [.. options.Value.Contributors
             .Select(serviceProvider.GetRequiredService)
-            .Cast<IModuleLifecycleContributor>()
-            .ToArray();
+            .Cast<IModuleLifecycleContributor>()];
     private readonly ILogger<SfModuleManager> _logger = logger;
 
     /// <summary>

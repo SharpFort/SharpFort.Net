@@ -11,10 +11,10 @@ internal class DefaultMinProgramToken(IOptions<WeChatMiniProgramOptions> options
 
     public async Task<string> GetTokenAsync()
     {
-        AccessTokenResponse token = await this.GetAccessToken();
-        return token.access_token;
+        AccessTokenResponse? token = await GetAccessToken();
+        return token?.access_token ?? throw new InvalidOperationException("Failed to get access token from WeChat API.");
     }
-    public async Task<AccessTokenResponse> GetAccessToken()
+    public async Task<AccessTokenResponse?> GetAccessToken()
     {
         AccessTokenRequest req = new()
         {

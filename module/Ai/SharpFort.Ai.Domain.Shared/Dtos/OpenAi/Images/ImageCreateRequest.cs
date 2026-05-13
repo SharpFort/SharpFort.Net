@@ -20,7 +20,7 @@ public record ImageCreateRequest : SharedImageRequestBaseModel
     ///     A text description of the desired image(s). The maximum length is 1000 characters for dall-e-2 and 4000 characters for dall-e-3
     /// </summary>
     [JsonPropertyName("prompt")]
-    public string Prompt { get; set; } = null!;
+    public string? Prompt { get; set; } = null;
 
     /// <summary>
     ///     The quality of the image that will be generated. Possible values are 'standard' or 'hd' (default is 'standard').

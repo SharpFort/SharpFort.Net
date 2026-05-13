@@ -39,7 +39,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
 
             responseBody!.ValidateSuccess();
 
-            return responseBody;
+            return responseBody!;
         }
     }
 
@@ -61,7 +61,7 @@ public class WeChatMiniProgramManager(IMiniProgramToken weChatToken, IOptions<We
             data = input.data,
             miniprogram_state = _options.Notice?.State ?? "formal"
         };
-        req.template_id = req.template_id ?? _options.Notice?.TemplateId;
+        req.template_id ??= _options.Notice?.TemplateId!;
 
         using (HttpClient httpClient = new())
         {

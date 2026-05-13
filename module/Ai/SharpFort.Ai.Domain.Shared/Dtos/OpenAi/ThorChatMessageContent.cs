@@ -17,7 +17,7 @@ public class ThorChatMessageContent
     /// 消息内容类型，只能使用<see cref="ThorMessageContentTypeConst"/> 定义的值赋值，如：ThorMessageContentTypeConst.Text
     /// </summary>
     [JsonPropertyName("type")]
-    public string Type { get; set; } = null!;
+    public string? Type { get; set; } = null;
 
     /// <summary>
     /// 消息内容类型为 text 时候的赋值，如：图片上描述了什么

@@ -24,7 +24,7 @@ public class Table : FullAuditedAggregateRoot<Guid>
     /// 规则：必填，唯一，建议 PascalCase
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; } = null;
 
     /// <summary>
     /// 表描述/备注

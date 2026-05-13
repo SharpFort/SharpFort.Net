@@ -30,7 +30,7 @@ namespace SharpFort.SqlSugarCore
             IConfiguration configuration = services.GetConfiguration();
 
             // 配置数据库连接选项
-            ConfigureDbOptions(services, configuration);
+            ConfigureDbOptions(configuration);
 
             // 配置GUID生成器
             ConfigureGuidGenerator(services);
@@ -41,7 +41,7 @@ namespace SharpFort.SqlSugarCore
             return Task.CompletedTask;
         }
 
-        private void ConfigureDbOptions(IServiceCollection services, IConfiguration configuration)
+        private void ConfigureDbOptions(IConfiguration configuration)
         {
             IConfigurationSection section = configuration.GetSection("DbConnOptions");
             Configure<DbConnOptions>(section);
@@ -56,7 +56,7 @@ namespace SharpFort.SqlSugarCore
             });
 
             // 配置默认租户
-            ConfigureDefaultTenant(services, dbConnOptions);
+            ConfigureDefaultTenant(dbConnOptions);
         }
 
         private void ConfigureGuidGenerator(IServiceCollection services)
@@ -84,7 +84,7 @@ namespace SharpFort.SqlSugarCore
             services.AddSfDbContext<DefaultSqlSugarDbContext>();
         }
 
-        private void ConfigureDefaultTenant(IServiceCollection services, DbConnOptions dbConfig)
+        private void ConfigureDefaultTenant(DbConnOptions dbConfig)
         {
             Configure<AbpDefaultTenantStoreOptions>(options =>
             {
@@ -122,6 +122,37 @@ namespace SharpFort.SqlSugarCore
                 DbType.MySql or DbType.PostgreSQL => SequentialGuidType.SequentialAsString,
                 DbType.SqlServer => SequentialGuidType.SequentialAtEnd,
                 DbType.Oracle => SequentialGuidType.SequentialAsBinary,
+                DbType.Sqlite => throw new NotImplementedException(),
+                DbType.Dm => throw new NotImplementedException(),
+                DbType.Kdbndp => throw new NotImplementedException(),
+                DbType.Oscar => throw new NotImplementedException(),
+                DbType.MySqlConnector => throw new NotImplementedException(),
+                DbType.Access => throw new NotImplementedException(),
+                DbType.OpenGauss => throw new NotImplementedException(),
+                DbType.QuestDB => throw new NotImplementedException(),
+                DbType.HG => throw new NotImplementedException(),
+                DbType.ClickHouse => throw new NotImplementedException(),
+                DbType.GBase => throw new NotImplementedException(),
+                DbType.Odbc => throw new NotImplementedException(),
+                DbType.OceanBaseForOracle => throw new NotImplementedException(),
+                DbType.TDengine => throw new NotImplementedException(),
+                DbType.GaussDB => throw new NotImplementedException(),
+                DbType.OceanBase => throw new NotImplementedException(),
+                DbType.Tidb => throw new NotImplementedException(),
+                DbType.Vastbase => throw new NotImplementedException(),
+                DbType.PolarDB => throw new NotImplementedException(),
+                DbType.Doris => throw new NotImplementedException(),
+                DbType.Xugu => throw new NotImplementedException(),
+                DbType.GoldenDB => throw new NotImplementedException(),
+                DbType.TDSQLForPGODBC => throw new NotImplementedException(),
+                DbType.TDSQL => throw new NotImplementedException(),
+                DbType.HANA => throw new NotImplementedException(),
+                DbType.DB2 => throw new NotImplementedException(),
+                DbType.GaussDBNative => throw new NotImplementedException(),
+                DbType.DuckDB => throw new NotImplementedException(),
+                DbType.MongoDb => throw new NotImplementedException(),
+                DbType.Custom => throw new NotImplementedException(),
+                null => throw new NotImplementedException(),
                 _ => SequentialGuidType.SequentialAtEnd
             };
         }
@@ -176,7 +207,7 @@ namespace SharpFort.SqlSugarCore
 
             // [FIX] SQLite 并发优化配置
             // 针对 SQLite 的 "database is locked" 问题，启用以下三项关键配置
-            if (db.CurrentConnectionConfig.DbType == SqlSugar.DbType.Sqlite)
+            if (db.CurrentConnectionConfig.DbType == DbType.Sqlite)
             {
                 // 1. WAL (Write-Ahead Logging) 模式
                 //    - 大幅提升读写并发能力，读操作不会阻塞写操作

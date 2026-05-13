@@ -140,7 +140,7 @@ namespace SharpFort.FluidSequence.Domain.Services
         /// </summary>
         private string ParseTemplate(SysSequenceRule rule, Dictionary<string, string> context)
         {
-            return Regex.Replace(rule.Template, @"\{(.*?)\}", match =>
+            return Regex.Replace(rule.Template!, @"\{(.*?)\}", match =>
             {
                 string key = match.Groups[1].Value;
 

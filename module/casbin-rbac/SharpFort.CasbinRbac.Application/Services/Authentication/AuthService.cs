@@ -35,8 +35,10 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         /// <param name="code">code是为了swagger更好的处理和显示</param>
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
+#pragma warning disable IDE0060 // code parameter is for swagger documentation
         [HttpGet("auth/oauth/login/{scheme}")]
         public async Task<object> AuthOauthLoginAsync([FromRoute] string scheme, [FromQuery] string code)
+#pragma warning restore IDE0060
         {
             (string? openId, string _) = await GetOpenIdAndNameAsync(scheme);
             OpenAuth authEntity = await _repository.GetAsync(x => x.OpenId == openId && x.AuthType == scheme) ?? throw new UserFriendlyException("第三方登录失败，请先注册后，在个人中心进行绑定该第三方后使用");
@@ -51,9 +53,11 @@ namespace SharpFort.CasbinRbac.Application.Services.Authentication
         /// <param name="code">code是为了swagger更好的处理和显示</param>
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
+#pragma warning disable IDE0060 // code parameter is for swagger documentation
         [HttpPost("auth/oauth/bind/{scheme}")]
         [Authorize]
         public async Task AuthOauthBindAsync([FromRoute] string scheme, [FromQuery] string code)
+#pragma warning restore IDE0060
         {
             (string? openId, string? name) = await GetOpenIdAndNameAsync(scheme);
             Guid? userId = CurrentUser.Id;

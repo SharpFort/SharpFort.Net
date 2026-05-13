@@ -24,8 +24,11 @@ public class ImageGenerationJob(
     public override async Task ExecuteAsync(ImageGenerationJobArgs args)
     {
         ImageStoreTaskAggregateRoot task = await _imageStoreTaskRepository.GetFirstAsync(x => x.Id == args.TaskId) ?? throw new UserFriendlyException($"{args.TaskId} 图片生成任务不存在");
-        _logger.LogInformation("开始执行图片生成任务，TaskId: {TaskId}, ModelId: {ModelId}, UserId: {UserId}",
-            task.Id, task.ModelId, task.UserId);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("开始执行图片生成任务，TaskId: {TaskId}, ModelId: {ModelId}, UserId: {UserId}",
+                task.Id, task.ModelId, task.UserId);
+        }
         try
         {
             // 构建 Gemini API 请求对象
@@ -75,15 +78,18 @@ public class ImageGenerationJob(
                 tokenId: task.TokenId);
 
 
-            _logger.LogInformation("图片生成任务完成，TaskId: {TaskId}", args.TaskId);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("图片生成任务完成，TaskId: {TaskId}", args.TaskId);
+            }
         }
         catch (Exception ex)
         {
-            string error = $"图片任务失败，TaskId: {args.TaskId}，错误信息: {ex.Message}，错误堆栈：{ex.StackTrace}";
-            _logger.LogError(ex, error);
+            _logger.LogError(ex, "图片任务失败，TaskId: {TaskId}，错误信息: {ErrorMessage}，错误堆栈：{StackTrace}",
+                args.TaskId, ex.Message, ex.StackTrace);
 
             task.TaskStatus = TaskStatusEnum.Fail;
-            task.ErrorInfo = error;
+            task.ErrorInfo = $"图片任务失败，TaskId: {args.TaskId}，错误信息: {ex.Message}，错误堆栈：{ex.StackTrace}";
 
             await _imageStoreTaskRepository.UpdateAsync(task);
         }

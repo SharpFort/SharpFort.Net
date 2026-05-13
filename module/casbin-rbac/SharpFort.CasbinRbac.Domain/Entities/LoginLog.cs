@@ -72,7 +72,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// (注意：CreatorId 记录的是登录成功的 UserId，而这里记录的是尝试登录的输入串)
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string LoginUser { get; protected set; } = null!;
+        public string? LoginUser { get; protected set; } = null;
 
         /// <summary>
         /// 登录IP

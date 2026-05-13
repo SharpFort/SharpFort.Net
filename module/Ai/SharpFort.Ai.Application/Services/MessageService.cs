@@ -80,7 +80,7 @@ public class MessageService(ISqlSugarRepository<ChatMessage> repository) : Appli
 
         // 批量更新为隐藏状态
         await _repository._Db.Updateable<ChatMessage>()
-            .SetColumns(x => x.IsHidden == true)
+            .SetColumns(x => x.IsHidden)
             .Where(x => idsToHide.Contains(x.Id))
             .ExecuteCommandAsync();
     }

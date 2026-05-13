@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Volo.Abp.DependencyInjection;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
+using SharpFort.CasbinRbac.Domain.Shared.Enums;
 
 namespace SharpFort.CasbinRbac.Domain.Utils
 {
@@ -62,7 +63,7 @@ namespace SharpFort.CasbinRbac.Domain.Utils
                             Guid.NewGuid(),
                             $"{controller.Name}.{method.Name}", // Name
                             fullPath, // Router/Url
-                            Domain.Shared.Enums.MenuType.Button, // Type
+                            MenuType.Button, // Type
                             Guid.Empty, // Parent (Root or specific category)
                             $"{controller.Name}:{method.Name}", // PermissionCode
                             null, // MenuIcon

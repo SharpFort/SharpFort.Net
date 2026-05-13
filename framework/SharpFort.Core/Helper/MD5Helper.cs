@@ -34,13 +34,10 @@ namespace SharpFort.Core.Helper
             byte[] bIn = Encoding.Unicode.GetBytes(pass);
             byte[] bSalt = Convert.FromBase64String(salt);
             byte[] bAll = new byte[bSalt.Length + bIn.Length];
-            byte[]? bRet = null;
-
             Buffer.BlockCopy(bSalt, 0, bAll, 0, bSalt.Length);
             Buffer.BlockCopy(bIn, 0, bAll, bSalt.Length, bIn.Length);
 
-            bRet = SHA512.HashData(bAll);
-
+            byte[]? bRet = SHA512.HashData(bAll);
             return ConvertEx.ToUrlBase64String(bRet);
         }
 

@@ -70,10 +70,7 @@ public class ThorToolFunctionPropertyDefinition
     [JsonPropertyName("type")]
     public object Type
     {
-        get
-        {
-            return Types is { Length: > 0 } ? Types : typeStr;
-        }
+        get => Types is { Length: > 0 } ? Types : typeStr;
         set
         {
             if (value is JsonElement str)

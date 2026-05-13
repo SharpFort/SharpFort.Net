@@ -24,19 +24,19 @@ namespace SharpFort.FluidSequence.Domain.Entities
         /// 规则名称 (如：采购订单号)
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "规则名称", IsNullable = false)]
-        public string RuleName { get; set; } = null!;
+        public string? RuleName { get; set; } = null;
 
         /// <summary>
         /// 规则编码 (业务唯一键，如：PO_NO)
         /// </summary>
         [SugarColumn(Length = 50, ColumnDescription = "规则编码", IsNullable = false)]
-        public string RuleCode { get; set; } = null!;
+        public string? RuleCode { get; set; } = null;
 
         /// <summary>
         /// 生成模板 (如：PO-{DeptCode}-{yyyy}{MM}-{SEQ})
         /// </summary>
         [SugarColumn(Length = 100, ColumnDescription = "生成模板", IsNullable = false)]
-        public string Template { get; set; } = null!;
+        public string? Template { get; set; } = null;
 
         /// <summary>
         /// 当前计数值 (核心状态，持久化存储)
@@ -147,8 +147,8 @@ namespace SharpFort.FluidSequence.Domain.Entities
                     shouldReset = last.Year != now.Year || lastWeek != currentWeek;
                     break;
                 case SequenceResetType.Quarterly:
-                    int lastQ = (last.Month - 1) / 3 + 1;
-                    int currentQ = (now.Month - 1) / 3 + 1;
+                    int lastQ = ((last.Month - 1) / 3) + 1;
+                    int currentQ = ((now.Month - 1) / 3) + 1;
                     shouldReset = last.Year != now.Year || lastQ != currentQ;
                     break;
                 case SequenceResetType.FiscalYearly:

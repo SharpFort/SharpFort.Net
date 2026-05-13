@@ -20,7 +20,7 @@ namespace Sf.Abp.Application.Services
         /// <param name="name"></param>
         /// <returns></returns>
         [HttpGet("hello-world")]
-        public string GetHelloWorld(string? name)
+        public static string GetHelloWorld(string? name)
         {
             //会自动添加前缀，而不是重置，更符合习惯
             //如果需要重置以"/"根目录开头即可
@@ -33,7 +33,7 @@ namespace Sf.Abp.Application.Services
         /// </summary>
         /// <returns></returns>
         [HttpGet("error")]
-        public string GetError()
+        public static string GetError()
         {
             throw new UserFriendlyException("业务异常");
             throw new Exception("系统异常");
@@ -108,14 +108,14 @@ namespace Sf.Abp.Application.Services
         /// <returns></returns>
         // [DisableRateLimiting]
         //[EnableRateLimiting("sliding")]
-        public int GetRateLimiting()
+        public static int GetRateLimiting()
         {
             RequestNumber++;
             return RequestNumber;
         }
 
 
-        public ISettingProvider SettingProvider { get; set; } = null!;
+        public new ISettingProvider SettingProvider { get; set; } = null!;
 
         public ISettingManager SettingManager { get; set; } = null!;
 
@@ -127,12 +127,9 @@ namespace Sf.Abp.Application.Services
         {
             //DDD需要提前定义
             //默认来说，不提供修改操作，配置应该独立
-            string? enableOrNull = await SettingProvider.GetOrNullAsync("DDD");
 
             //如果要进行修改，可使用yi.framework下的ISettingManager
             await SettingManager.SetGlobalAsync("DDD", "false");
-
-            string enableOrNull2 = await SettingManager.GetOrNullGlobalAsync("DDD");
 
             //当然，他的独特地方，是支持来自多个模块，例如配置文件？
             string result = await SettingManager.GetOrNullConfigurationAsync("Test");
@@ -177,7 +174,7 @@ namespace Sf.Abp.Application.Services
             return $"加锁结果：{number},不加锁结果：{number2}";
         }
 
-        public ICurrentTenant CurrentTenant { get; set; } = null!;
+        public new ICurrentTenant CurrentTenant { get; set; } = null!;
 
     }
 }

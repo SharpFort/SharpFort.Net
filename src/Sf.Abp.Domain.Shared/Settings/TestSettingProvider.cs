@@ -2,7 +2,7 @@
 
 namespace Sf.Abp.Domain.Shared.Settings
 {
-    internal class TestSettingProvider : SettingDefinitionProvider
+    internal sealed class TestSettingProvider : SettingDefinitionProvider
     {
         public override void Define(ISettingDefinitionContext context)
         {

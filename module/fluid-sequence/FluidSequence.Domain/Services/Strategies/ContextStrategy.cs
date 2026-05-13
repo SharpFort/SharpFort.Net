@@ -7,7 +7,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
     {
         public bool CanHandle(string placeholderKey)
         {
-            return placeholderKey == "UserCode" || placeholderKey == "DeptCode" || placeholderKey == "TenantCode" || placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal);
+            return placeholderKey == "UserCode" || placeholderKey == "DeptCode" || placeholderKey == "TenantCode" || placeholderKey.StartsWith("Param:", StringComparison.Ordinal);
         }
 
         public string Handle(string placeholderKey, SysSequenceRule rule, Dictionary<string, string> context)
@@ -17,7 +17,7 @@ namespace SharpFort.FluidSequence.Domain.Services.Strategies
                 return "";
             }
 
-            if (placeholderKey.StartsWith("Param:", System.StringComparison.Ordinal))
+            if (placeholderKey.StartsWith("Param:", StringComparison.Ordinal))
             {
                 string paramKey = placeholderKey[6..];
                 return context.TryGetValue(paramKey, out string? val1) ? val1 : "";

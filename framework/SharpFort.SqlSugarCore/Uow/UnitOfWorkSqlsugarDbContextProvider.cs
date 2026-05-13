@@ -26,11 +26,6 @@ namespace SharpFort.SqlSugarCore.Uow
         /// </summary>
         public IServiceProvider ServiceProvider { get; set; } = null!;
 
-        /// <summary>
-        /// 数据库上下文访问器实例
-        /// </summary>
-        private static AsyncLocalDbContextAccessor ContextInstance => AsyncLocalDbContextAccessor.Instance;
-
         private readonly TenantConfigurationWrapper _tenantConfigurationWrapper = tenantConfigurationWrapper;
         private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
         private readonly IConnectionStringResolver _connectionStringResolver = connectionStringResolver;
@@ -48,7 +43,7 @@ namespace SharpFort.SqlSugarCore.Uow
             // 获取连接字符串信息
             string connectionStringName = tenantConfiguration.GetCurrentConnectionName();
             string connectionString = tenantConfiguration.GetCurrentConnectionString();
-            string dbContextKey = $"{this.GetType().Name}_{connectionString}";
+            string dbContextKey = $"{GetType().Name}_{connectionString}";
 
             IUnitOfWork unitOfWork = _unitOfWorkManager.Current ?? throw new AbpException(
                     "DbContext 只能在工作单元内工作，当前DbContext没有工作单元，如需创建新线程并发操作，请手动创建工作单元");
@@ -99,9 +94,8 @@ namespace SharpFort.SqlSugarCore.Uow
         protected virtual async Task<TDbContext> CreateDbContextWithTransactionAsync(IUnitOfWork unitOfWork)
         {
             string transactionApiKey = $"SqlSugarCore_{SqlSugarDbContextCreationContext.Current.ConnectionString}";
-            SqlSugarTransactionApi? activeTransaction = unitOfWork.FindTransactionApi(transactionApiKey) as SqlSugarTransactionApi;
 
-            if (activeTransaction == null)
+            if (unitOfWork.FindTransactionApi(transactionApiKey) is not SqlSugarTransactionApi activeTransaction)
             {
                 TDbContext dbContext = unitOfWork.ServiceProvider.GetRequiredService<TDbContext>();
                 SqlSugarTransactionApi transaction = new(dbContext);

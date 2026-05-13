@@ -19,7 +19,7 @@ public class ThorChatMessage
     /// 【必填】发出消息的角色，请使用<see cref="ThorChatMessageRoleConst.User"/>赋值,如：ThorChatMessageRoleConst.User
     /// </summary>
     [JsonPropertyName("role")]
-    public string Role { get; set; } = null!;
+    public string? Role { get; set; } = null;
 
     /// <summary>
     /// 发出的消息内容,如：你好
@@ -55,15 +55,13 @@ public class ThorChatMessage
     [JsonPropertyName("content")]
     public object? ContentCalculated
     {
-        get
-        {
+        get =>
             // if (Content is not null && Contents is not null)
             // {
             //     throw new ValidationException("Messages 中 Content 和 Contents 字段不能同时有值");
             // }
 
-            return Content is not null ? Content : Contents;
-        }
+            Content is not null ? Content : Contents;
         set
         {
             if (value is JsonElement str)

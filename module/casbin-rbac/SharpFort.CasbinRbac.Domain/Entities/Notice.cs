@@ -60,7 +60,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 公告标题
         /// </summary>
         [SugarColumn(Length = 128)]
-        public string Title { get; protected set; } = null!;
+        public string? Title { get; protected set; } = null;
 
         /// <summary>
         /// 公告类型
@@ -73,7 +73,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// </summary>
         [SugarColumn(ColumnDataType = "text", IsNullable = false)]
         // 如果您的框架有 StaticConfig.CodeFirst_BigString，也可以保持原样，但 "text" 对 PGSQL 更通用
-        public string Content { get; protected set; } = null!;
+        public string? Content { get; protected set; } = null;
 
         /// <summary>
         /// 排序 (IOrderNum 实现)

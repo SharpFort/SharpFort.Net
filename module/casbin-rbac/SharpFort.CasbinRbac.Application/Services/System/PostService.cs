@@ -23,7 +23,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             RefAsync<int> total = 0;
 
             List<Position> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.PostName),
-                    x => x.PostName.Contains(input.PostName!))
+                    x => x.PostName!.Contains(input.PostName!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
                 .OrderByDescending(x => x.OrderNum)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);

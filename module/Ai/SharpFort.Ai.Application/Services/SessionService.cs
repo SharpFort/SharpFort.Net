@@ -13,7 +13,7 @@ namespace SharpFort.Ai.Application.Services;
 public class SessionService(ISqlSugarRepository<ChatSession, Guid> repository, ISqlSugarRepository<ChatMessage, Guid> messageRepository) : CrudAppService<ChatSession, SessionDto, Guid, SessionGetListInput, SessionCreateAndUpdateInput>(repository)
 {
     private readonly ISqlSugarRepository<ChatSession, Guid> _repository = repository;
-    public readonly ISqlSugarRepository<ChatMessage, Guid> _messageRepository = messageRepository;
+    private readonly ISqlSugarRepository<ChatMessage, Guid> _messageRepository = messageRepository;
 
     /// <summary>
     /// 创建会话

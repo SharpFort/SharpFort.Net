@@ -13,7 +13,7 @@ namespace SharpFort.Tool.Domain
         public NugetCrawlerManager(IDistributedCache<NugetResult> cache)
         {
             //缓存设置1分钟获取一次结果
-            this.NugetResult = cache.GetOrAdd("NugetResult", () => { return InitData(); }, () =>
+            NugetResult = cache.GetOrAdd("NugetResult", InitData, () =>
             {
                 DistributedCacheEntryOptions options = new()
                 {
@@ -23,7 +23,7 @@ namespace SharpFort.Tool.Domain
             })!;
         }
 
-        private HtmlDocument HtmlDoc { get; set; } = null!;
+        private HtmlDocument? HtmlDoc { get; set; }
         private NugetResult NugetResult { get; set; } = new NugetResult();
 
         private NugetResult InitData()
@@ -31,7 +31,7 @@ namespace SharpFort.Tool.Domain
             NugetResult nugetResult = new();
 
             HtmlWeb web = new();
-            this.HtmlDoc = web.Load(NugetVersionUrl);
+            HtmlDoc = web.Load(NugetVersionUrl);
             nugetResult.Versions = GetVersionList();
             nugetResult.DownloadNumber = GetDownloadNumber();
 
@@ -41,7 +41,7 @@ namespace SharpFort.Tool.Domain
 
         public NugetResult GetNugetResult()
         {
-            return this.NugetResult;
+            return NugetResult;
         }
 
         /// <summary>
@@ -52,13 +52,12 @@ namespace SharpFort.Tool.Domain
         {
             List<string> versions = [];
 
-            HtmlNodeCollection versionDoc = HtmlDoc.DocumentNode.SelectNodes("//*[@id=\"version-history\"]/table/tbody");
+            HtmlNodeCollection versionDoc = HtmlDoc!.DocumentNode.SelectNodes("//*[@id=\"version-history\"]/table/tbody");
             List<HtmlNode> trDoc = [.. versionDoc.First().ChildNodes.Where(x => x.Name == "tr")];
 
             foreach (HtmlNode? tr in trDoc)
             {
-                string version = tr.ChildNodes.Where(x => x.Name == "td").First().ChildNodes.Where(x => x.Name == "a")
-                    .First().GetAttributes("title").First().Value;
+                string version = tr.ChildNodes.First(x => x.Name == "td").ChildNodes.First(x => x.Name == "a").GetAttributes("title").First().Value;
 
                 versions.Add(version);
             }
@@ -73,7 +72,7 @@ namespace SharpFort.Tool.Domain
         private long GetDownloadNumber()
         {
             HtmlNodeCollection spanDoc =
-                HtmlDoc.DocumentNode.SelectNodes(
+                HtmlDoc!.DocumentNode.SelectNodes(
                     "//*[@id=\"skippedToContent\"]/section/div/aside/div[1]/div[2]/div[1]/span[2]");
             string downLoadNumber = spanDoc.First().InnerText;
             if (downLoadNumber.Contains('K'))

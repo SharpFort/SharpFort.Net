@@ -58,10 +58,7 @@ namespace SharpFort.Ai.Domain.Shared.Dtos.OpenAi
                 }
             }
 
-            get
-            {
-                return Messages?.Count > 1 ? Messages : Message!;
-            }
+            get => Messages?.Count > 1 ? Messages : Message!;
         }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Users;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Shared.Dtos;
 using SharpFort.Ai.Domain.Entities;
@@ -27,7 +26,6 @@ public class AiAccountService(
     [HttpGet("account/ai")]
     public async Task<UserRoleMenuDto> GetAsync()
     {
-        Guid userId = CurrentUser.GetId();
         UserRoleMenuDto userAccount = await _accountService.GetAsync();
         return userAccount;
     }

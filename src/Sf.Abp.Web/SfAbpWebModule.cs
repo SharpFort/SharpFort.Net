@@ -406,7 +406,7 @@ namespace Sf.Abp.Web
             app.UseAbpHangfireDashboard("/hangfire",
                 options =>
                 {
-                    options.AsyncAuthorization = new[] { new SfTokenAuthorizationFilter(app.ApplicationServices) };
+                    options.AsyncAuthorization = [new SfTokenAuthorizationFilter(app.ApplicationServices)];
                 });
 
             //终节点

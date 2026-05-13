@@ -39,7 +39,7 @@ namespace SharpFort.CasbinRbac.Domain.Extensions
         public static bool IsRefreshToken(this ICurrentUser currentUser)
         {
             string? refreshOrNull = currentUser.FindClaims(TokenTypeConst.Refresh).Select(x => x.Value).FirstOrDefault();
-            return refreshOrNull is null ? false : bool.Parse(refreshOrNull);
+            return refreshOrNull is not null && bool.Parse(refreshOrNull);
         }
     }
 }

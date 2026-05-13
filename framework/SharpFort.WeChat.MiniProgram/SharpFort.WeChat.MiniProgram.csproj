@@ -3,7 +3,7 @@
     <Import Project="..\..\common.props" />
     <PropertyGroup>
         <!-- CA1707: HttpModels 属性名由微信第三方 API JSON 字段决定（snake_case 约束），不可重命名 -->
-        <NoWarn>$(NoWarn);CA1707;CS8618</NoWarn>
+        <NoWarn>$(NoWarn);CA1707;CS8618;CA1822;IDE1006;IDE0160</NoWarn>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\SharpFort.Core\SharpFort.Core.csproj" />

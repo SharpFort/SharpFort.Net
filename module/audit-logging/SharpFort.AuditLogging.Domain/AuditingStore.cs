@@ -35,7 +35,13 @@ public partial class AuditingStore(
         }
         catch (Exception ex)
         {
-            LogCouldNotSaveAuditLog(auditInfo.ToString());
+            // CA1848/CA1873 suppressed: Logger is a public property (ABP convention), [LoggerMessage] requires _logger field
+#pragma warning disable CA1848, CA1873
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(ex, "Could not save the audit log object: {AuditInfo}", auditInfo.ToString());
+            }
+#pragma warning restore CA1848, CA1873
             Logger.LogException(ex, LogLevel.Error);
         }
     }
@@ -48,7 +54,7 @@ public partial class AuditingStore(
             {
                 DateFormatString = "yyyy-MM-dd HH:mm:ss"
             });
-            LogRequestTracking(auditInfoJson);
+            Logger.LogDebug("Sf-请求追踪:{AuditInfoJson}", auditInfoJson);
         }
         using (IUnitOfWork uow = UnitOfWorkManager.Begin())
         {
@@ -56,10 +62,4 @@ public partial class AuditingStore(
             await uow.CompleteAsync();
         }
     }
-
-    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Could not save the audit log object: {AuditInfo}")]
-    private partial void LogCouldNotSaveAuditLog(string auditInfo);
-
-    [LoggerMessage(EventId = 2, Level = LogLevel.Debug, Message = "Sf-请求追踪:{AuditInfoJson}")]
-    private partial void LogRequestTracking(string auditInfoJson);
 }

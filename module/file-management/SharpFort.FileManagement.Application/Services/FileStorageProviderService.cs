@@ -33,7 +33,7 @@ namespace SharpFort.FileManagement.Application.Services
         {
             RefAsync<int> total = 0;
             List<FileStorageProvider> entities = await _repository._DbQueryable
-                .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name.Contains(input.Name!))
+                .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name!.Contains(input.Name!))
                 .WhereIF(input.ProviderType.HasValue, x => x.ProviderType == input.ProviderType)
                 .WhereIF(input.IsEnabled.HasValue, x => x.IsEnabled == input.IsEnabled)
                 .OrderBy(x => x.OrderNum, OrderByType.Asc)

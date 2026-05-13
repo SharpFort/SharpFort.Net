@@ -76,7 +76,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 菜单名称 (Title)
         /// </summary>
         [SugarColumn(Length = 64)]
-        public string MenuName { get; protected set; } = null!;
+        public string? MenuName { get; protected set; } = null;
 
         /// <summary>
         /// 菜单类型 (目录/菜单/按钮)
@@ -273,14 +273,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                     r.AlwaysShow = true;
 
                     //判断是否为最顶层的路由
-                    if (Guid.Empty == m.ParentId)
-                    {
-                        r.Component = "Layout";
-                    }
-                    else
-                    {
-                        r.Component = "ParentView";
-                    }
+                    r.Component = Guid.Empty == m.ParentId ? "Layout" : "ParentView";
                 }
 
                 if (m.MenuType == MenuType.Menu)
@@ -333,7 +326,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                         FrameSrc = m.IsLink ? m.Router : null,
                         Auths = m.PermissionCode is not null ? [m.PermissionCode] : null, // CS8604
                         Icon = m.MenuIcon ?? string.Empty, // CS8601: MenuIcon 是 string?
-                        Title = m.MenuName,
+                        Title = m.MenuName!,
                     },
                     OrderNum = m.OrderNum,
                     Children = null,
@@ -355,7 +348,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
                 if (routerDic.TryGetValue(currentRouter.Id, out List<Vue3PureRouterDto>? items))
                 {
                     currentRouter.Children = items;
-                    items?.ForEach(x => stack.Push(x));
+                    items?.ForEach(stack.Push);
                 }
             }
 

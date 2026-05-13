@@ -27,7 +27,7 @@ public class AiPromptService(ISqlSugarRepository<AiPrompt> repository) : Applica
         RefAsync<int> total = 0;
 
         List<AiPrompt> entities = await _repository._DbQueryable
-            .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Code.Contains(input.SearchKey) || x.Content.Contains(input.SearchKey) || x.Description.Contains(input.SearchKey))
+            .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Code!.Contains(input.SearchKey!) || x.Content!.Contains(input.SearchKey!) || x.Description!.Contains(input.SearchKey!))
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 

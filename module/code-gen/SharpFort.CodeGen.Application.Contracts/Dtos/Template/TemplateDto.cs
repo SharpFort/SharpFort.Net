@@ -4,7 +4,7 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Template
 {
     public class TemplateDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
+        public new Guid Id { get; set; }
 
         /// <summary>
         /// 模板字符串

@@ -26,7 +26,7 @@ namespace SharpFort.Ddd.Application
         /// <summary>
         /// 配置默认分页设置
         /// </summary>
-        private void ConfigureDefaultPagingSettings()
+        private static void ConfigureDefaultPagingSettings()
         {
             // 设置默认每页显示记录数
             LimitedResultRequestDto.DefaultMaxResultCount = 10;

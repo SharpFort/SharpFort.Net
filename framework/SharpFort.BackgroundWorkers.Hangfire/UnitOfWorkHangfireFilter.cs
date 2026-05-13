@@ -42,7 +42,7 @@ public sealed class UnitOfWorkHangfireFilter(IUnitOfWorkManager unitOfWorkManage
     /// 任务执行后的异步处理
     /// </summary>
     /// <param name="context">执行上下文</param>
-    private async Task OnPerformedAsync(PerformedContext context)
+    private static async Task OnPerformedAsync(PerformedContext context)
     {
         if (!context.Items.TryGetValue(UnitOfWorkItemKey, out object? obj) ||
             obj is not IUnitOfWork uow)

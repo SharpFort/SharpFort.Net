@@ -81,10 +81,10 @@ namespace SharpFort.FileManagement.Domain.Managers
             await file.ComputeAndSetHashAsync(fileStream);
 
             // 保存文件到 Blob 存储
-            await blobProvider.SaveAsync(containerName, file.BlobName, fileStream, providerConfig);
+            await blobProvider.SaveAsync(containerName, file.BlobName!, fileStream, providerConfig);
 
             // 获取并设置文件 URL
-            string? url = await blobProvider.GetUrlAsync(containerName, file.BlobName, providerConfig);
+            string? url = await blobProvider.GetUrlAsync(containerName, file.BlobName!, providerConfig);
             if (url != null)
             {
                 file.SetUrl(url);
@@ -120,7 +120,7 @@ namespace SharpFort.FileManagement.Domain.Managers
                 containerName = FileManagementConsts.ThumbnailDirectory;
             }
 
-            return await blobProvider.GetAsync(containerName, file.BlobName, providerConfig);
+            return await blobProvider.GetAsync(containerName, file.BlobName!, providerConfig);
         }
 
         /// <summary>
@@ -133,12 +133,12 @@ namespace SharpFort.FileManagement.Domain.Managers
             string containerName = GetContainerName(file);
 
             // 删除 Blob
-            await blobProvider.DeleteAsync(containerName, file.BlobName, providerConfig);
+            await blobProvider.DeleteAsync(containerName, file.BlobName!, providerConfig);
 
             // 删除缩略图 (如果有)
             if (file.FileType == FileType.Image)
             {
-                await blobProvider.DeleteAsync(FileManagementConsts.ThumbnailDirectory, file.BlobName, providerConfig);
+                await blobProvider.DeleteAsync(FileManagementConsts.ThumbnailDirectory, file.BlobName!, providerConfig);
             }
         }
 
@@ -156,7 +156,7 @@ namespace SharpFort.FileManagement.Domain.Managers
             IBlobStorageProvider blobProvider = GetBlobProvider(file.ProviderName);
             string containerName = GetContainerName(file);
 
-            return await blobProvider.GetUrlAsync(containerName, file.BlobName, providerConfig);
+            return await blobProvider.GetUrlAsync(containerName, file.BlobName!, providerConfig);
         }
 
         #region 私有方法
@@ -213,6 +213,7 @@ namespace SharpFort.FileManagement.Domain.Managers
                 FileType.Audio => "audio",
                 FileType.Document => "document",
                 FileType.Archive => "archive",
+                FileType.File => throw new NotImplementedException(),
                 _ => "file"
             };
         }
@@ -245,14 +246,14 @@ namespace SharpFort.FileManagement.Domain.Managers
 
                 await blobProvider.SaveAsync(
                     FileManagementConsts.ThumbnailDirectory,
-                    file.BlobName,
+                    file.BlobName!,
                     thumbnailStream,
                     providerConfig);
 
                 // 设置缩略图 URL
                 string? thumbnailUrl = await blobProvider.GetUrlAsync(
                     FileManagementConsts.ThumbnailDirectory,
-                    file.BlobName,
+                    file.BlobName!,
                     providerConfig);
                 if (thumbnailUrl != null)
                 {

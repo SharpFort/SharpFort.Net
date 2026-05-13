@@ -12,9 +12,9 @@ public class SfAbpTestWebBase : SfAbpTestBase
     public SfAbpTestWebBase() : base()
     {
         HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext;
-        this.ConfigureHttpContext(httpContext);
+        ConfigureHttpContext(httpContext);
         HttpContext = httpContext;
-        IApplicationBuilder app = new ApplicationBuilder(this.ServiceProvider);
+        IApplicationBuilder app = new ApplicationBuilder(ServiceProvider);
         RequestDelegate httpDelegate = app.Build();
         httpDelegate.Invoke(httpContext);
     }

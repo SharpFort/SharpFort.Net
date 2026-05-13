@@ -14,6 +14,6 @@ public class UserSettingManagementProvider(
 
     protected override string? NormalizeProviderKey(string? providerKey)
     {
-        return providerKey != null ? providerKey : (CurrentUser.Id?.ToString());
+        return providerKey ?? (CurrentUser.Id?.ToString());
     }
 }

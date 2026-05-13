@@ -47,7 +47,7 @@ public class AuditLogInfoToAuditLogConverter(IGuidGenerator guidGenerator, IExce
                                               options.SendExceptionsDetailsToClients = ExceptionHandlingOptions.SendExceptionsDetailsToClients;
                                               options.SendStackTraceToClients = ExceptionHandlingOptions.SendStackTraceToClients;
                                           }))
-                                      ?? new List<RemoteServiceErrorInfo>();
+                                      ?? [];
 
         string? exceptions = remoteServiceErrorInfos.Any()
             ? JsonSerializer.Serialize(remoteServiceErrorInfos, indented: true)

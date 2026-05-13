@@ -57,14 +57,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 字典名称
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string DictName { get; protected set; } = null!;
+        public string? DictName { get; protected set; } = null;
 
         /// <summary>
         /// 字典类型编码
         /// 系统的核心标识，创建后不可变更
         /// </summary>
         [SugarColumn(Length = 100)]
-        public string DictType { get; protected set; } = null!;
+        public string? DictType { get; protected set; } = null;
 
         /// <summary>
         /// 状态 (IState 实现)

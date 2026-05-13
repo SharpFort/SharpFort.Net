@@ -74,7 +74,7 @@ namespace SharpFort.Rbac.Test.System
             User user1 = await _repository._DbQueryable.Where(user => user.UserName == "DeleteUserTest").FirstAsync();
             user1.ShouldNotBeNull();
 
-            await _userService.DeleteAsync(new List<Guid> { createdUser.Id });
+            await _userService.DeleteAsync([createdUser.Id]);
             User user2 = await _repository._DbQueryable.Where(user => user.UserName == "DeleteUserTest").FirstAsync();
             user2.ShouldBeNull();
         }

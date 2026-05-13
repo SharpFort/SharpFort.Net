@@ -143,25 +143,25 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // Build dictionaries for fast lookup
             Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = [];
-            foreach ((Guid Id, string RoleCode, string RoleName, bool State) r in roleData)
+            foreach ((Guid Id, string RoleCode, string RoleName, bool State) in roleData)
             {
-                if (!string.IsNullOrEmpty(r.RoleCode))
+                if (!string.IsNullOrEmpty(RoleCode))
                 {
-                    roleDic[r.Id] = (r.RoleCode, r.RoleName);
+                    roleDic[Id] = (RoleCode, RoleName);
                 }
                 else
                 {
-                    LogSkippingEmptyRoleCode(r.Id);
+                    LogSkippingEmptyRoleCode(Id);
                 }
             }
             LogValidRolesLoaded(roleDic.Count);
 
             Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = [];
             int menuWithApiCount = 0;
-            foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State) m in menuData)
+            foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State) in menuData)
             {
-                menuDic[m.Id] = (m.MenuName, m.ApiUrl, m.ApiMethod);
-                if (!string.IsNullOrEmpty(m.ApiUrl))
+                menuDic[Id] = (MenuName, ApiUrl, ApiMethod);
+                if (!string.IsNullOrEmpty(ApiUrl))
                 {
                     menuWithApiCount++;
                 }
@@ -175,15 +175,15 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             int skippedMenus = 0;
             int skippedRoles = 0;
 
-            foreach ((Guid RoleId, Guid MenuId) rm in roleMenuData)
+            foreach ((Guid RoleId, Guid MenuId) in roleMenuData)
             {
-                if (!roleDic.TryGetValue(rm.RoleId, out (string RoleCode, string RoleName) role))
+                if (!roleDic.TryGetValue(RoleId, out (string RoleCode, string RoleName) role))
                 {
                     skippedRoles++;
                     continue;
                 }
 
-                if (!menuDic.TryGetValue(rm.MenuId, out (string MenuName, string ApiUrl, string ApiMethod) menu))
+                if (!menuDic.TryGetValue(MenuId, out (string MenuName, string ApiUrl, string ApiMethod) menu))
                 {
                     skippedMenus++;
                     continue;
@@ -223,9 +223,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             LogBuildingGRules();
             int skippedUserRoles = 0;
 
-            foreach ((Guid UserId, Guid RoleId) ur in userRoleData)
+            foreach ((Guid UserId, Guid RoleId) in userRoleData)
             {
-                if (!roleDic.TryGetValue(ur.RoleId, out (string RoleCode, string RoleName) role))
+                if (!roleDic.TryGetValue(RoleId, out (string RoleCode, string RoleName) role))
                 {
                     skippedUserRoles++;
                     continue;
@@ -234,7 +234,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 rulesToInsert.Add(new CasbinRule
                 {
                     PType = "g",
-                    V0 = ur.UserId.ToString(), // Use userId directly (no prefix)
+                    V0 = UserId.ToString(), // Use userId directly (no prefix)
                     V1 = role.RoleCode, // Use RoleCode for consistency
                     V2 = domain
                 });
@@ -308,7 +308,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                         List<CasbinRule> batch = [.. rulesToInsert.Skip(i).Take(batchSize)];
                         int insertedCount = await writeClient.Insertable(batch).ExecuteCommandAsync();
                         totalInserted += insertedCount;
-                        LogBatchInserted(i / batchSize + 1, insertedCount, totalInserted, rulesToInsert.Count);
+                        LogBatchInserted((i / batchSize) + 1, insertedCount, totalInserted, rulesToInsert.Count);
                     }
 
                     LogAllRulesInserted(totalInserted);

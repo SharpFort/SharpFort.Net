@@ -39,7 +39,7 @@ public class TokenService(
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
 
-        if (!tokens.Any())
+        if (tokens.Count == 0)
         {
             return new PagedResultDto<TokenGetListOutputDto>();
         }
@@ -52,8 +52,8 @@ public class TokenService(
             return new TokenGetListOutputDto
             {
                 Id = t.Id,
-                Name = t.Name,
-                ApiKey = t.TokenKey,
+                Name = t.Name!,
+                ApiKey = t.TokenKey!,
                 ExpireTime = t.ExpireTime,
                 IsDisabled = t.IsDisabled,
                 IsEnableLog = t.IsEnableLog,
@@ -75,7 +75,7 @@ public class TokenService(
             .Select(x => new TokenSelectListOutputDto
             {
                 TokenId = x.Id,
-                Name = x.Name,
+                Name = x.Name!,
                 IsDisabled = x.IsDisabled
             }).ToListAsync();
 
@@ -121,8 +121,8 @@ public class TokenService(
         return new TokenGetListOutputDto
         {
             Id = token.Id,
-            Name = token.Name,
-            ApiKey = token.TokenKey,
+            Name = token.Name!,
+            ApiKey = token.TokenKey!,
             ExpireTime = token.ExpireTime,
             IsDisabled = token.IsDisabled,
             IsEnableLog = token.IsEnableLog,

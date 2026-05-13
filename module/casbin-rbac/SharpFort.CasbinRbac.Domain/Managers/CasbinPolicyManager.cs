@@ -55,10 +55,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 if (!uow.Items.ContainsKey(syncKey))
                 {
                     uow.Items[syncKey] = true;
-                    uow.OnCompleted(async () =>
-                    {
-                        await _enforcer.LoadPolicyAsync();
-                    });
+                    uow.OnCompleted(_enforcer.LoadPolicyAsync);
                 }
             }
             else
@@ -70,7 +67,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public async Task AddRoleForUserAsync(User user, Role role)
         {
             string sub = GetUserSubject(user.Id);
-            string roleSub = GetRoleSubject(role.RoleCode);
+            string roleSub = GetRoleSubject(role.RoleCode!);
             string domain = GetTenantDomain(user.TenantId);
 
             // 1. 持久化
@@ -93,7 +90,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         public async Task RemoveRoleForUserAsync(User user, Role role)
         {
             string sub = GetUserSubject(user.Id);
-            string roleSub = GetRoleSubject(role.RoleCode);
+            string roleSub = GetRoleSubject(role.RoleCode!);
             string domain = GetTenantDomain(user.TenantId);
 
             // 1. 持久化
@@ -121,7 +118,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 {
                     PType = "g",
                     V0 = sub,
-                    V1 = GetRoleSubject(r.RoleCode),
+                    V1 = GetRoleSubject(r.RoleCode!),
                     V2 = domain
                 })];
                 await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
@@ -140,7 +137,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             {
                 List<string[]> policies = [.. roles.Select(r => new[] {
                     sub,
-                    GetRoleSubject(r.RoleCode),
+                    GetRoleSubject(r.RoleCode!),
                     domain
                 })];
 
@@ -153,7 +150,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task SetRolePermissionsAsync(Role role, List<Menu> menus)
         {
-            string roleSub = GetRoleSubject(role.RoleCode);
+            string roleSub = GetRoleSubject(role.RoleCode!);
             string domain = GetTenantDomain(role.TenantId);
 
             // 1. 持久化
@@ -213,7 +210,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task InitAdminPermissionAsync(Role adminRole)
         {
-            string roleSub = GetRoleSubject(adminRole.RoleCode);
+            string roleSub = GetRoleSubject(adminRole.RoleCode!);
             string domain = GetTenantDomain(adminRole.TenantId);
 
             // 1. 持久化
@@ -240,7 +237,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task CleanRolePoliciesAsync(Role role)
         {
-            string roleSub = GetRoleSubject(role.RoleCode);
+            string roleSub = GetRoleSubject(role.RoleCode!);
             string domain = GetTenantDomain(role.TenantId);
 
             // 1. 持久化

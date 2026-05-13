@@ -37,6 +37,6 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Field
         /// 是否公共
         /// </summary>
         public bool IsPublic { get; set; }
-        public Guid Id { get; set; }
+        public new Guid Id { get; set; }
     }
 }

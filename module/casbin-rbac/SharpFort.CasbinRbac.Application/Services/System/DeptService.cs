@@ -43,7 +43,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             RefAsync<int> total = 0;
             List<Department> entities = await _repository._DbQueryable
-                .WhereIF(!string.IsNullOrEmpty(input.DeptName), u => u.DeptName.Contains(input.DeptName!))
+                .WhereIF(!string.IsNullOrEmpty(input.DeptName), u => u.DeptName!.Contains(input.DeptName!))
                 .WhereIF(input.State is not null, u => u.State == input.State)
                 .OrderBy(u => u.OrderNum, OrderByType.Asc)
                 .ToListAsync();

@@ -88,8 +88,7 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
         // 判断是否是友好异常
         if (exception is UserFriendlyException friendlyException)
         {
-            int statusCode2 = 500;
-            _ = int.TryParse(friendlyException.Code, out statusCode2);
+            _ = int.TryParse(friendlyException.Code, out int statusCode2);
             errorCode = friendlyException.Code!;
             originErrorCode = friendlyException.Code!;
             statusCode = statusCode2 == 0 ? 403 : statusCode2;

@@ -33,7 +33,7 @@ public class AiUsage : FullAuditedAggregateRoot<Guid>
     /// <summary>
     /// 模型ID
     /// </summary>
-    public string ModelId { get; set; } = null!;
+    public string? ModelId { get; set; }
 
     /// <summary>
     /// Token密钥Id
@@ -68,6 +68,6 @@ public class AiUsage : FullAuditedAggregateRoot<Guid>
         UsageTotalNumber += 1;
         UsageOutputTokenCount += outputTokenCount;
         UsageInputTokenCount += inputTokenCount;
-        TotalTokenCount += (outputTokenCount + inputTokenCount);
+        TotalTokenCount += outputTokenCount + inputTokenCount;
     }
 }

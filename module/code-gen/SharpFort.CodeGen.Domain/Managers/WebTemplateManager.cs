@@ -82,26 +82,11 @@ namespace SharpFort.CodeGen.Domain.Managers
             }
 
             //判断类型
-            string? enumName = typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Where(x => x.GetCustomAttribute<DisplayAttribute>()?.Description == fieldType.Name).FirstOrDefault()?.Name;
-            if (enumName is null)
-            {
-                fieldEntity.FieldType = FieldType.String;
-                // App.GetRequiredService<ILogger<WebTemplateManager>>().LogError($"字段类型：{propertyInfo.PropertyType.Name}，未定义");
-            }
-            else
-            {
-                fieldEntity.FieldType = Enum.Parse<FieldType>(enumName);
-            }
+            string? enumName = typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).FirstOrDefault(x => x.GetCustomAttribute<DisplayAttribute>()?.Description == fieldType.Name)?.Name;
+            fieldEntity.FieldType = enumName is null ? FieldType.String : Enum.Parse<FieldType>(enumName);
 
             //判断是否可空
-            if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                fieldEntity.IsRequired = false;
-            }
-            else
-            {
-                fieldEntity.IsRequired = true;
-            }
+            fieldEntity.IsRequired = !propertyInfo.PropertyType.IsGenericType || propertyInfo.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>);
 
 
 

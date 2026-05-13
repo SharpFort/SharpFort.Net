@@ -146,7 +146,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 throw new UserFriendlyException("用户名无效注册！");
             }
 
-            if (input.UserName.Length < 2)
+            if (input.UserName!.Length < 2)
             {
                 throw new UserFriendlyException("账号名需大于等于2位！");
             }
@@ -222,7 +222,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             foreach (Role role in roleList)
             {
-                userRoleMenu.RoleCodes.Add(role.RoleCode);
+                userRoleMenu.RoleCodes.Add(role.RoleCode!);
 
                 if (role.Menus is not null)
                 {

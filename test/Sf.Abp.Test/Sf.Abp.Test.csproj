@@ -4,6 +4,8 @@
     <TargetFramework>net10.0.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- NU1608: Hangfire.NetCore 1.8.21 传递依赖要求 Hangfire.Core = 1.8.21，我们显式使用 1.8.23 是兼容的 -->
+    <NoWarn>$(NoWarn);NU1608</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.Development.json" />

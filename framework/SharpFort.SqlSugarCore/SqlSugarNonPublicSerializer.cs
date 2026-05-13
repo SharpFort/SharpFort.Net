@@ -18,8 +18,8 @@ public class NonPublicPropertiesResolver : DefaultContractResolver
         JsonProperty prop = base.CreateProperty(member, memberSerialization);
         if (member is PropertyInfo pi)
         {
-            prop.Readable = (pi.GetMethod != null);
-            prop.Writable = (pi.SetMethod != null);
+            prop.Readable = pi.GetMethod != null;
+            prop.Writable = pi.SetMethod != null;
         }
 
         return prop;
@@ -59,7 +59,7 @@ public class SqlSugarNonPublicSerializer : ISerializeService
 
             MethodInfo methods = serializerType!
                 .GetMethods().Where(it => it.Name == "Deserialize")
-                .Where(it => it.GetParameters().Any(z => z.ParameterType == typeof(string))).First();
+                .First(it => it.GetParameters().Any(z => z.ParameterType == typeof(string)));
 
             // 调用 SerializeObject 方法序列化对象
             T? json = (T?)methods.MakeGenericMethod(typeof(T))

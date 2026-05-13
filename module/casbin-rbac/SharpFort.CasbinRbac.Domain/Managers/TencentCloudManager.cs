@@ -29,7 +29,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 // 实例化一个http选项，可选的，没有特殊需求可以跳过
                 HttpProfile httpProfile = new()
                 {
-                    Endpoint = ("sms.tencentcloudapi.com")
+                    Endpoint = "sms.tencentcloudapi.com"
                 };
                 clientProfile.HttpProfile = httpProfile;
 

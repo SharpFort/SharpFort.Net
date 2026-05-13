@@ -29,8 +29,10 @@
             string sHour = hour < 10 ? "0" + hour : "" + hour;//小时
             string sMinute = minute < 10 ? "0" + minute : "" + minute;//分钟
             string sSecond = second < 10 ? "0" + second : "" + second;//秒
+#pragma warning disable IDE0059 // sMilliSecond is computed but not used; preserved for future use
             string sMilliSecond = milliSecond < 10 ? "0" + milliSecond : "" + milliSecond;//毫秒
             sMilliSecond = milliSecond < 100 ? "0" + sMilliSecond : "" + sMilliSecond;
+#pragma warning restore IDE0059
 
             return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0} 天 {1} 小时 {2} 分 {3} 秒", sDay, sHour, sMinute, sSecond);
         }

@@ -41,14 +41,14 @@ public class TenantConfigurationWrapper(IAbpLazyServiceProvider serviceProvider)
         if (CurrentTenantService.Id.HasValue)
         {
             TenantConfiguration? config = await TenantStoreService.FindAsync(CurrentTenantService.Id.Value);
-            return config == null ? throw new InvalidOperationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}") : config;
+            return config ?? throw new InvalidOperationException($"未找到租户信息,租户Id:{CurrentTenantService.Id}");
         }
 
         // 通过租户名称查找
         if (!string.IsNullOrEmpty(CurrentTenantService.Name))
         {
             TenantConfiguration? config = await TenantStoreService.FindAsync(CurrentTenantService.Name);
-            return config == null ? throw new InvalidOperationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}") : config;
+            return config ?? throw new InvalidOperationException($"未找到租户信息,租户名称:{CurrentTenantService.Name}");
         }
 
         // 返回默认配置

@@ -6,7 +6,6 @@ using Volo.Abp.Users;
 using SharpFort.Ai.Application.Contracts.Dtos.UsageStatistics;
 using SharpFort.Ai.Application.Contracts.IServices;
 using SharpFort.Ai.Domain.Entities;
-using SharpFort.Ai.Domain.Managers;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.Ai.Application.Services;
@@ -46,7 +45,7 @@ public class UsageStatisticsService(
             .GroupBy(x => x.CreationTime.Date)
             .Select(g => new
             {
-                Date = g.CreationTime.Date,
+                g.CreationTime.Date,
                 Tokens = SqlFunc.AggregateSum(g.TokenUsage.TotalTokenCount)
             })
             .ToListAsync();
@@ -84,12 +83,12 @@ public class UsageStatisticsService(
             .GroupBy(x => x.ModelId)
             .Select(x => new
             {
-                ModelId = x.ModelId,
+                x.ModelId,
                 TotalTokenCount = SqlFunc.AggregateSum(x.TotalTokenCount)
             })
             .ToListAsync();
 
-        if (!modelUsages.Any())
+        if (modelUsages.Count == 0)
         {
             return [];
         }
@@ -100,7 +99,7 @@ public class UsageStatisticsService(
         // 计算各模型占比
         List<ModelTokenUsageDto> result = [.. modelUsages.Select(x => new ModelTokenUsageDto
         {
-            Model = x.ModelId,
+            Model = x.ModelId!,
             Tokens = x.TotalTokenCount,
             Percentage = totalTokens > 0 ? Math.Round((decimal)x.TotalTokenCount / totalTokens * 100, 2) : 0
         }).OrderByDescending(x => x.Tokens)];
@@ -213,13 +212,13 @@ public class UsageStatisticsService(
         if (modelStats.Count > 0)
         {
             List<string> modelIds = [.. modelStats.Select(x => x.ModelId)];
-            var modelDic = await _aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId))
+            Dictionary<string, string> modelDic = await _aiModelRepository._DbQueryable.Where(x => modelIds.Contains(x.ModelId!))
                 .Distinct()
                 .Where(x => x.IsEnabled)
                 .ToDictionaryAsync<string>(x => x.ModelId, y => y.IconUrl);
             modelStats.ForEach(x =>
             {
-                if (modelDic.TryGetValue(x.ModelId, out var icon))
+                if (modelDic.TryGetValue(x.ModelId, out string icon))
                 {
                     x.IconUrl = icon;
                 }

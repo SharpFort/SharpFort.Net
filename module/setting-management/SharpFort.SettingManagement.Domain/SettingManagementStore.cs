@@ -134,7 +134,7 @@ public class SettingManagementStore(
     {
         List<string> cacheKeys = [.. names.Select(x => CalculateCacheKey(x, providerName, providerKey))];
 
-        List<KeyValuePair<string, SettingCacheItem?>> cacheItems = [.. (await Cache.GetManyAsync(cacheKeys, considerUow: true))];
+        List<KeyValuePair<string, SettingCacheItem?>> cacheItems = [.. await Cache.GetManyAsync(cacheKeys, considerUow: true)];
 
         if (cacheItems.All(x => x.Value != null))
         {

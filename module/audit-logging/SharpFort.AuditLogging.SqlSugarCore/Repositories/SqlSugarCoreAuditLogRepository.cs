@@ -23,7 +23,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
     public override async Task<bool> InsertAsync(AuditLog insertObj)
     {
 
-        return await _Db.InsertNav<AuditLog>(insertObj)
+        return await _Db.InsertNav(insertObj)
                  .Include(z1 => z1.Actions)
                  //.Include(z1 => z1.EntityChanges).ThenInclude(z2 => z2.PropertyChanges)
                  .ExecuteCommandAsync();
@@ -168,7 +168,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
                                 .OrderBy(x => x.Id)
                                 .FirstAsync(cancellationToken);
 
-        return entityChange == null ? throw new EntityNotFoundException(typeof(EntityChange)) : entityChange;
+        return entityChange ?? throw new EntityNotFoundException(typeof(EntityChange));
     }
 
     public virtual async Task<List<EntityChange>> GetEntityChangeListAsync(

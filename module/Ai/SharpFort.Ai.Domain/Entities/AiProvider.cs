@@ -17,12 +17,12 @@ public class AiProvider : FullAuditedAggregateRoot<Guid>, IOrderNum
     /// <summary>
     /// 供应商名称 (e.g. OpenAI, DeepSeek)
     /// </summary>
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; }
 
     /// <summary>
     /// API终结点
     /// </summary>
-    public string Endpoint { get; set; } = null!;
+    public string? Endpoint { get; set; }
 
     /// <summary>
     /// 额外URL
@@ -32,7 +32,7 @@ public class AiProvider : FullAuditedAggregateRoot<Guid>, IOrderNum
     /// <summary>
     /// API Key
     /// </summary>
-    public string ApiKey { get; set; } = null!;
+    public string? ApiKey { get; set; }
 
     /// <summary>
     /// 排序

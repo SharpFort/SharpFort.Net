@@ -11,9 +11,9 @@ using SharpFort.Ai.Application.Contracts.Dtos;
 using SharpFort.Ai.Application.Jobs;
 using SharpFort.Ai.Domain.Entities;
 using SharpFort.Ai.Domain.Managers;
-using SharpFort.Ai.Domain.Managers;
 using SharpFort.Ai.Domain.Shared.Enums;
 using SharpFort.SqlSugarCore.Abstractions;
+using System.Globalization;
 
 namespace SharpFort.Ai.Application.Services;
 
@@ -131,14 +131,14 @@ public class AiImageService(
         string mimeType = "image/png";
         string base64Content = base64Data;
 
-        if (base64Data.Contains(","))
+        if (base64Data.Contains(','))
         {
             string[] parts = base64Data.Split(',');
             if (parts.Length == 2)
             {
                 // 提取MIME类型
                 string header = parts[0];
-                if (header.Contains(":") && header.Contains(";"))
+                if (header.Contains(':') && header.Contains(';'))
                 {
                     mimeType = header.Split(':')[1].Split(';')[0];
                 }
@@ -172,7 +172,7 @@ public class AiImageService(
         // ==============================
         // ✅ 按日期创建目录（yyyyMMdd）
         // ==============================
-        string dateFolder = DateTime.Now.ToString("yyyyMMdd");
+        string dateFolder = DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
         string uploadPath = Path.Combine(
             _webHostEnvironment.ContentRootPath,
             "wwwroot",
@@ -208,7 +208,7 @@ public class AiImageService(
         List<ImageTaskOutput> output = await _imageTaskRepository._DbQueryable
             .Where(x => x.UserId == userId)
             .WhereIF(input.TaskStatusEnum is not null, x => x.TaskStatus == input.TaskStatusEnum)
-            .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt))
+            .WhereIF(!string.IsNullOrWhiteSpace(input.Prompt), x => x.Prompt.Contains(input.Prompt!))
             .WhereIF(input.StartTime is not null && input.EndTime is not null,
                 x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)
             .OrderByDescending(x => x.CreationTime)
@@ -251,15 +251,15 @@ public class AiImageService(
     public async Task<List<ModelGetListOutput>> GetModelAsync()
     {
         List<ModelGetListOutput> output = await _aiModelRepository._DbQueryable
-            .Where(x => x.IsEnabled == true)
+            .Where(x => x.IsEnabled)
             .Where(x => x.ModelType == ModelType.Image)
             .Where(x => x.ModelApiType == ModelApiType.GenerateContent)
             .OrderByDescending(x => x.OrderNum)
             .Select(x => new ModelGetListOutput
             {
                 Id = x.Id,
-                ModelId = x.ModelId,
-                ModelName = x.Name,
+                ModelId = x.ModelId!,
+                ModelName = x.Name!,
                 ModelDescribe = x.Description,
                 Remark = x.Description,
             }).ToListAsync();

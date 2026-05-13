@@ -61,12 +61,12 @@ public class FileMasterService(IHttpContextAccessor httpContextAccessor, AiGateW
         //ai网关代理httpcontext
         if (input.Stream == true)
         {
-            await _aiGateWayManager.CompleteChatStreamForStatisticsAsync(_httpContextAccessor.HttpContext, input,
+            await _aiGateWayManager.CompleteChatStreamForStatisticsAsync(_httpContextAccessor.HttpContext!, input,
                 userId, null, null, cancellationToken);
         }
         else
         {
-            await _aiGateWayManager.CompleteChatForStatisticsAsync(_httpContextAccessor.HttpContext, input, userId,
+            await _aiGateWayManager.CompleteChatForStatisticsAsync(_httpContextAccessor.HttpContext!, input, userId,
                 null, null,
                 cancellationToken);
         }

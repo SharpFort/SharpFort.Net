@@ -71,14 +71,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 用户名
         /// 业务主键，不可变
         /// </summary>
-        public string UserName { get; protected set; } = null!;
+        public string? UserName { get; protected set; }
 
         /// <summary>
         /// 密码哈希值
         /// 存储 BCrypt 加密后的字符串
         /// </summary>
         [SugarColumn(Length = 128)]
-        public string Password { get; protected set; } = null!;
+        public string? Password { get; protected set; } = null;
 
         /// <summary>
         /// 姓名 (实名)
@@ -250,7 +250,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
             }
 
             // 2. 检查是否需要升级 (如果不是 BCrypt 格式)
-            if (!Password.StartsWith("$2", StringComparison.Ordinal))
+            if (!Password!.StartsWith("$2", StringComparison.Ordinal))
             {
                 SetPassword(rawPassword);
                 // 注意：调用方（应用服务）需要执行 Repository.UpdateAsync(user) 以持久化新密码

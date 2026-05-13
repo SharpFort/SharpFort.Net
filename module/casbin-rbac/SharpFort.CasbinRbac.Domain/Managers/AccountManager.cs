@@ -50,7 +50,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             UserRoleMenuDto userInfo = await _userManager.GetInfoAsync(userId);
 
             //判断用户状态
-            if (userInfo.User.State == false)
+            if (!userInfo.User.State)
             {
                 throw new UserFriendlyException(UserConst.State_Is_State);
             }
@@ -131,15 +131,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             User user = new();
             if (await ExistAsync(userName, o => user = o))
             {
-                if (userAction is not null)
-                {
-                    userAction.Invoke(user);
-                }
+                userAction?.Invoke(user);
                 // 使用新的密码验证方法（支持 BCrypt 和旧版 SHA512，并自动升级）
                 if (user.VerifyAndUpgradePassword(password))
                 {
                     // 如果密码被升级到 BCrypt，保存更新
-                    if (user.Password.StartsWith("$2", StringComparison.Ordinal))
+                    if (user.Password!.StartsWith("$2", StringComparison.Ordinal))
                     {
                         await _repository.UpdateAsync(user);
                     }
@@ -158,11 +155,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <returns></returns>
         public async Task<bool> ExistAsync(string userName, Action<User>? userAction = null)
         {
-            User user = await _repository.GetFirstAsync(u => u.UserName == userName && u.State == true);
-            if (userAction is not null)
-            {
-                userAction.Invoke(user);
-            }
+            User user = await _repository.GetFirstAsync(u => u.UserName == userName && u.State);
+            userAction?.Invoke(user);
             //这里为了兼容解决数据库开启了大小写不敏感问题,还要将用户名进行二次校验
             return user != null && user.UserName == userName;
         }

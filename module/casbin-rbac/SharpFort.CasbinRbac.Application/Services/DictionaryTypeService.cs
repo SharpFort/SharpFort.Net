@@ -21,7 +21,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
 
             RefAsync<int> total = 0;
-            List<DictionaryType> entities = await _repository._DbQueryable.WhereIF(input.DictName is not null, x => x.DictName.Contains(input.DictName!))
+            List<DictionaryType> entities = await _repository._DbQueryable.WhereIF(input.DictName is not null, x => x.DictName!.Contains(input.DictName!))
                       .WhereIF(input.DictType is not null, x => x.DictType!.Contains(input.DictType!))
                       .WhereIF(input.State is not null, x => x.State == input.State)
                       .WhereIF(input.StartTime is not null && input.EndTime is not null, x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)

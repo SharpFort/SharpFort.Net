@@ -68,8 +68,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             RefAsync<int> total = 0;
 
             List<Role> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.RoleCode),
-                    x => x.RoleCode.Contains(input.RoleCode!))
-                .WhereIF(!string.IsNullOrEmpty(input.RoleName), x => x.RoleName.Contains(input.RoleName!))
+                    x => x.RoleCode!.Contains(input.RoleCode!))
+                .WhereIF(!string.IsNullOrEmpty(input.RoleName), x => x.RoleName!.Contains(input.RoleName!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             return new PagedResultDto<RoleGetListOutputDto>(total, await MapToGetListOutputDtosAsync(entities));
@@ -120,7 +120,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 throw new UserFriendlyException(RoleConst.Exist);
             }
 
-            string oldRoleCode = entity.RoleCode;
+            string oldRoleCode = entity.RoleCode!;
 
             // Map 之后 entity.RoleCode 会更新为新值
             await MapToEntityAsync(input, entity);
@@ -146,43 +146,6 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             return dto;
         }
 
-        private static async Task SyncCasbinRolePermissions(Guid roleId, List<Guid> menuIds, string roleCode)
-        {
-            // /* 原代码注释保留，该方法已经废弃，统一使用 CasbinPolicyManager 处理 */
-            // if (menuIds == null || !menuIds.Any()) return;
-            // 
-            // // 获取菜单对应的接口信息
-            // // 仅处理带有 API 路径的菜单
-            // var menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id) && !string.IsNullOrEmpty(m.ApiUrl));
-            // 
-            // // 方案 V1.2: p = sub, dom, obj, act
-            // // sub = roleCode (使用 RoleCode 而不是 RoleId，更具可读性)
-            // // dom = "default" (或从 input 传入，如果支持多域)
-            // // obj = menu.ApiUrl (RESTful API 路径，如 /api/user/:id)
-            // // act = menu.ApiMethod (GET, POST 等)
-            // 
-            // var policies = new List<string[]>();
-            // string domain = "default";
-            // 
-            // foreach (var menu in menus)
-            // {
-            //     // 仅当菜单包含有效的 API URL 时
-            //     if (!string.IsNullOrEmpty(menu.ApiUrl))
-            //     {
-            //         string path = menu.ApiUrl;
-            //         // 使用 Menu 实体的 ApiMethod 字段，如果为空则默认为 GET
-            //         string method = !string.IsNullOrEmpty(menu.ApiMethod) ? menu.ApiMethod.ToUpper() : "GET";
-            // 
-            //         policies.Add(new[] { roleCode, domain, path, method });
-            //     }
-            // }
-            // 
-            // if (policies.Any())
-            // {
-            //     await _enforcer.AddPoliciesAsync(policies);
-            //     await _enforcer.SavePolicyAsync();
-            // }
-        }
 
 
         /// <summary>
@@ -212,17 +175,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public async Task<PagedResultDto<UserGetListOutputDto>> GetAuthUserByRoleIdAsync([FromRoute] Guid roleId,
             [FromRoute] bool isAllocated, [FromQuery] RoleAuthUserGetListInput input)
         {
-            PagedResultDto<UserGetListOutputDto> output;
+            PagedResultDto<UserGetListOutputDto> output = isAllocated
+                ? await GetAllocatedAuthUserByRoleIdAsync(roleId, input)
+                //角色下未授权用户
+                : await GetNotAllocatedAuthUserByRoleIdAsync(roleId, input);
             //角色下已授权用户
-            if (isAllocated)
-            {
-                output = await GetAllocatedAuthUserByRoleIdAsync(roleId, input);
-            }
-            //角色下未授权用户
-            else
-            {
-                output = await GetNotAllocatedAuthUserByRoleIdAsync(roleId, input);
-            }
 
             return output;
         }
@@ -234,7 +191,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             List<UserGetListOutputDto> output = await _userRoleRepository._DbQueryable
                 .LeftJoin<User>((ur, u) => ur.UserId == u.Id && ur.RoleId == roleId)
                 .Where((ur, u) => ur.RoleId == roleId)
-                .WhereIF(!string.IsNullOrEmpty(input.UserName), (ur, u) => u.UserName.Contains(input.UserName!))
+                .WhereIF(!string.IsNullOrEmpty(input.UserName), (ur, u) => u.UserName!.Contains(input.UserName!))
                 .WhereIF(input.Phone is not null, (ur, u) => u.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .Select((ur, u) => new UserGetListOutputDto { Id = u.Id }, true)
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
@@ -248,7 +205,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             List<User> entities = await _userRoleRepository._Db.Queryable<User>()
                 .Where(u => SqlFunc.Subqueryable<UserRole>().Where(x => x.RoleId == roleId)
                     .Where(x => x.UserId == u.Id).NotAny())
-                .WhereIF(!string.IsNullOrEmpty(input.UserName), u => u.UserName.Contains(input.UserName!))
+                .WhereIF(!string.IsNullOrEmpty(input.UserName), u => u.UserName!.Contains(input.UserName!))
                 .WhereIF(input.Phone is not null, u => u.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);
             List<UserGetListOutputDto> output = entities.Adapt<List<UserGetListOutputDto>>();

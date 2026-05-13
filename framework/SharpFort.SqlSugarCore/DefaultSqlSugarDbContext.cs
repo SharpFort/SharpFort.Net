@@ -153,7 +153,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
     /// </summary>
     private void HandleInsertAuditFields(object oldValue, DataFilterModel entityInfo)
     {
-        if (entityInfo.PropertyName.Equals(nameof(IEntity<Guid>.Id), StringComparison.Ordinal))
+        if (entityInfo.PropertyName.Equals(nameof(IEntity<>.Id), StringComparison.Ordinal))
         {
             if (typeof(Guid) == entityInfo.EntityColumnInfo.PropertyInfo.PropertyType)
             {
@@ -198,17 +198,17 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
         switch (entityInfo.OperationType)
         {
             case DataFilterType.InsertByObject:
-                if (entityInfo.PropertyName == nameof(IEntity<object>.Id))
+                if (entityInfo.PropertyName == nameof(IEntity<>.Id))
                 {
                     EntityChangeEventHelperService.PublishEntityCreatedEvent(entityInfo.EntityValue);
                 }
                 break;
             case DataFilterType.UpdateByObject:
-                if (entityInfo.PropertyName == nameof(IEntity<object>.Id))
+                if (entityInfo.PropertyName == nameof(IEntity<>.Id))
                 {
                     if (entityInfo.EntityValue is ISoftDelete softDelete)
                     {
-                        if (softDelete.IsDeleted == true)
+                        if (softDelete.IsDeleted)
                         {
                             EntityChangeEventHelperService.PublishEntityDeletedEvent(entityInfo.EntityValue);
                         }
@@ -243,7 +243,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
     private void HandleDomainEvents(DataFilterModel entityInfo)
     {
         // 实体领域事件-所有操作类型
-        if (entityInfo.PropertyName == nameof(IEntity<object>.Id))
+        if (entityInfo.PropertyName == nameof(IEntity<>.Id))
         {
             EntityEventReport? eventReport = CreateEventReport(entityInfo.EntityValue);
             if (eventReport is not null)
@@ -263,8 +263,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
         EntityEventReport eventReport = new();
 
         //判断是否为领域事件-聚合根
-        IGeneratesDomainEvents? generatesDomainEventsEntity = entity as IGeneratesDomainEvents;
-        if (generatesDomainEventsEntity == null)
+        if (entity is not IGeneratesDomainEvents generatesDomainEventsEntity)
         {
             return eventReport;
         }
@@ -362,7 +361,7 @@ public class DefaultSqlSugarDbContext(IAbpLazyServiceProvider lazyServiceProvide
             entityColumnInfo.IsIgnore = true;
         }
 
-        if (propertyInfo.Name == nameof(Entity<object>.Id))
+        if (propertyInfo.Name == nameof(Entity<>.Id))
         {
             entityColumnInfo.IsPrimarykey = true;
         }

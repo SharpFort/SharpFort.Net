@@ -53,9 +53,9 @@ namespace SharpFort.FluidSequence.Application.Services
             RefAsync<int> total = 0;
 
             List<SysSequenceRule> entities = await _repository._DbQueryable
-                .WhereIF(!string.IsNullOrWhiteSpace(input.RuleName), x => x.RuleName.Contains(input.RuleName!))
-                .WhereIF(!string.IsNullOrWhiteSpace(input.RuleCode), x => x.RuleCode.Contains(input.RuleCode!))
-                .ToPageListAsync(input.SkipCount / input.MaxResultCount + 1, input.MaxResultCount, total);
+                .WhereIF(!string.IsNullOrWhiteSpace(input.RuleName), x => x.RuleName!.Contains(input.RuleName!))
+                .WhereIF(!string.IsNullOrWhiteSpace(input.RuleCode), x => x.RuleCode!.Contains(input.RuleCode!))
+                .ToPageListAsync((input.SkipCount / input.MaxResultCount) + 1, input.MaxResultCount, total);
 
             return new PagedResultDto<SequenceRuleDto>(total, ObjectMapper.Map<List<SysSequenceRule>, List<SequenceRuleDto>>(entities));
         }

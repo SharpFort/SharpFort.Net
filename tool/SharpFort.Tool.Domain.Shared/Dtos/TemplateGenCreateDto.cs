@@ -14,17 +14,17 @@ namespace SharpFort.Tool.Domain.Shared.Dtos
 
         public void SetTemplateGiteeRef(string moduleType)
         {
-            this.GiteeRef = moduleType.ToLower(CultureInfo.InvariantCulture);
+            GiteeRef = moduleType.ToLower(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
         /// 模块名称
         /// </summary>
-        public string Name { get; set; } = null!;
+        public string? Name { get; set; }
         /// <summary>
         /// 模块所属gitee分支
         /// </summary>
-        public string GiteeRef { get; set; } = null!;
+        public string? GiteeRef { get; set; }
 
         /// <summary>
         /// 数据库提供者

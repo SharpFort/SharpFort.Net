@@ -98,13 +98,11 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
         }
 
         // 获取控制器信息
-        ControllerActionDescriptor? actionDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
-
         // 判断是否支持 MVC 规范化处理，检测配置而已
         // if (!UnifyContext.CheckSupportMvcController(context.HttpContext, actionDescriptor, out _)) return;
 
         // 判断是否跳过规范化处理，检测NonUnifyAttribute而已
-        if (actionDescriptor != null && CheckSucceededNonUnify(actionDescriptor.MethodInfo))
+        if (context.ActionDescriptor is ControllerActionDescriptor actionDescriptor && CheckSucceededNonUnify(actionDescriptor.MethodInfo))
         {
             return;
         }
@@ -271,14 +269,7 @@ public class SucceededUnifyResultFilter : IAsyncActionFilter, IOrderedFilter
                      || context.Request.Headers["accept"].ToString().Contains("odata.metadata=", StringComparison.OrdinalIgnoreCase)
                      || context.Request.Headers["accept"].ToString().Contains("odata.streaming=", StringComparison.OrdinalIgnoreCase);
 
-        if (isSkip == true)
-        {
-            unifyResult = null!;
-        }
-        else
-        {
-            unifyResult = context.RequestServices.GetRequiredService<IUnifyResultProvider>();
-        }
+        unifyResult = isSkip ? null! : context.RequestServices.GetRequiredService<IUnifyResultProvider>();
 
         return unifyResult == null || isSkip;
     }

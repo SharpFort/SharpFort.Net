@@ -6,7 +6,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
         {
             HandledTemplate output = new()
             {
-                TemplateStr = str.Replace("@model", char.ToLowerInvariant(Table.Name[0]) + Table.Name[1..]).Replace("@Model", char.ToUpperInvariant(Table.Name[0]) + Table.Name[1..]),
+                TemplateStr = str.Replace("@model", char.ToLowerInvariant(Table.Name![0]) + Table.Name[1..]).Replace("@Model", char.ToUpperInvariant(Table.Name[0]) + Table.Name[1..]),
                 BuildPath = path.Replace("@model", char.ToLowerInvariant(Table.Name[0]) + Table.Name[1..]).Replace("@Model", char.ToUpperInvariant(Table.Name[0]) + Table.Name[1..])
             };
             return output;

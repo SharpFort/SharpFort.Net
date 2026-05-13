@@ -45,7 +45,7 @@ namespace Sf.Abp.Test.example
             }
             catch (Exception ex)
             {
-                Assert.True(false, $"并发工作单元测试失败: {ex.Message}");
+                Assert.Fail($"并发工作单元测试失败: {ex.Message}");
             }
         }
     }

@@ -4,7 +4,6 @@ using MiniExcelLibs;
 using System.Globalization;
 using SqlSugar;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Caching;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Users;
 using SharpFort.Ddd.Application;
@@ -15,7 +14,6 @@ using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.CasbinRbac.Domain.Repositories;
-using SharpFort.CasbinRbac.Domain.Shared.Caches;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
 using SharpFort.CasbinRbac.Domain.Shared.OperLog;
@@ -26,29 +24,23 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     /// <summary>
     /// User服务实现
     /// </summary>
-    public class UserService : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
-        UserGetListInputVo, UserCreateInputVo, UserUpdateInputVo>, IUserService
+    public class UserService(ISqlSugarRepository<User, Guid> repository, UserManager userManager,
+        IUserRepository userRepository, ICurrentUser currentUser, IDeptService deptService,
+        ILocalEventBus localEventBus,
+        IEnforcer enforcer) : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
+        UserGetListInputVo, UserCreateInputVo, UserUpdateInputVo>(repository), IUserService
     //IUserService
     {
         protected ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
 
-        public UserService(ISqlSugarRepository<User, Guid> repository, UserManager userManager,
-            IUserRepository userRepository, ICurrentUser currentUser, IDeptService deptService,
-            ILocalEventBus localEventBus,
-            IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> userCache, IEnforcer enforcer) : base(repository)
-            =>
-                (_userManager, _userRepository, _currentUser, _deptService, _repository, _localEventBus, _enforcer) =
-                (userManager, userRepository, currentUser, deptService, repository, localEventBus, enforcer);
+        private UserManager _userManager { get; set; } = userManager;
+        private readonly ISqlSugarRepository<User, Guid> _repository = repository;
+        private IDeptService _deptService { get; set; } = deptService;
 
-        private UserManager _userManager { get; set; }
-        private readonly ISqlSugarRepository<User, Guid> _repository;
-        private IUserRepository _userRepository { get; set; }
-        private IDeptService _deptService { get; set; }
+        private ICurrentUser _currentUser { get; set; } = currentUser;
 
-        private ICurrentUser _currentUser { get; set; }
-
-        private readonly ILocalEventBus _localEventBus;
-        private readonly IEnforcer _enforcer;
+        private readonly ILocalEventBus _localEventBus = localEventBus;
+        private readonly IEnforcer _enforcer = enforcer;
 
         /// <summary>
         /// 批量查询用户
@@ -65,9 +57,9 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             }
 
 
-            List<Guid>? ids = input.Ids?.Split(",").Select(x => Guid.Parse(x)).ToList();
+            List<Guid>? ids = input.Ids?.Split(",").Select(Guid.Parse).ToList();
             List<UserGetListOutputDto> outPut = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.UserName),
-                    x => x.UserName.Contains(input.UserName!))
+                    x => x.UserName!.Contains(input.UserName!))
                 .WhereIF(input.Phone is not null, x => x.Phone!.Value.ToString(CultureInfo.InvariantCulture).Contains(input.Phone!.Value.ToString(CultureInfo.InvariantCulture)))
                 .WhereIF(!string.IsNullOrEmpty(input.Name), x => x.Name!.Contains(input.Name!))
                 .WhereIF(input.State is not null, x => x.State == input.State)
@@ -116,7 +108,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <param name="input"></param>
         /// <returns></returns>
         [OperLog("添加用户", OperationType.Insert)]
-        public async override Task<UserGetOutputDto> CreateAsync(UserCreateInputVo input)
+        public override async Task<UserGetOutputDto> CreateAsync(UserCreateInputVo input)
         {
             User entitiy = await MapToEntityAsync(input);
 
@@ -162,7 +154,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             // 查询实际的 RoleCode
             List<Role> roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
-            List<string> roleCodes = [.. roles.Select(r => r.RoleCode)];
+            List<string> roleCodes = [.. roles.Select(r => r.RoleCode!)];
 
             List<string[]> policies = [.. roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain })];
 
@@ -202,7 +194,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <param name="input"></param>
         /// <returns></returns>
         [OperLog("更新用户", OperationType.Update)]
-        public async override Task<UserGetOutputDto> UpdateAsync(Guid id, UserUpdateInputVo input)
+        public override async Task<UserGetOutputDto> UpdateAsync(Guid id, UserUpdateInputVo input)
         {
             if (input.UserName is UserConst.Admin or UserConst.TenantAdmin)
             {
@@ -297,6 +289,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 Nick = x.Nick,
                 Gender = x.Gender switch
                 {
+                    Gender.Unknown => "未知",
                     Gender.Male => "男",
                     Gender.Female => "女",
                     _ => "未知"

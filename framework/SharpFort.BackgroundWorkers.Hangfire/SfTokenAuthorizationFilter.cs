@@ -77,7 +77,7 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
     /// 当用户未认证时，返回一个包含令牌输入表单的HTML页面
     /// </summary>
     /// <param name="httpContext">HTTP 上下文</param>
-    private void SetChallengeResponse(HttpContext httpContext)
+    private static void SetChallengeResponse(HttpContext httpContext)
     {
         httpContext.Response.StatusCode = 401;
         httpContext.Response.ContentType = HtmlContentType;

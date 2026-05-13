@@ -91,7 +91,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                             string currentDeptIdStr = currentDeptId.ToString()!;
                             expUser.Or(u => SqlFunc.Subqueryable<Department>()
                                 .Where(d => d.Id == u.DepartmentId &&
-                                           (d.Id == currentDeptId || d.Ancestors.Contains(currentDeptIdStr)))
+                                           (d.Id == currentDeptId || d.Ancestors!.Contains(currentDeptIdStr)))
                                 .Any());
                         }
                         break;

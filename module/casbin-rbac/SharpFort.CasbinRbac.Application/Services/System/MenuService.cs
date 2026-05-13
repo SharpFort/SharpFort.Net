@@ -45,7 +45,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 处理 ApiMethod 转大写
             if (!string.IsNullOrEmpty(input.ApiMethod))
             {
-                input.ApiMethod = input.ApiMethod.ToUpper(global::System.Globalization.CultureInfo.InvariantCulture);  // CA1304
+                input.ApiMethod = input.ApiMethod.ToUpper(CultureInfo.InvariantCulture);  // CA1304
             }
             return await base.CreateAsync(input);
         }
@@ -105,7 +105,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task<PagedResultDto<MenuGetListOutputDto>> GetListAsync(MenuGetListInputVo input)
         {
             RefAsync<int> total = 0;
-            List<Menu> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName.Contains(input.MenuName!))
+            List<Menu> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName!.Contains(input.MenuName!))
                         .WhereIF(input.State is not null, x => x.State == input.State)
                         .Where(x => x.MenuSource == input.MenuSource)
                         .OrderBy(x => x.OrderNum)

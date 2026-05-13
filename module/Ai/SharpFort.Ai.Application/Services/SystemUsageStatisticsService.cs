@@ -50,7 +50,7 @@ public class SystemUsageStatisticsService(
             .GroupBy(x => x.ModelId)
             .Select(g => g.First())];
 
-        List<string> modelIds = [.. distinctModels.Select(x => x.ModelId)];
+        List<string> modelIds = [.. distinctModels.Select(x => x.ModelId!)];
 
         // 2. 查询指定日期内各模型的Token使用统计
         var modelStats = await _messageRepository._DbQueryable
@@ -60,7 +60,7 @@ public class SystemUsageStatisticsService(
             .GroupBy(x => x.ModelId)
             .Select(x => new
             {
-                ModelId = x.ModelId,
+                x.ModelId,
                 Tokens = SqlFunc.AggregateSum(x.TokenUsage.TotalTokenCount),
                 Count = SqlFunc.AggregateCount(x.Id)
             })
@@ -72,7 +72,7 @@ public class SystemUsageStatisticsService(
         List<ModelTokenStatisticsDto> result = [];
         foreach (AiModel? model in distinctModels)
         {
-            modelStatDict.TryGetValue(model.ModelId, out var stat);
+            modelStatDict.TryGetValue(model.ModelId!, out var stat);
             long tokens = stat?.Tokens ?? 0;
             long count = stat?.Count ?? 0;
 
@@ -84,8 +84,8 @@ public class SystemUsageStatisticsService(
 
             result.Add(new ModelTokenStatisticsDto
             {
-                ModelId = model.ModelId,
-                ModelName = model.Name,
+                ModelId = model.ModelId!,
+                ModelName = model.Name!,
                 Tokens = tokens,
                 TokensInWan = tokens / 10000m,
                 Count = count,
@@ -101,7 +101,7 @@ public class SystemUsageStatisticsService(
         };
     }
 
-    private string FormatDate(DateTime date)
+    private static string FormatDate(DateTime date)
     {
         string dayOfWeek = date.ToString("dddd", new CultureInfo("zh-CN"));
         string weekDay = dayOfWeek switch

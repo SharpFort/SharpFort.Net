@@ -42,7 +42,9 @@ public sealed class UnifyResultSettingsOptions
     /// </summary>
     /// <param name="options"></param>
     /// <param name="configuration"></param>
+#pragma warning disable IDE0060 // IConfiguration is part of the ASP.NET PostConfigure pattern signature
     public static void PostConfigure(UnifyResultSettingsOptions options, IConfiguration configuration)
+#pragma warning restore IDE0060
     {
         options.Return200StatusCodes ??= [401, 403];
         options.SupportMvcController ??= false;

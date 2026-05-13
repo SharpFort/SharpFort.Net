@@ -291,7 +291,7 @@ namespace SharpFort.Core.Helper
         {
             // encoded OID sequence for  PKCS #1 rsaEncryption szOID_RSA_RSA = "1.2.840.113549.1.1.1"
             byte[] seqOid = [0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00];
-            byte[] seq = new byte[15];
+            byte[] seq;
 
             byte[] x509Key = Convert.FromBase64String(publicKeyString);
 
@@ -416,16 +416,14 @@ namespace SharpFort.Core.Helper
 
         private static int GetIntegerSize(BinaryReader binr)
         {
-            byte bt = 0;
-            int count = 0;
-            bt = binr.ReadByte();
+            byte bt = binr.ReadByte();
             if (bt != 0x02)
             {
                 return 0;
             }
 
             bt = binr.ReadByte();
-
+            int count;
             if (bt == 0x81)
             {
                 count = binr.ReadByte();

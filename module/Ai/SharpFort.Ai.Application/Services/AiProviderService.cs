@@ -31,7 +31,7 @@ public class AiProviderService(
         RefAsync<int> total = 0;
 
         List<AiProvider> entities = await _providerRepository._DbQueryable
-            .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Name.Contains(input.SearchKey))
+            .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), x => x.Name!.Contains(input.SearchKey!))
             .OrderByDescending(x => x.OrderNum)
             .OrderByDescending(x => x.CreationTime)
             .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);

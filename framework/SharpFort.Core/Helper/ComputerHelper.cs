@@ -45,23 +45,16 @@ namespace SharpFort.Core.Helper
                 else
                 {
                     int length = str.Length;
-                    switch (length)
+                    return length switch
                     {
-                        case 4:
-                            return DateTime.ParseExact(str, "yyyy", System.Globalization.CultureInfo.CurrentCulture);
-                        case 6:
-                            return DateTime.ParseExact(str, "yyyyMM", System.Globalization.CultureInfo.CurrentCulture);
-                        case 8:
-                            return DateTime.ParseExact(str, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture);
-                        case 10:
-                            return DateTime.ParseExact(str, "yyyyMMddHH", System.Globalization.CultureInfo.CurrentCulture);
-                        case 12:
-                            return DateTime.ParseExact(str, "yyyyMMddHHmm", System.Globalization.CultureInfo.CurrentCulture);
-                        case 14:
-                            return DateTime.ParseExact(str, "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
-                        default:
-                            return DateTime.ParseExact(str, "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture);
-                    }
+                        4 => DateTime.ParseExact(str, "yyyy", CultureInfo.CurrentCulture),
+                        6 => DateTime.ParseExact(str, "yyyyMM", CultureInfo.CurrentCulture),
+                        8 => DateTime.ParseExact(str, "yyyyMMdd", CultureInfo.CurrentCulture),
+                        10 => DateTime.ParseExact(str, "yyyyMMddHH", CultureInfo.CurrentCulture),
+                        12 => DateTime.ParseExact(str, "yyyyMMddHHmm", CultureInfo.CurrentCulture),
+                        14 => DateTime.ParseExact(str, "yyyyMMddHHmmss", CultureInfo.CurrentCulture),
+                        _ => DateTime.ParseExact(str, "yyyyMMddHHmmss", CultureInfo.CurrentCulture),
+                    };
                 }
             }
             catch

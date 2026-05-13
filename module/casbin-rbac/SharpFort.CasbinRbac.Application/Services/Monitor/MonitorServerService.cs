@@ -18,7 +18,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
         private static List<NetworkAdapterDto> _cachedNetworks = null!;
         private static List<AssemblyInfoDto> _cachedAssemblies = null!;
         private static DateTime _lastStaticCacheTime = DateTime.MinValue;
-        private static readonly object _staticCacheLock = new();
+        private static readonly Lock _staticCacheLock = new();
 
         [HttpGet("monitor-server/info")]
         public async Task<MonitorServerInfoDto> GetServerInfoAsync()
@@ -91,7 +91,7 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
                 // disk info (Use native .NET DriveInfo for absolute cross-platform reliability instead of wmic/df)
                 try
                 {
-                    foreach (DriveInfo? drive in global::System.IO.DriveInfo.GetDrives().Where(d => d.IsReady))
+                    foreach (DriveInfo? drive in DriveInfo.GetDrives().Where(d => d.IsReady))
                     {
                         long totalSizeGb = drive.TotalSize / 1024 / 1024 / 1024;
                         long freeSpaceGb = drive.AvailableFreeSpace / 1024 / 1024 / 1024;
