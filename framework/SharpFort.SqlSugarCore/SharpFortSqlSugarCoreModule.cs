@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -169,7 +169,7 @@ namespace SharpFort.SqlSugarCore
             // 初始化数据库
             if (options.EnabledCodeFirst)
             {
-                await InitializeDatabase(serviceProvider);
+                InitializeDatabase(serviceProvider);
             }
 
             // 初始化种子数据
@@ -197,7 +197,7 @@ namespace SharpFort.SqlSugarCore
 #pragma warning restore CA1848, CA1873
         }
 
-        private static async Task InitializeDatabase(IServiceProvider serviceProvider)
+        private static void InitializeDatabase(IServiceProvider serviceProvider)
         {
             IModuleContainer moduleContainer = serviceProvider.GetRequiredService<IModuleContainer>();
             ISqlSugarClient db = serviceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;

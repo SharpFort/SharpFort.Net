@@ -1,8 +1,10 @@
-﻿using Lazy.Captcha.Core.Generator;
+using Lazy.Captcha.Core.Generator;
 using Microsoft.Extensions.DependencyInjection;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts;
 using SharpFort.CasbinRbac.Domain;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace SharpFort.CasbinRbac.Application
 {
@@ -25,7 +27,7 @@ namespace SharpFort.CasbinRbac.Application
             });
 
             // 注册字段级权限控制器
-            context.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+            context.Services.Configure<JsonOptions>(options =>
             {
                 // 注意：需要确保 IHttpContextAccessor 已注册 (ABP 默认已注册)
                 // 这里我们不能直接 new Factory(accessor)，因为 Configure 时还没有 provider。
@@ -51,11 +53,12 @@ namespace SharpFort.CasbinRbac.Application
             });
 
             // 注册配置服务，通过 DI 注入依赖
-            context.Services.AddTransient<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Mvc.JsonOptions>, JsonOptionsSetup>();
+            context.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsSetup>();
         }
 
-        public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
+        public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
+            return Task.CompletedTask;
         }
     }
 }

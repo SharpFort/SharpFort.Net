@@ -34,19 +34,19 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public async Task OnExceptionAsync(ExceptionContext context)
+    public Task OnExceptionAsync(ExceptionContext context)
     {
 
         // 排除 WebSocket 请求处理
         if (context.HttpContext.IsWebSocketRequest())
         {
-            return;
+            return Task.CompletedTask;
         }
 
         // 如果异常在其他地方被标记了处理，那么这里不再处理
         if (context.ExceptionHandled)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         // 解析异常信息
@@ -58,6 +58,8 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
 
         // 记录拦截日志
         LogException(context.Exception, context.Exception.Message);
+
+        return Task.CompletedTask;
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "{Message}")]

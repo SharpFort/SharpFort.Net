@@ -1,4 +1,5 @@
 using SqlSugar;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.MultiTenancy;
 using SharpFort.FileManagement.Domain.Shared.Consts;
@@ -101,7 +102,7 @@ namespace SharpFort.FileManagement.Domain.Entities
         {
             if (newParentId == Id)
             {
-                throw new Volo.Abp.BusinessException("FileManagement:Directory:CannotBeOwnParent", "目录不能作为自己的父目录");
+                throw new BusinessException("FileManagement:Directory:CannotBeOwnParent", "目录不能作为自己的父目录");
             }
             ParentId = newParentId;
         }

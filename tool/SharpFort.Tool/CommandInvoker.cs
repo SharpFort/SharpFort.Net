@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Extensions.CommandLineUtils;
 using Volo.Abp.DependencyInjection;
 
@@ -33,9 +33,10 @@ namespace SharpFort.Tool
             }
         }
 
-        public async Task InvokerAsync(string[] args)
+        public Task InvokerAsync(string[] args)
         {
             Application.Execute(args);
+            return Task.CompletedTask;
         }
     }
 }

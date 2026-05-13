@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS8767 // 接口可空性不匹配 - 继承自框架基类
+#pragma warning disable CS8767 // 接口可空性不匹配 - 继承自框架基类
 using System.Linq.Dynamic.Core;
 using System.Net;
 using SqlSugar;
@@ -109,7 +109,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         return totalCount;
     }
 
-    protected virtual async Task<ISugarQueryable<AuditLog>> GetListQueryAsync(
+    protected virtual Task<ISugarQueryable<AuditLog>> GetListQueryAsync(
         DateTime? startTime = null,
         DateTime? endTime = null,
         string? httpMethod = null,
@@ -126,7 +126,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         bool includeDetails = false)
     {
         int? nHttpStatusCode = (int?)httpStatusCode;
-        return _DbQueryable
+        var query = _DbQueryable
             .WhereIF(startTime.HasValue, auditLog => auditLog.ExecutionTime >= startTime)
             .WhereIF(endTime.HasValue, auditLog => auditLog.ExecutionTime <= endTime)
             .WhereIF(hasException.HasValue && hasException.Value, auditLog => auditLog.Exceptions != null && auditLog.Exceptions != "")
@@ -141,6 +141,8 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
             .WhereIF(httpStatusCode is not null and > 0, auditLog => auditLog.HttpStatusCode == nHttpStatusCode)
             .WhereIF(maxExecutionDuration != null && maxExecutionDuration.Value > 0, auditLog => auditLog.ExecutionDuration <= maxExecutionDuration)
             .WhereIF(minExecutionDuration != null && minExecutionDuration.Value > 0, auditLog => auditLog.ExecutionDuration >= minExecutionDuration);
+
+        return Task.FromResult(query);
     }
 
     public virtual async Task<Dictionary<DateTime, double>> GetAverageExecutionDurationPerDayAsync(

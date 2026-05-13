@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Volo.Abp;
+using SharpFort.FileManagement.Domain.Entities;
 
 namespace SharpFort.FileManagement.Domain.Services
 {
@@ -34,7 +36,7 @@ namespace SharpFort.FileManagement.Domain.Services
 
         public string ProviderName => "S3Compatible";
 
-        public async Task SaveAsync(string containerName, string blobName, Stream stream, Entities.FileStorageProvider? config = null)
+        public Task SaveAsync(string containerName, string blobName, Stream stream, FileStorageProvider? config = null)
         {
             ValidateConfig(config);
 
@@ -50,28 +52,28 @@ namespace SharpFort.FileManagement.Domain.Services
             // await s3Client.PutObjectAsync(putRequest);
 
             LogSaveSdkNotImplemented();
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
-        public async Task<Stream?> GetAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
+        public Task<Stream?> GetAsync(string containerName, string blobName, FileStorageProvider? config = null)
         {
             ValidateConfig(config);
 
             // TODO: 接入 AWS SDK S3
             LogGetSdkNotImplemented();
-            return await Task.FromResult<Stream?>(null);
+            return Task.FromResult<Stream?>(null);
         }
 
-        public async Task DeleteAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
+        public Task DeleteAsync(string containerName, string blobName, FileStorageProvider? config = null)
         {
             ValidateConfig(config);
 
             // TODO: 接入 AWS SDK S3
             LogDeleteSdkNotImplemented();
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
-        public Task<string?> GetUrlAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
+        public Task<string?> GetUrlAsync(string containerName, string blobName, FileStorageProvider? config = null)
         {
             if (config == null)
             {
@@ -96,25 +98,25 @@ namespace SharpFort.FileManagement.Domain.Services
             return Task.FromResult<string?>(null);
         }
 
-        public async Task<bool> ExistsAsync(string containerName, string blobName, Entities.FileStorageProvider? config = null)
+        public Task<bool> ExistsAsync(string containerName, string blobName, FileStorageProvider? config = null)
         {
             ValidateConfig(config);
 
             // TODO: 接入 AWS SDK S3
             LogExistsSdkNotImplemented();
-            return await Task.FromResult(false);
+            return Task.FromResult(false);
         }
 
-        private static void ValidateConfig(Entities.FileStorageProvider? config)
+        private static void ValidateConfig(FileStorageProvider? config)
         {
             if (config == null)
             {
-                throw new Volo.Abp.BusinessException("FileManagement:S3:MissingConfig", "S3 存储提供者需要提供配置信息");
+                throw new BusinessException("FileManagement:S3:MissingConfig", "S3 存储提供者需要提供配置信息");
             }
 
             if (string.IsNullOrEmpty(config.Endpoint))
             {
-                throw new Volo.Abp.BusinessException("FileManagement:S3:MissingEndpoint", "S3 存储提供者需要配置 Endpoint");
+                throw new BusinessException("FileManagement:S3:MissingEndpoint", "S3 存储提供者需要配置 Endpoint");
             }
         }
     }

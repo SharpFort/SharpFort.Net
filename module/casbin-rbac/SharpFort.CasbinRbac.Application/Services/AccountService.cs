@@ -160,19 +160,19 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// </summary>
         /// <returns></returns>
         [AllowAnonymous]
-        public async Task<CaptchaImageDto> GetCaptchaImageAsync()
+        public Task<CaptchaImageDto> GetCaptchaImageAsync()
         {
             Guid uuid = _guidGenerator.Create();
             CaptchaData captcha = _captcha.Generate(uuid.ToString());
             bool enableCaptcha = _rbacOptions.EnableCaptcha;
-            return new CaptchaImageDto { Img = captcha.Bytes, Uuid = uuid, IsEnableCaptcha = enableCaptcha };
+            return Task.FromResult(new CaptchaImageDto { Img = captcha.Bytes, Uuid = uuid, IsEnableCaptcha = enableCaptcha });
         }
 
         /// <summary>
         /// 验证电话号码
         /// </summary>
         /// <param name="phone"></param>
-        private static async Task ValidationPhone(string phone)
+        private static void ValidationPhone(string phone)
         {
             bool res = Regex.IsMatch(phone, @"^\d{11}$");
             if (!res)
@@ -228,7 +228,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             //验证uuid 和 验证码
             ValidationImageCaptcha(input.Uuid, input.Code);
 
-            await ValidationPhone(input.Phone);
+            ValidationPhone(input.Phone);
 
             if (validationPhoneType == PhoneValidationType.Register &&
                 await _userRepository.IsAnyAsync(x => x.Phone!.Value.ToString(CultureInfo.InvariantCulture) == input.Phone))

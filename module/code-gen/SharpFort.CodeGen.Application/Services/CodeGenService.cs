@@ -39,7 +39,7 @@ namespace SharpFort.CodeGen.Application.Services
         /// Web To Db
         /// </summary>
         /// <returns></returns>
-        public async Task PostWebBuildDbAsync()
+        public Task PostWebBuildDbAsync()
         {
             throw new NotImplementedException();
         }
@@ -65,7 +65,7 @@ namespace SharpFort.CodeGen.Application.Services
         /// Code To Db
         /// </summary>
         /// <returns></returns>
-        public async Task PostCodeBuildDbAsync()
+        public Task PostCodeBuildDbAsync()
         {
             throw new NotImplementedException();
         }
@@ -76,7 +76,7 @@ namespace SharpFort.CodeGen.Application.Services
         /// <returns></returns>
         [HttpPost("code-gen/dir/{**path}")]
 #pragma warning disable CA1822 // ABP requires instance methods for AutoAPI
-        public async Task PostDir([FromRoute] string path)
+        public Task PostDir([FromRoute] string path)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -90,7 +90,7 @@ namespace SharpFort.CodeGen.Application.Services
                 throw new UserFriendlyException("当前操作系统不支持打开目录");
             }
 
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 #pragma warning restore CA1822
     }

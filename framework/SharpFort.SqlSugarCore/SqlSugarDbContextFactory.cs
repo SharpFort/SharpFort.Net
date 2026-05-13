@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Reflection;
 using Microsoft.Extensions.Options;
 using SqlSugar;
@@ -68,7 +68,7 @@ namespace SharpFort.SqlSugarCore
             LazyServiceProvider = lazyServiceProvider;
 
             // 异步获取租户配置
-            TenantConfiguration? tenantConfiguration = AsyncHelper.RunSync(async () => await TenantConfigurationWrapper.GetAsync());
+            TenantConfiguration? tenantConfiguration = AsyncHelper.RunSync(() => TenantConfigurationWrapper.GetAsync());
 
             // 构建数据库连接配置
             ConnectionConfig connectionConfig = BuildConnectionConfig(options =>

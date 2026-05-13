@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace SharpFort.Core.Helper
@@ -37,9 +37,9 @@ namespace SharpFort.Core.Helper
         /// <example>
         /// "Active".StringToEnum&lt;Status&gt;() => Status.Active
         /// </example>
-        public static TEnum StringToEnum<TEnum>(this string str)
+        public static TEnum StringToEnum<TEnum>(this string str) where TEnum : struct, Enum
         {
-            return (TEnum)Enum.Parse(typeof(TEnum), str);
+            return Enum.Parse<TEnum>(str);
         }
 
         #region 新增方法 - 数据库字符串存储支持

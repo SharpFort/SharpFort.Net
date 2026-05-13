@@ -7,6 +7,8 @@ using Volo.Abp.Domain.Services;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
 using System.Text;
+using Volo.Abp.Uow;
+using System.Globalization;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
@@ -30,7 +32,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// Phase 3: Write with NEW dedicated connection
         /// Phase 4: Reload enforcer
         /// </summary>
-        [Volo.Abp.Uow.UnitOfWork(IsDisabled = true)]
+        [UnitOfWork(IsDisabled = true)]
         public async Task MigrateAllAsync()
         {
             Stopwatch totalSw = Stopwatch.StartNew();
@@ -195,7 +197,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     continue;
                 }
 
-                string method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper(global::System.Globalization.CultureInfo.InvariantCulture);
+                string method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper(CultureInfo.InvariantCulture);
 
                 rulesToInsert.Add(new CasbinRule
                 {

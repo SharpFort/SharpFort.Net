@@ -336,7 +336,7 @@ namespace Sf.Abp.Web
         }
 
 
-        public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
+        public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
             IServiceProvider service = context.ServiceProvider;
             IWebHostEnvironment env = context.GetEnvironment();
@@ -411,6 +411,8 @@ namespace Sf.Abp.Web
 
             //终节点
             app.UseConfiguredEndpoints();
+
+            return Task.CompletedTask;
         }
     }
 }

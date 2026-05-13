@@ -11,6 +11,7 @@ using SharpFort.CasbinRbac.Domain.Shared.Options;
 using SharpFort.SqlSugarCore;
 using SharpFort.SqlSugarCore.Abstractions;
 using Casbin.Adapter.SqlSugar.Entities;
+using SqlSugar;
 
 namespace SharpFort.CasbinRbac.SqlSugarCore
 {
@@ -135,16 +136,17 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             });
         }
 
-        public override async Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
+        public override Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
         {
             //========================================================================
             //【方案一】原始代码 - 使用 CreateScope（会导致 SQLite 死锁）
             //========================================================================
             using (IServiceScope scope = context.ServiceProvider.CreateScope())
             {
-                SqlSugar.ISqlSugarClient db = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
+                ISqlSugarClient db = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>().SqlSugarClient;
                 db.CodeFirst.InitTables<CasbinRule>();
             }
+            return Task.CompletedTask;
 
             // ========================================================================
             // 【方案二】使用 CopyNew（仍然导致 SQLite 死锁）
