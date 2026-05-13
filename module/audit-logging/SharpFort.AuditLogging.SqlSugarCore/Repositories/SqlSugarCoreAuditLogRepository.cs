@@ -126,7 +126,7 @@ public class SqlSugarCoreAuditLogRepository(ISugarDbContextProvider<ISqlSugarDbC
         bool includeDetails = false)
     {
         int? nHttpStatusCode = (int?)httpStatusCode;
-        var query = _DbQueryable
+        ISugarQueryable<AuditLog> query = _DbQueryable
             .WhereIF(startTime.HasValue, auditLog => auditLog.ExecutionTime >= startTime)
             .WhereIF(endTime.HasValue, auditLog => auditLog.ExecutionTime <= endTime)
             .WhereIF(hasException.HasValue && hasException.Value, auditLog => auditLog.Exceptions != null && auditLog.Exceptions != "")

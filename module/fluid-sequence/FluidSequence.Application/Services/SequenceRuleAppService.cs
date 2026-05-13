@@ -29,7 +29,7 @@ namespace SharpFort.FluidSequence.Application.Services
         {
             SysSequenceRule rule = await _repository.GetAsync(r => r.RuleCode == ruleCode);
             return rule == null
-                ? throw new Volo.Abp.UserFriendlyException($"Rule {ruleCode} not found")
+                ? throw new UserFriendlyException($"Rule {ruleCode} not found")
                 : _domainService.TestGenerate(rule, context);
         }
 

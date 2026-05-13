@@ -1,18 +1,18 @@
-﻿using Volo.Abp.Uow;
+using Volo.Abp.Uow;
 using Xunit;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace Sf.Abp.Test.example
 {
-    public class ThreadDb_Test : SfAbpTestBase
+    public class ThreadDbTest : SfAbpTestBase
     {
         /// <summary>
         /// 工作单元
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Uow_In_Test()
+        public async Task UowInTest()
         {
             try
             {

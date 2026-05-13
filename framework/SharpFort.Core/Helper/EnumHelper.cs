@@ -112,7 +112,7 @@ namespace SharpFort.Core.Helper
         public static TEnum TryParseEnumString<TEnum>(this string str, TEnum defaultValue, bool ignoreCase = true)
             where TEnum : struct, Enum
         {
-            return Enum.TryParse<TEnum>(str, ignoreCase, out TEnum result) ? result : defaultValue;
+            return Enum.TryParse(str, ignoreCase, out TEnum result) ? result : defaultValue;
         }
 
         /// <summary>

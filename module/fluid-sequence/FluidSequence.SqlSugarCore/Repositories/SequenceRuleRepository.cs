@@ -9,7 +9,7 @@ using System.Data;
 
 namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
 {
-    public class SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : SqlSugarRepository<SysSequenceRule, Guid>(dbContextProvider), ISequenceRuleRepository, ITransientDependency
+    public sealed class SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : SqlSugarRepository<SysSequenceRule, Guid>(dbContextProvider), ISequenceRuleRepository, ITransientDependency
     {
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
                 throw new UserFriendlyException($"流水号规则 [{ruleCode}] 不存在，无法执行号段预取。");
             }
 
-            int rangeStart = Convert.ToInt32(dt.Rows[0]["range_start"]);
-            int rangeEnd = Convert.ToInt32(dt.Rows[0]["range_end"]);
+            int rangeStart = Convert.ToInt32(dt.Rows[0]["range_start"], System.Globalization.CultureInfo.InvariantCulture);
+            int rangeEnd = Convert.ToInt32(dt.Rows[0]["range_end"], System.Globalization.CultureInfo.InvariantCulture);
 
             return (rangeStart, rangeEnd);
         }

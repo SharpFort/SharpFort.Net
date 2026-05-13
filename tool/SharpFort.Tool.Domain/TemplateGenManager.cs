@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 using SharpFort.Tool.Domain.Shared.Dtos;
@@ -40,7 +40,7 @@ namespace SharpFort.Tool.Domain
             }
 
             string downloadFilePath = Path.Combine(downloadPath, $"{id}.zip");
-            Stream gitSteam = await _giteeManager.DownLoadFileAsync(input.GiteeRef);
+            Stream gitSteam = await _giteeManager.DownLoadFileAsync(input.GiteeRef!);
             using (FileStream fileStream = new(downloadFilePath, FileMode.Create, FileAccess.Write))
             {
                 await gitSteam.CopyToAsync(fileStream);

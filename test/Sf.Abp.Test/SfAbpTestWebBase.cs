@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -11,10 +11,10 @@ public class SfAbpTestWebBase : SfAbpTestBase
     public HttpContext HttpContext { get; private set; }
     public SfAbpTestWebBase() : base()
     {
-        HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext;
+        HttpContext httpContext = DefaultHttpContextAccessor.CurrentHttpContext!;
         ConfigureHttpContext(httpContext);
         HttpContext = httpContext;
-        IApplicationBuilder app = new ApplicationBuilder(ServiceProvider);
+        ApplicationBuilder app = new(ServiceProvider);
         RequestDelegate httpDelegate = app.Build();
         httpDelegate.Invoke(httpContext);
     }
@@ -31,7 +31,7 @@ public class SfAbpTestWebBase : SfAbpTestBase
     }
 }
 
-internal class DefaultHttpContextAccessor : IHttpContextAccessor
+internal sealed class DefaultHttpContextAccessor : IHttpContextAccessor
 {
     internal static HttpContext? CurrentHttpContext { get; set; } = new DefaultHttpContext();
     public HttpContext? HttpContext { get => CurrentHttpContext; set => throw new NotImplementedException(); }

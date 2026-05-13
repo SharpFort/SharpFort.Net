@@ -274,7 +274,7 @@ namespace SharpFort.SqlSugarCore
             }
 
             string dbTypeString = name[(atIndex + 1)..];
-            return Enum.TryParse<DbType>(dbTypeString, out DbType dbType)
+            return Enum.TryParse(dbTypeString, out DbType dbType)
                 ? dbType
                 : throw new ArgumentException($"不支持的数据库类型: {dbTypeString}");
         }

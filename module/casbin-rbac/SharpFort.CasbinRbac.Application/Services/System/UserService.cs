@@ -13,7 +13,6 @@ using SharpFort.CasbinRbac.Application.Contracts.Dtos.Post;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
-using SharpFort.CasbinRbac.Domain.Repositories;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
 using SharpFort.CasbinRbac.Domain.Shared.OperLog;
@@ -25,7 +24,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     /// User服务实现
     /// </summary>
     public class UserService(ISqlSugarRepository<User, Guid> repository, UserManager userManager,
-        IUserRepository userRepository, ICurrentUser currentUser, IDeptService deptService,
+        ICurrentUser currentUser, IDeptService deptService,
         ILocalEventBus localEventBus,
         IEnforcer enforcer) : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
         UserGetListInputVo, UserCreateInputVo, UserUpdateInputVo>(repository), IUserService

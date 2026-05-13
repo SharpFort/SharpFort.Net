@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<Import Project="..\..\..\common.props" />
 
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA1716</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="10.2.0" />
   </ItemGroup>

@@ -37,7 +37,7 @@ public class TokenValidationResult
     public bool IsEnableLog { get; set; }
 }
 
-public class TokenManager(
+public sealed class TokenManager(
     ISqlSugarRepository<Token> tokenRepository,
     ISqlSugarRepository<AiUsage> usageStatisticsRepository,
     ISqlSugarRepository<AiModel, Guid> aiModelRepository) : DomainService
@@ -101,8 +101,8 @@ public class TokenManager(
         {
             UserId = entity.UserId,
             TokenId = entity.Id,
-            Token = entity.TokenKey,
-            TokenName = entity.Name,
+            Token = entity.TokenKey ?? string.Empty,
+            TokenName = entity.Name ?? string.Empty,
             IsEnableLog = entity.IsEnableLog
         };
     }

@@ -1,4 +1,4 @@
-﻿using Hangfire.Dashboard;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.DependencyInjection;
@@ -63,7 +63,7 @@ public sealed class SfTokenAuthorizationFilter(IServiceProvider serviceProvider)
 
         // 如果验证通过，设置 cookie
         string authorization = httpContext.Request.Headers.Authorization.ToString();
-        if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith(BearerPrefix))
+        if (!string.IsNullOrWhiteSpace(authorization) && authorization.StartsWith(BearerPrefix, StringComparison.Ordinal))
         {
             string token = authorization[BearerPrefix.Length..];
             SetTokenCookie(httpContext, token);

@@ -204,7 +204,7 @@ namespace Sf.Abp.Web
                 {
                     int jobDb = configuration.GetSection("Redis").GetValue<int>("JobDb");
                     config.UseRedisStorage(
-                        ConnectionMultiplexer.Connect(redisConfiguration),
+                        ConnectionMultiplexer.Connect(redisConfiguration ?? throw new InvalidOperationException("Redis:Configuration is missing in appsettings.")),
                         new RedisStorageOptions()
                         {
                             Db = jobDb,
@@ -232,7 +232,7 @@ namespace Sf.Abp.Web
                     }
 
                     context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-                    context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.");
+                    context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", _);
 
                     return new ValueTask();
                 };
@@ -257,8 +257,8 @@ namespace Sf.Abp.Web
 
 
             //jwt鉴权
-            JwtOptions? jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>();
-            RefreshJwtOptions? refreshJwtOptions = configuration.GetSection(nameof(RefreshJwtOptions)).Get<RefreshJwtOptions>();
+            JwtOptions jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>() ?? throw new InvalidOperationException("JwtOptions is missing in configuration.");
+            RefreshJwtOptions refreshJwtOptions = configuration.GetSection(nameof(RefreshJwtOptions)).Get<RefreshJwtOptions>() ?? throw new InvalidOperationException("RefreshJwtOptions is missing in configuration.");
 
             context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

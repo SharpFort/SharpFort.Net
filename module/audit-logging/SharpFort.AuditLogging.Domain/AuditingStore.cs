@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -21,6 +21,12 @@ public partial class AuditingStore(
     protected AbpAuditingOptions Options { get; } = options.Value;
     protected IAuditLogInfoToAuditLogConverter Converter { get; } = converter;
 
+    [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "Sf-请求追踪:{AuditInfoJson}")]
+    private static partial void LogAuditInfo(ILogger logger, string auditInfoJson);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Could not save the audit log object: {AuditInfo}")]
+    private static partial void LogSaveError(ILogger logger, Exception ex, string auditInfo);
+
     public virtual async Task SaveAsync(AuditLogInfo auditInfo)
     {
         if (!Options.HideErrors)
@@ -35,13 +41,7 @@ public partial class AuditingStore(
         }
         catch (Exception ex)
         {
-            // CA1848/CA1873 suppressed: Logger is a public property (ABP convention), [LoggerMessage] requires _logger field
-#pragma warning disable CA1848, CA1873
-            if (Logger.IsEnabled(LogLevel.Warning))
-            {
-                Logger.LogWarning(ex, "Could not save the audit log object: {AuditInfo}", auditInfo.ToString());
-            }
-#pragma warning restore CA1848, CA1873
+            LogSaveError(Logger, ex, auditInfo.ToString());
             Logger.LogException(ex, LogLevel.Error);
         }
     }
@@ -54,7 +54,7 @@ public partial class AuditingStore(
             {
                 DateFormatString = "yyyy-MM-dd HH:mm:ss"
             });
-            Logger.LogDebug("Sf-请求追踪:{AuditInfoJson}", auditInfoJson);
+            LogAuditInfo(Logger, auditInfoJson);
         }
         using (IUnitOfWork uow = UnitOfWorkManager.Begin())
         {

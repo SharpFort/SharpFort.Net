@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Volo.Abp;
 using SharpFort.FileManagement.Domain.Entities;
 
 namespace SharpFort.FileManagement.Domain.Services

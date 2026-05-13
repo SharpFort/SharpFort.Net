@@ -74,13 +74,13 @@ public class AiGateWayManager : DomainService
                 new AiModelDescribe
                 {
                     AppId = app.Id,
-                    AppName = app.Name,
-                    Endpoint = app.Endpoint,
-                    ApiKey = app.ApiKey,
+                    AppName = app.Name ?? string.Empty,
+                    Endpoint = app.Endpoint ?? string.Empty,
+                    ApiKey = app.ApiKey ?? string.Empty,
                     OrderNum = model.OrderNum,
-                    HandlerName = model.HandlerName,
-                    ModelId = model.ModelId,
-                    ModelName = model.Name,
+                    HandlerName = model.HandlerName ?? string.Empty,
+                    ModelId = model.ModelId ?? string.Empty,
+                    ModelName = model.Name ?? string.Empty,
                     Description = model.Description,
                     AppExtraUrl = app.ExtraUrl,
                     ModelType = model.ModelType
@@ -1266,7 +1266,7 @@ public class AiGateWayManager : DomainService
         {
             // 如果是 Contents 数组，提取第一个 text 类型的内容
             AnthropicMessageContent? textContent = lastMessage.Contents.FirstOrDefault(c => c.Type == "text");
-            userContent = textContent?.Text ?? System.Text.Json.JsonSerializer.Serialize(lastMessage.Contents);
+            userContent = textContent?.Text ?? JsonSerializer.Serialize(lastMessage.Contents);
         }
 
         // 处理模型前缀

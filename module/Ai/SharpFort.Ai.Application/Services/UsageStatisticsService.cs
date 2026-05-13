@@ -218,7 +218,7 @@ public class UsageStatisticsService(
                 .ToDictionaryAsync<string>(x => x.ModelId, y => y.IconUrl);
             modelStats.ForEach(x =>
             {
-                if (modelDic.TryGetValue(x.ModelId, out string icon))
+                if (modelDic.TryGetValue(x.ModelId, out string? icon))
                 {
                     x.IconUrl = icon;
                 }

@@ -36,7 +36,7 @@ namespace Sf.Abp.Application.Services
         public static string GetError()
         {
             throw new UserFriendlyException("业务异常");
-            throw new Exception("系统异常");
+            throw new InvalidOperationException("系统异常");
         }
 
 
@@ -100,7 +100,7 @@ namespace Sf.Abp.Application.Services
         }
 
 
-        private static int RequestNumber { get; set; } = 0;
+        private static int RequestNumber { get; set; }
 
         /// <summary>
         /// 速率限制
@@ -142,12 +142,12 @@ namespace Sf.Abp.Application.Services
         /// <summary>
         /// 分布式送abp版本：abp套了一层娃。但是纯粹鸡肋，不建议使用这个
         /// </summary>
-        public IAbpDistributedLock AbpDistributedLock => LazyServiceProvider.LazyGetService<IAbpDistributedLock>();
+        public IAbpDistributedLock AbpDistributedLock => LazyServiceProvider.LazyGetService<IAbpDistributedLock>()!;
 
         /// <summary>
         /// 分布式锁推荐使用版本：yyds，分布式锁永远的神！
         /// </summary>
-        public IDistributedLockProvider DistributedLock => LazyServiceProvider.LazyGetService<IDistributedLockProvider>();
+        public IDistributedLockProvider DistributedLock => LazyServiceProvider.LazyGetService<IDistributedLockProvider>()!;
 
         /// <summary>
         /// 分布式锁
@@ -159,17 +159,18 @@ namespace Sf.Abp.Application.Services
             int number = 0;
             await Parallel.ForAsync(0, 100, async (i, cancellationToken) =>
             {
-                await using (await DistributedLock.AcquireLockAsync("MyLockName"))
+                await using (await DistributedLock.AcquireLockAsync("MyLockName", cancellationToken: cancellationToken))
                 {
                     //执行1秒
                     number += 1;
                 }
             });
             int number2 = 0;
-            await Parallel.ForAsync(0, 100, async (i, cancellationToken) =>
+            await Parallel.ForAsync(0, 100, (i, cancellationToken) =>
             {
                 //执行1秒
                 number2 += 1;
+                return ValueTask.CompletedTask;
             });
             return $"加锁结果：{number},不加锁结果：{number2}";
         }

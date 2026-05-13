@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+#pragma warning disable CA1720 // Identifier contains type name
+#pragma warning disable CA1716 // Identifiers should not match keywords
 
 namespace SharpFort.CodeGen.Domain.Shared.Enums;
 

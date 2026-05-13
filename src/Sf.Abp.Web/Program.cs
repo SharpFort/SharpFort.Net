@@ -11,9 +11,9 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Error)
     .MinimumLevel.Override("Quartz", LogEventLevel.Warning)
     .Enrich.FromLogContext()
-    .WriteTo.Async(c => c.File("logs/all/log-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Debug))
-    .WriteTo.Async(c => c.File("logs/error/errorlog-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Error))
-    .WriteTo.Async(c => c.Console())
+    .WriteTo.Async(c => c.File("logs/all/log-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Debug, formatProvider: System.Globalization.CultureInfo.InvariantCulture))
+    .WriteTo.Async(c => c.File("logs/error/errorlog-.txt", rollingInterval: RollingInterval.Day, restrictedToMinimumLevel: LogEventLevel.Error, formatProvider: System.Globalization.CultureInfo.InvariantCulture))
+    .WriteTo.Async(c => c.Console(formatProvider: System.Globalization.CultureInfo.InvariantCulture))
     .CreateLogger();
 
 try
@@ -35,7 +35,7 @@ try
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
     Log.Information($"当前主机启动环境-【{builder.Environment.EnvironmentName}】");
     Log.Information($"当前主机启动地址-【{builder.Configuration["App:SelfUrl"]}】");
-    builder.WebHost.UseUrls(builder.Configuration["App:SelfUrl"]);
+    builder.WebHost.UseUrls(builder.Configuration["App:SelfUrl"] ?? throw new InvalidOperationException("App:SelfUrl is missing in configuration."));
     builder.Host.UseAutofac();
     builder.Host.UseSerilog();
     await builder.Services.AddApplicationAsync<SfAbpWebModule>();

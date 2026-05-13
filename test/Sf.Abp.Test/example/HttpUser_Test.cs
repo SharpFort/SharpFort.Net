@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Shouldly;
 using Xunit;
 
 namespace Sf.Abp.Test.example
 {
-    public class HttpUser_Test : SfAbpTestWebBase
+    public class HttpUserTest : SfAbpTestWebBase
     {
         [Fact]
-        public void Http_Test()
+        public void HttpTest()
         {
             IHttpContextAccessor httpContext = GetRequiredService<IHttpContextAccessor>();
-            httpContext.HttpContext.Request.Path.ToString().ShouldBe("/test");
+            httpContext.HttpContext!.Request.Path.ToString().ShouldBe("/test");
         }
     }
 }
