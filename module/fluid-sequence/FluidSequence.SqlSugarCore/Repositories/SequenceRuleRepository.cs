@@ -9,7 +9,7 @@ using System.Data;
 
 namespace SharpFort.FluidSequence.SqlSugarCore.Repositories
 {
-    public sealed class SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : SqlSugarRepository<SysSequenceRule, Guid>(dbContextProvider), ISequenceRuleRepository, ITransientDependency
+    public class SequenceRuleRepository(ISugarDbContextProvider<ISqlSugarDbContext> dbContextProvider) : SqlSugarRepository<SysSequenceRule, Guid>(dbContextProvider), ISequenceRuleRepository, ITransientDependency
     {
 
         /// <summary>
