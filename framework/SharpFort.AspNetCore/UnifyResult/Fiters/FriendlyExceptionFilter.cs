@@ -43,11 +43,13 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
             return Task.CompletedTask;
         }
 
-        // 如果异常在其他地方被标记了处理，那么这里不再处理
+        // 注释掉该判断，强行覆盖 ABP 的默认异常拦截，保证返回格式是我们想要的 UnifyResult
         if (context.ExceptionHandled)
         {
             return Task.CompletedTask;
         }
+        // 如果异常在其他地方被标记了处理，那么这里不再处理
+        //if (context.ExceptionHandled) return;
 
         // 解析异常信息
         ExceptionMetadata exceptionMetadata = GetExceptionMetadata(context);
@@ -55,6 +57,9 @@ public sealed partial class FriendlyExceptionFilter(ILogger<FriendlyExceptionFil
         IUnifyResultProvider unifyResult = context.GetRequiredService<IUnifyResultProvider>();
         // 执行规范化异常处理
         context.Result = unifyResult.OnException(context, exceptionMetadata);
+
+        // 标记异常已处理，防止后续异常过滤器（如 AbpExceptionFilter）覆盖返回值导致 500 错误
+        context.ExceptionHandled = true;
 
         // 记录拦截日志
         LogException(context.Exception, context.Exception.Message);

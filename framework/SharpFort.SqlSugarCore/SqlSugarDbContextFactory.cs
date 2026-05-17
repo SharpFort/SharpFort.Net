@@ -108,11 +108,9 @@ namespace SharpFort.SqlSugarCore
             //   确保同一个请求作用域内共享同一个连接上下文，
             //   从而让 ABP 和 Casbin 共用同一个连接，避免锁冲突。
             //
-            // 【原有代码】（可能导致 SQLite 死锁）：
-            SqlSugarClient = new SqlSugarClient(connectionConfig);
-            //
+            // SqlSugarClient = new SqlSugarClient(connectionConfig);
             // 【新代码】（推荐，对所有数据库都安全）：
-            // SqlSugarClient = new SqlSugarScope(connectionConfig);
+            SqlSugarClient = new SqlSugarScope(connectionConfig);
 
             // 配置数据库AOP
             ConfigureDbAop(SqlSugarClient);

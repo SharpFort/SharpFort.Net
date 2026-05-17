@@ -45,7 +45,7 @@ public class Table : FullAuditedAggregateRoot<Guid>
     /// 关系：1对多
     /// </summary>
     [Navigate(NavigateType.OneToMany, nameof(Field.TableId))]
-    public List<Field> Fields { get; set; }
+    public List<Field> Fields { get; set; } = null!;
 
     // IsDeleted, CreationTime, CreatorId 由基类自动实现
 

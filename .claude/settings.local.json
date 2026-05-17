@@ -70,7 +70,11 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:github.com)",
       "Bash(gh search *)",
-      "PowerShell(gh search *)"
+      "PowerShell(gh search *)",
+      "Bash(Select-String -Pattern \"VerifyPassword|Salt|MD5|SHA512\" -Context 3,5)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(Select-String -Pattern \"SqlSugar|sqlSugar\" -Context 1,0)",
+      "WebFetch(domain:gitee.com)"
     ],
     "deny": [],
     "ask": []

@@ -193,7 +193,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// [Navigate] 用于递归加载树
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(ParentId))]
-        public List<Menu> Children { get; set; } = [];
+        public List<Menu> Children { get; set; } = null!;
 
         #endregion
 

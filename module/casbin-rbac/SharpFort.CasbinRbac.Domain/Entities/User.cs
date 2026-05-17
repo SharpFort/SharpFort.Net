@@ -182,14 +182,14 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// 跨聚合关系，通过中间表 UserRole 连接
         /// </summary>
         [Navigate(typeof(UserRole), nameof(UserRole.UserId), nameof(UserRole.RoleId))]
-        public List<Role> Roles { get; set; } = [];
+        public List<Role> Roles { get; set; } = null!;
 
         /// <summary>
         /// 岗位集合
         /// 跨聚合关系，通过中间表 UserPosition 连接
         /// </summary>
         [Navigate(typeof(UserPosition), nameof(UserPosition.UserId), nameof(UserPosition.PostId))]
-        public List<Position> Posts { get; set; } = [];
+        public List<Position> Posts { get; set; } = null!;
 
         #endregion
 

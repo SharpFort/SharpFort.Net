@@ -43,5 +43,5 @@ public class AiProvider : FullAuditedAggregateRoot<Guid>, IOrderNum
     /// 关联的模型
     /// </summary>
     [Navigate(NavigateType.OneToMany, nameof(AiModel.AiProviderId))]
-    public List<AiModel> AiModels { get; set; } = [];
+    public List<AiModel> AiModels { get; set; } = null!;
 }

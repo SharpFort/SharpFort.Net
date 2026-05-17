@@ -52,17 +52,17 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             //判断用户状态
             if (!userInfo.User.State)
             {
-                throw new UserFriendlyException(UserConst.State_Is_State);
+                throw new UserFriendlyException(UserConst.State_Is_State, code: "LOGIN_ERR_003");
             }
 
             // 临时注释，允许无角色/无权限用户登录
             if (userInfo.RoleCodes.Count == 0)
             {
-                throw new UserFriendlyException(UserConst.No_Role);
+                throw new UserFriendlyException(UserConst.No_Role, code: "LOGIN_ERR_004");
             }
             if (userInfo.PermissionCodes.Count == 0)
             {
-                throw new UserFriendlyException(UserConst.No_Permission);
+                throw new UserFriendlyException(UserConst.No_Permission, code: "LOGIN_ERR_005");
             }
 
             if (getUserInfo is not null)
@@ -142,9 +142,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     }
                     return;
                 }
-                throw new UserFriendlyException(UserConst.Login_Error);
+                throw new UserFriendlyException(UserConst.Login_Error, code: "LOGIN_ERR_001");
             }
-            throw new UserFriendlyException(UserConst.Login_User_No_Exist);
+            throw new UserFriendlyException(UserConst.Login_User_No_Exist, code: "LOGIN_ERR_002");
         }
 
         /// <summary>

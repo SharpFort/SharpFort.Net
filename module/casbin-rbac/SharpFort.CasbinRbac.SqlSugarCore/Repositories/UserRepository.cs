@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using SqlSugar;
 using Volo.Abp.DependencyInjection;
 using SharpFort.CasbinRbac.Domain.Entities;
@@ -18,10 +18,13 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Repositories
         /// <exception cref="ArgumentNullException"></exception>
         public async Task<List<User>> GetListUserAllInfoAsync(List<Guid> userIds)
         {
-            List<User> users = await _DbQueryable.Where(x => userIds.Contains(x.Id)).Includes(u => u.Roles.Where(r => !r.IsDeleted).ToList(), r => r.Menus.Where(m => !m.IsDeleted).ToList()).ToListAsync();
+            List<User> users = await _DbQueryable
+                .Where(x => userIds.Contains(x.Id))
+                .Includes(u => u.Roles.Where(r => !r.IsDeleted).ToList(),
+                          r => r.Menus.Where(m => !m.IsDeleted).ToList())
+                .ToListAsync();
             return users;
         }
-
 
         /// <summary>
         /// 获取用户id的全部信息
@@ -31,13 +34,11 @@ namespace SharpFort.CasbinRbac.SqlSugarCore.Repositories
         /// <exception cref="ArgumentNullException"></exception>
         public async Task<User> GetUserAllInfoAsync(Guid userId)
         {
-            //得到用户
-            User user = await _DbQueryable.Includes(u => u.Roles.Where(r => !r.IsDeleted).ToList(), r => r.Menus.Where(m => !m.IsDeleted).ToList()).InSingleAsync(userId);
+            User user = await _DbQueryable
+                .Includes(u => u.Roles.Where(r => !r.IsDeleted).ToList(),
+                          r => r.Menus.Where(m => !m.IsDeleted).ToList())
+                .InSingleAsync(userId);
             return user;
         }
-
-
-
-
     }
 }

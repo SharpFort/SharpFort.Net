@@ -126,7 +126,7 @@ namespace SharpFort.CasbinRbac.Domain.Entities
         /// [Navigate] 用于向下递归查找
         /// </summary>
         [Navigate(NavigateType.OneToMany, nameof(ParentId))]
-        public List<Department> Children { get; set; } = [];
+        public List<Department> Children { get; set; } = null!;
 
         #endregion
 
