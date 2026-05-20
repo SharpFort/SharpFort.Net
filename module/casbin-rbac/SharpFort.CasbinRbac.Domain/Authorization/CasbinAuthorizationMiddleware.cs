@@ -32,7 +32,15 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             {
                 foreach (string ignoreUrl in _options.IgnoreUrls)
                 {
-                    if (path.StartsWith(ignoreUrl, StringComparison.OrdinalIgnoreCase))
+                    if (ignoreUrl.StartsWith("exact:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (path.Equals(ignoreUrl.Substring(6), StringComparison.OrdinalIgnoreCase))
+                        {
+                            await next(context);
+                            return;
+                        }
+                    }
+                    else if (path.StartsWith(ignoreUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         await next(context);
                         return;

@@ -28,15 +28,18 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
             context.Services.AddSfDbContext<SfCasbinRbacDbContext>();
             context.Services.AddTransient<SfCasbinRbacDbContext>();
 
-            // 1. Adapter (Scoped)
-            context.Services.AddScoped<IAdapter>(sp =>
+            // 1. Adapter (Singleton)
+            context.Services.AddSingleton<IAdapter>(sp =>
             {
-                ISqlSugarDbContext dbContext = sp.GetRequiredService<ISqlSugarDbContext>();
+                // Create a scope to resolve the scoped/transient DbContext to avoid captive dependency validation errors
+                using var scope = sp.CreateScope();
+                ISqlSugarDbContext dbContext = scope.ServiceProvider.GetRequiredService<ISqlSugarDbContext>();
+                // SqlSugarClient is actually a SqlSugarScope (thread-safe), so it can safely be held by a singleton adapter
                 return new SqlSugarAdapter(dbContext.SqlSugarClient);
             });
 
-            // 2. Enforcer (Scoped) - Supports CachedEnforcer based on configuration
-            context.Services.AddScoped<IEnforcer>(sp =>
+            // 2. Enforcer (Singleton) - Supports CachedEnforcer based on configuration
+            context.Services.AddSingleton<IEnforcer>(sp =>
             {
                 IConfiguration config = sp.GetRequiredService<IConfiguration>();
                 CasbinOptions casbinOptions = config.GetSection("Casbin").Get<CasbinOptions>() ?? new CasbinOptions();
