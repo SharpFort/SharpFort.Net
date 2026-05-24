@@ -90,5 +90,19 @@ public class AiModel : Entity<Guid>, IOrderNum, ISoftDelete
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 
+    /// <summary>
+    /// AI平台类型
+    /// </summary>
+    public AiPlatformType AiPlatformType { get; set; } = AiPlatformType.OpenAI;
+
+    /// <summary>
+    /// AI模型能力类型（对话/嵌入/重排）
+    /// </summary>
+    public AiModelType AiModelType { get; set; } = AiModelType.Chat;
+
+    /// <summary>
+    /// 矢量值大小（嵌入模型使用）
+    /// </summary>
+    public int EmbeddingValueSize { get; set; } = 2048;
 
 }

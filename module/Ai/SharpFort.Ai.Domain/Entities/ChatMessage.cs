@@ -91,4 +91,10 @@ public class ChatMessage : FullAuditedAggregateRoot<Guid>
     /// 是否隐藏
     /// </summary>
     public bool IsHidden { get; set; }
+
+    /// <summary>
+    /// 附件文件名
+    /// </summary>
+    [SugarColumn(Length = 500)]
+    public string? FileName { get; set; }
 }

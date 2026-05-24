@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\Ai\" -Recurse -File)",
+      "Bash(Select-Object FullName, Length)",
+      "Bash(Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem -Path \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\Ai\" -Recurse -Directory | ForEach-Object { $_.FullName.Replace\\(\"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\Ai\\\\\", \"\"\\) } | Sort-Object)",
+      "PowerShell(New-Item *)",
+      "Bash(New-Item *)",
+      "Bash(dotnet build *)",
+      "PowerShell(Get-ChildItem -Recurse -File \"E:\\\\Projects\\\\NetCoreKevin-master\\\\Kevin\\\\kevin.Module\\\\kevin.AI.AgentFramework\\\\Skills\\\\\" | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(git *)"
+    ]
+  }
+}

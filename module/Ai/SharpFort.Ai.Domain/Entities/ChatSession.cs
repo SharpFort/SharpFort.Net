@@ -27,4 +27,15 @@ public class ChatSession : FullAuditedAggregateRoot<Guid>
     /// 会话类型
     /// </summary>
     public SessionType SessionType { get; set; } = SessionType.Chat;
+
+    /// <summary>
+    /// 绑定AI应用ID
+    /// </summary>
+    public Guid? AppId { get; set; }
+
+    /// <summary>
+    /// 最后一条消息摘要
+    /// </summary>
+    [SugarColumn(Length = 500)]
+    public string? LastMessage { get; set; }
 }
