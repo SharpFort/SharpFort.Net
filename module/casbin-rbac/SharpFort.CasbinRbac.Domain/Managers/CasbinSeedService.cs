@@ -40,15 +40,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             string connectionString = _roleRepo._Db.CurrentConnectionConfig.ConnectionString;
             DbType dbType = _roleRepo._Db.CurrentConnectionConfig.DbType;
-            string domain = "default";
 
             // ========== PHASE 1: READ DATA ==========
             LogReadPhaseStart();
             Stopwatch phaseSw = Stopwatch.StartNew();
 
-            // Use anonymous types to avoid protected setter issues
-            List<(Guid Id, string RoleCode, string RoleName, bool State)> roleData;
-            List<(Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State)> menuData;
+            // B-02: 添加 tenant_id 支持多租户
+            List<(Guid Id, string RoleCode, string RoleName, bool State, Guid? TenantId)> roleData;
+            List<(Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State, Guid? TenantId)> menuData;
             List<(Guid RoleId, Guid MenuId)> roleMenuData;
             List<(Guid UserId, Guid RoleId)> userRoleData;
 
@@ -64,10 +63,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 Stopwatch stepSw = Stopwatch.StartNew();
                 LogReadingRoleTable();
 
-                // Use raw SQL to avoid entity mapping issues with TenantId field
-                // We only need: id, role_code, role_name, state (no tenant_id needed)
+                // B-02: 增加 tenant_id 查询支持多租户
                 string roleQuery = @"
-                    SELECT id, role_code, role_name, state
+                    SELECT id, role_code, role_name, state, tenant_id
                     FROM casbin_sys_role
                     WHERE is_deleted = false";
 
@@ -76,7 +74,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     Id: (Guid)r.id,
                     RoleCode: (string)r.role_code,
                     RoleName: (string)r.role_name,
-                    State: (bool)r.state
+                    State: (bool)r.state,
+                    TenantId: r.tenant_id != DBNull.Value ? (Guid?)r.tenant_id : null
                 ))];
 
                 LogTableReadComplete("Role", roleData.Count, stepSw.ElapsedMilliseconds);
@@ -84,9 +83,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 stepSw.Restart();
                 LogReadingMenuTable();
 
-                // Use raw SQL for Menu table
+                // B-02: 增加 tenant_id 查询支持多租户
                 string menuQuery = @"
-                    SELECT id, menu_name, api_url, api_method, state
+                    SELECT id, menu_name, api_url, api_method, state, tenant_id
                     FROM casbin_sys_menu
                     WHERE is_deleted = false";
 
@@ -96,7 +95,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                     MenuName: (string)m.menu_name,
                     ApiUrl: m.api_url != null ? (string)m.api_url : "",
                     ApiMethod: m.api_method != null ? (string)m.api_method : "",
-                    State: (bool)m.state
+                    State: (bool)m.state,
+                    TenantId: m.tenant_id != DBNull.Value ? (Guid?)m.tenant_id : null
                 ))];
 
                 LogTableReadComplete("Menu", menuData.Count, stepSw.ElapsedMilliseconds);
@@ -136,20 +136,17 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             // *** READ CLIENT IS NOW DISPOSED ***
             LogReadPhaseComplete(phaseSw.ElapsedMilliseconds);
 
-            // Small delay to ensure connection is fully released
-            await Task.Delay(100);
-
             // ========== PHASE 2: BUILD RULES IN MEMORY ==========
             LogProcessPhaseStart();
             phaseSw.Restart();
 
-            // Build dictionaries for fast lookup
-            Dictionary<Guid, (string RoleCode, string RoleName)> roleDic = [];
-            foreach ((Guid Id, string RoleCode, string RoleName, bool State) in roleData)
+            // Build dictionaries for fast lookup (B-02: include TenantId for domain)
+            Dictionary<Guid, (string RoleCode, string RoleName, Guid? TenantId)> roleDic = [];
+            foreach ((Guid Id, string RoleCode, string RoleName, bool State, Guid? TenantId) in roleData)
             {
                 if (!string.IsNullOrEmpty(RoleCode))
                 {
-                    roleDic[Id] = (RoleCode, RoleName);
+                    roleDic[Id] = (RoleCode, RoleName, TenantId);
                 }
                 else
                 {
@@ -158,11 +155,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             }
             LogValidRolesLoaded(roleDic.Count);
 
-            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod)> menuDic = [];
+            Dictionary<Guid, (string MenuName, string ApiUrl, string ApiMethod, Guid? TenantId)> menuDic = [];
             int menuWithApiCount = 0;
-            foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State) in menuData)
+            foreach ((Guid Id, string MenuName, string ApiUrl, string ApiMethod, bool State, Guid? TenantId) in menuData)
             {
-                menuDic[Id] = (MenuName, ApiUrl, ApiMethod);
+                menuDic[Id] = (MenuName, ApiUrl, ApiMethod, TenantId);
                 if (!string.IsNullOrEmpty(ApiUrl))
                 {
                     menuWithApiCount++;
@@ -179,13 +176,20 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             foreach ((Guid RoleId, Guid MenuId) in roleMenuData)
             {
-                if (!roleDic.TryGetValue(RoleId, out (string RoleCode, string RoleName) role))
+                if (!roleDic.TryGetValue(RoleId, out (string RoleCode, string RoleName, Guid? TenantId) role))
                 {
                     skippedRoles++;
                     continue;
                 }
 
-                if (!menuDic.TryGetValue(MenuId, out (string MenuName, string ApiUrl, string ApiMethod) menu))
+                if (!menuDic.TryGetValue(MenuId, out (string MenuName, string ApiUrl, string ApiMethod, Guid? TenantId) menu))
+                {
+                    skippedMenus++;
+                    continue;
+                }
+
+                // IMPROVE-03: 安全校验——如果菜单设置了租户隔离，且和角色的租户不一致，则跳过以防越权授权
+                if (menu.TenantId.HasValue && role.TenantId.HasValue && menu.TenantId.Value != role.TenantId.Value)
                 {
                     skippedMenus++;
                     continue;
@@ -198,11 +202,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 }
 
                 string method = string.IsNullOrEmpty(menu.ApiMethod) ? "*" : menu.ApiMethod.ToUpper(CultureInfo.InvariantCulture);
+                string domain = role.TenantId?.ToString() ?? "default";
 
                 rulesToInsert.Add(new CasbinRule
                 {
                     PType = "p",
-                    V0 = role.RoleCode, // Use RoleCode for better readability
+                    V0 = role.RoleCode,
                     V1 = domain,
                     V2 = menu.ApiUrl,
                     V3 = method
@@ -227,17 +232,19 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             foreach ((Guid UserId, Guid RoleId) in userRoleData)
             {
-                if (!roleDic.TryGetValue(RoleId, out (string RoleCode, string RoleName) role))
+                if (!roleDic.TryGetValue(RoleId, out (string RoleCode, string RoleName, Guid? TenantId) role))
                 {
                     skippedUserRoles++;
                     continue;
                 }
 
+                string domain = role.TenantId?.ToString() ?? "default";
+
                 rulesToInsert.Add(new CasbinRule
                 {
                     PType = "g",
-                    V0 = UserId.ToString(), // Use userId directly (no prefix)
-                    V1 = role.RoleCode, // Use RoleCode for consistency
+                    V0 = UserId.ToString(),
+                    V1 = role.RoleCode,
                     V2 = domain
                 });
             }

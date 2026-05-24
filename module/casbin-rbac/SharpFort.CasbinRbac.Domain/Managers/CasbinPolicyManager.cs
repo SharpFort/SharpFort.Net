@@ -7,7 +7,6 @@ using SharpFort.SqlSugarCore.Abstractions;
 using Casbin.Adapter.SqlSugar.Entities;
 
 
-
 namespace SharpFort.CasbinRbac.Domain.Managers
 {
     public class CasbinPolicyManager(
@@ -20,6 +19,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
         private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
         private readonly ICurrentTenant _currentTenant = currentTenant;
+
+        // 全局写操作互斥锁，消除并发写 Enforcer 内存竞态 (R-02)
+        private static readonly SemaphoreSlim _writeLock = new(1, 1);
 
         #region Helper Methods
 
@@ -42,9 +44,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         #endregion
 
         /// <summary>
-        /// 内存同步核心方法
-        /// 仅在事务成功提交后触发全量重载 (保证最终一致性)
-        /// 使用工作单元Items字典实现防抖，确保一个事务内只注册一次回调
+        /// 延迟内存同步：事务运行期间仅进行 DB 持久化，不碰内存 Enforcer
+        /// 事务成功提交后（OnCompleted），从 DB 全量重载策略到内存 (R-01)
+        /// 非事务环境下则锁定后即时重载
         /// </summary>
         private void TriggerMemorySync()
         {
@@ -55,219 +57,282 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 if (!uow.Items.ContainsKey(syncKey))
                 {
                     uow.Items[syncKey] = true;
-                    uow.OnCompleted(_enforcer.LoadPolicyAsync);
+                    uow.OnCompleted(async () =>
+                    {
+                        await _writeLock.WaitAsync();
+                        try
+                        {
+                            await _enforcer.LoadPolicyAsync();
+                        }
+                        finally
+                        {
+                            _writeLock.Release();
+                        }
+                    });
                 }
             }
             else
             {
-                _enforcer.LoadPolicy();
+                _writeLock.Wait();
+                try
+                {
+                    _enforcer.LoadPolicy();
+                }
+                finally
+                {
+                    _writeLock.Release();
+                }
             }
         }
 
         public async Task AddRoleForUserAsync(User user, Role role)
         {
-            string sub = GetUserSubject(user.Id);
-            string roleSub = GetRoleSubject(role.RoleCode!);
-            string domain = GetTenantDomain(user.TenantId);
-
-            // 1. 持久化
-            // g rule: V0=sub(User), V1=role(Role), V2=domain
-            CasbinRule rule = new()
+            await _writeLock.WaitAsync();
+            try
             {
-                PType = "g",
-                V0 = sub,
-                V1 = roleSub,
-                V2 = domain
-            };
-            await _roleRepository._Db.Insertable(rule).ExecuteCommandAsync();
+                string sub = GetUserSubject(user.Id);
+                string roleSub = GetRoleSubject(role.RoleCode!);
+                string domain = GetTenantDomain(user.TenantId);
 
-            // 2. 内存更新
-            await _enforcer.AddGroupingPolicyAsync(sub, roleSub, domain);
+                CasbinRule rule = new()
+                {
+                    PType = "g",
+                    V0 = sub,
+                    V1 = roleSub,
+                    V2 = domain
+                };
+                await _roleRepository._Db.Insertable(rule).ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
 
             TriggerMemorySync();
         }
 
         public async Task RemoveRoleForUserAsync(User user, Role role)
         {
-            string sub = GetUserSubject(user.Id);
-            string roleSub = GetRoleSubject(role.RoleCode!);
-            string domain = GetTenantDomain(user.TenantId);
+            await _writeLock.WaitAsync();
+            try
+            {
+                string sub = GetUserSubject(user.Id);
+                string roleSub = GetRoleSubject(role.RoleCode!);
+                string domain = GetTenantDomain(user.TenantId);
 
-            // 1. 持久化
-            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "g" && x.V0 == sub && x.V1 == roleSub && x.V2 == domain).ExecuteCommandAsync();
-
-            // 2. 内存更新
-            await _enforcer.RemoveGroupingPolicyAsync(sub, roleSub, domain);
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => x.PType == "g" && x.V0 == sub && x.V1 == roleSub && x.V2 == domain)
+                    .ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
 
             TriggerMemorySync();
         }
 
         public async Task SetUserRolesAsync(User user, List<Role> roles)
         {
-            string sub = GetUserSubject(user.Id);
-            string domain = GetTenantDomain(user.TenantId);
-
-            // 1. 持久化
-            // 先物理删除该用户在该租户下的所有角色关联 (g, sub, ?, domain)
-            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain).ExecuteCommandAsync();
-
-            // 批量插入新关联
-            if (roles.Count > 0)
+            await _writeLock.WaitAsync();
+            try
             {
-                List<CasbinRule> newRules = [.. roles.Select(r => new CasbinRule
+                string sub = GetUserSubject(user.Id);
+                string domain = GetTenantDomain(user.TenantId);
+
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain)
+                    .ExecuteCommandAsync();
+
+                if (roles.Count > 0)
                 {
-                    PType = "g",
-                    V0 = sub,
-                    V1 = GetRoleSubject(r.RoleCode!),
-                    V2 = domain
-                })];
-                await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
+                    List<CasbinRule> newRules = [.. roles.Select(r => new CasbinRule
+                    {
+                        PType = "g",
+                        V0 = sub,
+                        V1 = GetRoleSubject(r.RoleCode!),
+                        V2 = domain
+                    })];
+                    await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
+                }
             }
-
-            // 2. 内存更新
-            // 先清理旧数据 (Standard way: load user roles first then remove)
-            IEnumerable<string> oldRoles = _enforcer.GetRolesForUserInDomain(sub, domain);
-            foreach (string r in oldRoles)
+            finally
             {
-                await _enforcer.RemoveGroupingPolicyAsync(sub, r, domain);
+                _writeLock.Release();
             }
 
-            // 插入新数据
-            if (roles.Count > 0)
-            {
-                List<string[]> policies = [.. roles.Select(r => new[] {
-                    sub,
-                    GetRoleSubject(r.RoleCode!),
-                    domain
-                })];
-
-                await _enforcer.AddGroupingPoliciesAsync(policies);
-            }
-
-            // 3. 触发同步
             TriggerMemorySync();
         }
 
         public async Task SetRolePermissionsAsync(Role role, List<Menu> menus)
         {
-            string roleSub = GetRoleSubject(role.RoleCode!);
-            string domain = GetTenantDomain(role.TenantId);
-
-            // 1. 持久化
-            // 删除该角色在该域下的所有权限 (p, roleSub, domain, ?, ?)
-            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain).ExecuteCommandAsync();
-
-            List<string[]> newPolicies = [];
-            List<CasbinRule> newRules = [];
-
-            foreach (Menu menu in menus)
+            await _writeLock.WaitAsync();
+            try
             {
-                if (string.IsNullOrWhiteSpace(menu.ApiUrl))
+                string roleSub = GetRoleSubject(role.RoleCode!);
+                string domain = GetTenantDomain(role.TenantId);
+
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                    .ExecuteCommandAsync();
+
+                List<CasbinRule> newRules = [];
+
+                foreach (Menu menu in menus)
                 {
-                    continue;
+                    if (string.IsNullOrWhiteSpace(menu.ApiUrl))
+                    {
+                        continue;
+                    }
+
+                    string methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
+
+                    newRules.Add(new CasbinRule
+                    {
+                        PType = "p",
+                        V0 = roleSub,
+                        V1 = domain,
+                        V2 = menu.ApiUrl,
+                        V3 = methods
+                    });
                 }
 
-                string methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
-
-                // 内存对象
-                newPolicies.Add([
-                    roleSub,
-                    domain,
-                    menu.ApiUrl,
-                    methods
-                ]);
-
-                // 数据库对象
-                newRules.Add(new CasbinRule
+                if (newRules.Count > 0)
                 {
-                    PType = "p",
-                    V0 = roleSub,
-                    V1 = domain,
-                    V2 = menu.ApiUrl,
-                    V3 = methods
-                });
+                    await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
+                }
             }
-
-            // 批量插入
-            if (newRules.Count > 0)
+            finally
             {
-                await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
+                _writeLock.Release();
             }
 
-            // 2. 内存更新
-            // 先清理 (Memory way)
-            await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
-
-            // 插入新数据
-            if (newPolicies.Count > 0)
-            {
-                await _enforcer.AddPoliciesAsync(newPolicies);
-            }
-
-            // 3. 触发同步
             TriggerMemorySync();
         }
 
         public async Task InitAdminPermissionAsync(Role adminRole)
         {
-            string roleSub = GetRoleSubject(adminRole.RoleCode!);
-            string domain = GetTenantDomain(adminRole.TenantId);
-
-            // 1. 持久化
-            // 清理
-            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain).ExecuteCommandAsync();
-
-            // 插入无敌规则
-            await _roleRepository._Db.Insertable(new CasbinRule
+            await _writeLock.WaitAsync();
+            try
             {
-                PType = "p",
-                V0 = roleSub,
-                V1 = domain,
-                V2 = "*",
-                V3 = "*"
-            }).ExecuteCommandAsync();
+                string roleSub = GetRoleSubject(adminRole.RoleCode!);
+                string domain = GetTenantDomain(adminRole.TenantId);
 
-            // 2. 内存更新
-            await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
-            await _enforcer.AddPolicyAsync(roleSub, domain, "*", "*");
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                    .ExecuteCommandAsync();
 
-            // 3. 触发同步
+                await _roleRepository._Db.Insertable(new CasbinRule
+                {
+                    PType = "p",
+                    V0 = roleSub,
+                    V1 = domain,
+                    V2 = "*",
+                    V3 = "*"
+                }).ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
+
             TriggerMemorySync();
         }
 
         public async Task CleanRolePoliciesAsync(Role role)
         {
-            string roleSub = GetRoleSubject(role.RoleCode!);
-            string domain = GetTenantDomain(role.TenantId);
+            await _writeLock.WaitAsync();
+            try
+            {
+                string roleSub = GetRoleSubject(role.RoleCode!);
+                string domain = GetTenantDomain(role.TenantId);
 
-            // 1. 持久化
-            // 清理该角色的 p 规则 (权限) 和 g 规则 (作为角色与用户的绑定)
-            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain) || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain)).ExecuteCommandAsync();
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                             || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain))
+                    .ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
 
-            // 2. 内存更新
-            // 移除该角色下所有的 p 规则
-            await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
-            // 移除所有带有该角色的 g 规则 (用户绑定)
-            // _enforcer.RemoveGroupingPolicyAsync is singular, we need to remove by filter
-            await _enforcer.RemoveFilteredGroupingPolicyAsync(1, roleSub, domain);
-
-            // 3. 触发同步
             TriggerMemorySync();
         }
 
         public async Task CleanRolePoliciesByRoleCodeAsync(string roleCode, Guid? tenantId)
         {
-            string roleSub = GetRoleSubject(roleCode);
+            await _writeLock.WaitAsync();
+            try
+            {
+                string roleSub = GetRoleSubject(roleCode);
+                string domain = GetTenantDomain(tenantId);
+
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                             || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain))
+                    .ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
+
+            TriggerMemorySync();
+        }
+
+        /// <summary>
+        /// 迁移角色编码：将旧 RoleCode 的所有 p 规则和 g 规则更新为新 RoleCode (R-05)
+        /// 使用数据库事务原子性更新，避免用户角色关联丢失
+        /// </summary>
+        public async Task MigrateRoleCodeAsync(string oldRoleCode, string newRoleCode, Guid? tenantId)
+        {
             string domain = GetTenantDomain(tenantId);
 
-            // 1. 持久化
-            await _roleRepository._Db.Deleteable<CasbinRule>().Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain) || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain)).ExecuteCommandAsync();
+            await _writeLock.WaitAsync();
+            try
+            {
+                // 更新 g-rules: V1 从旧角色码变更为新角色码
+                // 注意：SetColumns 必须使用初始化器语法进行赋值，== 是比较运算符 (QA5-CRITICAL-01)
+                await _roleRepository._Db.Updateable<CasbinRule>()
+                    .SetColumns(it => new CasbinRule() { V1 = newRoleCode })
+                    .Where(x => x.PType == "g" && x.V1 == oldRoleCode && x.V2 == domain)
+                    .ExecuteCommandAsync();
 
-            // 2. 内存更新
-            await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
-            await _enforcer.RemoveFilteredGroupingPolicyAsync(1, roleSub, domain);
+                // 更新 p-rules: V0 从旧角色码变更为新角色码
+                await _roleRepository._Db.Updateable<CasbinRule>()
+                    .SetColumns(it => new CasbinRule() { V0 = newRoleCode })
+                    .Where(x => x.PType == "p" && x.V0 == oldRoleCode && x.V1 == domain)
+                    .ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
 
-            // 3. 触发同步
+            TriggerMemorySync();
+        }
+
+        /// <summary>
+        /// 清理用户所有的 Casbin 策略（删除用户时调用）(B-08)
+        /// </summary>
+        public async Task CleanUserPoliciesAsync(Guid userId, Guid? tenantId)
+        {
+            await _writeLock.WaitAsync();
+            try
+            {
+                string sub = GetUserSubject(userId);
+                string domain = GetTenantDomain(tenantId);
+
+                await _roleRepository._Db.Deleteable<CasbinRule>()
+                    .Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain)
+                    .ExecuteCommandAsync();
+            }
+            finally
+            {
+                _writeLock.Release();
+            }
+
             TriggerMemorySync();
         }
     }

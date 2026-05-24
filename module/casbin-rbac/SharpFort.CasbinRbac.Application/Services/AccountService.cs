@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using Lazy.Captcha.Core;
@@ -16,6 +17,7 @@ using Volo.Abp.Uow;
 using Volo.Abp.Users;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Account;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
+using SharpFort.CasbinRbac.Domain.Authorization;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.CasbinRbac.Domain.Repositories;
@@ -40,7 +42,8 @@ namespace SharpFort.CasbinRbac.Application.Services
         IGuidGenerator guidGenerator,
         IOptions<RbacOptions> options,
         IAliyunManger aliyunManger,
-        UserManager userManager, IHttpContextAccessor httpContextAccessor) : ApplicationService, IAccountService
+        UserManager userManager, IHttpContextAccessor httpContextAccessor,
+        IJwtBlacklist jwtBlacklist) : ApplicationService, IAccountService
     {
         protected ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
         private readonly IDistributedCache<CaptchaPhoneCacheItem, CaptchaPhoneCacheKey> _phoneCache = phoneCache;
@@ -51,6 +54,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         private readonly IDistributedCache<UserInfoCacheItem, UserInfoCacheKey> _userCache = userCache;
         private readonly UserManager _userManager = userManager;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly IJwtBlacklist _jwtBlacklist = jwtBlacklist;
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ICurrentUser _currentUser = currentUser;
         private readonly IAccountManager _accountManager = accountManager;
@@ -62,7 +66,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         [RemoteService(isEnabled: false)]
         public void ValidationImageCaptcha(string? uuid, string? code)
         {
-            if (_rbacOptions.EnableCaptcha)
+            if (_rbacOptions.EnableImageCaptcha)
             {
                 //登录不想要验证码 ，可不校验
                 if (!_captcha.Validate(uuid, code))
@@ -129,11 +133,12 @@ namespace SharpFort.CasbinRbac.Application.Services
 
                     // 填充解析出来的数据
                     LoginIp = clientInfo.LoginIp,
-                    // 假设你的 LoginEventArgs 里还没加 Location，建议加上，或者你可以把 Location 拼接到 LogMsg 里
-                    // LoginLocation = clientInfo.Location, 
                     Browser = clientInfo.Browser,
                     Os = clientInfo.Os
                 };
+
+                // 补全遗漏的发布调用，激活登录审计日志 (R-07)
+                await LocalEventBus.PublishAsync(loginEto);
             }
 
             return new LoginOutputDto { Token = accessToken, RefreshToken = refreshToken };
@@ -164,7 +169,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         {
             Guid uuid = _guidGenerator.Create();
             CaptchaData captcha = _captcha.Generate(uuid.ToString());
-            bool enableCaptcha = _rbacOptions.EnableCaptcha;
+            bool enableCaptcha = _rbacOptions.EnableImageCaptcha;
             return Task.FromResult(new CaptchaImageDto { Img = captcha.Bytes, Uuid = uuid, IsEnableCaptcha = enableCaptcha });
         }
 
@@ -200,6 +205,7 @@ namespace SharpFort.CasbinRbac.Application.Services
         /// <param name="input"></param>
         /// <returns></returns>
         [HttpPost("account/captcha-phone/repassword")]
+        [AllowAnonymous]
         public async Task<object> PostCaptchaPhoneForRetrievePasswordAsync(PhoneCaptchaImageDto input)
         {
             return await PostCaptchaPhoneAsync(PhoneValidationType.RetrievePassword, input);
@@ -269,8 +275,8 @@ namespace SharpFort.CasbinRbac.Application.Services
             CaptchaPhoneCacheItem? item = await _phoneCache.GetAsync(new CaptchaPhoneCacheKey(validationPhoneType, phone.ToString(CultureInfo.InvariantCulture)));
             if (item is not null && item.Code.Equals($"{code}", StringComparison.Ordinal))
             {
-                //成功，需要清空
-                await _phoneCache.RemoveAsync(new CaptchaPhoneCacheKey(validationPhoneType, code.ToString()));
+                //成功，需要清空（使用手机号而非验证码，修复 R-06 缓存 Key 错配导致可重放攻击）
+                await _phoneCache.RemoveAsync(new CaptchaPhoneCacheKey(validationPhoneType, phone.ToString(CultureInfo.InvariantCulture)));
                 return;
             }
 
@@ -313,13 +319,9 @@ namespace SharpFort.CasbinRbac.Application.Services
             {
                 throw new UserFriendlyException("手机号不能为空");
             }
-            //临时账号
-            if (input.UserName.StartsWith("ls_", StringComparison.Ordinal))
-            {
-                throw new UserFriendlyException("注册账号不能以ls_字符开头");
-            }
+            // ls_ 前缀校验已下沉到 UserManager.ValidateUserName (B-09)
 
-            if (_rbacOptions.EnableCaptcha)
+            if (_rbacOptions.EnablePhoneCaptcha)
             {
                 //校验验证码，根据电话号码获取 value，比对验证码已经uuid
                 await ValidationPhoneCaptchaAsync(PhoneValidationType.Register, input.Phone.Value, input.Code!);
@@ -437,8 +439,20 @@ namespace SharpFort.CasbinRbac.Application.Services
                 // throw new UserFriendlyException("用户已退出");
             }
 
+            // S-07: 拉黑当前 Token 的 JTI
+            string? jti = _currentUser.FindClaim(JwtRegisteredClaimNames.Jti)?.Value;
+            if (!string.IsNullOrEmpty(jti))
+            {
+                string? expClaim = _currentUser.FindClaim("exp")?.Value;
+                if (expClaim != null && long.TryParse(expClaim, out long expSeconds))
+                {
+                    DateTime expTime = DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
+                    _jwtBlacklist.Revoke(jti, expTime);
+                }
+            }
+
             await _userCache.RemoveAsync(new UserInfoCacheKey(userId.Value));
-            //Jwt去中心化登出，只需用记录日志即可
+            //Jwt去中心化登出，JTI 已加入黑名单
             return true;
         }
 

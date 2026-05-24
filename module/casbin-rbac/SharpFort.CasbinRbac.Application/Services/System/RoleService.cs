@@ -82,8 +82,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns></returns>
         public override async Task<RoleGetOutputDto> CreateAsync(RoleCreateInputVo input)
         {
-            bool isExist =
-                await _repository.IsAnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
+            // B-07: 增加租户过滤
+            Guid? currentTenantId = CurrentTenant.Id;
+            bool isExist = await _repository._DbQueryable
+                .Where(x => x.TenantId == currentTenantId)
+                .AnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
             if (isExist)
             {
                 throw new UserFriendlyException(RoleConst.Exist);
@@ -92,11 +95,6 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             Role entity = await MapToEntityAsync(input);
             await _repository.InsertAsync(entity);
 
-            // /* 原代码注释保留 */
-            // // Casbin 同步
-            // await SyncCasbinRolePermissions(entity.Id, input.MenuIds, entity.RoleCode);
-
-            // 修复之后使用 RoleManager 进行统一授权和Casbin分配
             await _roleManager.GiveRoleSetMenuAsync([entity.Id], input.MenuIds ?? []);
 
             RoleGetOutputDto outputDto = await MapToGetOutputDtoAsync(entity);
@@ -114,7 +112,18 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             Role entity = await _repository.GetByIdAsync(id);
 
-            bool isExist = await _repository._DbQueryable.Where(x => x.Id != entity.Id).AnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
+            // MISSING-04: 保护超级管理员角色编码不被修改
+            if (string.Equals(entity.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(input.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UserFriendlyException("超级管理员角色编码不允许修改");
+            }
+
+            // B-07: 增加租户过滤
+            bool isExist = await _repository._DbQueryable
+                .Where(x => x.Id != entity.Id)
+                .Where(x => x.TenantId == entity.TenantId)
+                .AnyAsync(x => x.RoleCode == input.RoleCode || x.RoleName == input.RoleName);
             if (isExist)
             {
                 throw new UserFriendlyException(RoleConst.Exist);
@@ -122,25 +131,19 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             string oldRoleCode = entity.RoleCode!;
 
-            // Map 之后 entity.RoleCode 会更新为新值
             await MapToEntityAsync(input, entity);
 
-            if (oldRoleCode != entity.RoleCode)
-            {
-                await _casbinPolicyManager.CleanRolePoliciesByRoleCodeAsync(oldRoleCode, entity.TenantId);
-            }
-
+            // B-05: 先更新业务表（最关键）
             await _repository.UpdateAsync(entity);
 
-            await _roleManager.GiveRoleSetMenuAsync([id], input.MenuIds ?? []);
+            // R-05: 如果 RoleCode 变更了，使用迁移而非删除（避免 g-rules 丢失）
+            if (oldRoleCode != entity.RoleCode)
+            {
+                await _casbinPolicyManager.MigrateRoleCodeAsync(oldRoleCode, entity.RoleCode!, entity.TenantId);
+            }
 
-            // /* 原代码注释保留 */
-            // // Casbin 同步：更新角色权限
-            // // 使用 RoleCode 作为策略标识，如果 RoleCode 变更，需要删除旧的策略
-            // // 这里我们使用更新后的 RoleCode，如果允许修改 RoleCode，需要额外处理
-            //
-            // await _enforcer.RemoveFilteredPolicyAsync(0, entity.RoleCode);
-            // await SyncCasbinRolePermissions(id, input.MenuIds, entity.RoleCode);
+            // 最后更新菜单策略（SetRolePermissionsAsync 会覆盖旧的 p 规则）
+            await _roleManager.GiveRoleSetMenuAsync([id], input.MenuIds ?? []);
 
             RoleGetOutputDto dto = await MapToGetOutputDtoAsync(entity);
             return dto;
@@ -158,6 +161,13 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public async Task<RoleGetOutputDto> UpdateStateAsync([FromRoute] Guid id, [FromRoute] bool state)
         {
             Role entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("角色未存在");
+
+            // QA5-CRITICAL-02: 禁止禁用超级管理员角色
+            if (!state && string.Equals(entity.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UserFriendlyException("超级管理员角色不允许禁用");
+            }
+
             entity.State = state;
             await _repository.UpdateAsync(entity);
             return await MapToGetOutputDtoAsync(entity);
@@ -278,6 +288,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         public override async Task DeleteAsync(IEnumerable<Guid> ids)
         {
             List<Role> roles = await _repository.GetListAsync(x => ids.Contains(x.Id));
+
+            // QA5-CRITICAL-02: 禁止删除超级管理员角色
+            if (roles.Any(r => string.Equals(r.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new UserFriendlyException("超级管理员角色不允许删除");
+            }
 
             await base.DeleteAsync(ids);
 
