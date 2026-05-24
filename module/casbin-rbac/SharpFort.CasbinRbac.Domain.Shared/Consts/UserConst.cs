@@ -28,5 +28,8 @@ namespace SharpFort.CasbinRbac.Domain.Shared.Consts
 
         public const string DefaultRoleCode = "default";
         public const string CommonRoleName = "common";
+
+        /// <summary>第三方登录临时账号前缀 (B-09)</summary>
+        public const string OAuthTempPrefix = "ls_";
     }
 }

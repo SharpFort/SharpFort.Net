@@ -43,5 +43,15 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// 用于角色编码变更时清理旧编码的策略
         /// </summary>
         Task CleanRolePoliciesByRoleCodeAsync(string roleCode, Guid? tenantId);
+
+        /// <summary>
+        /// 当角色编码变更时，在底层迁移所有关联的 p 规则和 g 规则，避免用户角色关联丢失 (R-05)
+        /// </summary>
+        Task MigrateRoleCodeAsync(string oldRoleCode, string newRoleCode, Guid? tenantId);
+
+        /// <summary>
+        /// 清理用户所有的 Casbin 策略（删除用户时调用）(B-08)
+        /// </summary>
+        Task CleanUserPoliciesAsync(Guid userId, Guid? tenantId);
     }
 }

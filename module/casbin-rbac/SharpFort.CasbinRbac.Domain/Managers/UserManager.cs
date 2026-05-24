@@ -146,6 +146,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 throw new UserFriendlyException("用户名无效注册！");
             }
 
+            // B-09: 第三方登录临时账号前缀限制下沉到领域层
+            if (input.UserName!.StartsWith(UserConst.OAuthTempPrefix, StringComparison.Ordinal))
+            {
+                throw new UserFriendlyException("注册账号不能以ls_字符开头");
+            }
+
             if (input.UserName!.Length < 2)
             {
                 throw new UserFriendlyException("账号名需大于等于2位！");
@@ -167,7 +173,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             return data is null ? throw new AbpAuthorizationException() : data;
         }
 
-        private async Task<UserRoleMenuDto> GetInfoByCacheAsync(Guid userId)
+        public async Task<UserRoleMenuDto> GetInfoByCacheAsync(Guid userId)
         {
             UserRoleMenuDto? output = null;
             long tokenExpiresMinuteTime = LazyServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value.ExpiresMinuteTime;

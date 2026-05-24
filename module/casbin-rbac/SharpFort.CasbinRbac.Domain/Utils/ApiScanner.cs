@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Volo.Abp.DependencyInjection;
@@ -104,6 +105,10 @@ namespace SharpFort.CasbinRbac.Domain.Utils
 
             path = path.Replace("[controller]", cName, StringComparison.OrdinalIgnoreCase);
             path = path.Replace("[action]", actionName, StringComparison.OrdinalIgnoreCase);
+
+            // B-06: 将 ASP.NET {param} 格式转换为 Casbin :param 格式
+            path = Regex.Replace(path, @"\{(\w+)\??\}", @":$1");
+
             return path;
         }
     }

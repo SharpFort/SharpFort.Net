@@ -1,4 +1,3 @@
-using Casbin;
 using Microsoft.AspNetCore.Mvc;
 using MiniExcelLibs;
 using System.Globalization;
@@ -26,9 +25,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     public class UserService(ISqlSugarRepository<User, Guid> repository, UserManager userManager,
         ICurrentUser currentUser, IDeptService deptService,
         ILocalEventBus localEventBus,
-        IEnforcer enforcer) : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
+        ICasbinPolicyManager casbinPolicyManager) : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
         UserGetListInputVo, UserCreateInputVo, UserUpdateInputVo>(repository), IUserService
-    //IUserService
     {
         protected ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
 
@@ -39,7 +37,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         private ICurrentUser _currentUser { get; set; } = currentUser;
 
         private readonly ILocalEventBus _localEventBus = localEventBus;
-        private readonly IEnforcer _enforcer = enforcer;
+        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
 
         /// <summary>
         /// 批量查询用户
@@ -111,9 +109,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             User entitiy = await MapToEntityAsync(input);
 
-            // 处理密码加密（与 UpdateAsync 保持一致的逻辑）
-            string password = string.IsNullOrEmpty(input.Password) ? "123456" : input.Password;
-            entitiy.SetPassword(password);
+            // R-08: 强制要求管理员在创建用户时设置初始密码
+            if (string.IsNullOrWhiteSpace(input.Password))
+            {
+                throw new UserFriendlyException("创建新用户时，必须显式设置安全的初始密码！", code: "USER_CREATE_001");
+            }
+            entitiy.SetPassword(input.Password);
 
             await _userManager.CreateAsync(entitiy);
             await _userManager.GiveUserSetRoleAsync([entitiy.Id], input.RoleIds ?? []);
@@ -132,36 +133,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 暂时先跳过 Role Code 查询，直接用 RoleId，但最佳实践是 RoleCode
             // 修正：Casbin g策略通常是 g, user_id, role_code, domain_id
 
-            // Casbin 同步逻辑放入 GiveUserSetRoleAsync 或者在这里显式调用
-            // 建议：封装一个私有方法或领域服务处理 Casbin 同步
-            await SyncCasbinUserRoles(entitiy.Id, input.RoleIds ?? []);
+            // Casbin 同步已在 GiveUserSetRoleAsync → SetUserRolesAsync 中完成，此处无需重复
+            // 已删除 SyncCasbinUserRoles 方法，消除双写 Bug (S-02)
 
             UserGetOutputDto result = await MapToGetOutputDtoAsync(entitiy);
             return result;
-        }
-
-        private async Task SyncCasbinUserRoles(Guid userId, List<Guid> roleIds)
-        {
-            if (roleIds.Count == 0)
-            {
-                return;
-            }
-
-            // 获取当前用户的域 (假设单域，或者从 User.DepartmentId 推导，或者默认 "default")
-            // 方案 V1.2: g = _, _, _ (user, role, domain)
-            string domain = "default"; // 默认域
-
-            // 查询实际的 RoleCode
-            List<Role> roles = await _repository._Db.Queryable<Role>().In(roleIds).ToListAsync();
-            List<string> roleCodes = [.. roles.Select(r => r.RoleCode!)];
-
-            List<string[]> policies = [.. roleCodes.Select(roleCode => new[] { userId.ToString(), roleCode, domain })];
-
-            // 必须禁用 AutoSave 并手动 Save，因为在外层事务中
-            // 已在 DI 中全局禁用 AutoSave
-
-            await _enforcer.AddGroupingPoliciesAsync(policies);
-            await _enforcer.SavePolicyAsync();
         }
 
         protected override async Task<User> MapToEntityAsync(UserCreateInputVo createInput)
@@ -214,15 +190,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             await MapToEntityAsync(input, entity);
 
-            bool res1 = await _repository.UpdateAsync(entity);
+            await _repository.UpdateAsync(entity);
             await _userManager.GiveUserSetRoleAsync([id], input.RoleIds ?? []);
             await _userManager.GiveUserSetPostAsync([id], input.PostIds ?? []);
 
-            // Casbin 同步：更新用户角色
-            // 先删除旧的
-            await _enforcer.RemoveFilteredGroupingPolicyAsync(0, id.ToString());
-            // 再添加新的
-            await SyncCasbinUserRoles(id, input.RoleIds ?? []);
+            // Casbin 同步已在 GiveUserSetRoleAsync → SetUserRolesAsync 中完成，此处无需重复
+            // 已删除 RemoveFilteredGroupingPolicyAsync + SyncCasbinUserRoles 双写 (S-02)
 
             return await MapToGetOutputDtoAsync(entity);
         }
@@ -263,9 +236,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         [OperLog("删除用户", OperationType.Delete)]
         public override async Task DeleteAsync(Guid id)
         {
-            // Casbin 同步：删除用户关联
-            await _enforcer.RemoveFilteredGroupingPolicyAsync(0, id.ToString());
-            await _enforcer.SavePolicyAsync();
+            // B-08: 使用 CasbinPolicyManager 统一清理用户策略
+            User? user = await _repository.GetByIdAsync(id);
+            if (user != null)
+            {
+                await _casbinPolicyManager.CleanUserPoliciesAsync(user.Id, user.TenantId);
+            }
 
             await base.DeleteAsync(id);
         }
@@ -317,7 +293,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // MiniExcel 会根据 UserExportOutputDto 上的特性自动处理表头和格式
             await MiniExcel.SaveAsAsync(filePath, exportData);
 
-            return new PhysicalFileResult(filePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            // R-11: FileOptions.DeleteOnClose 确保响应结束后自动删除临时文件
+            FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.DeleteOnClose);
+            return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = fileName
+            };
         }
 
         public override Task PostImportExcelAsync(List<UserCreateInputVo> input)

@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using Casbin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,35 +13,65 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
     /// <summary>
     /// Casbin Authorization Middleware
     /// </summary>
-    public class CasbinAuthorizationMiddleware(
-        ICurrentUser currentUser,
-        ICurrentTenant currentTenant,
-        IEnforcer enforcer,
-        IOptions<CasbinOptions> options) : IMiddleware, ITransientDependency
+    public class CasbinAuthorizationMiddleware : IMiddleware, ITransientDependency
     {
-        private readonly CasbinOptions _options = options.Value;
-        private readonly ICurrentUser _currentUser = currentUser;
-        private readonly ICurrentTenant _currentTenant = currentTenant;
-        private readonly IEnforcer _enforcer = enforcer;
+        private readonly CasbinOptions _options;
+        private readonly ICurrentUser _currentUser;
+        private readonly ICurrentTenant _currentTenant;
+        private readonly IEnforcer _enforcer;
+        private readonly IJwtBlacklist _jwtBlacklist;
+
+        // P-04: 预处理 IgnoreUrls — 精确匹配 O(1) + 前缀匹配 O(m)
+        private readonly HashSet<string> _exactIgnoreUrls;
+        private readonly List<string> _prefixIgnoreUrls;
+
+        public CasbinAuthorizationMiddleware(
+            ICurrentUser currentUser,
+            ICurrentTenant currentTenant,
+            IEnforcer enforcer,
+            IOptions<CasbinOptions> options,
+            IJwtBlacklist jwtBlacklist)
+        {
+            _currentUser = currentUser;
+            _currentTenant = currentTenant;
+            _enforcer = enforcer;
+            _options = options.Value;
+            _jwtBlacklist = jwtBlacklist;
+
+            _exactIgnoreUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            _prefixIgnoreUrls = [];
+
+            if (_options.IgnoreUrls != null)
+            {
+                foreach (string url in _options.IgnoreUrls)
+                {
+                    if (url.StartsWith("exact:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _exactIgnoreUrls.Add(url[6..]);
+                    }
+                    else
+                    {
+                        _prefixIgnoreUrls.Add(url);
+                    }
+                }
+            }
+        }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             string? path = context.Request.Path.Value;
 
-            // 0. Check configured IgnoreUrls from appsettings.json
-            if (!string.IsNullOrEmpty(path) && _options.IgnoreUrls != null && _options.IgnoreUrls.Count > 0)
+            // 0. P-04: IgnoreUrls 检查 — O(1) 精确 + O(m) 前缀
+            if (!string.IsNullOrEmpty(path) && (_exactIgnoreUrls.Count + _prefixIgnoreUrls.Count > 0))
             {
-                foreach (string ignoreUrl in _options.IgnoreUrls)
+                if (_exactIgnoreUrls.Contains(path))
                 {
-                    if (ignoreUrl.StartsWith("exact:", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (path.Equals(ignoreUrl.Substring(6), StringComparison.OrdinalIgnoreCase))
-                        {
-                            await next(context);
-                            return;
-                        }
-                    }
-                    else if (path.StartsWith(ignoreUrl, StringComparison.OrdinalIgnoreCase))
+                    await next(context);
+                    return;
+                }
+                foreach (string prefix in _prefixIgnoreUrls)
+                {
+                    if (path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     {
                         await next(context);
                         return;
@@ -56,6 +87,18 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
                 return;
             }
 
+            // 1.5 S-07: JWT 黑名单检查（在认证检查之前）
+            if (_currentUser.IsAuthenticated)
+            {
+                string? jti = _currentUser.FindClaim(JwtRegisteredClaimNames.Jti)?.Value;
+                if (!string.IsNullOrEmpty(jti) && _jwtBlacklist.IsRevoked(jti))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.Headers["X-Token-Revoked"] = "true";
+                    return;
+                }
+            }
+
             // 2. Identity (sub)
             if (!_currentUser.IsAuthenticated)
             {
@@ -69,16 +112,9 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             string dom = _currentTenant.Id?.ToString() ?? "default";
 
             // 4. Resource (obj)
-            // Strictly use Request Path for RESTful RBAC
-            // Normalizing path: lowercase? 
-            // The DB migration uses the path as stored in Menu (ApiUrl).
-            // We should ensure consistency. 
-            // Let's use the raw path or normalized to lowercase. 
-            // If DB stores "/api/User", and request is "/api/user", we need a match.
-            // keyMatch2 is case-sensitive? 
-            // Usually paths are case-insensitive in Windows but sensitive in Linux.
-            // Best practice: Normalize to lowercase for comparison if the convention allows.
-            string? obj = path; //.ToLower(); // Decided to keep case for now, assuming DB matches registration.
+            // B-06: 统一转小写以确保 keyMatch2 匹配一致性
+            // API 路径在 ASP.NET Core 中大小写不敏感，但 Casbin keyMatch2 大小写敏感
+            string? obj = path?.ToLowerInvariant();
 
             // 5. Action (act)
             string act = context.Request.Method.ToUpperInvariant();

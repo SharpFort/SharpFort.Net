@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
@@ -96,12 +97,66 @@ namespace SharpFort.CasbinRbac.Domain.Operlog
 
             if (operLogAttribute.IsSaveRequestData)
             {
-                logEntity.RequestParam = JsonConvert.SerializeObject(context.ActionArguments);
+                // S-10/R-03: 深层脱敏 — 递归遍历 DTO 属性，遮蔽敏感字段
+                logEntity.RequestParam = GetDesensitizedRequestParam(context);
             }
 
             using (IUnitOfWork uow = _unitOfWorkManager.Begin())
             {
                 await _repository.InsertAsync(logEntity);
+            }
+        }
+
+        // S-10/R-03: 敏感字段关键词（不区分大小写）
+        private static readonly HashSet<string> SensitiveKeys = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "password", "newPassword", "oldPassword", "confirmPassword", "pass", "pwd",
+            "token", "accessToken", "refreshToken", "secret", "securityKey",
+            "code", "smsCode"
+        };
+
+        private static string GetDesensitizedRequestParam(ActionExecutingContext context)
+        {
+            if (context.ActionArguments == null || context.ActionArguments.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                string json = JsonConvert.SerializeObject(context.ActionArguments);
+                JToken token = JToken.Parse(json);
+                MaskSensitiveProperties(token);
+                return token.ToString(Formatting.None);
+            }
+            catch
+            {
+                return "[Serialization Failed]";
+            }
+        }
+
+        private static void MaskSensitiveProperties(JToken token)
+        {
+            if (token is JObject obj)
+            {
+                foreach (JProperty prop in obj.Properties().ToList())
+                {
+                    if (SensitiveKeys.Contains(prop.Name))
+                    {
+                        prop.Value = "***";
+                    }
+                    else
+                    {
+                        MaskSensitiveProperties(prop.Value);
+                    }
+                }
+            }
+            else if (token is JArray arr)
+            {
+                foreach (JToken item in arr)
+                {
+                    MaskSensitiveProperties(item);
+                }
             }
         }
 

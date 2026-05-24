@@ -33,19 +33,26 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         public override async Task<MenuGetOutputDto> CreateAsync(MenuCreateInputVo input)
         {
-            // 防止前端传入重复ID导致唯一约束报错
-            input.Id = Guid.NewGuid();
-
             // 最小权限原则：如果提供了ApiUrl但没有ApiMethod，默认为GET
             if (!string.IsNullOrWhiteSpace(input.ApiUrl) && string.IsNullOrWhiteSpace(input.ApiMethod))
             {
                 input.ApiMethod = "GET";
             }
 
+            // B-06: ApiUrl 统一转小写 + {param} 格式校验
+            if (!string.IsNullOrWhiteSpace(input.ApiUrl))
+            {
+                if (input.ApiUrl.Contains('{'))
+                {
+                    throw new UserFriendlyException("ApiUrl 不支持 {param} 格式，请使用 :param 或 * 通配符。示例：/api/app/user/:id");
+                }
+                input.ApiUrl = input.ApiUrl.ToLowerInvariant();
+            }
+
             // 处理 ApiMethod 转大写
             if (!string.IsNullOrEmpty(input.ApiMethod))
             {
-                input.ApiMethod = input.ApiMethod.ToUpper(CultureInfo.InvariantCulture);  // CA1304
+                input.ApiMethod = input.ApiMethod.ToUpper(CultureInfo.InvariantCulture);
             }
             return await base.CreateAsync(input);
         }
@@ -63,6 +70,16 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (!string.IsNullOrWhiteSpace(input.ApiUrl) && string.IsNullOrWhiteSpace(input.ApiMethod))
             {
                 input.ApiMethod = "GET";
+            }
+
+            // B-06: ApiUrl 统一转小写 + {param} 格式校验
+            if (!string.IsNullOrWhiteSpace(input.ApiUrl))
+            {
+                if (input.ApiUrl.Contains('{'))
+                {
+                    throw new UserFriendlyException("ApiUrl 不支持 {param} 格式，请使用 :param 或 * 通配符。示例：/api/app/user/:id");
+                }
+                input.ApiUrl = input.ApiUrl.ToLowerInvariant();
             }
 
             // 获取旧菜单数据
@@ -104,13 +121,14 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         public override async Task<PagedResultDto<MenuGetListOutputDto>> GetListAsync(MenuGetListInputVo input)
         {
-            RefAsync<int> total = 0;
             List<Menu> entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.MenuName), x => x.MenuName!.Contains(input.MenuName!))
                         .WhereIF(input.State is not null, x => x.State == input.State)
                         .Where(x => x.MenuSource == input.MenuSource)
                         .OrderBy(x => x.OrderNum)
                         .OrderBy(x => x.CreationTime)
                         .ToListAsync();
+            // R-09: 直接以 entities.Count 设置 total，修复分页总数恒为 0 的问题
+            int total = entities.Count;
             return new PagedResultDto<MenuGetListOutputDto>(total, await MapToGetListOutputDtosAsync(entities));
         }
 
@@ -190,9 +208,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// 导入菜单Excel
         /// </summary>
         /// <param name="input">菜单列表数据</param>
-        public override Task PostImportExcelAsync(List<MenuCreateInputVo> input)
+        public override async Task PostImportExcelAsync(List<MenuCreateInputVo> input)
         {
-            return base.PostImportExcelAsync(input);
+            foreach (var item in input)
+            {
+                await CreateAsync(item);
+            }
         }
     }
 }

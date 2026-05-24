@@ -46,8 +46,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <exception cref="UserFriendlyException"></exception>
         public async Task<string> GetTokenByUserIdAsync(Guid userId, Action<UserRoleMenuDto>? getUserInfo = null)
         {
-            //获取用户信息
-            UserRoleMenuDto userInfo = await _userManager.GetInfoAsync(userId);
+            //获取用户信息 (P-01: 使用缓存版本减少 DB 查询)
+            UserRoleMenuDto userInfo = await _userManager.GetInfoByCacheAsync(userId);
 
             //判断用户状态
             if (!userInfo.User.State)
@@ -55,15 +55,17 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 throw new UserFriendlyException(UserConst.State_Is_State, code: "LOGIN_ERR_003");
             }
 
-            // 临时注释，允许无角色/无权限用户登录
-            if (userInfo.RoleCodes.Count == 0)
-            {
-                throw new UserFriendlyException(UserConst.No_Role, code: "LOGIN_ERR_004");
-            }
-            if (userInfo.PermissionCodes.Count == 0)
-            {
-                throw new UserFriendlyException(UserConst.No_Permission, code: "LOGIN_ERR_005");
-            }
+            // B-01: 允许无角色/无权限用户登录
+            // Casbin 中间件会在 API 调用时自动拦截未授权的请求（返回 403）
+            // 如需要拦截完全无权限的用户登录，取消下方注释
+            // if (userInfo.RoleCodes.Count == 0)
+            // {
+            //     throw new UserFriendlyException(UserConst.No_Role, code: "LOGIN_ERR_004");
+            // }
+            // if (userInfo.PermissionCodes.Count == 0)
+            // {
+            //     throw new UserFriendlyException(UserConst.No_Permission, code: "LOGIN_ERR_005");
+            // }
 
             if (getUserInfo is not null)
             {
@@ -85,6 +87,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_jwtOptions.SecurityKey));
             SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
             List<Claim> claims = [.. kvs.Select(x => new Claim(x.Key, x.Value.ToString()))];
+
+            // S-07: 添加 JTI（JWT ID）用于黑名单
+            string jti = Guid.NewGuid().ToString("N");
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, jti));
+
             JwtSecurityToken token = new(
                issuer: _jwtOptions.Issuer,
                audience: _jwtOptions.Audience,

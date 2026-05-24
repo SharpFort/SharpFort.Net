@@ -4,16 +4,11 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu
 {
     /// <summary>
     /// Menu输入创建对象
+    /// 系统字段 Id/CreationTime/CreatorId 由 ABP 审计自动填充
+    /// MenuSource 由实体构造函数默认赋值
     /// </summary>
     public class MenuCreateInputVo
     {
-        public Guid? Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time when the object was created.
-        /// </summary>
-        public DateTime CreationTime { get; set; } = DateTime.Now;
-        public Guid? CreatorId { get; set; }
         public bool State { get; set; }
         public string MenuName { get; set; } = string.Empty;
         public MenuType MenuType { get; set; } = MenuType.Menu;
@@ -28,7 +23,6 @@ namespace SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu
         public string? Component { get; set; }
         public string? Query { get; set; }
         public int OrderNum { get; set; }
-        public MenuSource MenuSource { get; set; } = MenuSource.Ruoyi;
         public string? RouterName { get; set; }
 
         /// <summary>

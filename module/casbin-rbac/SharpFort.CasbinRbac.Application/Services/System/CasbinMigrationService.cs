@@ -24,7 +24,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         /// <returns>迁移结果</returns>
         [HttpPost]
         [Route("api/app/casbin-migration/migrate-all")]
-        [Microsoft.AspNetCore.Authorization.AllowAnonymous] // 临时允许匿名访问，生产环境应该移除
+        // [AllowAnonymous] 已移除：迁移接口走 Casbin 策略表控制，仅 sys-admin 角色可访问
         public async Task<object> MigrateAllAsync()
         {
             try

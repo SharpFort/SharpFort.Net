@@ -41,8 +41,9 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                 return;
             }
 
-            // 管理员跳过过滤
-            if (CurrentUser.UserName == UserConst.Admin || CurrentUser.Roles.Contains(UserConst.AdminRolesCode))
+            // R-10: 管理员跳过过滤（大小写不敏感判定）
+            if (string.Equals(CurrentUser.UserName, UserConst.Admin, StringComparison.OrdinalIgnoreCase)
+                || CurrentUser.Roles.Contains(UserConst.AdminRolesCode))
             {
                 return;
             }
