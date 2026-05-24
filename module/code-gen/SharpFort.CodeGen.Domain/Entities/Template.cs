@@ -47,6 +47,12 @@ public class Template : FullAuditedAggregateRoot<Guid>
     [SugarColumn(ColumnName = "remarks", Length = 512, IsNullable = true)]
     public string? Remarks { get; private set; }
 
+    /// <summary>
+    /// 模板引擎类型 (Scriban 或 Legacy)
+    /// </summary>
+    [SugarColumn(ColumnName = "template_engine", Length = 20, IsNullable = false)]
+    public string? TemplateEngine { get; set; } = "Scriban";
+
     // IsDeleted, CreationTime, CreatorId, LastModificationTime 由基类自动实现
 
     /// <summary>

@@ -1,116 +1,251 @@
-﻿//using Volo.Abp.Data;
-//using Volo.Abp.DependencyInjection;
-//using Volo.Abp.Guids;
-//using SharpFort.CodeGen.Domain.Entities;
-//using SharpFort.SqlSugarCore.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Volo.Abp.Data;
+using Volo.Abp.DependencyInjection;
+using SharpFort.CodeGen.Domain.Entities;
+using SharpFort.SqlSugarCore.Abstractions;
 
-//namespace SharpFort.CodeGen.SqlSugarCore
-//{
-//    public class TemplateDataSeed : IDataSeedContributor, ITransientDependency
-//    {
-//        private ISqlSugarRepository<Template> _repository;
-//        public TemplateDataSeed(ISqlSugarRepository<Template> repository)
-//        {
-//            _repository = repository;
-//        }
-//        public async Task SeedAsync(DataSeedContext context)
-//        {
-//            if (!await _repository.IsAnyAsync(x => true))
-//            {
-//                await _repository.InsertManyAsync(GetSeedData());
-//            }
-//        }
-//        public List<Template> GetSeedData()
-//        {
-//            var entities = new List<Template>();
-//            Template entityTemplate = new Template()
-//            {
-//                Name = "Entity",
-//                BuildPath = "D:\\code\\Entities\\@ModelEntity.cs",
-//                Remarks = "实体",
-//                TemplateStr = "using SqlSugar;\r\nusing lo.Abp;\r\nusing lo.Abp.Auditing;\r\nusing lo.Abp.Domain.Entities;\r\nusing SharpFort.Core.Data;\r\n\r\nnamespace SharpFort.Rbac.Domain.Entities\r\n{\r\n    /// <summary>\r\n    /// 实体\r\n    /// </summary>\r\n    [SugarTable(\"@Model\")]\r\n    public class @ModelEntity : Entity<Guid>\r\n    {\r\n@field\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(entityTemplate);
+namespace SharpFort.CodeGen.SqlSugarCore
+{
+    /// <summary>
+    /// CodeGen 默认模板数据种子
+    /// </summary>
+    public class TemplateDataSeed : IDataSeedContributor, ITransientDependency
+    {
+        private readonly ISqlSugarRepository<Template> _repository;
 
+        public TemplateDataSeed(ISqlSugarRepository<Template> repository)
+        {
+            _repository = repository;
+        }
 
-//            Template getListInputTemplate = new Template()
-//            {
-//                Name = "GetListInput",
-//                BuildPath = "D:\\code\\Dtos\\@Model\\@ModelGetListInput.cs",
-//                Remarks = "列表查询参数",
-//                TemplateStr = "using SharpFort.Ddd;\r\nusing SharpFort.Ddd.Application.Contracts;\r\n\r\nnamespace SharpFort.Rbac.Application.Contracts.Dtos.@Model\r\n{\r\n    /// <summary>\r\n    /// 查询参数\r\n    /// </summary>\r\n    public class @ModelGetListInput : PagedAllResultRequestDto\r\n    {\r\n@field\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(getListInputTemplate);
+        public async Task SeedAsync(DataSeedContext context)
+        {
+            if (!await _repository.IsAnyAsync(x => true))
+            {
+                await _repository.InsertManyAsync(GetSeedData());
+            }
+        }
 
+        public List<Template> GetSeedData()
+        {
+            var entities = new List<Template>();
 
-//            Template getListOutputDtoTemplate = new Template()
-//            {
-//                Name = "GetListOutputDto",
-//                BuildPath = "D:\\code\\Dtos\\@Model\\@ModelGetListOutputDto.cs",
-//                Remarks = "列表返回dto",
-//                TemplateStr = "using lo.Abp.Application.Dtos;\r\n\r\nnamespace SharpFort.Rbac.Application.Contracts.Dtos.@Model\r\n{\r\n    public class @ModelGetListOutputDto : EntityDto<Guid>\r\n    {\r\n@field\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(getListOutputDtoTemplate);
+            // 1. Domain Entity 模板
+            entities.Add(new Template(
+                Guid.Parse("673752e5-3ba5-48fa-bb6d-978d46a81e3a"),
+                "Entity",
+                "module/{{Module}}/SharpFort.{{Module}}.Domain/Entities/{{Model}}Entity.cs",
+                @"using SqlSugar;
+using Volo.Abp.Domain.Entities;
 
+namespace {{RootNamespace}}.{{Module}}.Domain.Entities
+{
+    /// <summary>
+    /// {{Table.Description}} 实体定义
+    /// </summary>
+    [SugarTable(""{{Table.Name}}"")]
+    public class {{Model}}Entity : Entity<Guid>
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != ""Id"" && field.Name != ""IsDeleted"" && field.Name != ""CreationTime"" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        {{ sugar_column field }}
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; } = {{ default_value field }};
 
-//            Template getOutputDtoTemplate = new Template()
-//            {
-//                Name = "GetOutputDto",
-//                BuildPath = "D:\\code\\Dtos\\@Model\\@ModelGetOutputDto.cs",
-//                Remarks = "单返回dto",
-//                TemplateStr = "using lo.Abp.Application.Dtos;\r\n\r\nnamespace SharpFort.Rbac.Application.Contracts.Dtos.@Model\r\n{\r\n    public class @ModelGetOutputDto : EntityDto<Guid>\r\n    {\r\n@field\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(getOutputDtoTemplate);
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
 
-//            Template updateInputTemplate = new Template()
-//            {
-//                Name = "UpdateInput",
-//                BuildPath = "D:\\code\\Dtos\\@Model\\@ModelUpdateInput.cs",
-//                Remarks = "更新输入",
-//                TemplateStr = "namespace SharpFort.Rbac.Application.Contracts.Dtos.@Model\r\n{\r\n    public class @ModelUpdateInput\r\n    {\r\n@field\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(updateInputTemplate);
+            // 2. Dto GetListInput
+            entities.Add(new Template(
+                Guid.Parse("7fa2b98e-4a6c-48b4-8254-1b3260c6d7a1"),
+                "GetListInput",
+                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListInput.cs",
+                @"using SharpFort.Ddd.Application.Contracts;
 
-//            Template createInputTemplate = new Template()
-//            {
-//                Name = "CreateInput",
-//                BuildPath = "D:\\code\\Dtos\\@Model\\@ModelCreateInput.cs",
-//                Remarks = "创建dto",
-//                TemplateStr = "namespace SharpFort.Rbac.Application.Contracts.Dtos.@Model\r\n{\r\n    /// <summary>\r\n    /// @Model输入创建对象\r\n    /// </summary>\r\n    public class @ModelCreateInput\r\n    {\r\n@field\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(createInputTemplate);
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 列表查询输入 DTO
+    /// </summary>
+    public class {{Model}}GetListInput : PagedAllResultRequestDto
+    {
+        /// <summary>
+        /// 模糊关键字查询
+        /// </summary>
+        public string? Filter { get; set; }
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
 
+            // 3. Dto GetListOutputDto
+            entities.Add(new Template(
+                Guid.Parse("8a4de9c2-cf47-4952-944f-c0c660f545a1"),
+                "GetListOutputDto",
+                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListOutputDto.cs",
+                @"using System;
+using Volo.Abp.Application.Dtos;
 
-//            Template iServicesTemplate = new Template()
-//            {
-//                Name = "IServices",
-//                BuildPath = "D:\\code\\IServices\\I@ModelService.cs",
-//                Remarks = "应用服务抽象",
-//                TemplateStr = "using lo.Abp.Application.Services;\r\nusing SharpFort.Ddd.Application.Contracts;\r\nusing SharpFort.Rbac.Application.Contracts.Dtos.@Model;\r\n\r\nnamespace SharpFort.Rbac.Application.Contracts.IServices\r\n{\r\n    /// <summary>\r\n    /// @Model服务抽象\r\n    /// </summary>\r\n    public interface I@ModelService : ISfCrudAppService<@ModelGetOutputDto, @ModelGetListOutputDto, Guid, @ModelGetListInput, @ModelCreateInput, @ModelUpdateInput>\r\n    {\r\n\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(iServicesTemplate);
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 列表项返回 DTO
+    /// </summary>
+    public class {{Model}}GetListOutputDto : EntityDto<Guid>
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != ""Id"" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
 
+            // 4. Dto GetOutputDto
+            entities.Add(new Template(
+                Guid.Parse("96a5b9e0-cb41-477a-a232-c6f932e656d2"),
+                "GetOutputDto",
+                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetOutputDto.cs",
+                @"using System;
+using Volo.Abp.Application.Dtos;
 
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 详情返回 DTO
+    /// </summary>
+    public class {{Model}}GetOutputDto : EntityDto<Guid>
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != ""Id"" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
 
-//            Template servicesTemplate = new Template()
-//            {
-//                Name = "Service",
-//                BuildPath = "D:\\code\\Services\\@ModelService.cs",
-//                Remarks = "应用服务",
-//                TemplateStr = "using SqlSugar;\r\nusing lo.Abp.Application.Dtos;\r\nusing lo.Abp.Application.Services;\r\nusing SharpFort.Ddd.Application;\r\nusing SharpFort.Rbac.Application.Contracts.Dtos.@Model;\r\nusing SharpFort.Rbac.Application.Contracts.IServices;\r\nusing SharpFort.Rbac.Domain.Entities;\r\nusing SharpFort.SqlSugarCore.Abstractions;\r\n\r\nnamespace SharpFort.Rbac.Application.Services\r\n{\r\n    /// <summary>\r\n    /// @Model服务实现\r\n    /// </summary>\r\n    public class @ModelService : SfCrudAppService<@ModelEntity, @ModelGetOutputDto, @ModelGetListOutputDto, Guid, @ModelGetListInput, @ModelCreateInput, @ModelUpdateInput>,\r\n       I@ModelService\r\n    {\r\n        private ISqlSugarRepository<@ModelEntity, Guid> _repository;\r\n        public @ModelService(ISqlSugarRepository<@ModelEntity, Guid> repository) : base(repository)\r\n        {\r\n            _repository = repository;\r\n        }\r\n\r\n        /// <summary>\r\n        /// 多查\r\n        /// </summary>\r\n        /// <param name=\"input\"></param>\r\n        /// <returns></returns>\r\n        public override async Task<PagedResultDto<@ModelGetListOutputDto>> GetListAsync(@ModelGetListInput input)\r\n        {\r\n            RefAsync<int> total = 0;\r\n\r\n            var entities = await _repository._DbQueryable.WhereIF(!string.IsNullOrEmpty(input.@ModelKey), x => x.@ModelKey.Contains(input.@ModelKey!))\r\n                          .WhereIF(!string.IsNullOrEmpty(input.@ModelName), x => x.@ModelName!.Contains(input.@ModelName!))\r\n                          .WhereIF(input.StartTime is not null && input.EndTime is not null, x => x.CreationTime >= input.StartTime && x.CreationTime <= input.EndTime)\r\n                          .ToPageListAsync(input.SkipCount, input.MaxResultCount, total);\r\n            return new PagedResultDto<@ModelGetListOutputDto>(total, await MapToGetListOutputDtosAsync(entities));\r\n        }\r\n    }\r\n}\r\n"
-//            };
-//            entities.Add(servicesTemplate);
+            // 5. Dto CreateInput
+            entities.Add(new Template(
+                Guid.Parse("a5e9b98e-4a6c-48b4-8254-1b3260c6d7a2"),
+                "CreateInput",
+                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}CreateInput.cs",
+                @"using System;
 
-//            Template apiTemplate = new Template()
-//            {
-//                TemplateStr = "import request from '@/utils/request'\r\n\r\n// 分页查询\r\nexport function listData(query) {\r\n  return request({\r\n    url: '/@model',\r\n    method: 'get',\r\n    params: query\r\n  })\r\n}\r\n\r\n// id查询\r\nexport function getData(id) {\r\n  return request({\r\n    url: `/@model/${id}`,\r\n    method: 'get'\r\n  })\r\n}\r\n\r\n// 新增\r\nexport function addData(data) {\r\n  return request({\r\n    url: '/@model',\r\n    method: 'post',\r\n    data: data\r\n  })\r\n}\r\n\r\n// 修改\r\nexport function updateData(id,data) {\r\n  return request({\r\n    url: `/@model/${id}`,\r\n    method: 'put',\r\n    data: data\r\n  })\r\n}\r\n\r\n// 删除\r\nexport function delData(ids) {\r\n  return request({\r\n    url: `/@model`,\r\n    method: 'delete',\r\n    params:{id:ids}\r\n  })\r\n}\r\n",
-//                Name = "api",
-//                BuildPath = "D:\\code\\Api\\@ModelApi.vue",
-//                Remarks = "前端api"
-//            };
-//            entities.Add(apiTemplate);
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 新增输入 DTO
+    /// </summary>
+    public class {{Model}}CreateInput
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != ""Id"" && field.Name != ""CreationTime"" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
 
-//            return entities;
-//        }
-//    }
-//}
+            // 6. Dto UpdateInput
+            entities.Add(new Template(
+                Guid.Parse("b6fa9c8e-4a6c-48b4-8254-1b3260c6d7a3"),
+                "UpdateInput",
+                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}UpdateInput.cs",
+                @"using System;
+
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 编辑修改输入 DTO
+    /// </summary>
+    public class {{Model}}UpdateInput
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != ""Id"" && field.Name != ""CreationTime"" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
+
+            // 7. IApplicationService 抽象
+            entities.Add(new Template(
+                Guid.Parse("c7fa2b9e-4a6c-48b4-8254-1b3260c6d7a4"),
+                "IServices",
+                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/IServices/I{{Model}}Service.cs",
+                @"using System;
+using SharpFort.Ddd.Application.Contracts;
+using {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}};
+
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.IServices
+{
+    /// <summary>
+    /// {{Table.Description}} 应用服务接口
+    /// </summary>
+    public interface I{{Model}}Service : ISfCrudAppService<{{Model}}GetOutputDto, {{Model}}GetListOutputDto, Guid, {{Model}}GetListInput, {{Model}}CreateInput, {{Model}}UpdateInput>
+    {
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
+
+            // 8. ApplicationService 实现
+            entities.Add(new Template(
+                Guid.Parse("d8fa2b9e-4a6c-48b4-8254-1b3260c6d7a5"),
+                "Service",
+                "module/{{Module}}/SharpFort.{{Module}}.Application/Services/{{Model}}Service.cs",
+                @"using System;
+using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
+using SharpFort.Ddd.Application;
+using SharpFort.SqlSugarCore.Abstractions;
+using {{RootNamespace}}.{{Module}}.Domain.Entities;
+using {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}};
+using {{RootNamespace}}.{{Module}}.Application.Contracts.IServices;
+
+namespace {{RootNamespace}}.{{Module}}.Application.Services
+{
+    /// <summary>
+    /// {{Table.Description}} 应用服务实现
+    /// </summary>
+    public partial class {{Model}}Service : SfCrudAppService<{{Model}}Entity, {{Model}}GetOutputDto, {{Model}}GetListOutputDto, Guid, {{Model}}GetListInput, {{Model}}CreateInput, {{Model}}UpdateInput>, I{{Model}}Service
+    {
+        private readonly ISqlSugarRepository<{{Model}}Entity, Guid> _repository;
+
+        public {{Model}}Service(ISqlSugarRepository<{{Model}}Entity, Guid> repository) : base(repository)
+        {
+            _repository = repository;
+        }
+
+        // <sf-custom-code-start id=""CustomLogic"">
+        // 在此区域中添加手写业务逻辑，重新生成代码时不会丢失
+        // </sf-custom-code-start>
+    }
+}"
+            ) { TemplateEngine = "Scriban" });
+
+            return entities;
+        }
+    }
+}

@@ -86,6 +86,30 @@ public class Field : FullAuditedEntity<Guid>
     [SugarColumn(ColumnName = "is_public")]
     public bool IsPublic { get; set; }
 
+    /// <summary>
+    /// 是否为查询字段
+    /// </summary>
+    [SugarColumn(ColumnName = "is_query_field")]
+    public bool IsQueryField { get; set; }
+
+    /// <summary>
+    /// 是否列表显示
+    /// </summary>
+    [SugarColumn(ColumnName = "is_list_display")]
+    public bool IsListDisplay { get; set; }
+
+    /// <summary>
+    /// 是否表单项
+    /// </summary>
+    [SugarColumn(ColumnName = "is_form_item")]
+    public bool IsFormItem { get; set; }
+
+    /// <summary>
+    /// HTML展示类型
+    /// </summary>
+    [SugarColumn(ColumnName = "html_type", Length = 32)]
+    public string? HtmlType { get; set; }
+
     // IsDeleted, CreationTime 等由 FullAuditedAggregateRootEntity 自动实现
 
     /// <summary>

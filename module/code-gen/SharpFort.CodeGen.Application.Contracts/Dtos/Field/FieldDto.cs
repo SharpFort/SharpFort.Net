@@ -37,6 +37,27 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Field
         /// 是否公共
         /// </summary>
         public bool IsPublic { get; set; }
+
+        /// <summary>
+        /// 是否查询字段
+        /// </summary>
+        public bool IsQueryField { get; set; }
+
+        /// <summary>
+        /// 是否列表显示
+        /// </summary>
+        public bool IsListDisplay { get; set; }
+
+        /// <summary>
+        /// 是否表单项
+        /// </summary>
+        public bool IsFormItem { get; set; }
+
+        /// <summary>
+        /// HTML 展示类型
+        /// </summary>
+        public string? HtmlType { get; set; }
+
         public new Guid Id { get; set; }
     }
 }

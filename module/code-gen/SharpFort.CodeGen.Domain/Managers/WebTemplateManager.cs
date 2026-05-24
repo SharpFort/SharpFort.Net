@@ -64,7 +64,11 @@ namespace SharpFort.CodeGen.Domain.Managers
         {
             Field fieldEntity = new()
             {
-                Name = propertyInfo.Name
+                Name = propertyInfo.Name,
+                IsQueryField = true,
+                IsListDisplay = true,
+                IsFormItem = true,
+                HtmlType = "Input"
             };
 
 

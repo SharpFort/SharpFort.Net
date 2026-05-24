@@ -33,6 +33,30 @@ public class Table : FullAuditedAggregateRoot<Guid>
     public string? Description { get; set; }
 
     /// <summary>
+    /// 目标模块名称
+    /// </summary>
+    [SugarColumn(ColumnName = "module_name", Length = 128, IsNullable = true)]
+    public string? ModuleName { get; set; }
+
+    /// <summary>
+    /// 解决方案命名空间
+    /// </summary>
+    [SugarColumn(ColumnName = "root_namespace", Length = 256, IsNullable = true)]
+    public string? RootNamespace { get; set; }
+
+    /// <summary>
+    /// 是否覆盖已有文件
+    /// </summary>
+    [SugarColumn(ColumnName = "is_overwrite", IsNullable = false)]
+    public bool IsOverwrite { get; set; }
+
+    /// <summary>
+    /// 模板引擎类型 (Scriban 或 Legacy)
+    /// </summary>
+    [SugarColumn(ColumnName = "template_engine", Length = 20, IsNullable = false)]
+    public string TemplateEngine { get; set; } = "Scriban";
+
+    /// <summary>
     /// 扩展属性 (ABP Feature)
     /// 场景：存储生成器的配置参数（如：是否覆盖、输出路径、命名空间前缀等）
     /// 映射：Postgres JSONB
