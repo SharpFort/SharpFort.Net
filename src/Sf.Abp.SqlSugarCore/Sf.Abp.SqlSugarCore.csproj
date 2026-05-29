@@ -21,4 +21,9 @@
     <Folder Include="Repositories\" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain.Shared" Version="10.4.0" />
+  </ItemGroup>
+
 </Project>

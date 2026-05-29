@@ -57,6 +57,18 @@ namespace SharpFort.SqlSugarCore
         /// </summary>
         private static readonly ConcurrentDictionary<string, ConnectionConfig> ConnectionConfigCache = new();
 
+        /// <summary>
+        /// 数据过滤服务
+        /// </summary>
+        private IDataFilter DataFilter =>
+            LazyServiceProvider.LazyGetRequiredService<IDataFilter>();
+
+        /// <summary>
+        /// 当前租户服务
+        /// </summary>
+        private ICurrentTenant CurrentTenant =>
+            LazyServiceProvider.LazyGetRequiredService<ICurrentTenant>();
+
         #endregion
 
         /// <summary>
@@ -77,43 +89,30 @@ namespace SharpFort.SqlSugarCore
                 options.DbType = GetCurrentDbType(tenantConfiguration!.GetCurrentConnectionName());
             });
 
-            // 创建SqlSugar客户端实例
-            // [FIX] 原有代码：使用 SqlSugarClient (非线程安全，容易产生死锁)
-            // SqlSugarClient = new SqlSugarClient(connectionConfig);
+            // 使用 SqlSugarScope 构造函数回调注册全局过滤器，
+            // 确保 SqlSugarScope 创建的每个内部连接实例都自动获得过滤器配置
+            SqlSugarClient = new SqlSugarScope(connectionConfig, ConfigureGlobalFilters);
 
-            // [FIX] 新代码：使用 SqlSugarScope (推荐)
-            // SqlSugarScope 是 SqlSugar 专门为依赖注入设计的线程安全容器
-            // 它可以自动管理连接生命周期，并确保在同一个请求/作用域内共享同一个连接上下文
-            // 从而解决 Client A (业务) 和 Client B (Casbin) 争抢数据库锁的问题
-            // SqlSugarClient = new SqlSugarScope(connectionConfig);
-
-            // ========================================================================
-            // [FIX] SQLite 单连接限制的解决方案
-            // ========================================================================
-            // 
-            // 【问题背景】仅 SQLite 存在此问题：
-            //   SQLite 使用文件锁机制，同一进程内多个连接会导致 "database is locked" 错误。
-            //   当 ABP 业务代码和 Casbin Adapter 使用不同的 SqlSugarClient 实例时，
-            //   它们会各自持有独立的数据库连接，争抢文件锁导致死锁。
-            //
-            // 【其他数据库不需要此修改】：
-            //   PostgreSQL、SQL Server、MySQL 等数据库都支持真正的多连接并发：
-            //   - 拥有成熟的连接池机制
-            //   - 支持 MVCC 或行级锁实现事务隔离
-            //   - 无文件锁限制
-            //   因此，这些数据库使用 SqlSugarClient 或 SqlSugarScope 都没有问题。
-            //
-            // 【解决方案】使用 SqlSugarScope：
-            //   SqlSugarScope 是 SqlSugar 为依赖注入设计的线程安全容器，
-            //   确保同一个请求作用域内共享同一个连接上下文，
-            //   从而让 ABP 和 Casbin 共用同一个连接，避免锁冲突。
-            //
-            // SqlSugarClient = new SqlSugarClient(connectionConfig);
-            // 【新代码】（推荐，对所有数据库都安全）：
-            SqlSugarClient = new SqlSugarScope(connectionConfig);
-
-            // 配置数据库AOP
+            // 配置数据库AOP（日志、审计、数据权限等）
             ConfigureDbAop(SqlSugarClient);
+        }
+
+        /// <summary>
+        /// 注册核心全局过滤器（软删除、多租户），
+        /// 通过 SqlSugarScope 构造函数回调确保每个连接实例都生效
+        /// </summary>
+        private void ConfigureGlobalFilters(ISqlSugarClient db)
+        {
+            if (DataFilter.IsEnabled<ISoftDelete>())
+            {
+                db.QueryFilter.AddTableFilter<ISoftDelete>(entity => !entity.IsDeleted);
+            }
+
+            if (DataFilter.IsEnabled<IMultiTenant>())
+            {
+                Guid? tenantId = CurrentTenant.Id;
+                db.QueryFilter.AddTableFilter<IMultiTenant>(entity => entity.TenantId == tenantId);
+            }
         }
 
         /// <summary>

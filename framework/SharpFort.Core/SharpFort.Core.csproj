@@ -3,14 +3,14 @@
 
 
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="IPTools.China" Version="1.6.0" />
-    <PackageReference Include="Masuit.Tools.Core" Version="2026.1.4" />
+    <PackageReference Include="Masuit.Tools.Core" Version="2026.1.5" />
     <!-- NU1902: 覆盖 Masuit.Tools.Abstractions 传递依赖中的 SharpCompress 0.47.1 中危漏洞 -->
-    <PackageReference Include="SharpCompress" Version="0.48.0" />
+    <PackageReference Include="SharpCompress" Version="0.48.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
     <PackageReference Include="UAParser" Version="3.1.47" />
-    <PackageReference Include="Volo.Abp.Core" Version="10.3.0" />
+    <PackageReference Include="Volo.Abp.Core" Version="10.4.0" />
   </ItemGroup>
 
 </Project>

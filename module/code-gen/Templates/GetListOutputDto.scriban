@@ -1,0 +1,20 @@
+using System;
+using Volo.Abp.Application.Dtos;
+
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 列表项返回 DTO
+    /// </summary>
+    public class {{Model}}GetListOutputDto : EntityDto<Guid>
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != "Id" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}

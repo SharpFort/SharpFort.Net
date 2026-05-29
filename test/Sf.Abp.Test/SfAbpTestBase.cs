@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Xunit;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace Sf.Abp.Test
 {
@@ -19,7 +21,7 @@ namespace Sf.Abp.Test
                    ConfigureServices(host, service);
                    service.AddLogging(builder => builder.ClearProviders().AddConsole().AddDebug());
                    /*application= */
-                   service.AddApplicationAsync<SfAbpTestModule>().Wait();
+                   System.Threading.Tasks.Task.Run(() => service.AddApplicationAsync<SfAbpTestModule>()).GetAwaiter().GetResult();
                })
                .ConfigureAppConfiguration(ConfigureAppConfiguration)
                .Build();
@@ -28,7 +30,7 @@ namespace Sf.Abp.Test
             TestServiceScope = ServiceProvider.CreateScope();
             Logger = (ILogger)ServiceProvider.GetRequiredService(typeof(ILogger<>).MakeGenericType(GetType()));
 
-            host.InitializeAsync().Wait();
+            System.Threading.Tasks.Task.Run(() => host.InitializeAsync()).GetAwaiter().GetResult();
         }
 
 

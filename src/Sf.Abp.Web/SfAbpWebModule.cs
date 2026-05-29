@@ -260,6 +260,9 @@ namespace Sf.Abp.Web
             JwtOptions jwtOptions = configuration.GetSection(nameof(JwtOptions)).Get<JwtOptions>() ?? throw new InvalidOperationException("JwtOptions is missing in configuration.");
             RefreshJwtOptions refreshJwtOptions = configuration.GetSection(nameof(RefreshJwtOptions)).Get<RefreshJwtOptions>() ?? throw new InvalidOperationException("RefreshJwtOptions is missing in configuration.");
 
+            ValidateSecurityKey(jwtOptions.SecurityKey, nameof(JwtOptions));
+            ValidateSecurityKey(refreshJwtOptions.SecurityKey, nameof(RefreshJwtOptions));
+
             context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -413,6 +416,15 @@ namespace Sf.Abp.Web
             app.UseConfiguredEndpoints();
 
             return Task.CompletedTask;
+        }
+
+        private static void ValidateSecurityKey(string? key, string optionName)
+        {
+            if (string.IsNullOrEmpty(key) || key.Length < 32)
+            {
+                throw new InvalidOperationException(
+                    $"{optionName}:SecurityKey 未配置或长度不足（至少32字符）。请设置环境变量 {optionName}__SecurityKey 或在 .env 文件中配置 {optionName}:SecurityKey。");
+            }
         }
     }
 }

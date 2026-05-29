@@ -1,0 +1,28 @@
+using System;
+using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
+using SharpFort.Ddd.Application;
+using SharpFort.SqlSugarCore.Abstractions;
+using {{RootNamespace}}.{{Module}}.Domain.Entities;
+using {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}};
+using {{RootNamespace}}.{{Module}}.Application.Contracts.IServices;
+
+namespace {{RootNamespace}}.{{Module}}.Application.Services
+{
+    /// <summary>
+    /// {{Table.Description}} 应用服务实现
+    /// </summary>
+    public partial class {{Model}}Service : SfCrudAppService<{{Model}}Entity, {{Model}}GetOutputDto, {{Model}}GetListOutputDto, Guid, {{Model}}GetListInput, {{Model}}CreateInput, {{Model}}UpdateInput>, I{{Model}}Service
+    {
+        private readonly ISqlSugarRepository<{{Model}}Entity, Guid> _repository;
+
+        public {{Model}}Service(ISqlSugarRepository<{{Model}}Entity, Guid> repository) : base(repository)
+        {
+            _repository = repository;
+        }
+
+        // <sf-custom-code-start id="CustomLogic">
+        // 在此区域中添加手写业务逻辑，重新生成代码时不会丢失
+        // </sf-custom-code-end>
+    }
+}

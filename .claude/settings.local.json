@@ -74,7 +74,20 @@
       "Bash(Select-String -Pattern \"VerifyPassword|Salt|MD5|SHA512\" -Context 3,5)",
       "PowerShell(Get-ChildItem *)",
       "Bash(Select-String -Pattern \"SqlSugar|sqlSugar\" -Context 1,0)",
-      "WebFetch(domain:gitee.com)"
+      "WebFetch(domain:gitee.com)",
+      "Bash(Copy-Item -Path \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\casbin-rbac\\\\SharpFort.CasbinRbac.Domain\\\\rbac_with_domains_model.conf\" -Destination \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\casbin-rbac\\\\SharpFort.CasbinRbac.Domain\\\\bin\\\\Debug\\\\net10.0\\\\rbac_with_domains_model.conf\" -Force)",
+      "Bash(Copy-Item -Path \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\casbin-rbac\\\\SharpFort.CasbinRbac.Domain\\\\rbac_with_domains_model.conf\" -Destination \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\casbin-rbac\\\\SharpFort.CasbinRbac.Application\\\\bin\\\\Debug\\\\net10.0\\\\rbac_with_domains_model.conf\" -Force)",
+      "Bash(Copy-Item -Path \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\casbin-rbac\\\\SharpFort.CasbinRbac.Domain\\\\rbac_with_domains_model.conf\" -Destination \"E:\\\\Projects\\\\SharpFort.Net\\\\module\\\\casbin-rbac\\\\SharpFort.CasbinRbac.SqlSugarCore\\\\bin\\\\Debug\\\\net10.0\\\\rbac_with_domains_model.conf\" -Force)",
+      "PowerShell(Copy-Item *)",
+      "Bash(Get-ChildItem -Path \"E:\\\\Projects\\\\SharpFort.Net\" -Depth 0)",
+      "Bash(Format-Table Name, Mode -AutoSize)",
+      "Skill(code-review:code-review)",
+      "PowerShell(New-Item *)",
+      "PowerShell(dotnet test *)",
+      "Bash(node *)",
+      "Bash(Get-Content \"E:\\\\Projects\\\\SharpFort.Net\\\\src\\\\Sf.Abp.Web\\\\SfAbpWebModule.cs\")",
+      "Bash(Measure-Object -Line)",
+      "Bash(Select-Object -Last 20)"
     ],
     "deny": [],
     "ask": []

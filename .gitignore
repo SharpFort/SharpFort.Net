@@ -65,6 +65,9 @@ tool/Yi.Abp.Tool.Web/appsettings.Development.json
 appsettings.local.json
 *.secrets.json
 
+## [环境变量]
+.env
+
 ## [发布与部署]
 publish/
 *.[Pp]ublish.xml

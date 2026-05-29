@@ -1,6 +1,7 @@
 using Serilog;
 using Serilog.Events;
 using Sf.Abp.Web;
+using Sf.Abp.Web.Extensions;
 
 //创建日志,可使用{SourceContext}记录
 Log.Logger = new LoggerConfiguration()
@@ -33,6 +34,7 @@ try
     Log.Information("Sf框架-Abp.vNext，启动！");
 
     WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+    builder.Configuration.AddEnvFile();
     Log.Information($"当前主机启动环境-【{builder.Environment.EnvironmentName}】");
     Log.Information($"当前主机启动地址-【{builder.Configuration["App:SelfUrl"]}】");
     builder.WebHost.UseUrls(builder.Configuration["App:SelfUrl"] ?? throw new InvalidOperationException("App:SelfUrl is missing in configuration."));

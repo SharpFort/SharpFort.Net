@@ -1,0 +1,19 @@
+using System;
+
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 编辑修改输入 DTO
+    /// </summary>
+    public class {{Model}}UpdateInput
+    {
+        {{~ for field in Fields ~}}
+        {{~ if field.Name != "Id" && field.Name != "CreationTime" ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
+    }
+}

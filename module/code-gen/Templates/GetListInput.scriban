@@ -1,0 +1,15 @@
+using SharpFort.Ddd.Application.Contracts;
+
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
+{
+    /// <summary>
+    /// {{Table.Description}} 列表查询输入 DTO
+    /// </summary>
+    public class {{Model}}GetListInput : PagedAllResultRequestDto
+    {
+        /// <summary>
+        /// 模糊关键字查询
+        /// </summary>
+        public string? Filter { get; set; }
+    }
+}

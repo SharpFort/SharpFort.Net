@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MiniExcel" Version="1.43.0" />
+    <PackageReference Include="MiniExcel" Version="1.44.1" />
   </ItemGroup>
 
 </Project>

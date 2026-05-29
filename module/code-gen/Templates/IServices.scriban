@@ -1,0 +1,13 @@
+using System;
+using SharpFort.Ddd.Application.Contracts;
+using {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}};
+
+namespace {{RootNamespace}}.{{Module}}.Application.Contracts.IServices
+{
+    /// <summary>
+    /// {{Table.Description}} 应用服务接口
+    /// </summary>
+    public interface I{{Model}}Service : ISfCrudAppService<{{Model}}GetOutputDto, {{Model}}GetListOutputDto, Guid, {{Model}}GetListInput, {{Model}}CreateInput, {{Model}}UpdateInput>
+    {
+    }
+}

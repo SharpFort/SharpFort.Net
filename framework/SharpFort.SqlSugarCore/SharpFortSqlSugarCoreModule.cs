@@ -122,7 +122,7 @@ namespace SharpFort.SqlSugarCore
                 DbType.MySql or DbType.PostgreSQL => SequentialGuidType.SequentialAsString,
                 DbType.SqlServer => SequentialGuidType.SequentialAtEnd,
                 DbType.Oracle => SequentialGuidType.SequentialAsBinary,
-                DbType.Sqlite => throw new NotImplementedException(),
+                DbType.Sqlite => SequentialGuidType.SequentialAsString,
                 DbType.Dm => throw new NotImplementedException(),
                 DbType.Kdbndp => throw new NotImplementedException(),
                 DbType.Oscar => throw new NotImplementedException(),
@@ -152,7 +152,7 @@ namespace SharpFort.SqlSugarCore
                 DbType.DuckDB => throw new NotImplementedException(),
                 DbType.MongoDb => throw new NotImplementedException(),
                 DbType.Custom => throw new NotImplementedException(),
-                null => throw new NotImplementedException(),
+                null => SequentialGuidType.SequentialAtEnd,
                 _ => SequentialGuidType.SequentialAtEnd
             };
         }
