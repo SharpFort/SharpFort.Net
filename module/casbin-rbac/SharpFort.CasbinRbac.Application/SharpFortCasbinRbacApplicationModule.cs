@@ -5,6 +5,10 @@ using SharpFort.CasbinRbac.Application.Contracts;
 using SharpFort.CasbinRbac.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Volo.Abp.Modularity;
+using Volo.Abp;
+using SharpFort.CasbinRbac.Application.Contracts.IServices;
+using Microsoft.Extensions.Logging;
 
 namespace SharpFort.CasbinRbac.Application
 {
@@ -56,9 +60,19 @@ namespace SharpFort.CasbinRbac.Application
             context.Services.AddTransient<IConfigureOptions<JsonOptions>, JsonOptionsSetup>();
         }
 
-        public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
+        public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
-            return Task.CompletedTask;
+            // M-1 修复：包装启动预热流程。应用"最佳实践"式异常防线，如果 DB 暂未就绪只打印警告，绝不中断正常启动进程
+            try
+            {
+                IMenuService menuService = context.ServiceProvider.GetRequiredService<IMenuService>();
+                await menuService.WarmupCacheAsync();
+            }
+            catch (Exception ex)
+            {
+                ILogger<SharpFortCasbinRbacApplicationModule>? logger = context.ServiceProvider.GetService<ILogger<SharpFortCasbinRbacApplicationModule>>();
+                logger?.LogWarning(ex, "菜单本地缓存预热失败（可能是数据库未就绪或未完成种子迁移），系统缓存将在首次真实请求时自动按需加载");
+            }
         }
     }
 }

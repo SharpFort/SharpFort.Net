@@ -44,296 +44,296 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         #endregion
 
         /// <summary>
-        /// 延迟内存同步：事务运行期间仅进行 DB 持久化，不碰内存 Enforcer
-        /// 事务成功提交后（OnCompleted），从 DB 全量重载策略到内存 (R-01)
-        /// 非事务环境下则锁定后即时重载
+        /// 无 UOW 时的一致性兜底：先尝试增量同步，失败则全量重载。
         /// </summary>
-        private void TriggerMemorySync()
+        private async Task SyncOrFallback(Func<Task> incrementalSync)
         {
-            IUnitOfWork? uow = _unitOfWorkManager.Current;
-            if (uow != null)
-            {
-                const string syncKey = "CasbinMemorySyncTriggered";
-                if (!uow.Items.ContainsKey(syncKey))
-                {
-                    uow.Items[syncKey] = true;
-                    uow.OnCompleted(async () =>
-                    {
-                        await _writeLock.WaitAsync();
-                        try
-                        {
-                            await _enforcer.LoadPolicyAsync();
-                        }
-                        finally
-                        {
-                            _writeLock.Release();
-                        }
-                    });
-                }
-            }
-            else
-            {
-                _writeLock.Wait();
-                try
-                {
-                    _enforcer.LoadPolicy();
-                }
-                finally
-                {
-                    _writeLock.Release();
-                }
-            }
+            try { await incrementalSync(); }
+            catch { await ReloadAllPoliciesAsync(); }
+        }
+
+        /// <summary>
+        /// 带全局写锁的全量策略重载。
+        /// </summary>
+        public async Task ReloadAllPoliciesAsync()
+        {
+            await _writeLock.WaitAsync();
+            try { await _enforcer.LoadPolicyAsync(); }
+            finally { _writeLock.Release(); }
         }
 
         public async Task AddRoleForUserAsync(User user, Role role)
         {
-            await _writeLock.WaitAsync();
-            try
-            {
-                string sub = GetUserSubject(user.Id);
-                string roleSub = GetRoleSubject(role.RoleCode!);
-                string domain = GetTenantDomain(user.TenantId);
+            string sub = GetUserSubject(user.Id);
+            string roleSub = GetRoleSubject(role.RoleCode!);
+            string domain = GetTenantDomain(user.TenantId);
 
-                CasbinRule rule = new()
-                {
-                    PType = "g",
-                    V0 = sub,
-                    V1 = roleSub,
-                    V2 = domain
-                };
-                await _roleRepository._Db.Insertable(rule).ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            await _roleRepository._Db.Insertable(
+                new CasbinRule { PType = "g", V0 = sub, V1 = roleSub, V2 = domain })
+                .ExecuteCommandAsync();
 
-            TriggerMemorySync();
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try { await _enforcer.AddGroupingPolicyAsync(sub, roleSub, domain); }
+                finally { _writeLock.Release(); }
+            };
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
         public async Task RemoveRoleForUserAsync(User user, Role role)
         {
-            await _writeLock.WaitAsync();
-            try
-            {
-                string sub = GetUserSubject(user.Id);
-                string roleSub = GetRoleSubject(role.RoleCode!);
-                string domain = GetTenantDomain(user.TenantId);
+            string sub = GetUserSubject(user.Id);
+            string roleSub = GetRoleSubject(role.RoleCode!);
+            string domain = GetTenantDomain(user.TenantId);
 
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => x.PType == "g" && x.V0 == sub && x.V1 == roleSub && x.V2 == domain)
-                    .ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => x.PType == "g" && x.V0 == sub && x.V1 == roleSub && x.V2 == domain)
+                .ExecuteCommandAsync();
 
-            TriggerMemorySync();
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try { await _enforcer.RemoveGroupingPolicyAsync(sub, roleSub, domain); }
+                finally { _writeLock.Release(); }
+            };
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
         public async Task SetUserRolesAsync(User user, List<Role> roles)
         {
-            await _writeLock.WaitAsync();
-            try
+            string sub = GetUserSubject(user.Id);
+            string domain = GetTenantDomain(user.TenantId);
+
+            // DB（锁外，保留 domain 过滤）
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain)
+                .ExecuteCommandAsync();
+
+            if (roles.Count > 0)
             {
-                string sub = GetUserSubject(user.Id);
-                string domain = GetTenantDomain(user.TenantId);
-
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain)
-                    .ExecuteCommandAsync();
-
-                if (roles.Count > 0)
+                List<CasbinRule> newRules = roles.Select(r => new CasbinRule
                 {
-                    List<CasbinRule> newRules = [.. roles.Select(r => new CasbinRule
-                    {
-                        PType = "g",
-                        V0 = sub,
-                        V1 = GetRoleSubject(r.RoleCode!),
-                        V2 = domain
-                    })];
-                    await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
-                }
-            }
-            finally
-            {
-                _writeLock.Release();
+                    PType = "g", V0 = sub, V1 = GetRoleSubject(r.RoleCode!), V2 = domain
+                }).ToList();
+                await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
             }
 
-            TriggerMemorySync();
+            // 内存（锁内：枚举 + domain 过滤 + 逐个精确删除）
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try
+                {
+                    var oldRules = _enforcer.GetFilteredGroupingPolicy(0, sub)
+                        .Select(r => r.ToList())
+                        .Where(r => r.Count >= 3 && r[2] == domain)
+                        .ToList();
+                        
+                    foreach (var rule in oldRules)
+                    {
+                        await _enforcer.RemoveGroupingPolicyAsync(rule[0], rule[1], rule[2]);
+                    }
+
+                    if (roles.Count > 0)
+                    {
+                        List<List<string>> groupings = roles.Select(r =>
+                            new List<string> { sub, GetRoleSubject(r.RoleCode!), domain }).ToList();
+                        await _enforcer.AddGroupingPoliciesAsync(groupings);
+                    }
+                }
+                finally { _writeLock.Release(); }
+            };
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
         public async Task SetRolePermissionsAsync(Role role, List<Menu> menus)
         {
-            await _writeLock.WaitAsync();
-            try
+            string roleSub = GetRoleSubject(role.RoleCode!);
+            string domain = GetTenantDomain(role.TenantId);
+
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                .ExecuteCommandAsync();
+
+            List<CasbinRule> newRules = new();
+            foreach (Menu menu in menus)
             {
-                string roleSub = GetRoleSubject(role.RoleCode!);
-                string domain = GetTenantDomain(role.TenantId);
+                if (string.IsNullOrWhiteSpace(menu.ApiUrl)) continue;
+                string methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
+                newRules.Add(new CasbinRule
+                    { PType = "p", V0 = roleSub, V1 = domain, V2 = menu.ApiUrl, V3 = methods });
+            }
 
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
-                    .ExecuteCommandAsync();
+            if (newRules.Count > 0)
+                await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
 
-                List<CasbinRule> newRules = [];
-
-                foreach (Menu menu in menus)
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try
                 {
-                    if (string.IsNullOrWhiteSpace(menu.ApiUrl))
+                    await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
+                    if (menus.Count > 0)
                     {
-                        continue;
+                        List<List<string>> policies = new();
+                        foreach (Menu menu in menus)
+                        {
+                            if (string.IsNullOrWhiteSpace(menu.ApiUrl)) continue;
+                            string methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
+                            policies.Add(new List<string> { roleSub, domain, menu.ApiUrl, methods });
+                        }
+                        await _enforcer.AddPoliciesAsync(policies);
                     }
-
-                    string methods = string.IsNullOrWhiteSpace(menu.ApiMethod) ? "*" : menu.ApiMethod;
-
-                    newRules.Add(new CasbinRule
-                    {
-                        PType = "p",
-                        V0 = roleSub,
-                        V1 = domain,
-                        V2 = menu.ApiUrl,
-                        V3 = methods
-                    });
                 }
+                finally { _writeLock.Release(); }
+            };
 
-                if (newRules.Count > 0)
-                {
-                    await _roleRepository._Db.Insertable(newRules).ExecuteCommandAsync();
-                }
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
-
-            TriggerMemorySync();
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
         public async Task InitAdminPermissionAsync(Role adminRole)
         {
-            await _writeLock.WaitAsync();
-            try
+            string roleSub = GetRoleSubject(adminRole.RoleCode!);
+            string domain = GetTenantDomain(adminRole.TenantId);
+
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                .ExecuteCommandAsync();
+
+            await _roleRepository._Db.Insertable(new CasbinRule
+                { PType = "p", V0 = roleSub, V1 = domain, V2 = "*", V3 = "*" })
+                .ExecuteCommandAsync();
+
+            Func<Task> syncAction = async () =>
             {
-                string roleSub = GetRoleSubject(adminRole.RoleCode!);
-                string domain = GetTenantDomain(adminRole.TenantId);
-
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
-                    .ExecuteCommandAsync();
-
-                await _roleRepository._Db.Insertable(new CasbinRule
+                await _writeLock.WaitAsync();
+                try
                 {
-                    PType = "p",
-                    V0 = roleSub,
-                    V1 = domain,
-                    V2 = "*",
-                    V3 = "*"
-                }).ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+                    await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
+                    await _enforcer.AddPolicyAsync(roleSub, domain, "*", "*");
+                }
+                finally { _writeLock.Release(); }
+            };
 
-            TriggerMemorySync();
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
         public async Task CleanRolePoliciesAsync(Role role)
         {
-            await _writeLock.WaitAsync();
-            try
-            {
-                string roleSub = GetRoleSubject(role.RoleCode!);
-                string domain = GetTenantDomain(role.TenantId);
+            string roleSub = GetRoleSubject(role.RoleCode!);
+            string domain = GetTenantDomain(role.TenantId);
 
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
-                             || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain))
-                    .ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                         || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain))
+                .ExecuteCommandAsync();
 
-            TriggerMemorySync();
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try
+                {
+                    await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
+                    await _enforcer.RemoveFilteredGroupingPolicyAsync(1, roleSub, domain);
+                }
+                finally { _writeLock.Release(); }
+            };
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
         public async Task CleanRolePoliciesByRoleCodeAsync(string roleCode, Guid? tenantId)
         {
-            await _writeLock.WaitAsync();
-            try
-            {
-                string roleSub = GetRoleSubject(roleCode);
-                string domain = GetTenantDomain(tenantId);
+            string roleSub = GetRoleSubject(roleCode);
+            string domain = GetTenantDomain(tenantId);
 
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
-                             || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain))
-                    .ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => (x.PType == "p" && x.V0 == roleSub && x.V1 == domain)
+                         || (x.PType == "g" && x.V1 == roleSub && x.V2 == domain))
+                .ExecuteCommandAsync();
 
-            TriggerMemorySync();
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try
+                {
+                    await _enforcer.RemoveFilteredPolicyAsync(0, roleSub, domain);
+                    await _enforcer.RemoveFilteredGroupingPolicyAsync(1, roleSub, domain);
+                }
+                finally { _writeLock.Release(); }
+            };
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
 
-        /// <summary>
-        /// 迁移角色编码：将旧 RoleCode 的所有 p 规则和 g 规则更新为新 RoleCode (R-05)
-        /// 使用数据库事务原子性更新，避免用户角色关联丢失
-        /// </summary>
         public async Task MigrateRoleCodeAsync(string oldRoleCode, string newRoleCode, Guid? tenantId)
         {
             string domain = GetTenantDomain(tenantId);
 
-            await _writeLock.WaitAsync();
-            try
-            {
-                // 更新 g-rules: V1 从旧角色码变更为新角色码
-                // 注意：SetColumns 必须使用初始化器语法进行赋值，== 是比较运算符 (QA5-CRITICAL-01)
-                await _roleRepository._Db.Updateable<CasbinRule>()
-                    .SetColumns(it => new CasbinRule() { V1 = newRoleCode })
-                    .Where(x => x.PType == "g" && x.V1 == oldRoleCode && x.V2 == domain)
-                    .ExecuteCommandAsync();
+            await _roleRepository._Db.Updateable<CasbinRule>()
+                .SetColumns(it => new CasbinRule { V1 = newRoleCode })
+                .Where(x => x.PType == "g" && x.V1 == oldRoleCode && x.V2 == domain)
+                .ExecuteCommandAsync();
 
-                // 更新 p-rules: V0 从旧角色码变更为新角色码
-                await _roleRepository._Db.Updateable<CasbinRule>()
-                    .SetColumns(it => new CasbinRule() { V0 = newRoleCode })
-                    .Where(x => x.PType == "p" && x.V0 == oldRoleCode && x.V1 == domain)
-                    .ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            await _roleRepository._Db.Updateable<CasbinRule>()
+                .SetColumns(it => new CasbinRule { V0 = newRoleCode })
+                .Where(x => x.PType == "p" && x.V0 == oldRoleCode && x.V1 == domain)
+                .ExecuteCommandAsync();
 
-            TriggerMemorySync();
+            Func<Task> syncAction = ReloadAllPoliciesAsync;
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await syncAction(); }
         }
 
-        /// <summary>
-        /// 清理用户所有的 Casbin 策略（删除用户时调用）(B-08)
-        /// </summary>
         public async Task CleanUserPoliciesAsync(Guid userId, Guid? tenantId)
         {
-            await _writeLock.WaitAsync();
-            try
-            {
-                string sub = GetUserSubject(userId);
-                string domain = GetTenantDomain(tenantId);
+            string sub = GetUserSubject(userId);
+            string domain = GetTenantDomain(tenantId);
 
-                await _roleRepository._Db.Deleteable<CasbinRule>()
-                    .Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain)
-                    .ExecuteCommandAsync();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            await _roleRepository._Db.Deleteable<CasbinRule>()
+                .Where(x => x.PType == "g" && x.V0 == sub && x.V2 == domain)
+                .ExecuteCommandAsync();
 
-            TriggerMemorySync();
+            Func<Task> syncAction = async () =>
+            {
+                await _writeLock.WaitAsync();
+                try
+                {
+                    var oldRules = _enforcer.GetFilteredGroupingPolicy(0, sub)
+                        .Select(r => r.ToList())
+                        .Where(r => r.Count >= 3 && r[2] == domain)
+                        .ToList();
+                    foreach (var rule in oldRules)
+                    {
+                        await _enforcer.RemoveGroupingPolicyAsync(rule[0], rule[1], rule[2]);
+                    }
+                }
+                finally { _writeLock.Release(); }
+            };
+
+            IUnitOfWork? uow = _unitOfWorkManager.Current;
+            if (uow != null) { uow.OnCompleted(syncAction); }
+            else { await SyncOrFallback(syncAction); }
         }
     }
 }

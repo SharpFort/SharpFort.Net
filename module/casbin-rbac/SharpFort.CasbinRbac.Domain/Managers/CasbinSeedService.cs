@@ -19,10 +19,12 @@ namespace SharpFort.CasbinRbac.Domain.Managers
     public partial class CasbinSeedService(
         IEnforcer enforcer,
         ISqlSugarRepository<Role> roleRepo,
+        ICasbinPolicyManager casbinPolicyManager,
         ILogger<CasbinSeedService> logger) : DomainService
     {
         private readonly IEnforcer _enforcer = enforcer;
         private readonly ISqlSugarRepository<Role> _roleRepo = roleRepo;
+        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
         private readonly ILogger<CasbinSeedService> _logger = logger;
 
         /// <summary>
@@ -337,7 +339,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             try
             {
-                await _enforcer.LoadPolicyAsync();
+                await _casbinPolicyManager.ReloadAllPoliciesAsync();
                 LogEnforcerReloaded(phaseSw.ElapsedMilliseconds);
 
                 // Verify loaded policies (use synchronous methods)

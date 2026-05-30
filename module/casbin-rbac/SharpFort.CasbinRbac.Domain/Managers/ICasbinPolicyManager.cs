@@ -53,5 +53,10 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// 清理用户所有的 Casbin 策略（删除用户时调用）(B-08)
         /// </summary>
         Task CleanUserPoliciesAsync(Guid userId, Guid? tenantId);
+
+        /// <summary>
+        /// 带全局写锁的全量策略重载（供系统初始化、运维手动触发及数据迁移使用）。
+        /// </summary>
+        Task ReloadAllPoliciesAsync();
     }
 }
