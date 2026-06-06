@@ -355,7 +355,7 @@ namespace SharpFort.CasbinRbac.Application.Services
             Guid userId = _currentUser.Id ?? throw new UserFriendlyException("用户未登录");
 
             //此处优先从缓存中获取
-            UserRoleMenuDto output = await _userManager.GetInfoAsync(userId);
+            UserRoleMenuDto output = await _userManager.GetInfoByCacheAsync(userId);
             return output;
         }
 
@@ -380,7 +380,7 @@ namespace SharpFort.CasbinRbac.Application.Services
                 throw new UserFriendlyException($"该用户名不存在或已禁用-{userName}");
             }
 
-            UserRoleMenuDto output = await _userManager.GetInfoAsync(user.Id);
+            UserRoleMenuDto output = await _userManager.GetInfoByCacheAsync(user.Id);
             return output;
         }
 
@@ -399,13 +399,17 @@ namespace SharpFort.CasbinRbac.Application.Services
                 throw new AbpAuthorizationException("用户未登录");
             }
 
-            UserRoleMenuDto data = await _userManager.GetInfoAsync(userId!.Value);
-            List<MenuDto> menus = [.. data.Menus];
-
-            //为超级管理员直接给全部路由
-            if (UserConst.Admin.Equals(data.User.UserName, StringComparison.Ordinal))
+            // S2: 通过 JWT claim 判断 admin，避免为 admin 做无用的 User+Roles+Menus DB 查询
+            bool isAdmin = UserConst.Admin.Equals(_currentUser.UserName, StringComparison.Ordinal);
+            List<MenuDto> menus;
+            if (isAdmin)
             {
                 menus = ObjectMapper.Map<List<Menu>, List<MenuDto>>(await _menuRepository.GetListAsync());
+            }
+            else
+            {
+                UserRoleMenuDto data = await _userManager.GetInfoByCacheAsync(userId!.Value);
+                menus = [.. data.Menus];
             }
 
             object? output = null;

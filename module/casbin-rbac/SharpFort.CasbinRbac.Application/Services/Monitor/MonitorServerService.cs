@@ -15,137 +15,166 @@ namespace SharpFort.CasbinRbac.Application.Services.Monitor
     {
         private readonly IWebHostEnvironment _hostEnvironment = hostEnvironment;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
+        // 长时间静态缓存（1 小时 TTL）
         private static List<NetworkAdapterDto> _cachedNetworks = null!;
         private static List<AssemblyInfoDto> _cachedAssemblies = null!;
         private static DateTime _lastStaticCacheTime = DateTime.MinValue;
         private static readonly Lock _staticCacheLock = new();
 
+        // 服务器信息缓存（10 秒 TTL）：用静态字段 + 双重检查锁，适配 IDistributedCache 架构
+        private static MonitorServerInfoDto? _cachedServerInfo;
+        private static DateTime _lastServerInfoRefresh = DateTime.MinValue;
+        private static readonly Lock _serverInfoLock = new();
+        private static readonly TimeSpan ServerInfoCacheDuration = TimeSpan.FromSeconds(10);
+
         [HttpGet("monitor-server/info")]
-        public async Task<MonitorServerInfoDto> GetServerInfoAsync()
+        public Task<MonitorServerInfoDto> GetServerInfoAsync()
         {
-            return await Task.Run(() =>
+            // 快速路径：缓存有效直接返回
+            MonitorServerInfoDto? cached = _cachedServerInfo;
+            if (cached != null && (DateTime.Now - _lastServerInfoRefresh) < ServerInfoCacheDuration)
             {
-                MonitorServerInfoDto dto = new();
+                return Task.FromResult(cached);
+            }
 
-                // PERFORMANCE FIX: Never call RefreshAll() in a request loop! It queries BIOS, Motherboard, Batteries, etc., and blocks the thread.
-                // Create a scoped instance and ONLY refresh what we specifically need (Memory and CPU are fast).
-                HardwareInfo hardwareInfo = new();  // CA1859: use concrete type
-                hardwareInfo.RefreshMemoryStatus();
-                hardwareInfo.RefreshCPUList();
-
-                // sys info (Use native Environment.TickCount64 for cross-platform uptime in milliseconds)
-                long sysRunTimeMs = Environment.TickCount64;
-                string sysRunTime = DateTimeHelper.FormatTime(sysRunTimeMs);
-                string? serverIp = _httpContextAccessor.HttpContext?.Connection?.LocalIpAddress?.MapToIPv4()?.ToString() + ":" + _httpContextAccessor.HttpContext?.Connection?.LocalPort;
-                dto.Sys = new SysInfoDto
+            lock (_serverInfoLock)
+            {
+                // 双重检查：进入锁后再次确认缓存是否仍然有效
+                cached = _cachedServerInfo;
+                if (cached != null && (DateTime.Now - _lastServerInfoRefresh) < ServerInfoCacheDuration)
                 {
-                    ComputerName = Environment.MachineName,
-                    OsName = RuntimeInformation.OSDescription,
-                    OsArch = RuntimeInformation.OSArchitecture.ToString(),
-                    ServerIP = serverIp ?? "未知",
-                    RunTime = sysRunTime
-                };
+                    return Task.FromResult(cached);
+                }
 
-                // app info
-                Process currentProcess = Process.GetCurrentProcess();
-                DateTime programStartTime = currentProcess.StartTime;
-                string programRunTime = DateTimeHelper.FormatTime((long)(DateTime.Now - programStartTime).TotalMilliseconds);
-                string appRAM = ((double)currentProcess.WorkingSet64 / 1048576).ToString("N2", global::System.Globalization.CultureInfo.InvariantCulture) + " MB";
+                _cachedServerInfo = BuildServerInfo();
+                _lastServerInfoRefresh = DateTime.Now;
+                return Task.FromResult(_cachedServerInfo);
+            }
+        }
 
-                dto.App = new AppInfoDto
+        /// <summary>
+        /// 构建服务器信息（仅在缓存过期时执行，约每 10 秒一次）
+        /// </summary>
+        private MonitorServerInfoDto BuildServerInfo()
+        {
+            MonitorServerInfoDto dto = new();
+
+            // 创建 HardwareInfo 实例，仅刷新需要的部分
+            HardwareInfo hardwareInfo = new();
+            hardwareInfo.RefreshMemoryStatus();
+            hardwareInfo.RefreshCPUList();
+
+            // sys info
+            long sysRunTimeMs = Environment.TickCount64;
+            string sysRunTime = DateTimeHelper.FormatTime(sysRunTimeMs);
+            string? serverIp = _httpContextAccessor.HttpContext?.Connection?.LocalIpAddress?.MapToIPv4()?.ToString() + ":" + _httpContextAccessor.HttpContext?.Connection?.LocalPort;
+            dto.Sys = new SysInfoDto
+            {
+                ComputerName = Environment.MachineName,
+                OsName = RuntimeInformation.OSDescription,
+                OsArch = RuntimeInformation.OSArchitecture.ToString(),
+                ServerIP = serverIp ?? "未知",
+                RunTime = sysRunTime
+            };
+
+            // app info
+            Process currentProcess = Process.GetCurrentProcess();
+            DateTime programStartTime = currentProcess.StartTime;
+            string programRunTime = DateTimeHelper.FormatTime((long)(DateTime.Now - programStartTime).TotalMilliseconds);
+            string appRAM = ((double)currentProcess.WorkingSet64 / 1048576).ToString("N2", global::System.Globalization.CultureInfo.InvariantCulture) + " MB";
+            dto.App = new AppInfoDto
+            {
+                Name = _hostEnvironment.EnvironmentName,
+                RootPath = _hostEnvironment.ContentRootPath,
+                WebRootPath = _hostEnvironment.WebRootPath,
+                Version = RuntimeInformation.FrameworkDescription,
+                AppRAM = appRAM,
+                StartTime = programStartTime.ToString("yyyy-MM-dd HH:mm:ss", global::System.Globalization.CultureInfo.InvariantCulture),
+                RunTime = programRunTime,
+                Host = serverIp ?? "未知"
+            };
+
+            // cpu info
+            CPU? hardwareCpu = hardwareInfo.CpuList.FirstOrDefault();
+            double cpuPercent = hardwareCpu?.PercentProcessorTime ?? 0;
+            dto.Cpu = new CpuInfoDto
+            {
+                Name = hardwareCpu?.Name ?? "未知 CPU",
+                CoreTotal = (int)(hardwareCpu?.NumberOfCores ?? (uint)Environment.ProcessorCount),
+                LogicalProcessors = (int)(hardwareCpu?.NumberOfLogicalProcessors ?? (uint)Environment.ProcessorCount),
+                CPURate = Math.Round(cpuPercent, 2),
+                FreeRate = Math.Round(100.0 - cpuPercent, 2)
+            };
+
+            // memory info
+            ulong totalPhysMem = hardwareInfo.MemoryStatus.TotalPhysical;
+            ulong availPhysMem = hardwareInfo.MemoryStatus.AvailablePhysical;
+            ulong usedPhysMem = totalPhysMem - availPhysMem;
+            dto.Memory = new MemoryInfoDto
+            {
+                TotalRAM = totalPhysMem > 0 ? Math.Round(totalPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
+                UsedRam = usedPhysMem > 0 ? Math.Round(usedPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
+                FreeRam = availPhysMem > 0 ? Math.Round(availPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
+                RAMRate = totalPhysMem > 0 ? Math.Ceiling(100.0 * usedPhysMem / totalPhysMem) + "%" : "未知"
+            };
+
+            // disk info
+            try
+            {
+                foreach (DriveInfo? drive in DriveInfo.GetDrives().Where(d => d.IsReady))
                 {
-                    Name = _hostEnvironment.EnvironmentName,
-                    RootPath = _hostEnvironment.ContentRootPath,
-                    WebRootPath = _hostEnvironment.WebRootPath,
-                    Version = RuntimeInformation.FrameworkDescription,
-                    AppRAM = appRAM,
-                    StartTime = programStartTime.ToString("yyyy-MM-dd HH:mm:ss", global::System.Globalization.CultureInfo.InvariantCulture),
-                    RunTime = programRunTime,
-                    Host = serverIp ?? "未知"
-                };
+                    long totalSizeGb = drive.TotalSize / 1024 / 1024 / 1024;
+                    long freeSpaceGb = drive.AvailableFreeSpace / 1024 / 1024 / 1024;
+                    long usedSpaceGb = totalSizeGb - freeSpaceGb;
+                    decimal availablePercent = totalSizeGb > 0 ? decimal.Ceiling(usedSpaceGb / (decimal)totalSizeGb * 100) : 0;
 
-                // cpu info (Hardware.Info handles the cross-platform cpu usage without wmic/top)
-                CPU? hardwareCpu = hardwareInfo.CpuList.FirstOrDefault();
-                double cpuPercent = hardwareCpu?.PercentProcessorTime ?? 0;
-                dto.Cpu = new CpuInfoDto
-                {
-                    Name = hardwareCpu?.Name ?? "未知 CPU",
-                    CoreTotal = (int)(hardwareCpu?.NumberOfCores ?? (uint)Environment.ProcessorCount),
-                    LogicalProcessors = (int)(hardwareCpu?.NumberOfLogicalProcessors ?? (uint)Environment.ProcessorCount),
-                    CPURate = Math.Round(cpuPercent, 2),
-                    FreeRate = Math.Round(100.0 - cpuPercent, 2)
-                };
-
-                // memory info
-                ulong totalPhysMem = hardwareInfo.MemoryStatus.TotalPhysical;
-                ulong availPhysMem = hardwareInfo.MemoryStatus.AvailablePhysical;
-                ulong usedPhysMem = totalPhysMem - availPhysMem;
-                dto.Memory = new MemoryInfoDto
-                {
-                    TotalRAM = totalPhysMem > 0 ? Math.Round(totalPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
-                    UsedRam = usedPhysMem > 0 ? Math.Round(usedPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
-                    FreeRam = availPhysMem > 0 ? Math.Round(availPhysMem / 1024.0 / 1024.0 / 1024.0, 2) + "GB" : "未知",
-                    RAMRate = totalPhysMem > 0 ? Math.Ceiling(100.0 * usedPhysMem / totalPhysMem) + "%" : "未知"
-                };
-
-                // disk info (Use native .NET DriveInfo for absolute cross-platform reliability instead of wmic/df)
-                try
-                {
-                    foreach (DriveInfo? drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+                    dto.Disks.Add(new DiskInfoDto
                     {
-                        long totalSizeGb = drive.TotalSize / 1024 / 1024 / 1024;
-                        long freeSpaceGb = drive.AvailableFreeSpace / 1024 / 1024 / 1024;
-                        long usedSpaceGb = totalSizeGb - freeSpaceGb;
-                        decimal availablePercent = totalSizeGb > 0 ? decimal.Ceiling(usedSpaceGb / (decimal)totalSizeGb * 100) : 0;
-
-                        dto.Disks.Add(new DiskInfoDto
-                        {
-                            DiskName = drive.Name,
-                            TypeName = drive.DriveType.ToString(),
-                            TotalSize = totalSizeGb,
-                            AvailableFreeSpace = freeSpaceGb,
-                            Used = usedSpaceGb,
-                            AvailablePercent = availablePercent
-                        });
-                    }
+                        DiskName = drive.Name,
+                        TypeName = drive.DriveType.ToString(),
+                        TotalSize = totalSizeGb,
+                        AvailableFreeSpace = freeSpaceGb,
+                        Used = usedSpaceGb,
+                        AvailablePercent = availablePercent
+                    });
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error retrieving disk info natively: {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving disk info natively: {ex.Message}");
+            }
 
-                // Cache slowly changing information like Networks and Assemblies to avoid WMI and Reflection overhead
-                lock (_staticCacheLock)
+            // 长时间静态缓存（1 小时 TTL）
+            lock (_staticCacheLock)
+            {
+                if ((DateTime.Now - _lastStaticCacheTime).TotalHours > 1 || _cachedNetworks == null || _cachedAssemblies == null)
                 {
-                    if ((DateTime.Now - _lastStaticCacheTime).TotalHours > 1 || _cachedNetworks == null || _cachedAssemblies == null)
+                    hardwareInfo.RefreshNetworkAdapterList();
+                    _cachedNetworks = [.. hardwareInfo.NetworkAdapterList.Select(net => new NetworkAdapterDto
                     {
-                        hardwareInfo.RefreshNetworkAdapterList();
-                        _cachedNetworks = [.. hardwareInfo.NetworkAdapterList.Select(net => new NetworkAdapterDto
+                        Name = net.Name,
+                        MacAddress = net.MACAddress,
+                        IPv4 = net.IPAddressList != null ? string.Join(", ", net.IPAddressList.Select(ip => ip.ToString())) : "N/A"
+                    })];
+
+                    _cachedAssemblies = [.. AppDomain.CurrentDomain.GetAssemblies()
+                        .Where(a => !a.IsDynamic)
+                        .Select(a => new AssemblyInfoDto
                         {
-                            Name = net.Name,
-                            MacAddress = net.MACAddress,
-                            IPv4 = net.IPAddressList != null ? string.Join(", ", net.IPAddressList.Select(ip => ip.ToString())) : "N/A"
-                        })];
+                            Name = a.GetName().Name ?? "Unknown",
+                            Version = a.GetName().Version?.ToString() ?? string.Empty
+                        })
+                        .OrderBy(a => a.Name)];
 
-                        _cachedAssemblies = [.. AppDomain.CurrentDomain.GetAssemblies()
-                            .Where(a => !a.IsDynamic)
-                            .Select(a => new AssemblyInfoDto
-                            {
-                                Name = a.GetName().Name ?? "Unknown",
-                                Version = a.GetName().Version?.ToString() ?? string.Empty
-                            })
-                            .OrderBy(a => a.Name)];
-
-                        _lastStaticCacheTime = DateTime.Now;
-                    }
+                    _lastStaticCacheTime = DateTime.Now;
                 }
+            }
 
-                // Assign cached values
-                dto.Networks = _cachedNetworks;
-                dto.Assemblies = _cachedAssemblies;
+            dto.Networks = _cachedNetworks;
+            dto.Assemblies = _cachedAssemblies;
 
-                return dto;
-            });
+            return dto;
         }
     }
 }

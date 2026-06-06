@@ -80,10 +80,12 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                     .Where(u => userIds.Contains(u.Id))
                     .ToListAsync();
 
+                // O(1) Dictionary 查找替代 O(n) FirstOrDefault
+                Dictionary<Guid, User> userDict = usersWithRelations.ToDictionary(u => u.Id);
+
                 foreach (UserGetListOutputDto? dto in outPut)
                 {
-                    User? userEntity = usersWithRelations.FirstOrDefault(u => u.Id == dto.Id);
-                    if (userEntity != null)
+                    if (userDict.TryGetValue(dto.Id, out User? userEntity))
                     {
                         dto.Roles = ObjectMapper.Map<List<Role>, List<RoleGetListOutputDto>>(userEntity.Roles);
                         dto.Posts = ObjectMapper.Map<List<Position>, List<PostGetListOutputDto>>(userEntity.Posts);

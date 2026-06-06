@@ -38,45 +38,52 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly IGuidGenerator _guidGenerator = guidGenerator;
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ILocalEventBus _localEventBus = localEventBus;
-        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager; // 新增
+        private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
 
         /// <summary>
         /// 给用户设置角色
         /// </summary>
         public async Task GiveUserSetRoleAsync(List<Guid> userIds, List<Guid> roleIds)
         {
-            // 1. 业务逻辑 (持久化)
-            // 删除用户之前所有的用户角色关系（物理删除，没有恢复的必要）
-            await _repositoryUserRole.DeleteAsync(u => userIds.Contains(u.UserId));
-
-            if (roleIds is not null)
+            try
             {
-                // 遍历用户
-                foreach (Guid userId in userIds)
+                // 1. 业务逻辑 (持久化)
+                await _repositoryUserRole.DeleteAsync(u => userIds.Contains(u.UserId));
+
+                if (roleIds is not null)
                 {
-                    // 添加新的关系
-                    List<UserRole> userRoleEntities = [];
-                    foreach (Guid roleId in roleIds)
+                    // G4: 批量插入 — 将所有映射关系收集到一个集合，单次 InsertRangeAsync
+                    List<UserRole> allUserRoleEntities = [];
+                    foreach (Guid userId in userIds)
                     {
-                        userRoleEntities.Add(new UserRole() { UserId = userId, RoleId = roleId });
+                        foreach (Guid roleId in roleIds)
+                        {
+                            allUserRoleEntities.Add(new UserRole() { UserId = userId, RoleId = roleId });
+                        }
                     }
-                    // 一次性批量添加
-                    await _repositoryUserRole.InsertRangeAsync(userRoleEntities);
+                    await _repositoryUserRole.InsertRangeAsync(allUserRoleEntities);
+                }
+
+                // 2. Casbin 同步逻辑
+                List<User> users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
+                List<Role> roles = [];
+                if (roleIds is not null && roleIds.Count > 0)
+                {
+                    roles = await _roleRepository.GetListAsync(r => roleIds.Contains(r.Id));
+                }
+
+                foreach (User user in users)
+                {
+                    await _casbinPolicyManager.SetUserRolesAsync(user, roles);
                 }
             }
-
-            // 2. Casbin 同步逻辑
-            List<User> users = await _repository.GetListAsync(u => userIds.Contains(u.Id));
-            List<Role> roles = [];
-            if (roleIds is not null && roleIds.Count > 0)
+            finally
             {
-                roles = await _roleRepository.GetListAsync(r => roleIds.Contains(r.Id));
-            }
-
-            foreach (User user in users)
-            {
-                // 将选中的 roles 赋给该 user (Casbin g 策略)
-                await _casbinPolicyManager.SetUserRolesAsync(user, roles);
+                // S4: 角色变更后立即清除受影响用户的缓存
+                foreach (Guid userId in userIds)
+                {
+                    await _userCache.RemoveAsync(new UserInfoCacheKey(userId));
+                }
             }
         }
 
@@ -86,17 +93,28 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// </summary>
         public async Task GiveUserSetPostAsync(List<Guid> userIds, List<Guid> postIds)
         {
-            await _repositoryUserPost.DeleteAsync(u => userIds.Contains(u.UserId));
-            if (postIds is not null)
+            try
             {
+                await _repositoryUserPost.DeleteAsync(u => userIds.Contains(u.UserId));
+                if (postIds is not null)
+                {
+                    List<UserPosition> allUserPostEntities = [];
+                    foreach (Guid userId in userIds)
+                    {
+                        foreach (Guid postId in postIds)
+                        {
+                            allUserPostEntities.Add(new UserPosition() { UserId = userId, PostId = postId });
+                        }
+                    }
+                    await _repositoryUserPost.InsertRangeAsync(allUserPostEntities);
+                }
+            }
+            finally
+            {
+                // S4: 岗位变更后清除受影响用户的缓存
                 foreach (Guid userId in userIds)
                 {
-                    List<UserPosition> userPostEntities = [];
-                    foreach (Guid post in postIds)
-                    {
-                        userPostEntities.Add(new UserPosition() { UserId = userId, PostId = post });
-                    }
-                    await _repositoryUserPost.InsertRangeAsync(userPostEntities);
+                    await _userCache.RemoveAsync(new UserInfoCacheKey(userId));
                 }
             }
         }
@@ -124,7 +142,6 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             User entity = await _repository.InsertReturnEntityAsync(userEntity);
 
-            // 发布事件 (可能会触发 SetDefautRoleAsync，进而触发 Casbin 同步)
             await _localEventBus.PublishAsync(new UserCreateEventArgs(entity.Id));
         }
 
@@ -134,7 +151,6 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             Role? role = await _roleRepository.GetFirstAsync(x => x.RoleCode == UserConst.DefaultRoleCode);
             if (role is not null)
             {
-                // 这会调用上面修改过的 GiveUserSetRoleAsync，从而自动同步 Casbin
                 await GiveUserSetRoleAsync([userId], [role.Id]);
             }
         }
@@ -146,7 +162,6 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 throw new UserFriendlyException("用户名无效注册！");
             }
 
-            // B-09: 第三方登录临时账号前缀限制下沉到领域层
             if (input.UserName!.StartsWith(UserConst.OAuthTempPrefix, StringComparison.Ordinal))
             {
                 throw new UserFriendlyException("注册账号不能以ls_字符开头");
@@ -173,6 +188,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             return data is null ? throw new AbpAuthorizationException() : data;
         }
 
+        /// <summary>
+        /// 使用 IDistributedCache（ABP 统一缓存抽象，支持 MemoryCache 和 Redis 自由切换）
+        /// </summary>
         public async Task<UserRoleMenuDto> GetInfoByCacheAsync(Guid userId)
         {
             UserRoleMenuDto? output = null;
@@ -195,14 +213,51 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         }
 
 
+        /// <summary>
+        /// G3: 批量缓存查询 — 先尝试逐个命中缓存，cache miss 的统一用单次 DB 批量查询
+        /// </summary>
         public async Task<List<UserRoleMenuDto>> GetInfoListAsync(List<Guid> userIds)
         {
-            List<UserRoleMenuDto> output = [];
+            List<UserRoleMenuDto> result = [];
+
+            // 第一遍：尝试从缓存获取；收集 cache miss 的 userId
+            List<Guid> missedIds = [];
             foreach (Guid userId in userIds)
             {
-                output.Add(await GetInfoByCacheAsync(userId));
+                UserInfoCacheItem? cacheData = await _userCache.GetAsync(new UserInfoCacheKey(userId));
+                if (cacheData is not null)
+                {
+                    result.Add(cacheData.Info);
+                }
+                else
+                {
+                    missedIds.Add(userId);
+                }
             }
-            return output;
+
+            // 第二遍：批量 DB 查询所有 cache miss 的用户
+            if (missedIds.Count > 0)
+            {
+                long tokenExpiresMinuteTime = LazyServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value.ExpiresMinuteTime;
+                List<User> users = await _userRepository.GetListUserAllInfoAsync(missedIds);
+                Dictionary<Guid, User> userDict = users.ToDictionary(u => u.Id);
+
+                foreach (Guid userId in missedIds)
+                {
+                    if (userDict.TryGetValue(userId, out User? user))
+                    {
+                        UserRoleMenuDto dto = EntityMapToDto(user)
+                            ?? throw new AbpAuthorizationException();
+                        // 写回缓存
+                        await _userCache.SetAsync(new UserInfoCacheKey(userId),
+                            new UserInfoCacheItem(dto),
+                            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(tokenExpiresMinuteTime) });
+                        result.Add(dto);
+                    }
+                }
+            }
+
+            return result;
         }
 
         private static UserRoleMenuDto EntityMapToDto(User user)
@@ -218,7 +273,6 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             {
                 userRoleMenu.User = user.Adapt<UserDto>();
                 userRoleMenu.User.Password = string.Empty;
-                // userRoleMenu.User.Salt = string.Empty; // UserDto 可能没有 Salt 了
                 userRoleMenu.RoleCodes.Add(UserConst.AdminRolesCode);
                 userRoleMenu.PermissionCodes.Add(UserConst.AdminPermissionCode);
                 return userRoleMenu;
