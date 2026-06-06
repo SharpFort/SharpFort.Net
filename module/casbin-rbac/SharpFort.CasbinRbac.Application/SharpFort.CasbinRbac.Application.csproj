@@ -16,6 +16,7 @@
   <ItemGroup>
 	  <PackageReference Include="Hardware.Info" Version="110.0.0.1" />
 	  <PackageReference Include="Lazy.Captcha.Core" Version="2.2.4" />
+	  <PackageReference Include="SkiaSharp" Version="3.119.4" />
 	  <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" />
 	  <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.8" />
 	  <PackageReference Include="Volo.Abp.BackgroundJobs.Hangfire" Version="10.4.1" />
