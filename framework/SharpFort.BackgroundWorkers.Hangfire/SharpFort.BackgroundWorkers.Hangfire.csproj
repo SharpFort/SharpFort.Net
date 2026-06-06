@@ -10,8 +10,8 @@
 
 
     <ItemGroup>
-        <PackageReference Include="Volo.Abp.BackgroundJobs.Hangfire" Version="10.4.0" />
-        <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="10.4.0" />
+        <PackageReference Include="Volo.Abp.BackgroundJobs.Hangfire" Version="10.4.1" />
+        <PackageReference Include="Volo.Abp.BackgroundWorkers.Hangfire" Version="10.4.1" />
         <!-- NU1903: 覆盖 ABP 传递依赖中的 System.Security.Cryptography.Xml 10.0.2 高危漏洞 -->
         <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.8" />
     </ItemGroup>

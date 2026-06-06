@@ -17,22 +17,22 @@
 
     <PackageReference Include="IPTools.China" Version="1.6.0" />
 
-    <PackageReference Include="TencentCloudSDK" Version="3.0.1431" />
+    <PackageReference Include="TencentCloudSDK" Version="3.0.1440" />
 
     <PackageReference Include="UAParser" Version="3.1.47" />
 
-    <PackageReference Include="Volo.Abp.AspNetCore.SignalR" Version="10.4.0" />
+    <PackageReference Include="Volo.Abp.AspNetCore.SignalR" Version="10.4.1" />
 
-    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.4.0" />
-	  <PackageReference Include="Volo.Abp.Caching" Version="10.4.0" />
-    <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="10.4.0" />
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="10.4.1" />
+	  <PackageReference Include="Volo.Abp.Caching" Version="10.4.1" />
+    <PackageReference Include="Volo.Abp.Imaging.ImageSharp" Version="10.4.1" />
     <PackageReference Include="Casbin.NET.Adapter.SqlSugar" Version="1.0.3" />
     <PackageReference Include="Casbin.NET.Watcher.Redis" Version="2.0.0" />
 	  
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DistributedLock.Redis" Version="1.1.1" />
-    <PackageReference Include="Volo.Abp.DistributedLocking" Version="10.4.0" />
+    <PackageReference Include="Volo.Abp.DistributedLocking" Version="10.4.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>

@@ -6,8 +6,8 @@
     <ProjectReference Include="..\..\..\framework\SharpFort.Ddd.Application\SharpFort.Ddd.Application.csproj" />
     <ProjectReference Include="..\SharpFort.Ai.Application.Contracts\SharpFort.Ai.Application.Contracts.csproj" />
     <ProjectReference Include="..\SharpFort.Ai.Domain\SharpFort.Ai.Domain.csproj" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs" Version="10.4.0" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.Hangfire" Version="10.4.0" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs" Version="10.4.1" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.Hangfire" Version="10.4.1" />
     <ProjectReference Include="..\..\casbin-rbac\SharpFort.CasbinRbac.Application.Contracts\SharpFort.CasbinRbac.Application.Contracts.csproj" />
     <ProjectReference Include="..\SharpFort.Ai.AgentFramework\SharpFort.Ai.AgentFramework.csproj" />
   </ItemGroup>
