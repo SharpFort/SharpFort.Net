@@ -2,9 +2,11 @@ using Casbin;
 using System.Globalization;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using SqlSugar;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
+using SharpFort.CasbinRbac.Application.Extensions;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Role;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.User;
@@ -35,13 +37,48 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             IEnforcer enforcer,
             ISqlSugarRepository<Menu, Guid> menuRepository,
             ICasbinPolicyManager casbinPolicyManager,
-            ISqlSugarRepository<User, Guid> userRepository) : base(repository)
+            ISqlSugarRepository<User, Guid> userRepository,
+            IDistributedCache distributedCache) : base(repository)
         {
+            _distributedCache = distributedCache;
             (_roleManager, _roleDeptRepository, _userRoleRepository, _repository, _enforcer, _menuRepository, _casbinPolicyManager, _userRepository) =
                 (roleManager, roleDeptRepository, userRoleRepository, repository, enforcer, menuRepository, casbinPolicyManager, userRepository);
         }
 
+        private readonly IDistributedCache _distributedCache;
         private readonly ISqlSugarRepository<Role, Guid> _repository;
+
+        // ========== 缓存版本控制 ==========
+        private static long _roleSchemaVersion = 1;
+
+        private void InvalidateRoleCache()
+        {
+            Interlocked.Increment(ref _roleSchemaVersion);
+        }
+
+        private static string GetRoleCachedKeyPrefix()
+        {
+            long ver = Interlocked.Read(ref _roleSchemaVersion);
+            return $"Role:v{ver}:";
+        }
+
+        // ========== 重写下拉列表查询（Redis 缓存） ==========
+        public override async Task<PagedResultDto<RoleGetListOutputDto>> GetSelectDataListAsync(
+            string? keywords = null)
+        {
+            string cacheKey = $"{GetRoleCachedKeyPrefix()}Select:ALL";
+
+            var cached = await _distributedCache.GetFromCacheAsync<PagedResultDto<RoleGetListOutputDto>>(cacheKey);
+            if (cached is not null) return cached;
+
+            var result = await base.GetSelectDataListAsync(keywords);
+
+            var options = result.TotalCount == 0
+                ? SfDistributedCacheExtensions.ShortCacheOptions
+                : SfDistributedCacheExtensions.DefaultCacheOptions;
+            await _distributedCache.SetCacheAsync(cacheKey, result, options);
+            return result;
+        }
         private RoleManager _roleManager { get; set; }
 
         private readonly ISqlSugarRepository<RoleDepartment> _roleDeptRepository;
@@ -61,6 +98,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             Role entity = new() { DataScope = input.DataScope };
             EntityHelper.TrySetId(entity, () => input.RoleId);
             await _repository._Db.Updateable(entity).UpdateColumns(x => x.DataScope).ExecuteCommandAsync();
+            InvalidateRoleCache();
         }
 
         public override async Task<PagedResultDto<RoleGetListOutputDto>> GetListAsync(RoleGetListInputVo input)
@@ -99,6 +137,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             RoleGetOutputDto outputDto = await MapToGetOutputDtoAsync(entity);
 
+            InvalidateRoleCache();
             return outputDto;
         }
 
@@ -146,6 +185,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await _roleManager.GiveRoleSetMenuAsync([id], input.MenuIds ?? []);
 
             RoleGetOutputDto dto = await MapToGetOutputDtoAsync(entity);
+            InvalidateRoleCache();
             return dto;
         }
 
@@ -170,6 +210,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             entity.State = state;
             await _repository.UpdateAsync(entity);
+            InvalidateRoleCache();
             return await MapToGetOutputDtoAsync(entity);
         }
 
@@ -296,6 +337,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             }
 
             await base.DeleteAsync(ids);
+            InvalidateRoleCache();
 
             // 物理删除角色后，清理与该角色绑定的所有 Casbin p规则与g规则
             foreach (Role role in roles)

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
 using System.Globalization;
 using SqlSugar;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Users;
+using SharpFort.CasbinRbac.Application.Extensions;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.User;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Role;
@@ -25,11 +27,13 @@ namespace SharpFort.CasbinRbac.Application.Services.System
     public class UserService(ISqlSugarRepository<User, Guid> repository, UserManager userManager,
         ICurrentUser currentUser, IDeptService deptService,
         ILocalEventBus localEventBus,
-        ICasbinPolicyManager casbinPolicyManager) : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
+        ICasbinPolicyManager casbinPolicyManager,
+        IDistributedCache distributedCache) : SfCrudAppService<User, UserGetOutputDto, UserGetListOutputDto, Guid,
         UserGetListInputVo, UserCreateInputVo, UserUpdateInputVo>(repository), IUserService
     {
         protected ILocalEventBus LocalEventBus => LazyServiceProvider.LazyGetRequiredService<ILocalEventBus>();
 
+        private readonly IDistributedCache _distributedCache = distributedCache;
         private UserManager _userManager { get; set; } = userManager;
         private readonly ISqlSugarRepository<User, Guid> _repository = repository;
         private IDeptService _deptService { get; set; } = deptService;
@@ -38,6 +42,39 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
         private readonly ILocalEventBus _localEventBus = localEventBus;
         private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
+
+        // ========== 缓存版本控制 ==========
+        private static long _userSchemaVersion = 1;
+
+        private void InvalidateUserCache()
+        {
+            Interlocked.Increment(ref _userSchemaVersion);
+        }
+
+        private static string GetUserCachedKeyPrefix()
+        {
+            long ver = Interlocked.Read(ref _userSchemaVersion);
+            return $"User:v{ver}:";
+        }
+
+        // ========== 重写下拉列表查询（Redis 缓存） ==========
+        public override async Task<PagedResultDto<UserGetListOutputDto>> GetSelectDataListAsync(
+            string? keywords = null)
+        {
+            // 注意：基类忽略 keywords 参数，固定 cacheKey 即可
+            string cacheKey = $"{GetUserCachedKeyPrefix()}Select:ALL";
+
+            var cached = await _distributedCache.GetFromCacheAsync<PagedResultDto<UserGetListOutputDto>>(cacheKey);
+            if (cached is not null) return cached;
+
+            var result = await base.GetSelectDataListAsync(keywords);
+
+            var options = result.TotalCount == 0
+                ? SfDistributedCacheExtensions.ShortCacheOptions
+                : SfDistributedCacheExtensions.DefaultCacheOptions;
+            await _distributedCache.SetCacheAsync(cacheKey, result, options);
+            return result;
+        }
 
         /// <summary>
         /// 批量查询用户
@@ -139,6 +176,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // 已删除 SyncCasbinUserRoles 方法，消除双写 Bug (S-02)
 
             UserGetOutputDto result = await MapToGetOutputDtoAsync(entitiy);
+            InvalidateUserCache();
             return result;
         }
 
@@ -199,6 +237,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             // Casbin 同步已在 GiveUserSetRoleAsync → SetUserRolesAsync 中完成，此处无需重复
             // 已删除 RemoveFilteredGroupingPolicyAsync + SyncCasbinUserRoles 双写 (S-02)
 
+            InvalidateUserCache();
             return await MapToGetOutputDtoAsync(entity);
         }
 
@@ -216,6 +255,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             await _repository.UpdateAsync(entity);
             UserGetOutputDto dto = await MapToGetOutputDtoAsync(entity);
 
+            InvalidateUserCache();
             return dto;
         }
 
@@ -232,6 +272,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             User entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("用户未存在");
             entity.State = state;
             await _repository.UpdateAsync(entity);
+            InvalidateUserCache();
             return await MapToGetOutputDtoAsync(entity);
         }
 
@@ -246,6 +287,25 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             }
 
             await base.DeleteAsync(id);
+            InvalidateUserCache();
+        }
+
+        /// <summary>
+        /// 批量删除用户（前端实际调用入口 — 基类单删被禁用远程）
+        /// 覆盖基类以追加 Casbin 策略清理 + 缓存失效
+        /// </summary>
+        [OperLog("批量删除用户", OperationType.Delete)]
+        public override async Task DeleteAsync(IEnumerable<Guid> ids)
+        {
+            // 一次性查询所有待删用户，避免 N+1
+            List<User> users = await _repository.GetListAsync(u => ids.Contains(u.Id));
+            foreach (User user in users)
+            {
+                await _casbinPolicyManager.CleanUserPoliciesAsync(user.Id, user.TenantId);
+            }
+
+            await base.DeleteAsync(ids);
+            InvalidateUserCache();
         }
 
         /// <summary>

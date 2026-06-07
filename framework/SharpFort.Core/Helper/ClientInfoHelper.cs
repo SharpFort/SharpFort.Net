@@ -9,6 +9,9 @@ namespace SharpFort.Core.Helper
 {
     public static class ClientInfoHelper
     {
+        // 单例：应用启动时初始化一次，避免高并发下重复解析 regexes.yaml
+        private static readonly Parser _uaParser = Parser.GetDefault();
+
         public class ClientResult
         {
             public string LoginIp { get; set; } = string.Empty;
@@ -26,11 +29,10 @@ namespace SharpFort.Core.Helper
 
             // 1. 解析 UserAgent (浏览器和OS)
             string uaStr = context.GetUserAgent(); // 假设这是你的扩展方法
-            Parser uaParser = Parser.GetDefault();
             ClientInfo c;
             try
             {
-                c = uaParser.Parse(uaStr);
+                c = _uaParser.Parse(uaStr);
             }
             catch
             {
@@ -39,7 +41,7 @@ namespace SharpFort.Core.Helper
             }
             //return c;
 
-            string browser = c?.Device?.Family ?? "Unknown";
+            string browser = c?.UA?.Family ?? "Unknown";
             string os = c?.OS?.ToString() ?? "Unknown";
 
             // 2. 解析 IP 和 地理位置

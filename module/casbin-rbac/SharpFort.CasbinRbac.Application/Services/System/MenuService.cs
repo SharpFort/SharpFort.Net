@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
 
 namespace SharpFort.CasbinRbac.Application.Services.System
 {
@@ -160,10 +161,15 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         // ================= 4. 写接口重构（单条新增） =================
         public override async Task<MenuGetOutputDto> CreateAsync(MenuCreateInputVo input)
         {
-            return await CreateInternalAsync(input, invalidateCache: true);
+            return await CreateInternalAsync(input, invalidateCache: true, associateAdminRole: true);
         }
 
-        private async Task<MenuGetOutputDto> CreateInternalAsync(MenuCreateInputVo input, bool invalidateCache)
+        /// <summary>
+        /// 内部创建方法
+        /// </summary>
+        /// <param name="associateAdminRole">是否关联超管 RoleMenu。单条创建时为 true，批量导入时由外部统一处理</param>
+        private async Task<MenuGetOutputDto> CreateInternalAsync(
+            MenuCreateInputVo input, bool invalidateCache, bool associateAdminRole = true)
         {
             if (!string.IsNullOrWhiteSpace(input.ApiUrl) && string.IsNullOrWhiteSpace(input.ApiMethod))
             {
@@ -186,6 +192,19 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             var result = await base.CreateAsync(input);
 
+            // 将新菜单关联给超管（仅 RoleMenu，不碰 Casbin — 超管已有 *,* 通配符）
+            if (associateAdminRole)
+            {
+                Role? adminRole = await _roleRepository.GetFirstAsync(
+                    r => r.RoleCode == UserConst.AdminRolesCode);
+                if (adminRole != null)
+                {
+                    await _roleMenuRepository.InsertAsync(
+                        new RoleMenu { RoleId = adminRole.Id, MenuId = result.Id });
+                    // 注意：不调用 SetRolePermissionsAsync — 超管已有 *,* 通配符
+                }
+            }
+
             if (invalidateCache)
             {
                 InvalidateMenuCache();
@@ -197,11 +216,28 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         // ================= 5. 写接口重构（批量导入优化） =================
         public override async Task PostImportExcelAsync(List<MenuCreateInputVo> input)
         {
+            List<Guid> newMenuIds = new();
             try
             {
                 foreach (var item in input)
                 {
-                    await CreateInternalAsync(item, invalidateCache: false);
+                    // 批量导入时不逐个关联超管（associateAdminRole: false）
+                    var result = await CreateInternalAsync(item, invalidateCache: false, associateAdminRole: false);
+                    newMenuIds.Add(result.Id);
+                }
+
+                // 批量结束后一次性插入所有 RoleMenu 关联
+                if (newMenuIds.Count > 0)
+                {
+                    Role? adminRole = await _roleRepository.GetFirstAsync(
+                        r => r.RoleCode == UserConst.AdminRolesCode);
+                    if (adminRole != null)
+                    {
+                        List<RoleMenu> roleMenus = newMenuIds
+                            .Select(id => new RoleMenu { RoleId = adminRole.Id, MenuId = id })
+                            .ToList();
+                        await _roleMenuRepository.InsertRangeAsync(roleMenus);
+                    }
                 }
             }
             finally
