@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -147,22 +148,23 @@ namespace SharpFort.CodeGen.Application.Services
         }
 
         /// <summary>
-        /// 打开本地目录 (仅支持 Windows 开发环境)
+        /// 打开本地目录 (支持 Windows/Linux/macOS)
         /// </summary>
         [HttpPost("code-gen/dir/{**path}")]
 #pragma warning disable CA1822
         public Task PostDir([FromRoute] string path)
         {
+            path = Uri.UnescapeDataString(path);
+            path = string.Join(Path.DirectorySeparatorChar, path.Split('/', '\\').Where(x => !x.Contains('@')));
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                path = Uri.UnescapeDataString(path);
-                path = string.Join('\\', path.Split('\\').Where(x => !x.Contains('@')));
                 Process.Start("explorer.exe", path);
-            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                Process.Start("xdg-open", path);
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                Process.Start("open", path);
             else
-            {
                 throw new UserFriendlyException("当前操作系统不支持打开目录");
-            }
 
             return Task.CompletedTask;
         }

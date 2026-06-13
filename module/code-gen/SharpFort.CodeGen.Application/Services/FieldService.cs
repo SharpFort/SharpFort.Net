@@ -41,7 +41,7 @@ namespace SharpFort.CodeGen.Application.Services
 #pragma warning disable CA1822 // ABP requires instance methods for AutoAPI
         public object GetFieldType()
         {
-            return typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Select(x => new { lable = x.Name, value = (int)Enum.Parse<FieldType>(x.Name) }).ToList();
+            return typeof(FieldType).GetFields(BindingFlags.Static | BindingFlags.Public).Select(x => new { label = x.Name, value = (int)Enum.Parse<FieldType>(x.Name) }).ToList();
         }
 #pragma warning restore CA1822
     }
