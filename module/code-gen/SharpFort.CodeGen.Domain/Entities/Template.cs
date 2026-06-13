@@ -4,8 +4,10 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace SharpFort.CodeGen.Domain.Entities;
 
 /// <summary>
-/// 代码生成模板聚合根
-/// 领域定义：定义用于生成代码的模板内容（如 .cs, .vue, .js 的模板）及生成路径规则
+/// Scriban 代码生成模板聚合根
+/// 领域定义：存储用于生成 DTO/IService/Service 代码的 Scriban 模板内容及生成路径规则
+/// 职责：存储“输出规则”——模板名称、Scriban 脚本内容、生成路径模板 (BuildPath)
+/// 架构：DB 基线层 (种子数据) + 本地文件覆写层 (Templates/*.scriban)
 /// </summary>
 [SugarTable("gen_template")]
 // 索引：模板名称必须唯一，便于前端选择和识别
@@ -19,30 +21,29 @@ public class Template : FullAuditedAggregateRoot<Guid>
     public override Guid Id { get; protected set; }
 
     /// <summary>
-    /// 模板名称
-    /// 示例：Service.cs, Index.vue
-    /// 规则：必填，唯一，长度 64
+    /// 模板名称 (如: Service, GetListOutputDto, IServices)
+    /// 规则：必填，唯一，与 Templates/{Name}.scriban 本地文件名对应
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
     public string? Name { get; private set; } = null;
 
     /// <summary>
-    /// 建议生成路径
-    /// 示例：aspnet-core/src/Domain/Entities/
-    /// 规则：必填，长度 256
+    /// 生成路径模板 (支持 Scriban 占位符)
+    /// 示例：module/{{project_name}}/SharpFort.{{project_name}}.Application/Services/{{Model}}Service.cs
+    /// 规则：必填，长度 256，渲染时自动替换占位符
     /// </summary>
     [SugarColumn(ColumnName = "build_path", Length = 256, IsNullable = false)]
     public string? BuildPath { get; private set; } = null;
 
     /// <summary>
-    /// 模板内容
-    /// 规则：大文本，存储 Razor/Scriban 脚本
+    /// Scriban 模板脚本内容 (大文本)
+    /// 用途：CodeFileManager 加载后经 Scriban 引擎渲染生成代码文件
     /// </summary>
     [SugarColumn(ColumnName = "content", ColumnDataType = "text", IsNullable = false)]
     public string? Content { get; private set; } = null;
 
     /// <summary>
-    /// 备注/说明
+    /// 模板备注/说明
     /// </summary>
     [SugarColumn(ColumnName = "remarks", Length = 512, IsNullable = true)]
     public string? Remarks { get; private set; }

@@ -5,8 +5,9 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace SharpFort.CodeGen.Domain.Entities;
 
 /// <summary>
-/// 表定义聚合根
-/// 领域定义：描述数据库中的一张表，作为代码生成的源头配置
+/// 实体注册表聚合根 (YiTable)
+/// 领域定义：收集并管理所有 C# Entity 类的元数据信息，作为代码生成的配置源头
+/// 职责：存储“源”信息——实体类名、所属模块/项目、物理表名、命名空间等
 /// </summary>
 [SugarTable("gen_table")]
 // 索引：表名必须唯一，防止生成的代码类名冲突
@@ -20,35 +21,45 @@ public class Table : FullAuditedAggregateRoot<Guid>
     public override Guid Id { get; protected set; }
 
     /// <summary>
-    /// 表名称 (如: SystemUser)
+    /// 实体类名称 (如: SystemUser)
+    /// 来源：C# Entity 类名或 SugarTable 特性值
     /// 规则：必填，唯一，建议 PascalCase
     /// </summary>
     [SugarColumn(ColumnName = "name", Length = 64, IsNullable = false)]
     public string? Name { get; set; } = null;
 
     /// <summary>
-    /// 表描述/备注
+    /// 实体描述/备注 (如: 系统用户)
     /// </summary>
     [SugarColumn(ColumnName = "description", Length = 512, IsNullable = true)]
     public string? Description { get; set; }
 
     /// <summary>
-    /// 目标模块名称
+    /// 所属模块名称 (如: Rbac)
+    /// 用途：拼接生成路径 SharpFort.{ModuleName}.Application.Contracts
     /// </summary>
     [SugarColumn(ColumnName = "module_name", Length = 128, IsNullable = true)]
     public string? ModuleName { get; set; }
 
     /// <summary>
-    /// 解决方案命名空间
+    /// 解决方案根命名空间 (如: Sf.Abp)
+    /// 用途：生成代码中的 namespace 声明前缀
     /// </summary>
     [SugarColumn(ColumnName = "root_namespace", Length = 256, IsNullable = true)]
     public string? RootNamespace { get; set; }
 
     /// <summary>
-    /// 是否覆盖已有文件
+    /// 生成代码时是否覆盖已有文件
     /// </summary>
     [SugarColumn(ColumnName = "is_overwrite", IsNullable = false)]
     public bool IsOverwrite { get; set; }
+
+    /// <summary>
+    /// 物理数据库表名 (如: sys_user)
+    /// 来源：[SugarTable("sys_user")] 特性中的 TableName
+    /// </summary>
+    [SugarColumn(ColumnName = "physical_table_name", Length = 128, IsNullable = true)]
+    public string? PhysicalTableName { get; set; }
 
     /// <summary>
     /// 所属项目名称 (从实体命名空间推断)
@@ -77,8 +88,8 @@ public class Table : FullAuditedAggregateRoot<Guid>
     public override ExtraPropertyDictionary ExtraProperties { get; protected set; }
 
     /// <summary>
-    /// 包含的字段列表 (聚合子项)
-    /// 关系：1对多
+    /// 字段列表 (聚合子项)
+    /// 关系：1:N (一个实体注册表条目对应多个字段)
     /// </summary>
     [Navigate(NavigateType.OneToMany, nameof(Field.TableId))]
     public List<Field> Fields { get; set; } = null!;
@@ -95,7 +106,7 @@ public class Table : FullAuditedAggregateRoot<Guid>
     }
 
     /// <summary>
-    /// 创建表定义
+    /// 创建实体注册表条目
     /// </summary>
     public Table(Guid id, string name, string? description = null) : base(id)
     {

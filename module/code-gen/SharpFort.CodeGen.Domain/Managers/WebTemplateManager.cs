@@ -59,6 +59,7 @@ namespace SharpFort.CodeGen.Domain.Managers
                 {
                     // 更新已有记录：保留用户手动配置，仅更新结构性字段
                     existing.Description = scanned.Description ?? existing.Description;
+                    existing.PhysicalTableName = scanned.PhysicalTableName;
                     existing.ProjectName = scanned.ProjectName;
                     existing.LastSyncTime = scanned.LastSyncTime;
 
@@ -139,7 +140,8 @@ namespace SharpFort.CodeGen.Domain.Managers
             };
             SugarTable? sugarTable = entityType.GetCustomAttribute<SugarTable>();
 
-            table.Name = sugarTable?.TableName ?? entityType.Name;
+            table.Name = entityType.Name;
+            table.PhysicalTableName = sugarTable?.TableName;
 
             foreach (PropertyInfo p in entityType.GetProperties())
             {
