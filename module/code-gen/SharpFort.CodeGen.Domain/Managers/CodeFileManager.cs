@@ -22,7 +22,6 @@ namespace SharpFort.CodeGen.Domain.Managers
     public class CodeFileManager : DomainService
     {
         private readonly IEnumerable<ITemplateContextEnricher> _enrichers;
-        private readonly IEnumerable<ITemplateHandler> _legacyHandlers;
         private readonly ISqlSugarRepository<DbTemplate> _templateRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<CodeFileManager> _logger;
@@ -30,13 +29,11 @@ namespace SharpFort.CodeGen.Domain.Managers
 
         public CodeFileManager(
             IEnumerable<ITemplateContextEnricher> enrichers,
-            IEnumerable<ITemplateHandler> legacyHandlers,
             ISqlSugarRepository<DbTemplate> templateRepository,
             IConfiguration configuration,
             ILogger<CodeFileManager> logger)
         {
             _enrichers = enrichers;
-            _legacyHandlers = legacyHandlers;
             _templateRepository = templateRepository;
             _configuration = configuration;
             _logger = logger;
@@ -85,7 +82,6 @@ namespace SharpFort.CodeGen.Domain.Managers
                     }
 
                     string templateContent = dbTemplate.Content!;
-                    string templateEngine = dbTemplate.TemplateEngine ?? "Scriban";
 
                     if (File.Exists(localTemplatePath))
                     {
@@ -96,58 +92,38 @@ namespace SharpFort.CodeGen.Domain.Managers
                     string renderedContent = string.Empty;
                     string relativeBuildPath = dbTemplate.BuildPath!;
 
-                    if (string.Equals(templateEngine, "Legacy", StringComparison.OrdinalIgnoreCase))
+                    // Scriban 引擎处理逻辑
+                    TemplateContext contextModel = new();
+                    foreach (var enricher in _enrichers.OrderBy(x => x.Priority))
                     {
-                        // 4. Legacy 引擎处理逻辑
-                        _logger.LogWarning($"[CodeGen] 模板 '{dbTemplate.Name}' 运行在 Legacy 兼容模式，建议尽快迁移至 Scriban！");
-                        HandledTemplate handledTemplate = new()
-                        {
-                            TemplateStr = templateContent,
-                            BuildPath = dbTemplate.BuildPath!
-                        };
-                        foreach (ITemplateHandler handler in _legacyHandlers)
-                        {
-                            handler.SetTable(tableEntity);
-                            handledTemplate = handler.Invoker(handledTemplate.TemplateStr, handledTemplate.BuildPath);
-                        }
-                        renderedContent = handledTemplate.TemplateStr;
-                        relativeBuildPath = handledTemplate.BuildPath;
-                    }
-                    else
-                    {
-                        // 5. Scriban 引擎处理逻辑
-                        TemplateContext contextModel = new();
-                        foreach (var enricher in _enrichers.OrderBy(x => x.Priority))
-                        {
-                            enricher.Enrich(contextModel, tableEntity);
-                        }
-
-                        // 初始化 Scriban 变量脚本对象
-                        var scriptObject = new ScriptObject();
-                        scriptObject.Import(contextModel);
-                        
-                        // 注册 Supplement 9 要求的全局自定义 C# 帮助函数
-                        scriptObject.Import("sugar_column", new Func<FieldInfo, string>(ScribanHelperFunctions.SugarColumn));
-                        scriptObject.Import("csharp_type", new Func<FieldInfo, string>(ScribanHelperFunctions.CsharpType));
-                        scriptObject.Import("default_value", new Func<FieldInfo, string>(ScribanHelperFunctions.DefaultValue));
-
-                        var renderContext = new Scriban.TemplateContext();
-                        renderContext.PushGlobal(scriptObject);
-
-                        // 渲染模板内容
-                        var scribanTemplate = Scriban.Template.Parse(templateContent);
-                        if (scribanTemplate.HasErrors)
-                        {
-                            throw new Exception($"[CodeGen] 模板 '{dbTemplate.Name}' 解析失败:\n" + string.Join("\n", scribanTemplate.Messages));
-                        }
-                        renderedContent = await scribanTemplate.RenderAsync(renderContext);
-
-                        // 渲染生成相对路径 (BuildPath 支持占位符)
-                        var pathTemplate = Scriban.Template.Parse(dbTemplate.BuildPath!);
-                        relativeBuildPath = await pathTemplate.RenderAsync(renderContext);
+                        enricher.Enrich(contextModel, tableEntity);
                     }
 
-                    // 6. 自适应拼接绝对路径
+                    // 初始化 Scriban 变量脚本对象
+                    var scriptObject = new ScriptObject();
+                    scriptObject.Import(contextModel);
+                    
+                    // 注册全局自定义 C# 帮助函数
+                    scriptObject.Import("sugar_column", new Func<FieldInfo, string>(ScribanHelperFunctions.SugarColumn));
+                    scriptObject.Import("csharp_type", new Func<FieldInfo, string>(ScribanHelperFunctions.CsharpType));
+                    scriptObject.Import("default_value", new Func<FieldInfo, string>(ScribanHelperFunctions.DefaultValue));
+
+                    var renderContext = new Scriban.TemplateContext();
+                    renderContext.PushGlobal(scriptObject);
+
+                    // 渲染模板内容
+                    var scribanTemplate = Scriban.Template.Parse(templateContent);
+                    if (scribanTemplate.HasErrors)
+                    {
+                        throw new Exception($"[CodeGen] 模板 '{dbTemplate.Name}' 解析失败:\n" + string.Join("\n", scribanTemplate.Messages));
+                    }
+                    renderedContent = await scribanTemplate.RenderAsync(renderContext);
+
+                    // 渲染生成相对路径 (BuildPath 支持占位符)
+                    var pathTemplate = Scriban.Template.Parse(dbTemplate.BuildPath!);
+                    relativeBuildPath = await pathTemplate.RenderAsync(renderContext);
+
+                    // 自适应拼接绝对路径
                     relativeBuildPath = relativeBuildPath.Replace('\\', '/').TrimStart('/');
                     // 处理可能硬编码在旧模板里的绝对路径（如 D:/code/ 转换为相对路径）
                     if (Path.IsPathRooted(relativeBuildPath))
@@ -161,7 +137,7 @@ namespace SharpFort.CodeGen.Domain.Managers
                     
                     string absoluteBuildPath = Path.Combine(solutionRoot, relativeBuildPath);
 
-                    // 7. 增量安全合并写入
+                    // 增量安全合并写入
                     string? mergedContent = _merger.Merge(absoluteBuildPath, renderedContent);
 
                     if (mergedContent == null)
@@ -170,7 +146,7 @@ namespace SharpFort.CodeGen.Domain.Managers
                         continue;
                     }
 
-                    // 8. 写入目标磁盘文件
+                    // 写入目标磁盘文件
                     string? dir = Path.GetDirectoryName(absoluteBuildPath);
                     if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                     {
