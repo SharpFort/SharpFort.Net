@@ -106,6 +106,10 @@ namespace SharpFort.CodeGen.Domain.Managers
                     var scriptObject = new ScriptObject();
                     scriptObject.Import(contextModel);
                     
+                    // 注入路径变量，供 BuildPath 模板使用
+                    scriptObject.Import("solution_root", solutionRoot);
+                    scriptObject.Import("project_name", tableEntity.ProjectName ?? tableEntity.ModuleName ?? "Rbac");
+                    
                     // 注册全局自定义 C# 帮助函数
                     scriptObject.Import("sugar_column", new Func<FieldInfo, string>(ScribanHelperFunctions.SugarColumn));
                     scriptObject.Import("csharp_type", new Func<FieldInfo, string>(ScribanHelperFunctions.CsharpType));
