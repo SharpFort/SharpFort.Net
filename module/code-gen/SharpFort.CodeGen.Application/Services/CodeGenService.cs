@@ -2,20 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SqlSugar;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Uow;
-using Volo.Abp.Data;
 using Volo.Abp.Guids;
-using Volo.Abp.Users;
 using SharpFort.CodeGen.Application.Contracts.IServices;
 using SharpFort.CodeGen.Domain.Entities;
 using SharpFort.CodeGen.Domain.Managers;
@@ -33,9 +27,7 @@ namespace SharpFort.CodeGen.Application.Services
         private readonly ISqlSugarRepository<Field, Guid> _fieldRepository;
         private readonly CodeFileManager _codeFileManager;
         private readonly WebTemplateManager _webTemplateManager;
-        private readonly IModuleContainer _moduleContainer;
         private readonly IGuidGenerator _guidGenerator;
-        private readonly ICurrentUser _currentUser;
         private readonly ILogger<CodeGenService> _logger;
 
         public CodeGenService(
@@ -43,18 +35,14 @@ namespace SharpFort.CodeGen.Application.Services
             ISqlSugarRepository<Field, Guid> fieldRepository,
             CodeFileManager codeFileManager,
             WebTemplateManager webTemplateManager,
-            IModuleContainer moduleContainer,
             IGuidGenerator guidGenerator,
-            ICurrentUser currentUser,
             ILogger<CodeGenService> logger)
         {
             _tableRepository = tableRepository;
             _fieldRepository = fieldRepository;
             _codeFileManager = codeFileManager;
             _webTemplateManager = webTemplateManager;
-            _moduleContainer = moduleContainer;
             _guidGenerator = guidGenerator;
-            _currentUser = currentUser;
             _logger = logger;
         }
 
@@ -74,101 +62,6 @@ namespace SharpFort.CodeGen.Application.Services
             }
         }
 
-        /// <summary>
-        /// Web To Db (Scaffolding 在线物理表设计更新，安全 DDL 护栏)
-        /// </summary>
-        [Authorize(Roles = "admin")]
-        [UnitOfWork]
-        public async Task<string> PostWebBuildDbAsync(List<Guid> ids, bool dryRun = false)
-        {
-            List<Table> tables = await _tableRepository._DbQueryable
-                .Where(x => ids.Contains(x.Id))
-                .Includes(x => x.Fields)
-                .ToListAsync();
-
-            StringBuilder ddlBuilder = new();
-
-            foreach (Table table in tables)
-            {
-                if (string.IsNullOrWhiteSpace(table.Name)) continue;
-
-                bool tableExists = _tableRepository._Db.DbMaintenance.IsAnyTable(table.Name, false);
-                if (!tableExists)
-                {
-                    // CREATE TABLE
-                    var colDefinitions = table.Fields.OrderBy(x => x.OrderNum).Select(GetColumnSqlDefinition);
-                    string createSql = $"CREATE TABLE \"{table.Name}\" (\n  {string.Join(",\n  ", colDefinitions)}\n);\n";
-                    ddlBuilder.AppendLine(createSql);
-                }
-                else
-                {
-                    // ALTER TABLE (ADD COLUMN / ALTER COLUMN)
-                    var physicalColumns = _tableRepository._Db.DbMaintenance.GetColumnInfosByTableName(table.Name, false);
-                    
-                    foreach (var genField in table.Fields.OrderBy(x => x.OrderNum))
-                    {
-                        if (string.IsNullOrWhiteSpace(genField.Name)) continue;
-
-                        var physicalCol = physicalColumns.FirstOrDefault(c => string.Equals(c.DbColumnName, genField.Name, StringComparison.OrdinalIgnoreCase));
-                        if (physicalCol == null)
-                        {
-                            // ADD COLUMN
-                            string def = GetColumnSqlDefinition(genField);
-                            string addSql = $"ALTER TABLE \"{table.Name}\" ADD COLUMN {def};\n";
-                            ddlBuilder.AppendLine(addSql);
-                        }
-                        else
-                        {
-                            // Compare and ALTER COLUMN if changed
-                            var connDbType = _tableRepository._Db.CurrentConnectionConfig.DbType;
-                            string dbTypeName = GetDbTypeName(genField.FieldType, connDbType);
-                            bool isNullableChanged = physicalCol.IsNullable != !genField.IsRequired;
-                            bool isTypeChanged = !physicalCol.DataType.Contains(dbTypeName, StringComparison.OrdinalIgnoreCase);
-
-                            if (isNullableChanged || isTypeChanged)
-                            {
-                                string alterSql = GetAlterColumnSql(table.Name, genField);
-                                ddlBuilder.AppendLine(alterSql);
-                            }
-                        }
-                    }
-                }
-            }
-
-            string totalSql = ddlBuilder.ToString();
-
-            // 审计日志记录真实用户身份
-            _logger.LogInformation($"[CodeGen DDL Audit] 用户 {_currentUser.UserName ?? "未知"} 触发表结构同步。DryRun: {dryRun}，SQL 内容:\n{totalSql}");
-
-            if (dryRun)
-            {
-                return totalSql;
-            }
-
-            // 显式 DDL DROP 安全拦截
-            if (totalSql.Contains("DROP", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new UserFriendlyException("禁止的DDL操作：代码生成不允许执行DROP语句。如需删除表/列，请手动操作数据库。");
-            }
-
-            if (!string.IsNullOrWhiteSpace(totalSql))
-            {
-                // 逐条拆分执行，兼容 PostgreSQL Npgsql 等不支持多语句的驱动
-                string[] statements = totalSql.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                await _tableRepository._Db.Ado.UseTranAsync(async () =>
-                {
-                    foreach (string stmt in statements)
-                    {
-                        if (!string.IsNullOrWhiteSpace(stmt))
-                        {
-                            await _tableRepository._Db.Ado.ExecuteCommandAsync(stmt.TrimEnd() + ";");
-                        }
-                    }
-                });
-            }
-
-            return "同步成功！";
-        }
 
         /// <summary>
         /// Code To Web (反射 C# 扫描并同步到 Scaffolder 元数据配置中)
@@ -194,27 +87,6 @@ namespace SharpFort.CodeGen.Application.Services
             }
 
             await _tableRepository._Db.InsertNav(tables).Include(x => x.Fields).ExecuteCommandAsync();
-        }
-
-        /// <summary>
-        /// Code To Db (扫描 C# 实体类通过 CodeFirst 同步物理表)
-        /// </summary>
-        public async Task PostCodeBuildDbAsync()
-        {
-            List<Type> entityTypes = [];
-            foreach (IAbpModuleDescriptor module in _moduleContainer.Modules)
-            {
-                entityTypes.AddRange(module.Assembly.GetTypes()
-                    .Where(x => x.GetCustomAttribute<IgnoreCodeFirstAttribute>() == null)
-                    .Where(x => x.GetCustomAttribute<SugarTable>() != null)
-                    .Where(x => x.GetCustomAttribute<SplitTableAttribute>() is null));
-            }
-
-            if (entityTypes.Count > 0)
-            {
-                _logger.LogInformation($"[CodeGen Code-First] 正在同步 {entityTypes.Count} 个实体到物理数据库...");
-                _tableRepository._Db.CodeFirst.InitTables(entityTypes.ToArray());
-            }
         }
 
         /// <summary>
@@ -303,112 +175,6 @@ namespace SharpFort.CodeGen.Application.Services
 #pragma warning restore CA1822
 
         #region 私有辅助工具
-
-        private string GetColumnSqlDefinition(Field field)
-        {
-            var dbType = _tableRepository._Db.CurrentConnectionConfig.DbType;
-            string typeName = MapFieldTypeToSqlType(field.FieldType, field.Length, dbType);
-
-            string pk = field.IsKey ? " PRIMARY KEY" : "";
-            string nullable = (!field.IsRequired && !field.IsKey) ? " NULL" : " NOT NULL";
-
-            return $"\"{field.Name}\" {typeName}{pk}{nullable}";
-        }
-
-        private string GetAlterColumnSql(string tableName, Field field)
-        {
-            var dbType = _tableRepository._Db.CurrentConnectionConfig.DbType;
-            string typeName = MapFieldTypeToSqlType(field.FieldType, field.Length, dbType);
-
-            string nullable = (!field.IsRequired && !field.IsKey) ? "NULL" : "NOT NULL";
-
-            return dbType switch
-            {
-                DbType.PostgreSQL => $"ALTER TABLE \"{tableName}\" ALTER COLUMN \"{field.Name}\" TYPE {typeName}, ALTER COLUMN \"{field.Name}\" {(field.IsRequired ? "SET NOT NULL" : "DROP NOT NULL")};\n",
-                DbType.MySql => $"ALTER TABLE `{tableName}` MODIFY COLUMN `{field.Name}` {typeName} {nullable};\n",
-                _ => $"ALTER TABLE [{tableName}] ALTER COLUMN [{field.Name}] {typeName} {nullable};\n"
-            };
-        }
-
-        private static string MapFieldTypeToSqlType(FieldType type, int length, DbType dbType)
-        {
-            return dbType switch
-            {
-                DbType.PostgreSQL => type switch
-                {
-                    FieldType.String => length > 0 ? $"VARCHAR({length})" : "TEXT",
-                    FieldType.Int => "INT",
-                    FieldType.Long => "BIGINT",
-                    FieldType.Bool => "BOOLEAN",
-                    FieldType.Decimal => "DECIMAL(18,2)",
-                    FieldType.DateTime => "TIMESTAMP",
-                    FieldType.Guid => "UUID",
-                    _ => length > 0 ? $"VARCHAR({length})" : "VARCHAR(255)"
-                },
-                DbType.MySql => type switch
-                {
-                    FieldType.String => length > 0 ? $"VARCHAR({length})" : "LONGTEXT",
-                    FieldType.Int => "INT",
-                    FieldType.Long => "BIGINT",
-                    FieldType.Bool => "TINYINT(1)",
-                    FieldType.Decimal => "DECIMAL(18,2)",
-                    FieldType.DateTime => "DATETIME",
-                    FieldType.Guid => "VARCHAR(36)",
-                    _ => length > 0 ? $"VARCHAR({length})" : "VARCHAR(255)"
-                },
-                _ => type switch
-                {
-                    FieldType.String => length > 0 ? $"VARCHAR({length})" : "NVARCHAR(MAX)",
-                    FieldType.Int => "INT",
-                    FieldType.Long => "BIGINT",
-                    FieldType.Bool => "BIT",
-                    FieldType.Decimal => "DECIMAL(18,2)",
-                    FieldType.DateTime => "DATETIME",
-                    FieldType.Guid => "UNIQUEIDENTIFIER",
-                    _ => length > 0 ? $"VARCHAR({length})" : "VARCHAR(255)"
-                }
-            };
-        }
-
-        private static string GetDbTypeName(FieldType type, DbType dbType)
-        {
-            return dbType switch
-            {
-                DbType.PostgreSQL => type switch
-                {
-                    FieldType.String => "varchar",
-                    FieldType.Int => "int",
-                    FieldType.Long => "bigint",
-                    FieldType.Bool => "bool",
-                    FieldType.Decimal => "numeric",
-                    FieldType.DateTime => "timestamp",
-                    FieldType.Guid => "uuid",
-                    _ => "varchar"
-                },
-                DbType.MySql => type switch
-                {
-                    FieldType.String => "varchar",
-                    FieldType.Int => "int",
-                    FieldType.Long => "bigint",
-                    FieldType.Bool => "tinyint",
-                    FieldType.Decimal => "decimal",
-                    FieldType.DateTime => "datetime",
-                    FieldType.Guid => "varchar",
-                    _ => "varchar"
-                },
-                _ => type switch
-                {
-                    FieldType.String => "varchar",
-                    FieldType.Int => "int",
-                    FieldType.Long => "bigint",
-                    FieldType.Bool => "bit",
-                    FieldType.Decimal => "decimal",
-                    FieldType.DateTime => "datetime",
-                    FieldType.Guid => "uniqueidentifier",
-                    _ => "varchar"
-                }
-            };
-        }
 
         private static string ToPascalCase(string input)
         {
