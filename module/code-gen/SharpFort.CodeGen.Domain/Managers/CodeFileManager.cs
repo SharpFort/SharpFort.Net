@@ -23,6 +23,7 @@ namespace SharpFort.CodeGen.Domain.Managers
     {
         private readonly IEnumerable<ITemplateContextEnricher> _enrichers;
         private readonly ISqlSugarRepository<DbTemplate> _templateRepository;
+        private readonly ISqlSugarRepository<Table, Guid> _tableRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<CodeFileManager> _logger;
         private readonly IncrementalCodeMerger _merger;
@@ -30,11 +31,13 @@ namespace SharpFort.CodeGen.Domain.Managers
         public CodeFileManager(
             IEnumerable<ITemplateContextEnricher> enrichers,
             ISqlSugarRepository<DbTemplate> templateRepository,
+            ISqlSugarRepository<Table, Guid> tableRepository,
             IConfiguration configuration,
             ILogger<CodeFileManager> logger)
         {
             _enrichers = enrichers;
             _templateRepository = templateRepository;
+            _tableRepository = tableRepository;
             _configuration = configuration;
             _logger = logger;
             _merger = new IncrementalCodeMerger();
@@ -162,6 +165,10 @@ namespace SharpFort.CodeGen.Domain.Managers
                     throw;
                 }
             }
+
+            // 记录最后代码生成时间
+            tableEntity.LastBuildTime = DateTime.UtcNow;
+            await _tableRepository.UpdateAsync(tableEntity);
         }
     }
 }
