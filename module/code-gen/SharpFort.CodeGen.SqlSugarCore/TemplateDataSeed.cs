@@ -36,7 +36,7 @@ namespace SharpFort.CodeGen.SqlSugarCore
             entities.Add(new Template(
                 Guid.Parse("7fa2b98e-4a6c-48b4-8254-1b3260c6d7a1"),
                 "GetListInput",
-                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListInput.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListInput.cs",
                 @"using SharpFort.Ddd.Application.Contracts;
 
 namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
@@ -58,7 +58,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
             entities.Add(new Template(
                 Guid.Parse("8a4de9c2-cf47-4952-944f-c0c660f545a1"),
                 "GetListOutputDto",
-                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListOutputDto.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListOutputDto.cs",
                 @"using System;
 using Volo.Abp.Application.Dtos;
 
@@ -85,7 +85,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
             entities.Add(new Template(
                 Guid.Parse("96a5b9e0-cb41-477a-a232-c6f932e656d2"),
                 "GetOutputDto",
-                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetOutputDto.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetOutputDto.cs",
                 @"using System;
 using Volo.Abp.Application.Dtos;
 
@@ -112,7 +112,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
             entities.Add(new Template(
                 Guid.Parse("a5e9b98e-4a6c-48b4-8254-1b3260c6d7a2"),
                 "CreateInput",
-                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}CreateInput.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application.Contracts/Dtos/{{Model}}/{{Model}}CreateInput.cs",
                 @"using System;
 
 namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
@@ -138,7 +138,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
             entities.Add(new Template(
                 Guid.Parse("b6fa9c8e-4a6c-48b4-8254-1b3260c6d7a3"),
                 "UpdateInput",
-                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}UpdateInput.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application.Contracts/Dtos/{{Model}}/{{Model}}UpdateInput.cs",
                 @"using System;
 
 namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
@@ -164,7 +164,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
             entities.Add(new Template(
                 Guid.Parse("c7fa2b9e-4a6c-48b4-8254-1b3260c6d7a4"),
                 "IServices",
-                "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/IServices/I{{Model}}Service.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application.Contracts/IServices/I{{Model}}Service.cs",
                 @"using System;
 using SharpFort.Ddd.Application.Contracts;
 using {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}};
@@ -184,7 +184,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.IServices
             entities.Add(new Template(
                 Guid.Parse("d8fa2b9e-4a6c-48b4-8254-1b3260c6d7a5"),
                 "Service",
-                "module/{{Module}}/SharpFort.{{Module}}.Application/Services/{{Model}}Service.cs",
+                "module/{{project_name}}/SharpFort.{{project_name}}.Application/Services/{{Model}}Service.cs",
                 @"using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
