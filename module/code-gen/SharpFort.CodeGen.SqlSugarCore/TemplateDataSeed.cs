@@ -32,37 +32,7 @@ namespace SharpFort.CodeGen.SqlSugarCore
         {
             var entities = new List<Template>();
 
-            // 1. Domain Entity 模板
-            entities.Add(new Template(
-                Guid.Parse("673752e5-3ba5-48fa-bb6d-978d46a81e3a"),
-                "Entity",
-                "module/{{Module}}/SharpFort.{{Module}}.Domain/Entities/{{Model}}Entity.cs",
-                @"using SqlSugar;
-using Volo.Abp.Domain.Entities;
-
-namespace {{RootNamespace}}.{{Module}}.Domain.Entities
-{
-    /// <summary>
-    /// {{Table.Description}} 实体定义
-    /// </summary>
-    [SugarTable(""{{Table.Name}}"")]
-    public class {{Model}}Entity : Entity<Guid>
-    {
-        {{~ for field in Fields ~}}
-        {{~ if field.Name != ""Id"" && field.Name != ""IsDeleted"" && field.Name != ""CreationTime"" ~}}
-        /// <summary>
-        /// {{field.Description}}
-        /// </summary>
-        {{ sugar_column field }}
-        public {{ field.CsharpType }} {{ field.Name }} { get; set; } = {{ default_value field }};
-
-        {{~ end ~}}
-        {{~ end ~}}
-    }
-}"
-            ) { TemplateEngine = "Scriban" });
-
-            // 2. Dto GetListInput
+            // 1. Dto GetListInput
             entities.Add(new Template(
                 Guid.Parse("7fa2b98e-4a6c-48b4-8254-1b3260c6d7a1"),
                 "GetListInput",
@@ -84,7 +54,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
 }"
             ) { TemplateEngine = "Scriban" });
 
-            // 3. Dto GetListOutputDto
+            // 2. Dto GetListOutputDto
             entities.Add(new Template(
                 Guid.Parse("8a4de9c2-cf47-4952-944f-c0c660f545a1"),
                 "GetListOutputDto",
@@ -111,7 +81,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
 }"
             ) { TemplateEngine = "Scriban" });
 
-            // 4. Dto GetOutputDto
+            // 3. Dto GetOutputDto
             entities.Add(new Template(
                 Guid.Parse("96a5b9e0-cb41-477a-a232-c6f932e656d2"),
                 "GetOutputDto",
@@ -138,7 +108,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
 }"
             ) { TemplateEngine = "Scriban" });
 
-            // 5. Dto CreateInput
+            // 4. Dto CreateInput
             entities.Add(new Template(
                 Guid.Parse("a5e9b98e-4a6c-48b4-8254-1b3260c6d7a2"),
                 "CreateInput",
@@ -164,7 +134,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
 }"
             ) { TemplateEngine = "Scriban" });
 
-            // 6. Dto UpdateInput
+            // 5. Dto UpdateInput
             entities.Add(new Template(
                 Guid.Parse("b6fa9c8e-4a6c-48b4-8254-1b3260c6d7a3"),
                 "UpdateInput",
@@ -190,7 +160,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
 }"
             ) { TemplateEngine = "Scriban" });
 
-            // 7. IApplicationService 抽象
+            // 6. IApplicationService 抽象
             entities.Add(new Template(
                 Guid.Parse("c7fa2b9e-4a6c-48b4-8254-1b3260c6d7a4"),
                 "IServices",
@@ -210,7 +180,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.IServices
 }"
             ) { TemplateEngine = "Scriban" });
 
-            // 8. ApplicationService 实现
+            // 7. ApplicationService 实现
             entities.Add(new Template(
                 Guid.Parse("d8fa2b9e-4a6c-48b4-8254-1b3260c6d7a5"),
                 "Service",
