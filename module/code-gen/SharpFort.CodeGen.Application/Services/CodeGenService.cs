@@ -64,29 +64,12 @@ namespace SharpFort.CodeGen.Application.Services
 
 
         /// <summary>
-        /// Code To Web (反射 C# 扫描并同步到 Scaffolder 元数据配置中)
+        /// Code To Web (反射 C# 扫描并增量同步到实体注册表)
         /// </summary>
         [UnitOfWork]
         public async Task PostCodeBuildWebAsync()
         {
-            List<Table> tables = await _webTemplateManager.BuildCodeToWebAsync();
-            
-            // 覆盖式更新
-            _tableRepository._Db.DbMaintenance.TruncateTable<Table>();
-            _tableRepository._Db.DbMaintenance.TruncateTable<Field>();
-
-            foreach (var table in tables)
-            {
-                table.Fields.ForEach(x =>
-                {
-                    x.IsQueryField = true;
-                    x.IsListDisplay = true;
-                    x.IsFormItem = true;
-                    x.HtmlType = "Input";
-                });
-            }
-
-            await _tableRepository._Db.InsertNav(tables).Include(x => x.Fields).ExecuteCommandAsync();
+            await _webTemplateManager.BuildCodeToWebAsync();
         }
 
         /// <summary>
