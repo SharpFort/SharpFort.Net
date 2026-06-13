@@ -51,6 +51,24 @@ public class Table : FullAuditedAggregateRoot<Guid>
     public bool IsOverwrite { get; set; }
 
     /// <summary>
+    /// 所属项目名称 (从实体命名空间推断)
+    /// </summary>
+    [SugarColumn(ColumnName = "project_name", Length = 128, IsNullable = true)]
+    public string? ProjectName { get; set; }
+
+    /// <summary>
+    /// 最后同步时间 (Code→Web 扫描时更新)
+    /// </summary>
+    [SugarColumn(ColumnName = "last_sync_time", IsNullable = true)]
+    public DateTime? LastSyncTime { get; set; }
+
+    /// <summary>
+    /// 最后代码生成时间 (Web→Code 生成时更新)
+    /// </summary>
+    [SugarColumn(ColumnName = "last_build_time", IsNullable = true)]
+    public DateTime? LastBuildTime { get; set; }
+
+    /// <summary>
     /// 扩展属性 (ABP Feature)
     /// 场景：存储生成器的配置参数（如：是否覆盖、输出路径、命名空间前缀等）
     /// 映射：Postgres JSONB
