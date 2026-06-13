@@ -63,6 +63,8 @@ namespace SharpFort.CodeGen.Domain.Handlers
                 FieldType.Decimal => "decimal",
                 FieldType.DateTime => "DateTime",
                 FieldType.Guid => "Guid",
+                FieldType.Float => "float",
+                FieldType.Double => "double",
                 _ => "string"
             };
 

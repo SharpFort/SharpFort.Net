@@ -59,6 +59,8 @@ namespace SharpFort.CodeGen.Domain.Handlers
                 "int" => "0",
                 "long" => "0",
                 "decimal" => "0M",
+                "float" => "0F",
+                "double" => "0D",
                 "datetime" => "DateTime.MinValue",
                 _ => "null"
             };

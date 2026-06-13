@@ -26,7 +26,13 @@ public enum FieldType
     DateTime = 6,
 
     [Display(Name = "Guid", Description = "Guid")]
-    Guid = 7
+    Guid = 7,
+
+    [Display(Name = "float", Description = "Single")]
+    Float = 8,
+
+    [Display(Name = "double", Description = "Double")]
+    Double = 9
 }
 
 
