@@ -12,12 +12,16 @@ using SharpFort.SqlSugarCore.Abstractions;
 namespace SharpFort.CodeGen.Application.Services
 {
     /// <summary>
-    /// 字段管理
+    /// 实体字段 (YiField) CRUD 服务
+    /// 管理实体注册表下的字段元数据，支持查询、新增、编辑、删除、类型枚举查询
     /// </summary>
     public class FieldService(ISqlSugarRepository<Field, Guid> repository) : SfCrudAppService<Field, FieldDto, Guid, FieldGetListInput>(repository), IFieldService
     {
         private readonly ISqlSugarRepository<Field, Guid> _repository = repository;
 
+        /// <summary>
+        /// 分页查询字段列表，支持按所属实体 ID 和字段名称筛选
+        /// </summary>
         public override async Task<PagedResultDto<FieldDto>> GetListAsync([FromQuery] FieldGetListInput input)
         {
             RefAsync<int> total = 0;
@@ -34,9 +38,9 @@ namespace SharpFort.CodeGen.Application.Services
         }
 
         /// <summary>
-        /// 获取类型枚举
+        /// 获取字段类型枚举列表：返回所有可用的 FieldType 枚举值 (String/Int/Long/Bool/Decimal/DateTime/Guid/Float/Double)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>字段类型枚举列表，包含 label (显示名) 和 value (整数值)</returns>
         [Route("field/type")]
 #pragma warning disable CA1822 // ABP requires instance methods for AutoAPI
         public object GetFieldType()
