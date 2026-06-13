@@ -21,7 +21,6 @@ namespace SharpFort.CodeGen.Domain.Handlers
         public string ModuleName { get; set; } = string.Empty;
         public string RootNamespace { get; set; } = string.Empty;
         public bool IsOverwrite { get; set; }
-        public string TemplateEngine { get; set; } = "Scriban";
     }
 
     public class FieldInfo

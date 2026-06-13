@@ -32,11 +32,6 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Table
         public bool IsOverwrite { get; set; }
 
         /// <summary>
-        /// 模板引擎类型
-        /// </summary>
-        public string? TemplateEngine { get; set; }
-
-        /// <summary>
         /// 一表多字段
         /// </summary>
         public List<FieldDto>? Fields { get; set; }

@@ -27,8 +27,7 @@ namespace SharpFort.CodeGen.Domain.Handlers
                 Description = table.Description ?? string.Empty,
                 ModuleName = moduleName,
                 RootNamespace = rootNamespace,
-                IsOverwrite = table.IsOverwrite,
-                TemplateEngine = table.TemplateEngine ?? "Scriban"
+                IsOverwrite = table.IsOverwrite
             };
 
             context.Fields = [];

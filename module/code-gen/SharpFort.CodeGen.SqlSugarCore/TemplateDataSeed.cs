@@ -52,7 +52,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
         public string? Filter { get; set; }
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             // 2. Dto GetListOutputDto
             entities.Add(new Template(
@@ -79,7 +79,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
         {{~ end ~}}
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             // 3. Dto GetOutputDto
             entities.Add(new Template(
@@ -106,7 +106,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
         {{~ end ~}}
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             // 4. Dto CreateInput
             entities.Add(new Template(
@@ -132,7 +132,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
         {{~ end ~}}
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             // 5. Dto UpdateInput
             entities.Add(new Template(
@@ -158,7 +158,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
         {{~ end ~}}
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             // 6. IApplicationService 抽象
             entities.Add(new Template(
@@ -178,7 +178,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.IServices
     {
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             // 7. ApplicationService 实现
             entities.Add(new Template(
@@ -213,7 +213,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Services
         // </sf-custom-code-start>
     }
 }"
-            ) { TemplateEngine = "Scriban" });
+            ));
 
             return entities;
         }

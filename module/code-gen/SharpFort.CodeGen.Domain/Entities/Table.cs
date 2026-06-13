@@ -51,12 +51,6 @@ public class Table : FullAuditedAggregateRoot<Guid>
     public bool IsOverwrite { get; set; }
 
     /// <summary>
-    /// 模板引擎类型 (Scriban 或 Legacy)
-    /// </summary>
-    [SugarColumn(ColumnName = "template_engine", Length = 20, IsNullable = false)]
-    public string TemplateEngine { get; set; } = "Scriban";
-
-    /// <summary>
     /// 扩展属性 (ABP Feature)
     /// 场景：存储生成器的配置参数（如：是否覆盖、输出路径、命名空间前缀等）
     /// 映射：Postgres JSONB
