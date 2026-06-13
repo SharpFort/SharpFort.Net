@@ -73,6 +73,17 @@ namespace SharpFort.CodeGen.Application.Services
         }
 
         /// <summary>
+        /// 手动刷新实体注册表 (重新扫描所有实体类并增量同步)
+        /// </summary>
+        [UnitOfWork]
+        public async Task PostRefreshAsync()
+        {
+            _logger.LogInformation("[CodeGen] 手动刷新实体注册表...");
+            await PostCodeBuildWebAsync();
+            _logger.LogInformation("[CodeGen] 刷新完成！");
+        }
+
+        /// <summary>
         /// DB To Web (DB-First 逆向物理表结构生成 Web 配置元数据)
         /// </summary>
         [UnitOfWork]

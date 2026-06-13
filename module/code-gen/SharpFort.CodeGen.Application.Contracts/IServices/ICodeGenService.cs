@@ -11,6 +11,8 @@ namespace SharpFort.CodeGen.Application.Contracts.IServices
 
         Task PostCodeBuildWebAsync();
 
+        Task PostRefreshAsync();
+
         Task PostDbToWebAsync(string tableName, string? moduleName = null, string? rootNamespace = null);
     }
 }
