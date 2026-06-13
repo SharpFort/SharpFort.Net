@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using SqlSugar;
 using Volo.Abp.Domain.Services;
 using SharpFort.CodeGen.Domain.Entities;
@@ -9,19 +10,24 @@ using SharpFort.SqlSugarCore.Abstractions;
 namespace SharpFort.CodeGen.Domain.Managers
 {
     /// <summary>
-    /// 与webfrist相关，同步到web，code to web
+    /// 实体注册表管理器 (Code→Web)
+    /// 扫描 C# 实体类并同步到 YiTable 注册表，采用增量合并策略
     /// </summary>
-    public class WebTemplateManager(ISqlSugarRepository<Table> repository, IModuleContainer moduleContainer) : DomainService
+    public class WebTemplateManager(
+        ISqlSugarRepository<Table> tableRepository,
+        ISqlSugarRepository<Field> fieldRepository,
+        IModuleContainer moduleContainer,
+        ILogger<WebTemplateManager> logger) : DomainService
     {
-        private readonly ISqlSugarRepository<Table> _repository = repository;
+        private readonly ISqlSugarRepository<Table> _tableRepository = tableRepository;
+        private readonly ISqlSugarRepository<Field> _fieldRepository = fieldRepository;
         private readonly IModuleContainer _moduleContainer = moduleContainer;
+        private readonly ILogger<WebTemplateManager> _logger = logger;
 
         /// <summary>
-        /// 通过当前的实体代码获取表存储
+        /// 扫描所有实体类并增量合并到注册表 (Upsert by Name)
         /// </summary>
-        /// <returns></returns>
-
-        public Task<List<Table>> BuildCodeToWebAsync()
+        public async Task<List<Table>> BuildCodeToWebAsync()
         {
             List<Type> entityTypes = [];
             foreach (IAbpModuleDescriptor module in _moduleContainer.Modules)
@@ -32,13 +38,97 @@ namespace SharpFort.CodeGen.Domain.Managers
                     .Where(x => x.GetCustomAttribute<SplitTableAttribute>() is null));
             }
 
-            List<Table> tables = [];
+            List<Table> scannedTables = [];
             foreach (Type entityType in entityTypes)
             {
-                tables.Add(EntityTypeMapperToTable(entityType));
+                Table table = EntityTypeMapperToTable(entityType);
+                table.ProjectName = ExtractProjectName(entityType.Namespace);
+                table.LastSyncTime = DateTime.UtcNow;
+                scannedTables.Add(table);
             }
 
-            return Task.FromResult(tables);
+            // 增量合并 (Upsert by Name)
+            foreach (var scanned in scannedTables)
+            {
+                var existing = await _tableRepository._DbQueryable
+                    .Includes(x => x.Fields)
+                    .Where(x => x.Name == scanned.Name)
+                    .FirstAsync();
+
+                if (existing != null)
+                {
+                    // 更新已有记录：保留用户手动配置，仅更新结构性字段
+                    existing.Description = scanned.Description ?? existing.Description;
+                    existing.ProjectName = scanned.ProjectName;
+                    existing.LastSyncTime = scanned.LastSyncTime;
+
+                    // 合并字段列表：保留已有字段的 UI 配置，新增/更新结构字段
+                    MergeFields(existing, scanned);
+
+                    await _tableRepository.UpdateAsync(existing);
+                    // 同步字段到数据库
+                    await _fieldRepository._Db.Deleteable<Field>().Where(f => f.TableId == existing.Id).ExecuteCommandAsync();
+                    if (existing.Fields.Count > 0)
+                    {
+                        await _fieldRepository._Db.Insertable(existing.Fields).ExecuteCommandAsync();
+                    }
+                }
+                else
+                {
+                    // 插入新记录
+                    scanned.Fields.ForEach(x =>
+                    {
+                        x.IsQueryField = true;
+                        x.IsListDisplay = true;
+                        x.IsFormItem = true;
+                        x.HtmlType = "Input";
+                    });
+                    await _tableRepository._Db.InsertNav(scanned).Include(x => x.Fields).ExecuteCommandAsync();
+                }
+            }
+
+            _logger.LogInformation("[CodeGen] 实体注册表同步完成，共处理 {Count} 个实体", scannedTables.Count);
+            return scannedTables;
+        }
+
+        /// <summary>
+        /// 从命名空间提取项目名称
+        /// 例: "SharpFort.Rbac.Domain.Entities" → "Rbac"
+        /// </summary>
+        private static string? ExtractProjectName(string? namespaceStr)
+        {
+            if (string.IsNullOrEmpty(namespaceStr)) return null;
+            var parts = namespaceStr.Split('.');
+            return parts.Length >= 2 ? parts[1] : parts[0];
+        }
+
+        /// <summary>
+        /// 合并字段列表：保留已有字段的 UI 配置，更新结构性字段
+        /// </summary>
+        private static void MergeFields(Table existing, Table scanned)
+        {
+            var existingFieldMap = existing.Fields.ToDictionary(f => f.Name, f => f);
+            var mergedFields = new List<Field>();
+
+            foreach (var scannedField in scanned.Fields)
+            {
+                if (existingFieldMap.TryGetValue(scannedField.Name, out var existingField))
+                {
+                    // 保留已有的 UI 配置
+                    scannedField.IsQueryField = existingField.IsQueryField;
+                    scannedField.IsListDisplay = existingField.IsListDisplay;
+                    scannedField.IsFormItem = existingField.IsFormItem;
+                    scannedField.HtmlType = existingField.HtmlType;
+                    scannedField.OrderNum = existingField.OrderNum;
+                    scannedField.IsPublic = existingField.IsPublic;
+                    scannedField.Description = existingField.Description ?? scannedField.Description;
+                }
+
+                scannedField.TableId = existing.Id;
+                mergedFields.Add(scannedField);
+            }
+
+            existing.Fields = mergedFields;
         }
 
         private static Table EntityTypeMapperToTable(Type entityType)
