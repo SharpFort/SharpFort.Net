@@ -16,8 +16,11 @@ x86/
 *.sln.iml
 *.txt
 *.log
-*.md
 *.doc
+## Markdown 文件：忽略构建副本和用户上传文档，但跟踪源码中的分析文档
+**/[Bb]in/**/*.md
+**/[Oo]bj/**/*.md
+src/Sf.Abp.Web/wwwroot/document/*.md
 
 
 ## 移除文件夹
