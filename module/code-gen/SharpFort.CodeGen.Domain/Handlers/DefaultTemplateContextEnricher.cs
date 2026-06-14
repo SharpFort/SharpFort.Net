@@ -45,7 +45,10 @@ namespace SharpFort.CodeGen.Domain.Handlers
                         Description = field.Description ?? string.Empty,
                         IsQueryField = field.IsQueryField,
                         OrderNum = field.OrderNum,
-                        CsharpType = GetCsharpType(field)
+                        CsharpType = GetCsharpType(field),
+                        IsListDisplay = field.IsListDisplay,
+                        IsFormItem = field.IsFormItem,
+                        IsPublic = field.IsPublic
                     };
                     context.Fields.Add(fieldInfo);
                 }

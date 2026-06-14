@@ -19,6 +19,16 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Field
         public Guid TableId { get; set; }
 
         /// <summary>
+        /// 所属实体名称（冗余字段，方便前端展示）
+        /// </summary>
+        public string? TableName { get; set; }
+
+        /// <summary>
+        /// 所属模块名称（冗余字段，方便前端展示）
+        /// </summary>
+        public string? ModuleName { get; set; }
+
+        /// <summary>
         /// 是否必填
         /// </summary>
         public bool IsRequired { get; set; }

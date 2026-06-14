@@ -9,7 +9,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
     public class {{Model}}GetListOutputDto : EntityDto<Guid>
     {
         {{~ for field in Fields ~}}
-        {{~ if field.Name != "Id" ~}}
+        {{~ if field.IsListDisplay && !field.IsPublic ~}}
         /// <summary>
         /// {{field.Description}}
         /// </summary>

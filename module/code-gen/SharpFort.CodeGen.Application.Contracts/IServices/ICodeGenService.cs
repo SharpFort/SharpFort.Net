@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
 
 namespace SharpFort.CodeGen.Application.Contracts.IServices
@@ -24,5 +25,11 @@ namespace SharpFort.CodeGen.Application.Contracts.IServices
         /// 手动刷新实体注册表：重新扫描所有实体类并增量同步到 YiTable
         /// </summary>
         Task PostRefreshAsync();
+
+        /// <summary>
+        /// 打开本地目录：在系统文件管理器中打开指定路径 (支持 Windows/Linux/macOS)
+        /// </summary>
+        /// <param name="path">要打开的目录相对路径</param>
+        Task PostDir([FromRoute] string path);
     }
 }

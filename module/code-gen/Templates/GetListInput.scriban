@@ -11,5 +11,14 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
         /// 模糊关键字查询
         /// </summary>
         public string? Filter { get; set; }
+
+        {{~ for field in Fields ~}}
+        {{~ if field.IsQueryField && !field.IsPublic ~}}
+        /// <summary>
+        /// {{field.Description}}
+        /// </summary>
+        public {{ field.CsharpType }} {{ field.Name }} { get; set; }
+        {{~ end ~}}
+        {{~ end ~}}
     }
 }

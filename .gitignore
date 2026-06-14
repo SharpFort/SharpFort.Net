@@ -14,8 +14,11 @@ x86/
 .vscode/
 .idea/
 *.sln.iml
-.txt
-.log
+*.txt
+*.log
+*.md
+*.doc
+
 
 ## 移除文件夹
 module/ai-hub

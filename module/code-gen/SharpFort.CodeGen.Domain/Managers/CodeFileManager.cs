@@ -68,29 +68,20 @@ namespace SharpFort.CodeGen.Domain.Managers
             string solutionRoot = SolutionDirectoryDetector.Detect(_configuration);
             _logger.LogInformation($"[CodeGen] 探测到解决方案根目录: {solutionRoot}");
 
-            // 2. 加载全部模板
+            // 2. 加载全部模板（DB 是运行时唯一数据源）
             List<DbTemplate> dbTemplates = await _templateRepository.GetListAsync();
+
+            if (dbTemplates.Count == 0)
+            {
+                throw new Exception("[CodeGen] 数据库中没有任何模板数据，请先调用 POST /api/app/code-gen/template-sync (direction=import) 导入本地模板到数据库");
+            }
 
             foreach (DbTemplate dbTemplate in dbTemplates)
             {
                 try
                 {
-                    // 3. 混合模板加载逻辑：优先从本地工作区读取自定义文件模板
-                    string localTemplateFolder = Path.Combine(solutionRoot, "module", "code-gen", "Templates");
-                    string localTemplatePath = Path.Combine(localTemplateFolder, $"{dbTemplate.Name}.scriban");
-                    if (!File.Exists(localTemplatePath))
-                    {
-                        // 尝试不带扩展名的读取
-                        localTemplatePath = Path.Combine(localTemplateFolder, dbTemplate.Name!);
-                    }
-
+                    // 3. 直接使用 DB 中的模板内容
                     string templateContent = dbTemplate.Content!;
-
-                    if (File.Exists(localTemplatePath))
-                    {
-                        templateContent = await File.ReadAllTextAsync(localTemplatePath);
-                        _logger.LogInformation($"[CodeGen] 加载本地工作区覆写模板: {localTemplatePath}");
-                    }
 
                     string renderedContent = string.Empty;
                     string relativeBuildPath = dbTemplate.BuildPath!;

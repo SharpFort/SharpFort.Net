@@ -356,6 +356,22 @@ namespace Sf.Abp.Web
                 app.UseRateLimiter();
             }
 
+            //静态资源
+            app.UseDefaultFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                RequestPath = "/api/app/wwwroot",
+                // 可以在这里添加或修改MIME类型映射  
+                ContentTypeProvider = new FileExtensionContentTypeProvider
+                {
+                    Mappings =
+                    {
+                        [".wxss"] = "text/css"
+                    }
+                }
+            });
+            app.UseDirectoryBrowser("/api/app/wwwroot");
+
 
             //无感token，先刷新再鉴权
             app.UseRefreshToken();
@@ -374,22 +390,6 @@ namespace Sf.Abp.Web
 
             //请求处理
             app.UseApiInfoHandling();
-
-            //静态资源
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                RequestPath = "/api/app/wwwroot",
-                // 可以在这里添加或修改MIME类型映射  
-                ContentTypeProvider = new FileExtensionContentTypeProvider
-                {
-                    Mappings =
-                    {
-                        [".wxss"] = "text/css"
-                    }
-                }
-            });
-            app.UseDefaultFiles();
-            app.UseDirectoryBrowser("/api/app/wwwroot");
 
 
             // app.Properties.Add("_AbpExceptionHandlingMiddleware_Added",false);

@@ -142,26 +142,32 @@ namespace SharpFort.CodeGen.Domain.Managers
 
             table.Name = entityType.Name;
             table.PhysicalTableName = sugarTable?.TableName;
+            table.Description = sugarTable?.TableDescription;
 
+            int order = 0;
             foreach (PropertyInfo p in entityType.GetProperties())
             {
-                table.Fields.Add(PropertyMapperToFiled(p));
+                table.Fields.Add(PropertyMapperToFiled(p, order++, entityType));
             }
             table.Fields.ForEach(x => x.TableId = table.Id);
             return table;
         }
 
 
-        private static Field PropertyMapperToFiled(PropertyInfo propertyInfo)
+        private static Field PropertyMapperToFiled(PropertyInfo propertyInfo, int order, Type entityType)
         {
             Field fieldEntity = new()
             {
                 Name = propertyInfo.Name,
+                OrderNum = order,
                 IsQueryField = true,
                 IsListDisplay = true,
                 IsFormItem = true,
                 HtmlType = "Input"
             };
+
+            // 自动检测基类/审计字段：DeclaringType 不是当前实体类 → 继承自基类
+            fieldEntity.IsPublic = propertyInfo.DeclaringType != entityType;
 
 
             //获取数据类型，包括可空类型

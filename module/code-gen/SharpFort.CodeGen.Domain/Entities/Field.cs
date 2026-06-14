@@ -120,6 +120,24 @@ public class Field : FullAuditedEntity<Guid>
     // IsDeleted, CreationTime 等由 FullAuditedAggregateRootEntity 自动实现
 
     /// <summary>
+    /// 所属实体注册表（导航属性）
+    /// </summary>
+    [Navigate(NavigateType.OneToOne, nameof(TableId))]
+    public Table? Table { get; set; }
+
+    /// <summary>
+    /// 所属实体名称（非数据库字段，查询时动态填充）
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public string? TableName { get; set; }
+
+    /// <summary>
+    /// 所属模块名称（非数据库字段，查询时动态填充）
+    /// </summary>
+    [SugarColumn(IsIgnore = true)]
+    public string? ModuleName { get; set; }
+
+    /// <summary>
     /// ORM 专用
     /// </summary>
     public Field() { }

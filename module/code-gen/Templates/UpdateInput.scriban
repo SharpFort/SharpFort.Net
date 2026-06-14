@@ -8,7 +8,7 @@ namespace {{RootNamespace}}.{{Module}}.Application.Contracts.Dtos.{{Model}}
     public class {{Model}}UpdateInput
     {
         {{~ for field in Fields ~}}
-        {{~ if field.Name != "Id" && field.Name != "CreationTime" ~}}
+        {{~ if field.IsFormItem && !field.IsPublic ~}}
         /// <summary>
         /// {{field.Description}}
         /// </summary>

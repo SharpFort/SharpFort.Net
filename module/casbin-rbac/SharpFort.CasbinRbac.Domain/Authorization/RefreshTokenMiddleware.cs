@@ -17,9 +17,10 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            string refreshToken = context.Request.Headers["refresh_token"].ToString();
-            if (!string.IsNullOrEmpty(refreshToken))
+            if (context.Request.Headers.TryGetValue("refresh_token", out var refreshTokenValues) &&
+                !Microsoft.Extensions.Primitives.StringValues.IsNullOrEmpty(refreshTokenValues))
             {
+                string refreshToken = refreshTokenValues.ToString();
                 AuthenticateResult authResult = await context.AuthenticateAsync(TokenTypeConst.Refresh);
                 if (authResult.Succeeded)
                 {

@@ -7,9 +7,9 @@ namespace SharpFort.CodeGen.Application.Contracts.Dtos.Template
         public new Guid Id { get; set; }
 
         /// <summary>
-        /// 模板字符串
+        /// Scriban 模板脚本内容
         /// </summary>
-        public required string TemplateStr { get; set; } = string.Empty;
+        public required string Content { get; set; } = string.Empty;
 
         /// <summary>
         /// 生成路径

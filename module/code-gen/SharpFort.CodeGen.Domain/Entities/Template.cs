@@ -7,7 +7,7 @@ namespace SharpFort.CodeGen.Domain.Entities;
 /// Scriban 代码生成模板聚合根
 /// 领域定义：存储用于生成 DTO/IService/Service 代码的 Scriban 模板内容及生成路径规则
 /// 职责：存储“输出规则”——模板名称、Scriban 脚本内容、生成路径模板 (BuildPath)
-/// 架构：DB 基线层 (种子数据) + 本地文件覆写层 (Templates/*.scriban)
+/// 架构：DB 是运行时唯一数据源，本地 Templates/*.scriban 文件仅用于 Git 版本控制
 /// </summary>
 [SugarTable("gen_template")]
 // 索引：模板名称必须唯一，便于前端选择和识别

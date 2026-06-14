@@ -34,5 +34,20 @@ namespace SharpFort.CodeGen.Domain.Handlers
         public string Description { get; set; } = string.Empty;
         public bool IsQueryField { get; set; }
         public int OrderNum { get; set; }
+
+        /// <summary>
+        /// 是否在列表 DTO 中生成此字段 (来自 Field.IsListDisplay UI 配置)
+        /// </summary>
+        public bool IsListDisplay { get; set; }
+
+        /// <summary>
+        /// 是否在 CreateInput/UpdateInput DTO 中生成此字段 (来自 Field.IsFormItem UI 配置)
+        /// </summary>
+        public bool IsFormItem { get; set; }
+
+        /// <summary>
+        /// 是否为基类/审计公共字段 (如 Id, CreationTime)，Scriban 模板应跳过此类字段
+        /// </summary>
+        public bool IsPublic { get; set; }
     }
 }
