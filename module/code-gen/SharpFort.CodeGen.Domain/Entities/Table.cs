@@ -5,7 +5,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace SharpFort.CodeGen.Domain.Entities;
 
 /// <summary>
-/// 实体注册表聚合根 (YiTable)
+/// 实体注册表聚合根 (SfTable)
 /// 领域定义：收集并管理所有 C# Entity 类的元数据信息，作为代码生成的配置源头
 /// 职责：存储“源”信息——实体类名、所属模块/项目、物理表名、命名空间等
 /// </summary>

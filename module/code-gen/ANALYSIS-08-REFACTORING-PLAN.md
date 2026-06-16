@@ -63,7 +63,7 @@
 | 项目 | DESIGN-FINAL 方案 | 在当前 Scriban 体系下的适配 |
 |------|-------------------|--------------------------|
 | **删除 Legacy 引擎** | 无（DESIGN-FINAL 本身是Legacy） | ⚡ 当前更彻底：删除整个 Handler Chain + Legacy 代码路径 |
-| **YiTable 扩展字段** | `ProjectName`, `LastSyncTime`, `LastBuildTime` | 直接加到 Table 实体 |
+| **SfTable 扩展字段** | `ProjectName`, `LastSyncTime`, `LastBuildTime` | 直接加到 Table 实体 |
 | **Truncate→Merge** | upsert by Name | 改造 `PostCodeBuildWebAsync()` |
 | **ProjectName 提取** | 从 Entity 命名空间解析 | 改造 `WebTemplateManager` |
 | **路径变量系统** | `{SolutionRoot}/{ProjectName}` | 融入 Scriban 上下文（作为内置变量注入） |
@@ -91,12 +91,14 @@ CodeFileManager.BuildWebToCodeAsync()
 ### 3.2 决策：删除 Legacy 引擎
 
 **理由**:
+
 1. DESIGN-FINAL v3 的所有"修复"（@namespace 动态替换、路径变量化）在 Scriban 体系下**不是修复，是降级**
 2. Legacy Handler Chain 是**字符串替换实现**，而 Scriban 模板中这些占位符**已经以 `{{变量}}` 形式**存在
 3. Scriban 模板已覆盖所有 8 种文件类型，Legacy 没有任何模板使用它
 4. 代码中有 `_logger.LogWarning("建议尽快迁移至 Scriban！")`——说明 Legacy 本就是兼容模式
 
 **删除内容**:
+
 ```
 删除文件:
   ✗ ITemplateHandler.cs
@@ -138,6 +140,7 @@ Task PostCodeBuildDbAsync();
 ```
 
 **文件**: `CodeGenService.cs` — 删除对应的私有辅助方法（仅在 DB 操作中使用）:
+
 - `GetColumnSqlDefinition()`
 - `GetAlterColumnSql()`
 - `MapFieldTypeToSqlType()` （注意：`GetDbTypeName()` 也可能仅被这些方法使用）
@@ -150,6 +153,7 @@ Task PostCodeBuildDbAsync();
 #### 1.3 删除 Legacy 引擎
 
 **删除 6 个文件**:
+
 ```
 SharpFort.CodeGen.Domain/Handlers/ITemplateHandler.cs
 SharpFort.CodeGen.Domain/Handlers/TemplateHandlerBase.cs
@@ -167,6 +171,7 @@ SharpFort.CodeGen.Domain/Handlers/HandledTemplate.cs
 ```
 
 修改后 `CodeFileManager` 构造函数简化为:
+
 ```csharp
 public CodeFileManager(
     IEnumerable<ITemplateContextEnricher> enrichers,  // 保留
@@ -194,6 +199,7 @@ public string TemplateEngine { get; set; } = "Scriban";
 ```
 
 **同步修改**:
+
 - `TableDto.cs` — 删除 `TemplateEngine` 属性
 - `DefaultTemplateContextEnricher.cs` — 删除 `TemplateEngine` 赋值
 - 所有引用 `table.TemplateEngine` 的代码
@@ -320,6 +326,7 @@ Task PostRefreshAsync();
 #### 2.6 CodeFileManager — 记录生成时间
 
 在 `BuildWebToCodeAsync()` 末尾添加:
+
 ```csharp
 // 记录最后生成时间
 tableEntity.LastBuildTime = DateTime.UtcNow;
@@ -334,6 +341,7 @@ await _tableRepository.UpdateAsync(tableEntity);
 #### 3.1 当前路径生成机制
 
 当前 `CodeFileManager` 的路径流程：
+
 ```
 dbTemplate.BuildPath (如 "module/{{Module}}/.../{{Model}}Entity.cs")
   → Scriban 渲染 BuildPath
@@ -347,6 +355,7 @@ dbTemplate.BuildPath (如 "module/{{Module}}/.../{{Model}}Entity.cs")
 在 Scriban 上下文中注入路径变量，使种子模板可以直接使用:
 
 **ScriptObject 注册**:
+
 ```csharp
 // CodeFileManager — 在渲染上下文中注入
 scriptObject.Import("solution_root", solutionRoot);
@@ -354,6 +363,7 @@ scriptObject.Import("project_name", tableEntity.ProjectName ?? tableEntity.Modul
 ```
 
 **种子模板 BuildPath 改为**:
+
 ```
 // 之前:
 "module/{{Module}}/SharpFort.{{Module}}.Application.Contracts/Dtos/{{Model}}/{{Model}}GetListInput.cs"
@@ -365,6 +375,7 @@ scriptObject.Import("project_name", tableEntity.ProjectName ?? tableEntity.Modul
 #### 3.3 TemplateDataSeed 路径去硬编码
 
 所有 8 个种子模板的 `BuildPath` 改为使用 `{{solution_root}}` 和 `{{project_name}}` 变量:
+
 ```
 GetListInput:     "{{solution_root}}/src/.../Dtos/{{Model}}/{{Model}}GetListInput.cs"
 GetListOutputDto: "{{solution_root}}/src/.../Dtos/{{Model}}/{{Model}}GetListOutputDto.cs"
@@ -389,6 +400,7 @@ Double = 9,  // [Display(Name = "double", Description = "Double")]
 ```
 
 同步更新:
+
 - `DefaultTemplateContextEnricher.GetCsharpType()` — 添加 float/double 映射
 - `ScribanHelperFunctions.DefaultValue()` — 添加 `"float" => "0F"`, `"double" => "0D"`
 
@@ -462,12 +474,12 @@ else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
    │ CodeFirst │ │PostRefresh│ │PostWebBuild│
    │ 自动建表   │ │ 扫描实体    │ │ Code(ids)  │
    │ (ORM职责)  │ │ → Merge    │ │ → 生成代码  │
-   │           │ │ → YiTable  │ │ (Scriban)  │
+   │           │ │ → SfTable  │ │ (Scriban)  │
    └───────────┘ └─────┬──────┘ └─────┬──────┘
                        │               │
                        ▼               ▼
                 ┌──────────────┐ ┌──────────────┐
-                │  YiTable     │ │  生成文件      │
+                │  SfTable     │ │  生成文件      │
                 │  (注册表)     │ │ ───────────  │
                 │ ─────────── │ │  DTOs × 5    │
                 │ ProjectName │ │  IService    │

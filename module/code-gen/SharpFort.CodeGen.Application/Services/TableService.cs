@@ -13,7 +13,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 namespace SharpFort.CodeGen.Application.Services
 {
     /// <summary>
-    /// 实体注册表 (YiTable) 服务
+    /// 实体注册表 (SfTable) 服务
     /// 管理所有 C# Entity 类的元数据注册表，数据由反射扫描自动填充 (Code→Web)，用户仅需配置生成参数
     /// </summary>
     public class TableService(ISqlSugarRepository<Table, Guid> repository) : SfCrudAppService<Table, TableDto, Guid, TableGetListInput>(repository), ITableService

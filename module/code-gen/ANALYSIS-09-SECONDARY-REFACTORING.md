@@ -24,11 +24,12 @@
 **理由 A：SqlSugar 原生 DB-First 完全覆盖此场景**
 
 SqlSugar 提供完整的 DB-First 工具链：
+
 - `SqlSugar.IOC.DbFirst`：自动生成带 `[SugarTable]` / `[SugarColumn]` 注解的 C# 实体类
 - 支持命名规则转换、基类继承、可空类型映射等高级配置
 - 生成结果直接可用，无需中间元数据层
 
-而 `PostDbToWebAsync` 只做了一件半成品——从物理表读取结构写入 YiTable，但**不会生成 C# 实体类**。用户仍需手动写 Entity 或用 SqlSugar DB-First。
+而 `PostDbToWebAsync` 只做了一件半成品——从物理表读取结构写入 SfTable，但**不会生成 C# 实体类**。用户仍需手动写 Entity 或用 SqlSugar DB-First。
 
 **理由 B：与模块核心工作流不一致**
 
@@ -37,12 +38,13 @@ SqlSugar 提供完整的 DB-First 工具链：
 ```
 手写/DB-First C# Entity 类
     │
-    ├─→ PostRefreshAsync (Code→Web) → 扫描实体 → 增量合并到 YiTable
+    ├─→ PostRefreshAsync (Code→Web) → 扫描实体 → 增量合并到 SfTable
     │
-    └─→ PostWebBuildCodeAsync (Web→Code) → YiTable + Scriban → 生成 DTO/Service/IService
+    └─→ PostWebBuildCodeAsync (Web→Code) → SfTable + Scriban → 生成 DTO/Service/IService
 ```
 
-`DB → Web` 是一条**旁路**，它跳过了 C# Entity 这一核心环节，产出的 YiTable 元数据**缺少**以下关键信息：
+`DB → Web` 是一条**旁路**，它跳过了 C# Entity 这一核心环节，产出的 SfTable 元数据**缺少**以下关键信息：
+
 - `ProjectName`（从命名空间推断）
 - `RootNamespace`（从代码结构推断）
 - `ModuleName`（从项目结构推断）
@@ -72,8 +74,8 @@ Phase 1 已删除了 `PostWebBuildDbAsync` (Web→DB) 和 `PostCodeBuildDbAsync`
 ```
 1. 使用 SqlSugar DbFirst 工具生成 C# Entity 类
 2. 将 Entity 类放入对应模块的 Domain/Entities 目录
-3. 调用 PostRefreshAsync → 自动扫描并同步到 YiTable
-4. 在 YiTable UI 中微调字段配置（IsQueryField、IsFormItem 等）
+3. 调用 PostRefreshAsync → 自动扫描并同步到 SfTable
+4. 在 SfTable UI 中微调字段配置（IsQueryField、IsFormItem 等）
 5. 调用 PostWebBuildCodeAsync → 生成 DTO/Service/IService
 ```
 
@@ -119,6 +121,7 @@ Field (gen_field)
 所有 7 个 Scriban 模板都通过 `{{~ for field in Fields ~}}` 遍历字段列表来生成代码。没有 Field，模板无法知道要生成哪些属性。
 
 以 `GetListOutputDto.scriban` 为例：
+
 ```scriban
 {{~ for field in Fields ~}}
 {{~ if field.Name != "Id" ~}}
@@ -165,6 +168,7 @@ public class Table : FullAuditedAggregateRoot<Guid>
 ```
 
 当前注释说"描述数据库中的一张表"，但实际上：
+
 - `Name` 存的是 **C# 实体类名**（如 `SystemUser`），不是物理表名（如 `sys_user`）
 - `ProjectName` 存的是**项目名称**（从命名空间推断）
 - `ModuleName` 存的是**模块名称**
@@ -176,7 +180,7 @@ public class Table : FullAuditedAggregateRoot<Guid>
 
 ```csharp
 /// <summary>
-/// 实体注册表聚合根 (YiTable)
+/// 实体注册表聚合根 (SfTable)
 /// 领域定义：收集并管理所有 C# Entity 类的元数据信息，作为代码生成的配置源头
 /// </summary>
 [SugarTable("gen_table")]
@@ -236,6 +240,7 @@ Template 表 + 本地文件 构成了一个**双层模板系统**：
 | **覆写层** | 本地文件 `Templates/*.scriban` | 项目级定制，版本控制，开发期快速迭代 |
 
 这个设计非常灵活：
+
 - 新项目启动：种子数据自动填充 7 个默认模板，开箱即用
 - 需要定制模板：在本地 `Templates/` 目录放同名文件即可覆写，无需改数据库
 - 需要在线调整：通过前端 UI 直接编辑模板内容
@@ -243,6 +248,7 @@ Template 表 + 本地文件 构成了一个**双层模板系统**：
 **理由 B：前端有完整的模板管理 CRUD**
 
 前端 `template/index.vue` 提供了完整的模板列表、新增、编辑、删除功能。用户可以在 UI 上：
+
 - 查看所有模板及其生成路径
 - 在线编辑模板内容（Scriban 语法）
 - 调整生成路径规则
@@ -291,6 +297,7 @@ Template 表存储的是 **Scriban 模板内容**，与 Legacy 引擎无关。Le
 #### Step 1: 删除 PostDbToWebAsync
 
 **后端改动：**
+
 - `ICodeGenService.cs` — 删除 `PostDbToWebAsync` 声明
 - `CodeGenService.cs` — 删除 `PostDbToWebAsync` 方法体 + 3 个私有辅助方法
   - `ToPascalCase()`
@@ -299,6 +306,7 @@ Template 表存储的是 **Scriban 模板内容**，与 Legacy 引擎无关。Le
 - 删除 `_fieldRepository` 依赖（**已验证**：第 112 行是唯一使用处，声明第 28 行 + 构造函数第 43 行可一并清理）
 
 **前端改动：**
+
 - `codegen-dialog.vue` — 删除 "同步到数据库" 和 "从代码同步到数据库" 两个按钮
 - `code-gen.ts` — 删除 `webToDb`、`codeToDb`、`dbToWeb` API
 - `casbin-rbac.ts` — 删除 `webToDb`、`codeToDb` API
@@ -351,12 +359,12 @@ Template 表存储的是 **Scriban 模板内容**，与 Legacy 引擎无关。Le
    │ CodeFirst │ │PostRefresh│ │ PostWebBuild   │
    │ 自动建表   │ │ 扫描实体    │ │ CodeAsync(ids) │
    │ (ORM职责)  │ │ → Upsert   │ │ → Scriban 渲染  │
-   │           │ │ → YiTable  │ │ → 增量合并写入   │
+   │           │ │ → SfTable  │ │ → 增量合并写入   │
    └───────────┘ └─────┬──────┘ └──────┬─────────┘
                        │               │
                        ▼               ▼
               ┌──────────────┐ ┌──────────────┐
-              │  YiTable     │ │  生成文件      │
+              │  SfTable     │ │  生成文件      │
               │  (实体注册表) │ │ ───────────  │
               │ ─────────── │ │  DTOs × 5    │
               │ Table       │ │  IService    │
@@ -413,7 +421,7 @@ public Table? Table { get; set; }
 
 | 实体 | 职责 | 存储内容 |
 |------|------|------|
-| **Table** (YiTable 实体注册表) | 存储“源”信息 | C# Entity 类名、所属模块/项目、命名空间、物理表名 (SugarTable)、同步/生成时间 |
+| **Table** (SfTable 实体注册表) | 存储“源”信息 | C# Entity 类名、所属模块/项目、命名空间、物理表名 (SugarTable)、同步/生成时间 |
 | **Field** (实体字段表) | 存储“源的细节” | 字段名、类型、长度、是否必填/主键、以及 UI 配置（IsQueryField/IsListDisplay/IsFormItem/HtmlType/OrderNum） |
 | **Template** (Scriban 模板库) | 存储“输出规则” | 模板名称、Scriban 模板内容、生成路径模板 (BuildPath)、备注 |
 
@@ -435,4 +443,3 @@ table.Name = sugarTable?.TableName ?? entityType.Name;
 
 - `Name` = C# 实体类名（如 `SystemUser`）
 - `PhysicalTableName` = 物理数据库表名（如 `sys_user`）
-

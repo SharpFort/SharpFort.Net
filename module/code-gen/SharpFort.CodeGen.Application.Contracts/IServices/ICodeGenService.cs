@@ -17,12 +17,12 @@ namespace SharpFort.CodeGen.Application.Contracts.IServices
         Task PostWebBuildCodeAsync(List<Guid> ids);
 
         /// <summary>
-        /// 同步实体到注册表 (Code → Web)：反射扫描所有带 [SugarTable] 特性的 C# 实体类，增量合并到 YiTable 注册表
+        /// 同步实体到注册表 (Code → Web)：反射扫描所有带 [SugarTable] 特性的 C# 实体类，增量合并到 SfTable 注册表
         /// </summary>
         Task PostCodeBuildWebAsync();
 
         /// <summary>
-        /// 手动刷新实体注册表：重新扫描所有实体类并增量同步到 YiTable
+        /// 手动刷新实体注册表：重新扫描所有实体类并增量同步到 SfTable
         /// </summary>
         Task PostRefreshAsync();
 

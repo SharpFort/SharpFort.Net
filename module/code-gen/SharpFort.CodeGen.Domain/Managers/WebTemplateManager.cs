@@ -11,7 +11,7 @@ namespace SharpFort.CodeGen.Domain.Managers
 {
     /// <summary>
     /// 实体注册表管理器 (Code→Web)
-    /// 扫描 C# 实体类并同步到 YiTable 注册表，采用增量合并策略
+    /// 扫描 C# 实体类并同步到 SfTable 注册表，采用增量合并策略
     /// </summary>
     public class WebTemplateManager(
         ISqlSugarRepository<Table> tableRepository,

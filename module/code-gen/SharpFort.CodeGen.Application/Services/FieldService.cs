@@ -14,7 +14,7 @@ using SharpFort.SqlSugarCore.Abstractions;
 namespace SharpFort.CodeGen.Application.Services
 {
     /// <summary>
-    /// 实体字段 (YiField) 服务
+    /// 实体字段 (SfField) 服务
     /// 管理实体注册表下的字段元数据，数据由反射扫描自动填充 (Code→Web)，用户仅需调整 UI 配置参数
     /// </summary>
     public class FieldService : SfCrudAppService<Field, FieldDto, Guid, FieldGetListInput>, IFieldService

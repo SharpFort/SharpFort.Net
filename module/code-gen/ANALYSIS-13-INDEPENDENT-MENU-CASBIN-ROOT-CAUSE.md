@@ -367,4 +367,108 @@ List<Role> roles = await _roleRepository.GetListAsync(
 
 ---
 
+## 八、验证结论（2026-06-15 补充）
+
+### 8.1 问题复现与验证
+
+按照本报告的分析路径，在角色管理页面将新建的 API 菜单（导入模板/导出模板）勾选给目标角色后，`GiveRoleSetMenuAsync` → `SetRolePermissionsAsync` 路径正确地将 casbin_rule 写入，接口可正常通过 Casbin 鉴权。
+
+**确定结论**：自定义接口无法访问的根因**不是**"未正确集成 ISfCrudAppService"或"ABP 端点生成失败"，而是 **Menu 创建时设计上不写 casbin_rule**——这是所有菜单（不论是自定义接口还是标准 CRUD 接口）的统一行为。区别仅在于：标准 CRUD 接口的菜单记录在系统初始化时就已经通过 `RoleManager.GiveRoleSetMenuAsync` 路径完成了 Casbin 同步。
+
+### 8.2 完整端到端工作流
+
+```
+[Step 1] 菜单管理 → 新建 API 菜单
+         └→ MenuService.CreateInternalAsync
+              ├─ menu 表: INSERT ✅
+              ├─ role_menu 表: INSERT (仅超管) ✅
+              └─ casbin_rule 表: 无写入 ← 设计如此
+
+[Step 2] 角色管理 → 编辑目标角色 → 勾选新菜单 → 保存
+         └→ RoleService.UpdateAsync
+              └→ RoleManager.GiveRoleSetMenuAsync
+                   └→ CasbinPolicyManager.SetRolePermissionsAsync
+                        ├─ DELETE 该角色旧 p 规则
+                        ├─ INSERT 新 p 规则 (含新菜单的 ApiUrl + ApiMethod)
+                        └─ Enforcer 内存同步 ✅
+
+[Step 3] 非超管用户请求 → CasbinAuthorizationMiddleware
+         └→ Enforcer.EnforceAsync(sub, dom, obj, act)
+              ├─ g(r.sub, p.sub, r.dom) ← Step2 写入的 p 规则被匹配
+              └─ keyMatch2(r.obj, /api/app/template/import-templates) ✅
+```
+
+---
+
+## 九、`UserConst.AdminRolesCode` 与 `SuperAdminRoleCode` 配置化分析（2026-06-15 补充）
+
+### 9.1 问题背景
+
+`appsettings.json` 中配置了 `"SuperAdminRoleCode": "super-admin"`，但代码中所有超管角色判断均使用 `UserConst.AdminRolesCode = "admin"`（编译期常量），两者值不一致。用户提出：是否可以让 `UserConst.AdminRolesCode` 读取 `appsettings.json` 的 `SuperAdminRoleCode`，保证二者一致？
+
+### 9.2 技术分析：`const string` 不能读取配置
+
+`UserConst.AdminRolesCode` 声明为 `public const string`，这是 C# 编译期常量——值在编译时直接嵌入 IL 代码，**运行时无法修改**。因此"让 const 读取配置"在技术上是不可行的。
+
+### 9.3 当前架构：`CasbinOptions` 已绑定但 `SuperAdminRoleCode` 未被消费
+
+项目已有完整的配置基础设施但存在断链：
+
+| 组件 | 状态 | 详情 |
+|------|:----:|------|
+| `CasbinOptions.SuperAdminRoleCode` | ✅ 已定义 | `Domain.Shared/Options/CasbinOptions.cs:10`，默认值 `"admin"` |
+| `Configure<CasbinOptions>(config.GetSection("Casbin"))` | ✅ 已注册 | `Domain/SharpFortCasbinRbacDomainModule.cs:43` — 从 appsettings.json 绑定 |
+| `CasbinAuthorizationMiddleware` | ⚠️ 注入但未使用 | 注入了 `IOptions<CasbinOptions>` 但只读 `EnableDebugMode` 和 `IgnoreUrls` |
+| `MenuService` | ❌ 硬编码 `"admin"` | `MenuService.cs:199,233` — `UserConst.AdminRolesCode` |
+| `RoleService` | ❌ 硬编码 `"admin"` | `RoleService.cs:155,156,206,334` — `UserConst.AdminRolesCode` |
+| `UserManager` | ❌ 硬编码 `"admin"` | `UserManager.cs:276` — `UserConst.AdminRolesCode` |
+| `AccountManager` | ❌ 硬编码 `"admin"` | `AccountManager.cs:200` — `UserConst.AdminRolesCode` |
+| `SfCasbinRbacDbContext` | ❌ 硬编码 `"admin"` | `SfCasbinRbacDbContext.cs:46` — 数据过滤绕过 |
+
+**结论**：`appsettings.json` 的 `SuperAdminRoleCode` 配置是**死配置**——已被正确绑定到 `CasbinOptions` 对象，但全代码库没有任何地方读取 `CasbinOptions.SuperAdminRoleCode`。所有超管判断都绕过了配置，直接使用 `UserConst.AdminRolesCode = "admin"`。
+
+### 9.4 推荐的修复方案
+
+**方案：保留 `UserConst.AdminRolesCode` 作为默认值，服务层改用 `IOptions<CasbinOptions>`**
+
+```
+改造思路（非直接修改 UserConst）：
+┌─ UserConst.AdminRolesCode = "admin"        ← 保留，仅作默认回退值
+└─ 所有服务注入 IOptions<CasbinOptions>       ← 读取 SuperAdminRoleCode
+     └─ _adminRoleCode = options.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode
+```
+
+需要修改的位置（共 6 处，均在 DI 容器管理的服务中）：
+
+| # | 文件:行号 | 当前写法 | 改为 |
+|---|----------|---------|------|
+| 1 | `MenuService.cs:199,233` | `r.RoleCode == UserConst.AdminRolesCode` | 注入 `IOptions<CasbinOptions>`，读取 `SuperAdminRoleCode` |
+| 2 | `RoleService.cs:155,156,206,334` | `entity.RoleCode, UserConst.AdminRolesCode` | 同上 |
+| 3 | `UserManager.cs:276` | `UserConst.AdminRolesCode` | 同上 |
+| 4 | `AccountManager.cs:200` | `UserConst.AdminRolesCode` | 同上 |
+| 5 | `SfCasbinRbacDbContext.cs:46` | `UserConst.AdminRolesCode` | 同上 |
+| 6 | `CasbinAuthorizationMiddleware.cs:123` | (目前未使用超管快速路径) | 可选：注入 `SuperAdminRoleCode` 实现 Bypass |
+
+**优点**：
+- 不改动 `UserConst` 本身（Domain.Shared 层保持纯净无 DI 依赖）
+- 与现有 `CasbinOptions` 绑定无缝对接
+- 配置热重载（`IOptionsSnapshot<T>` 可实时读取最新配置）
+- 改动范围小：6 个文件，每个新增约 3 行代码
+
+**注意事项**：
+- `[Authorize(Roles = UserConst.AdminRolesCode)]` 类 Attribute 仍须使用 `const`，因为 Attribute 参数必须是编译期常量。Attribute 中的超管角色码可以保持 `"admin"` 作为编译期回退，或改用 Policy-based 授权
+- 部署时应确保 `appsettings.json` 的 `SuperAdminRoleCode` 与数据库中超管角色的 `RoleCode` 字段值一致
+
+### 9.5 新 Bug 发现：BUG-13.7 — `SuperAdminRoleCode` 配置是死配置
+
+| 维度 | 说明 |
+|------|------|
+| **位置** | `CasbinOptions.cs:10` — `SuperAdminRoleCode` 属性 |
+| **现象** | `appsettings.json` 中 `"SuperAdminRoleCode": "super-admin"` 配置已被绑定到 `CasbinOptions`，但全代码库无人读取 |
+| **根因** | 6 个服务/中间件全都绕过 `CasbinOptions`，直接使用 `UserConst.AdminRolesCode = "admin"` |
+| **影响** | 如果用户想将超管角色码从 `"admin"` 改为 `"super-admin"`（如多租户场景差异化），仅修改配置文件不会生效 |
+| **严重度** | MEDIUM — 单租户场景下通常不需要改超管角色码，但配置与行为不一致是隐患 |
+
+---
+
 *本报告基于对 24 个关键源文件的完整阅读和独立数据流追踪。所有证据均可通过文件路径和行号验证。*

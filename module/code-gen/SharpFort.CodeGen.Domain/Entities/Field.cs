@@ -7,7 +7,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace SharpFort.CodeGen.Domain.Entities;
 
 /// <summary>
-/// 实体字段定义实体 (YiField)
+/// 实体字段定义实体 (SfField)
 /// 领域定义：描述 C# Entity 类中的一个属性，用于代码生成时控制 DTO/Service 的字段输出
 /// 职责：存储字段结构信息 + UI 配置（IsQueryField/IsListDisplay/IsFormItem/HtmlType/OrderNum）
 /// </summary>

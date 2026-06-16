@@ -59,7 +59,7 @@ namespace SharpFort.CodeGen.Application.Services
 
 
         /// <summary>
-        /// 同步实体到注册表 (Code → Web)：反射扫描所有带 [SugarTable] 特性的 C# 实体类，增量合并到 YiTable 注册表
+        /// 同步实体到注册表 (Code → Web)：反射扫描所有带 [SugarTable] 特性的 C# 实体类，增量合并到 SfTable 注册表
         /// </summary>
         [UnitOfWork]
         public async Task PostCodeBuildWebAsync()
@@ -68,7 +68,7 @@ namespace SharpFort.CodeGen.Application.Services
         }
 
         /// <summary>
-        /// 手动刷新实体注册表：重新扫描所有实体类并增量同步到 YiTable，用于实体代码变更后立即更新注册表
+        /// 手动刷新实体注册表：重新扫描所有实体类并增量同步到 SfTable，用于实体代码变更后立即更新注册表
         /// </summary>
         [UnitOfWork]
         public async Task PostRefreshAsync()
