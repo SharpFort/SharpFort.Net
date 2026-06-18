@@ -46,7 +46,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 
             // F-10: 管理员跳过过滤 — 用户名和角色均使用严格 Ordinal 大小写敏感比较
             if (string.Equals(CurrentUser.UserName, UserConst.Admin, StringComparison.Ordinal)
-                || CurrentUser.Roles.Contains(AdminRoleCode))
+                || CurrentUser.Roles.Contains(AdminRoleCode, StringComparer.Ordinal))
             {
                 return;
             }

@@ -12,6 +12,7 @@ using SharpFort.CasbinRbac.Domain;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.Domain.Shared.Options;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Application
@@ -71,9 +72,11 @@ namespace SharpFort.CasbinRbac.Application
             {
                 var roleRepo = context.ServiceProvider.GetRequiredService<ISqlSugarRepository<Role, Guid>>();
                 var casbinPolicyManager = context.ServiceProvider.GetRequiredService<ICasbinPolicyManager>();
+                var casbinOptions = context.ServiceProvider.GetRequiredService<IOptions<CasbinOptions>>();
+                string adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
                 var adminRole = await roleRepo._DbQueryable
-                    .FirstAsync(r => r.RoleCode == UserConst.AdminRolesCode);
+                    .FirstAsync(r => r.RoleCode == adminRoleCode);
                 if (adminRole != null)
                 {
                     await casbinPolicyManager.InitAdminPermissionAsync(adminRole);

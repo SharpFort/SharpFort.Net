@@ -127,6 +127,10 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
                 var userRoles = _enforcer.GetRolesForUser(sub, dom);
                 if (userRoles.Contains(adminRoleCode))
                 {
+                    if (_options.EnableDebugMode)
+                    {
+                        context.Response.Headers["X-Casbin-AdminBypass"] = "true";
+                    }
                     await next(context);
                     return;
                 }

@@ -366,7 +366,9 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             if (affectedRoleIds.Count > 0)
             {
-                List<Role> roles = await _roleRepository.GetListAsync(x => affectedRoleIds.Contains(x.Id));
+                // F-05: 纵深防御 — 排除超管角色
+                List<Role> roles = await _roleRepository.GetListAsync(
+                    x => affectedRoleIds.Contains(x.Id) && x.RoleCode != _adminRoleCode);
 
                 var roleMenuMappings = await _roleMenuRepository._DbQueryable
                     .Where(x => affectedRoleIds.Contains(x.RoleId))
