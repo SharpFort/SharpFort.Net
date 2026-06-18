@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SqlSugar;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
@@ -8,6 +9,7 @@ using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Extensions;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
+using SharpFort.CasbinRbac.Domain.Shared.Options;
 using SharpFort.SqlSugarCore;
 using SharpFort.CasbinRbac.Domain.Shared.Model;
 
@@ -22,6 +24,7 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
 
         protected IDataFilter DataFilter => LazyServiceProvider.LazyGetRequiredService<IDataFilter>();
         protected ICurrentUser CurrentUser => LazyServiceProvider.GetRequiredService<ICurrentUser>();
+        protected string AdminRoleCode => LazyServiceProvider.GetRequiredService<IOptions<CasbinOptions>>().Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
         protected override void CustomDataFilter(ISqlSugarClient sqlSugarClient)
         {
@@ -41,9 +44,9 @@ namespace SharpFort.CasbinRbac.SqlSugarCore
                 return;
             }
 
-            // R-10: 管理员跳过过滤（大小写不敏感判定）
-            if (string.Equals(CurrentUser.UserName, UserConst.Admin, StringComparison.OrdinalIgnoreCase)
-                || CurrentUser.Roles.Contains(UserConst.AdminRolesCode))
+            // F-10: 管理员跳过过滤 — 用户名和角色均使用严格 Ordinal 大小写敏感比较
+            if (string.Equals(CurrentUser.UserName, UserConst.Admin, StringComparison.Ordinal)
+                || CurrentUser.Roles.Contains(AdminRoleCode))
             {
                 return;
             }

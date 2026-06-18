@@ -3,6 +3,7 @@ using System.Globalization;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using SqlSugar;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
@@ -15,6 +16,7 @@ using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.CasbinRbac.Domain.Shared.Enums;
+using SharpFort.CasbinRbac.Domain.Shared.Options;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Application.Services.System
@@ -30,6 +32,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         private readonly ISqlSugarRepository<Menu, Guid> _menuRepository;
         private readonly ICasbinPolicyManager _casbinPolicyManager;
         private readonly ISqlSugarRepository<User, Guid> _userRepository;
+        private readonly string _adminRoleCode;
 
         public RoleService(RoleManager roleManager, ISqlSugarRepository<RoleDepartment> roleDeptRepository,
             ISqlSugarRepository<UserRole> userRoleRepository,
@@ -38,9 +41,11 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             ISqlSugarRepository<Menu, Guid> menuRepository,
             ICasbinPolicyManager casbinPolicyManager,
             ISqlSugarRepository<User, Guid> userRepository,
-            IDistributedCache distributedCache) : base(repository)
+            IDistributedCache distributedCache,
+            IOptions<CasbinOptions> casbinOptions) : base(repository)
         {
             _distributedCache = distributedCache;
+            _adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? _adminRoleCode;
             (_roleManager, _roleDeptRepository, _userRoleRepository, _repository, _enforcer, _menuRepository, _casbinPolicyManager, _userRepository) =
                 (roleManager, roleDeptRepository, userRoleRepository, repository, enforcer, menuRepository, casbinPolicyManager, userRepository);
         }
@@ -152,8 +157,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             Role entity = await _repository.GetByIdAsync(id);
 
             // MISSING-04: 保护超级管理员角色编码不被修改
-            if (string.Equals(entity.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(input.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(entity.RoleCode, _adminRoleCode, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(input.RoleCode, _adminRoleCode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new UserFriendlyException("超级管理员角色编码不允许修改");
             }
@@ -203,7 +208,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             Role entity = await _repository.GetByIdAsync(id) ?? throw new UserFriendlyException("角色未存在");
 
             // QA5-CRITICAL-02: 禁止禁用超级管理员角色
-            if (!state && string.Equals(entity.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase))
+            if (!state && string.Equals(entity.RoleCode, _adminRoleCode, StringComparison.OrdinalIgnoreCase))
             {
                 throw new UserFriendlyException("超级管理员角色不允许禁用");
             }
@@ -331,7 +336,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             List<Role> roles = await _repository.GetListAsync(x => ids.Contains(x.Id));
 
             // QA5-CRITICAL-02: 禁止删除超级管理员角色
-            if (roles.Any(r => string.Equals(r.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase)))
+            if (roles.Any(r => string.Equals(r.RoleCode, _adminRoleCode, StringComparison.OrdinalIgnoreCase)))
             {
                 throw new UserFriendlyException("超级管理员角色不允许删除");
             }

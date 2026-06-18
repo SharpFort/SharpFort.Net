@@ -1,18 +1,20 @@
 using System.Text.Json;
 using SqlSugar;
 using System.Globalization;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts.Dtos.Menu;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
 using SharpFort.CasbinRbac.Domain.Entities;
 using SharpFort.CasbinRbac.Domain.Managers;
-using SharpFort.SqlSugarCore.Abstractions;
-using Microsoft.Extensions.Caching.Distributed;
-using Volo.Abp;
-using Volo.Abp.Domain.Entities;
-using SharpFort.CasbinRbac.Domain.Shared.Enums;
 using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.Domain.Shared.Enums;
+using SharpFort.CasbinRbac.Domain.Shared.Options;
+using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Application.Services.System
 {
@@ -21,7 +23,8 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         ISqlSugarRepository<RoleMenu> roleMenuRepository,
         ICasbinPolicyManager casbinPolicyManager,
         ISqlSugarRepository<Role, Guid> roleRepository,
-        IDistributedCache distributedCache) // ABP 统一缓存抽象，支持 MemoryCache 和 Redis 自由切换
+        IDistributedCache distributedCache, // ABP 统一缓存抽象，支持 MemoryCache 和 Redis 自由切换
+        IOptions<CasbinOptions> casbinOptions)
         : SfCrudAppService<Menu, MenuGetOutputDto, MenuGetListOutputDto, Guid, MenuGetListInputVo, MenuCreateInputVo, MenuUpdateInputVo>(repository),
           IMenuService
     {
@@ -30,6 +33,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
         private readonly ISqlSugarRepository<Role, Guid> _roleRepository = roleRepository;
         private readonly IDistributedCache _distributedCache = distributedCache;
+        private readonly string _adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -62,6 +66,36 @@ namespace SharpFort.CasbinRbac.Application.Services.System
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
         };
+
+        /// <summary>
+        /// F-11: ABP 风格 ApiUrl 校验 — 验证 URL 是否符合 ABP Auto API 路由约定
+        /// 校验失败抛出 UserFriendlyException，确保 Casbin keyMatch2 能正确匹配
+        /// </summary>
+        private static void ValidateApiUrl(string? apiUrl)
+        {
+            if (string.IsNullOrWhiteSpace(apiUrl)) return;
+
+            // 1. ABP Auto API 路由固定以 /api/app/ 开头
+            if (!apiUrl.StartsWith("/api/", StringComparison.Ordinal))
+            {
+                throw new UserFriendlyException(
+                    $"ApiUrl 必须以 /api/ 开头（ABP Auto API 路由约定），当前值: {apiUrl}");
+            }
+
+            // 2. URL 必须全部小写（Casbin keyMatch2 大小写敏感，ABP 约定自动转 kebab-case 小写）
+            if (apiUrl.Any(char.IsUpper))
+            {
+                throw new UserFriendlyException(
+                    $"ApiUrl 必须全部小写（ABP 约定 + Casbin 大小写敏感），当前值: {apiUrl}");
+            }
+
+            // 3. 不支持 {param} 格式（keyMatch2 使用 :param 语法）
+            if (apiUrl.Contains('{'))
+            {
+                throw new UserFriendlyException(
+                    $"ApiUrl 不支持 {{param}} 格式，请使用 :param 或 * 通配符。示例: /api/app/user/:id");
+            }
+        }
 
         private async Task<T?> GetFromCacheAsync<T>(string key)
         {
@@ -178,10 +212,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             if (!string.IsNullOrWhiteSpace(input.ApiUrl))
             {
-                if (input.ApiUrl.Contains('{'))
-                {
-                    throw new UserFriendlyException("ApiUrl 不支持 {param} 格式，请使用 :param 或 * 通配符。示例：/api/app/user/:id");
-                }
+                ValidateApiUrl(input.ApiUrl);
                 input.ApiUrl = input.ApiUrl.ToLowerInvariant();
             }
 
@@ -196,7 +227,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
             if (associateAdminRole)
             {
                 Role? adminRole = await _roleRepository.GetFirstAsync(
-                    r => r.RoleCode == UserConst.AdminRolesCode);
+                    r => r.RoleCode == _adminRoleCode);
                 if (adminRole != null)
                 {
                     await _roleMenuRepository.InsertAsync(
@@ -230,7 +261,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
                 if (newMenuIds.Count > 0)
                 {
                     Role? adminRole = await _roleRepository.GetFirstAsync(
-                        r => r.RoleCode == UserConst.AdminRolesCode);
+                        r => r.RoleCode == _adminRoleCode);
                     if (adminRole != null)
                     {
                         List<RoleMenu> roleMenus = newMenuIds
@@ -256,10 +287,7 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
             if (!string.IsNullOrWhiteSpace(input.ApiUrl))
             {
-                if (input.ApiUrl.Contains('{'))
-                {
-                    throw new UserFriendlyException("ApiUrl 不支持 {param} 格式，请使用 :param 或 * 通配符。示例：/api/app/user/:id");
-                }
+                ValidateApiUrl(input.ApiUrl);
                 input.ApiUrl = input.ApiUrl.ToLowerInvariant();
             }
 
@@ -290,7 +318,9 @@ namespace SharpFort.CasbinRbac.Application.Services.System
 
                 if (roleIds.Count > 0)
                 {
-                    List<Role> roles = await _roleRepository.GetListAsync(x => roleIds.Contains(x.Id));
+                    // F-05: 纵深防御 — 排除超管角色（超管由 *,* 覆盖，不应参与逐菜单 Casbin 同步）
+                    List<Role> roles = await _roleRepository.GetListAsync(
+                        x => roleIds.Contains(x.Id) && x.RoleCode != _adminRoleCode);
 
                     var roleMenuMappings = await _roleMenuRepository._DbQueryable
                         .Where(x => roleIds.Contains(x.RoleId))

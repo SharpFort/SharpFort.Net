@@ -1,14 +1,18 @@
 using Lazy.Captcha.Core.Generator;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
+using Volo.Abp;
+using Volo.Abp.Modularity;
 using SharpFort.Ddd.Application;
 using SharpFort.CasbinRbac.Application.Contracts;
-using SharpFort.CasbinRbac.Domain;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Volo.Abp.Modularity;
-using Volo.Abp;
 using SharpFort.CasbinRbac.Application.Contracts.IServices;
-using Microsoft.Extensions.Logging;
+using SharpFort.CasbinRbac.Domain;
+using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Managers;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Application
 {
@@ -62,6 +66,25 @@ namespace SharpFort.CasbinRbac.Application
 
         public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
         {
+            // F-01: 确保超管 *,* 通配符策略存在 — 在缓存预热之前执行
+            try
+            {
+                var roleRepo = context.ServiceProvider.GetRequiredService<ISqlSugarRepository<Role, Guid>>();
+                var casbinPolicyManager = context.ServiceProvider.GetRequiredService<ICasbinPolicyManager>();
+
+                var adminRole = await roleRepo._DbQueryable
+                    .FirstAsync(r => r.RoleCode == UserConst.AdminRolesCode);
+                if (adminRole != null)
+                {
+                    await casbinPolicyManager.InitAdminPermissionAsync(adminRole);
+                }
+            }
+            catch (Exception ex)
+            {
+                ILogger<SharpFortCasbinRbacApplicationModule>? logger = context.ServiceProvider.GetService<ILogger<SharpFortCasbinRbacApplicationModule>>();
+                logger?.LogWarning(ex, "超管 Casbin 权限初始化失败（可能是数据库未就绪），将在首次策略检查时使用备用路径");
+            }
+
             // M-1 修复：包装启动预热流程。应用"最佳实践"式异常防线，如果 DB 暂未就绪只打印警告，绝不中断正常启动进程
             try
             {

@@ -1,5 +1,8 @@
 using Volo.Abp.Domain.Services;
+using Microsoft.Extensions.Options;
 using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.Domain.Shared.Options;
 using SharpFort.SqlSugarCore.Abstractions;
 
 namespace SharpFort.CasbinRbac.Domain.Managers
@@ -8,12 +11,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         ISqlSugarRepository<Role> repository,
         ISqlSugarRepository<RoleMenu> roleMenuRepository,
         ISqlSugarRepository<Menu> menuRepository,
-        ICasbinPolicyManager casbinPolicyManager) : DomainService
+        ICasbinPolicyManager casbinPolicyManager,
+        IOptions<CasbinOptions> casbinOptions) : DomainService
     {
         private readonly ISqlSugarRepository<Role> _repository = repository;
         private readonly ISqlSugarRepository<RoleMenu> _roleMenuRepository = roleMenuRepository;
         private readonly ISqlSugarRepository<Menu> _menuRepository = menuRepository;
         private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
+        private readonly string _adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
         /// <summary>
         /// 给角色设置菜单
@@ -42,7 +47,9 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
             // 2. Casbin 策略同步
             // 获取所有涉及的角色实体和菜单实体
-            List<Role> roles = await _repository.GetListAsync(r => roleIds.Contains(r.Id));
+            // F-05: 纵深防御 — 排除超管角色（超管由 *,* 覆盖）
+            List<Role> roles = await _repository.GetListAsync(
+                r => roleIds.Contains(r.Id) && r.RoleCode != _adminRoleCode);
             // 获取选中的菜单实体（包含 ApiUrl）
             List<Menu> menus = await _menuRepository.GetListAsync(m => menuIds.Contains(m.Id));
 

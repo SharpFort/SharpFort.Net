@@ -28,7 +28,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         IUserRepository userRepository,
         ILocalEventBus localEventBus,
         ISqlSugarRepository<Role> roleRepository,
-        ICasbinPolicyManager casbinPolicyManager) : DomainService
+        ICasbinPolicyManager casbinPolicyManager,
+        IOptions<CasbinOptions> casbinOptions) : DomainService
     {
         private readonly ISqlSugarRepository<User> _repository = repository;
         private readonly ISqlSugarRepository<UserRole> _repositoryUserRole = repositoryUserRole;
@@ -39,6 +40,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ILocalEventBus _localEventBus = localEventBus;
         private readonly ICasbinPolicyManager _casbinPolicyManager = casbinPolicyManager;
+        private readonly string _adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
         /// <summary>
         /// 给用户设置角色
@@ -260,7 +262,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             return result;
         }
 
-        private static UserRoleMenuDto EntityMapToDto(User user)
+        private UserRoleMenuDto EntityMapToDto(User user)
         {
             UserRoleMenuDto userRoleMenu = new();
             if (user is null)
@@ -273,7 +275,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             {
                 userRoleMenu.User = user.Adapt<UserDto>();
                 userRoleMenu.User.Password = string.Empty;
-                userRoleMenu.RoleCodes.Add(UserConst.AdminRolesCode);
+                userRoleMenu.RoleCodes.Add(_adminRoleCode);
                 userRoleMenu.PermissionCodes.Add(UserConst.AdminPermissionCode);
                 return userRoleMenu;
             }

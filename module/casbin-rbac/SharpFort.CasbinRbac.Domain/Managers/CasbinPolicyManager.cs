@@ -1,8 +1,11 @@
 using Casbin;
+using Microsoft.Extensions.Options;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Uow;
 using Volo.Abp.MultiTenancy;
 using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
+using SharpFort.CasbinRbac.Domain.Shared.Options;
 using SharpFort.SqlSugarCore.Abstractions;
 using Casbin.Adapter.SqlSugar.Entities;
 
@@ -13,12 +16,14 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         IEnforcer enforcer,
         IUnitOfWorkManager unitOfWorkManager,
         ISqlSugarRepository<Role> roleRepository,
-        ICurrentTenant currentTenant) : DomainService, ICasbinPolicyManager
+        ICurrentTenant currentTenant,
+        IOptions<CasbinOptions> casbinOptions) : DomainService, ICasbinPolicyManager
     {
         private readonly IEnforcer _enforcer = enforcer;
         private readonly IUnitOfWorkManager _unitOfWorkManager = unitOfWorkManager;
         private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
         private readonly ICurrentTenant _currentTenant = currentTenant;
+        private readonly string _adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
         // 全局写操作互斥锁，消除并发写 Enforcer 内存竞态 (R-02)
         private static readonly SemaphoreSlim _writeLock = new(1, 1);
@@ -158,6 +163,13 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         public async Task SetRolePermissionsAsync(Role role, List<Menu> menus)
         {
+            // P1/F-03: 超管保护 — 直接跳过，保持 *,* 通配符不变
+            // 超管的权限由 InitAdminPermissionAsync 管理，不应被菜单分配覆盖
+            if (string.Equals(role.RoleCode, _adminRoleCode, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
             string roleSub = GetRoleSubject(role.RoleCode!);
             string domain = GetTenantDomain(role.TenantId);
 
@@ -203,6 +215,11 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             else { await SyncOrFallback(syncAction); }
         }
 
+        /// <summary>
+        /// 初始化超管通配符策略 p, &lt;adminRoleCode&gt;, &lt;domain&gt;, *, *
+        /// 多租户场景：每个租户各自拥有独立的 admin 角色，方法为 adminRole 所属的 domain 创建 *,*
+        /// 如果是全局跨租户 admin，调用方需遍历所有 domain 分别调用
+        /// </summary>
         public async Task InitAdminPermissionAsync(Role adminRole)
         {
             string roleSub = GetRoleSubject(adminRole.RoleCode!);

@@ -27,7 +27,8 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             , UserManager userManager
             , IOptions<RefreshJwtOptions> refreshJwtOptions
             , ISqlSugarRepository<Role> roleRepository
-            , IOptions<RbacOptions> options) : DomainService, IAccountManager
+            , IOptions<RbacOptions> options
+            , IOptions<CasbinOptions> casbinOptions) : DomainService, IAccountManager
     {
         private readonly IUserRepository _repository = repository;
         private readonly ILocalEventBus _localEventBus = localEventBus;
@@ -36,6 +37,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         private readonly UserManager _userManager = userManager;
         private readonly ISqlSugarRepository<Role> _roleRepository = roleRepository;
         private readonly RefreshJwtOptions _refreshJwtOptions = refreshJwtOptions.Value;
+        private readonly string _adminRoleCode = casbinOptions.Value.SuperAdminRoleCode ?? UserConst.AdminRolesCode;
 
         /// <summary>
         /// 根据用户id获取token
@@ -173,7 +175,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
         /// <param name="dto"></param>
         /// <returns></returns>
 
-        public static List<KeyValuePair<string, string>> UserInfoToClaim(UserRoleMenuDto dto)
+        public List<KeyValuePair<string, string>> UserInfoToClaim(UserRoleMenuDto dto)
         {
             List<KeyValuePair<string, string>> claims = [];
             AddToClaim(claims, AbpClaimTypes.UserId, dto.User.Id.ToString());
@@ -197,7 +199,7 @@ namespace SharpFort.CasbinRbac.Domain.Managers
             if (UserConst.Admin.Equals(dto.User.UserName, StringComparison.Ordinal))
             {
                 AddToClaim(claims, TokenTypeConst.Permission, UserConst.AdminPermissionCode);
-                AddToClaim(claims, TokenTypeConst.Roles, UserConst.AdminRolesCode);
+                AddToClaim(claims, TokenTypeConst.Roles, _adminRoleCode);
             }
             else
             {

@@ -119,7 +119,20 @@ namespace SharpFort.CasbinRbac.Domain.Authorization
             // 5. Action (act)
             string act = context.Request.Method.ToUpperInvariant();
 
-            // 6. Enforce
+            // 6. F-08: 超管快速路径 — 即使 *,* 策略丢失也能保证 admin 不被锁死
+            // 这是策略层的应急备份，与 casbin_rule 中的 *,* 职责互补
+            string? adminRoleCode = _options.SuperAdminRoleCode;
+            if (!string.IsNullOrEmpty(adminRoleCode))
+            {
+                var userRoles = _enforcer.GetRolesForUser(sub, dom);
+                if (userRoles.Contains(adminRoleCode))
+                {
+                    await next(context);
+                    return;
+                }
+            }
+
+            // 7. Enforce
             bool allowed = await _enforcer.EnforceAsync(sub, dom, obj, act);
 
             // Debug headers

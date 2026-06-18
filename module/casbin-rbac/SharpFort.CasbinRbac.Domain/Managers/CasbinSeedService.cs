@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SqlSugar;
 using Volo.Abp.Domain.Services;
 using SharpFort.CasbinRbac.Domain.Entities;
+using SharpFort.CasbinRbac.Domain.Shared.Consts;
 using SharpFort.SqlSugarCore.Abstractions;
 using System.Text;
 using Volo.Abp.Uow;
@@ -353,6 +354,34 @@ namespace SharpFort.CasbinRbac.Domain.Managers
                 throw;
             }
 
+            // ========== PHASE 4.5: RESTORE ADMIN *,* WILDCARD ==========
+            // F-02: 全量迁移不会从 RoleMenu 生成 *,*，需要在重建后重新写入 admin 通配符
+            LogRestoringAdminWildcard();
+            var adminRoleData = roleData.FirstOrDefault(r =>
+                string.Equals(r.RoleCode, UserConst.AdminRolesCode, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(adminRoleData.RoleCode))
+            {
+                try
+                {
+                    // 使用 _roleRepo._Db 获取真实的 Role 实体（RoleCode/TenantId 是 protected set）
+                    Role? adminRole = await _roleRepo._Db.Queryable<Role>()
+                        .FirstAsync(r => r.RoleCode == adminRoleData.RoleCode);
+                    if (adminRole != null)
+                    {
+                        await _casbinPolicyManager.InitAdminPermissionAsync(adminRole);
+                        LogAdminWildcardRestored(adminRoleData.RoleCode, adminRoleData.TenantId?.ToString() ?? "default");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogAdminWildcardRestoreFailed(ex);
+                }
+            }
+            else
+            {
+                LogAdminRoleNotFound();
+            }
+
             totalSw.Stop();
             LogMigrationCompleted(totalSw.ElapsedMilliseconds);
         }
@@ -511,6 +540,19 @@ namespace SharpFort.CasbinRbac.Domain.Managers
 
         [LoggerMessage(EventId = 53, Level = LogLevel.Error, Message = "[PHASE 4] Failed to reload Casbin Enforcer")]
         private partial void LogReloadFailed(Exception ex);
+
+        // Phase 4.5 — Admin wildcard restore (F-02)
+        [LoggerMessage(EventId = 54, Level = LogLevel.Information, Message = "[PHASE 4.5] Restoring admin *,* wildcard...")]
+        private partial void LogRestoringAdminWildcard();
+
+        [LoggerMessage(EventId = 55, Level = LogLevel.Information, Message = "[PHASE 4.5] Admin *,* wildcard restored for role '{RoleCode}' (domain: {Domain})")]
+        private partial void LogAdminWildcardRestored(string roleCode, string domain);
+
+        [LoggerMessage(EventId = 56, Level = LogLevel.Warning, Message = "[PHASE 4.5] Admin role not found in roleData — *,* wildcard NOT restored!")]
+        private partial void LogAdminRoleNotFound();
+
+        [LoggerMessage(EventId = 57, Level = LogLevel.Error, Message = "[PHASE 4.5] Failed to restore admin *,* wildcard")]
+        private partial void LogAdminWildcardRestoreFailed(Exception ex);
 
         #endregion
     }
